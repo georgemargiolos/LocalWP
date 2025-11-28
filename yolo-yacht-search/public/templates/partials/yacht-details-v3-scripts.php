@@ -34,30 +34,77 @@ const yachtCarousel = {
     }
 };
 
-// Price Carousel
+// Price Carousel - Show 4 weeks at a time
 const priceCarousel = {
-    currentSlide: 0,
+    currentIndex: 0,
+    visibleSlides: 4,
     slides: document.querySelectorAll('.price-slide'),
+    container: document.querySelector('.price-carousel-slides'),
     
-    goTo: function(index) {
+    init: function() {
+        this.updateView();
+    },
+    
+    updateView: function() {
         if (this.slides.length === 0) return;
-        this.slides[this.currentSlide].classList.remove('active');
-        this.currentSlide = index;
-        this.slides[this.currentSlide].classList.add('active');
+        
+        // Hide all slides
+        this.slides.forEach(slide => {
+            slide.style.display = 'none';
+            slide.classList.remove('active');
+        });
+        
+        // Show 4 slides starting from currentIndex
+        for (let i = 0; i < this.visibleSlides && (this.currentIndex + i) < this.slides.length; i++) {
+            this.slides[this.currentIndex + i].style.display = 'block';
+            if (i === 0) {
+                this.slides[this.currentIndex + i].classList.add('active');
+            }
+        }
+        
+        // Update arrow visibility
+        this.updateArrows();
+    },
+    
+    updateArrows: function() {
+        const prevBtn = document.querySelector('.price-carousel-prev');
+        const nextBtn = document.querySelector('.price-carousel-next');
+        
+        if (prevBtn) {
+            prevBtn.style.opacity = this.currentIndex > 0 ? '1' : '0.3';
+            prevBtn.style.cursor = this.currentIndex > 0 ? 'pointer' : 'not-allowed';
+        }
+        
+        if (nextBtn) {
+            const hasMore = (this.currentIndex + this.visibleSlides) < this.slides.length;
+            nextBtn.style.opacity = hasMore ? '1' : '0.3';
+            nextBtn.style.cursor = hasMore ? 'pointer' : 'not-allowed';
+        }
     },
     
     next: function() {
         if (this.slides.length === 0) return;
-        const nextIndex = (this.currentSlide + 1) % this.slides.length;
-        this.goTo(nextIndex);
+        if ((this.currentIndex + this.visibleSlides) < this.slides.length) {
+            this.currentIndex += this.visibleSlides;
+            this.updateView();
+        }
     },
     
     prev: function() {
         if (this.slides.length === 0) return;
-        const prevIndex = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-        this.goTo(prevIndex);
+        if (this.currentIndex > 0) {
+            this.currentIndex = Math.max(0, this.currentIndex - this.visibleSlides);
+            this.updateView();
+        }
     }
 };
+
+// Initialize price carousel on load
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.price-carousel-slides')) {
+        priceCarousel.init();
+    }
+});
 
 // Select Week Function
 function selectWeek(button) {

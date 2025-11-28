@@ -168,68 +168,93 @@
 }
 
 .price-carousel-slides {
-    position: relative;
-    min-height: 280px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    min-height: 200px;
+    padding: 0 40px; /* Space for arrows */
+}
+
+@media (max-width: 968px) {
+    .price-carousel-slides {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .price-carousel-slides {
+        grid-template-columns: 1fr;
+    }
 }
 
 .price-slide {
     display: none;
     text-align: center;
-    padding: 20px;
+    padding: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s;
+}
+
+.price-slide:hover {
+    border-color: #1e3a8a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .price-slide.active {
     display: block;
+    border-color: #1e3a8a;
 }
 
 .price-week {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .price-product {
-    font-size: 14px;
+    font-size: 11px;
     color: #6b7280;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
 }
 
 .price-original {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .strikethrough {
     text-decoration: line-through;
     color: #9ca3af;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .price-discount-badge {
     background: #fef3c7;
     color: #92400e;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
     display: inline-block;
 }
 
 .price-final {
-    font-size: 32px;
+    font-size: 20px;
     font-weight: 700;
     color: #059669;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .price-select-btn {
-    background: #6b7280;
+    background: #1e3a8a;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 12px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
@@ -237,7 +262,7 @@
 }
 
 .price-select-btn:hover {
-    background: #4b5563;
+    background: #1e40af;
 }
 
 .price-carousel-prev,

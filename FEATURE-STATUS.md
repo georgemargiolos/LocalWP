@@ -1,6 +1,14 @@
 # YOLO Yacht Search Plugin - Feature Status
 
-## 🚨 LATEST UPDATE: v1.5.4 (November 28, 2025)
+## 🚨 LATEST UPDATE: v1.5.5 (November 28, 2025)
+
+### UI/UX Enhancement: Price Carousel Redesign
+**What's New:** Price carousel now shows only May-September in 4-week grid layout  
+**Benefits:** Better visual comparison, faster navigation, focused on peak season  
+**Design:** Matches industry standard (Boataround.com style)  
+**Status:** ✅ IMPLEMENTED in v1.5.5
+
+### Previous Update: v1.5.4 (November 28, 2025)
 
 ### Performance Fix: Reduced Price Sync Period
 **Problem:** v1.5.3 sync still slow (2-5 minutes) even with `companyId` fix  

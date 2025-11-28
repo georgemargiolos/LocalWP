@@ -29,8 +29,18 @@ $images = $wpdb->get_results($wpdb->prepare(
     $yacht_id
 ));
 
-// Get prices
-$prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
+// Get prices - filter for peak season (May-September) only
+$all_prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
+$prices = array();
+if (!empty($all_prices)) {
+    foreach ($all_prices as $price) {
+        $month = (int)date('n', strtotime($price->date_from)); // 1-12
+        // Only include May (5), June (6), July (7), August (8), September (9)
+        if ($month >= 5 && $month <= 9) {
+            $prices[] = $price;
+        }
+    }
+}
 
 // Get equipment
 $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
@@ -104,9 +114,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         
         <!-- Weekly Price Carousel + Booking Section -->
         <div class="yacht-booking-section">
-            <h3>Weekly Prices</h3>
+            <h3>Availability & Pricing</h3>
             <?php if (!empty($prices)): ?>
-                <div class="price-carousel-container">
+                <div class="price-carousel-container" data-visible-slides="4">
                     <div class="price-carousel-slides">
                         <?php foreach ($prices as $index => $price): 
                             $discount_amount = $price->start_price - $price->price;
