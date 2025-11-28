@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function() {
-                $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> Failed to sync prices. Please try again.</p></div>');
+                $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> Failed to sync offers. Please try again.</p></div>');
             },
             complete: function() {
                 $button.prop('disabled', false);

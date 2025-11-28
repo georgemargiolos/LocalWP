@@ -139,7 +139,22 @@ class YOLO_YS_Booking_Manager_API {
         $url = $this->base_url . $endpoint;
         
         if (!empty($params)) {
-            $url .= '?' . http_build_query($params);
+            // Custom query encoding to handle arrays properly
+            // Booking Manager API expects repeated parameters (companyId=1&companyId=2)
+            // not bracketed arrays (companyId[0]=1&companyId[1]=2)
+            $query_parts = array();
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    // For arrays, add repeated parameters
+                    foreach ($value as $item) {
+                        $query_parts[] = urlencode($key) . '=' . urlencode($item);
+                    }
+                } else {
+                    // For scalars, add single parameter
+                    $query_parts[] = urlencode($key) . '=' . urlencode($value);
+                }
+            }
+            $url .= '?' . implode('&', $query_parts);
         }
         
         $args = array(

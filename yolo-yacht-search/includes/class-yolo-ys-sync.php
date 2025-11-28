@@ -100,6 +100,8 @@ class YOLO_YS_Sync {
             'success' => false,
             'message' => '',
             'offers_synced' => 0,
+            'yachts_with_offers' => 0,
+            'year' => $year,
             'errors' => array()
         );
         
@@ -126,62 +128,76 @@ class YOLO_YS_Sync {
         $dateFrom = "{$year}-01-01T00:00:00";
         $dateTo = "{$year}-12-31T23:59:59";
         
-        try {
-            // Call /offers endpoint with ALL companies at once
-            // flexibility=6 means "in year" - returns all available Saturday departures
-            // tripDuration=7 means weekly charters (Saturday to Saturday)
-            $offers = $this->api->get_offers(array(
-                'companyId' => $all_companies,  // Array of all company IDs
-                'dateFrom' => $dateFrom,
-                'dateTo' => $dateTo,
-                'tripDuration' => 7,            // Weekly charters
-                'flexibility' => 6,             // In year (all Saturday departures)
-                'productName' => 'bareboat'     // Focus on bareboat charters
-            ));
+        // Get yacht-to-company mapping from database
+        global $wpdb;
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Track unique yachts with offers
+        $yachtOffersMap = array();
+        
+        // Call API once per company to avoid HTTP 500 error
+        // The API fails when multiple companies are passed with array syntax companyId[0]=...
+        foreach ($all_companies as $company_id) {
+            if (empty($company_id)) continue;
             
-            // Validate response is an array
-            if (!is_array($offers)) {
-                $results['errors'][] = "Unexpected response format from /offers endpoint";
-                error_log('YOLO YS: Unexpected offers response: ' . print_r($offers, true));
-                $results['message'] = 'Failed to sync offers: Unexpected API response';
-                return $results;
-            }
-            
-            // Get yacht-to-company mapping from database
-            global $wpdb;
-            $yachts_table = $wpdb->prefix . 'yolo_yachts';
-            
-            // Store each offer in database
-            foreach ($offers as $offer) {
-                // Determine company ID from yacht ID
-                $company_id = null;
-                if (isset($offer['yachtId'])) {
-                    $yacht = $wpdb->get_row($wpdb->prepare(
-                        "SELECT company_id FROM $yachts_table WHERE id = %s",
-                        $offer['yachtId']
-                    ));
-                    if ($yacht) {
-                        $company_id = $yacht->company_id;
-                    }
+            try {
+                error_log('YOLO YS: Fetching offers for company ' . $company_id . ' for year ' . $year);
+                
+                // Call /offers endpoint for this company
+                // flexibility=6 means "in year" - returns all available Saturday departures
+                // tripDuration=7 means weekly charters (Saturday to Saturday)
+                $offers = $this->api->get_offers(array(
+                    'companyId' => array($company_id),  // Single company as array
+                    'dateFrom' => $dateFrom,
+                    'dateTo' => $dateTo,
+                    'tripDuration' => array(7),         // Weekly charters
+                    'flexibility' => 6,                 // In year (all Saturday departures)
+                    'productName' => 'bareboat'         // Focus on bareboat charters
+                ));
+                
+                // Validate response is an array
+                if (!is_array($offers)) {
+                    $error_msg = "Company $company_id: Unexpected response format";
+                    $results['errors'][] = $error_msg;
+                    error_log('YOLO YS: ' . $error_msg);
+                    continue;
                 }
                 
-                // Store offer
-                YOLO_YS_Database_Prices::store_offer($offer, $company_id);
-                $results['offers_synced']++;
+                // Store each offer in database
+                foreach ($offers as $offer) {
+                    // Track yacht
+                    if (isset($offer['yachtId'])) {
+                        $yachtOffersMap[$offer['yachtId']] = true;
+                    }
+                    
+                    // Store offer with company ID
+                    YOLO_YS_Database_Prices::store_offer($offer, $company_id);
+                    $results['offers_synced']++;
+                }
+                
+                error_log('YOLO YS: Stored ' . count($offers) . ' offers for company ' . $company_id);
+                
+            } catch (Exception $e) {
+                $error_msg = 'Company ' . $company_id . ': ' . $e->getMessage();
+                $results['errors'][] = $error_msg;
+                error_log('YOLO YS: Failed to sync offers - ' . $error_msg);
             }
-            
+        }
+        
+        // Calculate yachts with offers
+        $results['yachts_with_offers'] = count($yachtOffersMap);
+        
+        if ($results['offers_synced'] > 0) {
             $results['success'] = true;
             $results['message'] = sprintf(
-                'Successfully synced %d weekly offers for year %d (%d companies)',
+                'Successfully synced %d weekly offers for year %d (%d companies, %d yachts)',
                 $results['offers_synced'],
                 $year,
-                count($all_companies)
+                count($all_companies),
+                $results['yachts_with_offers']
             );
-            
-        } catch (Exception $e) {
-            $results['errors'][] = $e->getMessage();
-            $results['message'] = 'Failed to sync offers: ' . $e->getMessage();
-            error_log('YOLO YS: Failed to sync offers: ' . $e->getMessage());
+        } else {
+            $results['message'] = 'No offers were synced. Check errors.';
         }
         
         // Delete old offers (older than 60 days in the past)
@@ -202,7 +218,7 @@ class YOLO_YS_Sync {
     public function get_sync_status() {
         $stats = $this->db->get_sync_stats();
         $last_sync = get_option('yolo_ys_last_sync', null);
-        $last_price_sync = get_option('yolo_ys_last_price_sync', null);
+        $last_offer_sync = get_option('yolo_ys_last_offer_sync', null);
         
         return array(
             'total_yachts' => $stats['total_yachts'],
@@ -210,8 +226,8 @@ class YOLO_YS_Sync {
             'partner_yachts' => $stats['total_yachts'] - $stats['yolo_yachts'],
             'last_sync' => $last_sync,
             'last_sync_human' => $last_sync ? human_time_diff(strtotime($last_sync), current_time('timestamp')) . ' ago' : 'Never',
-            'last_price_sync' => $last_price_sync,
-            'last_price_sync_human' => $last_price_sync ? human_time_diff(strtotime($last_price_sync), current_time('timestamp')) . ' ago' : 'Never'
+            'last_price_sync' => $last_offer_sync,
+            'last_price_sync_human' => $last_offer_sync ? human_time_diff(strtotime($last_offer_sync), current_time('timestamp')) . ' ago' : 'Never'
         );
     }
 }

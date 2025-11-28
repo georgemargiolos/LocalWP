@@ -259,6 +259,16 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         </div>
     </div>
     
+    <!-- Description Section -->
+    <?php if (!empty($yacht->description)): ?>
+    <div class="yacht-description-section">
+        <h3>Description</h3>
+        <div class="yacht-description-content">
+            <?php echo nl2br(esc_html($yacht->description)); ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <!-- Location Section -->
     <?php if ($yacht->home_base): ?>
     <div class="yacht-map-section">

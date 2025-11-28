@@ -188,7 +188,7 @@
 }
 
 .price-slide {
-    display: none;
+    display: block;
     text-align: center;
     padding: 15px;
     border: 2px solid #e5e7eb;
@@ -203,7 +203,6 @@
 }
 
 .price-slide.active {
-    display: block;
     border-color: #1e3a8a;
 }
 
@@ -487,6 +486,28 @@
 .spec-label {
     font-size: 14px;
     color: #6b7280;
+}
+
+/* Description Section */
+.yacht-description-section {
+    margin-bottom: 40px;
+}
+
+.yacht-description-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.yacht-description-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #1e3a8a;
 }
 
 /* Map Section */
