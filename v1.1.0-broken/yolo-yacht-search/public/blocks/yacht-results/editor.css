@@ -1,0 +1,67 @@
+.yolo-ys-results-preview {
+    background: #f0fdf4;
+    border: 2px dashed #16a34a;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+}
+
+.yolo-ys-results-preview h3 {
+    color: #16a34a;
+    margin: 0 0 10px 0;
+}
+
+.yolo-ys-results-preview p {
+    color: #666;
+    margin: 0 0 20px 0;
+}
+
+.preview-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.preview-result-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    position: relative;
+}
+
+.preview-result-card.yolo-boat {
+    border: 2px solid #dc2626;
+}
+
+.preview-result-card .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc2626;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.preview-result-card h4 {
+    margin: 0 0 10px 0;
+    color: #1e3a8a;
+}
+
+.preview-result-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.preview-result-card .price {
+    color: #16a34a;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 10px;
+}

@@ -28,10 +28,12 @@ class YOLO_YS_Activator {
             }
         }
         
-        // Create database tables (classes already loaded in main plugin file)
+        // Create database tables
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database.php';
         YOLO_YS_Database::create_tables();
         
         // Create prices table
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database-prices.php';
         YOLO_YS_Database_Prices::create_prices_table();
         
         // Flush rewrite rules
