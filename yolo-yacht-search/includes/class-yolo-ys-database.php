@@ -22,14 +22,21 @@ class YOLO_YS_Database {
     /**
      * Create database tables
      */
-    public function create_tables() {
+    public static function create_tables() {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         
+        // Define table names
+        $table_yachts = $wpdb->prefix . 'yolo_yachts';
+        $table_products = $wpdb->prefix . 'yolo_yacht_products';
+        $table_images = $wpdb->prefix . 'yolo_yacht_images';
+        $table_extras = $wpdb->prefix . 'yolo_yacht_extras';
+        $table_equipment = $wpdb->prefix . 'yolo_yacht_equipment';
+        
         // Yachts table
-        $sql_yachts = "CREATE TABLE {$this->table_yachts} (
+        $sql_yachts = "CREATE TABLE {$table_yachts} (
             id bigint(20) NOT NULL,
             company_id bigint(20) NOT NULL,
             name varchar(255) NOT NULL,
@@ -57,7 +64,7 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         
         // Products table (charter types)
-        $sql_products = "CREATE TABLE {$this->table_products} (
+        $sql_products = "CREATE TABLE {$table_products} (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             yacht_id bigint(20) NOT NULL,
             product_type varchar(100) NOT NULL,
@@ -70,7 +77,7 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         
         // Images table
-        $sql_images = "CREATE TABLE {$this->table_images} (
+        $sql_images = "CREATE TABLE {$table_images} (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             yacht_id bigint(20) NOT NULL,
             image_url varchar(500) NOT NULL,
@@ -82,7 +89,7 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         
         // Extras table
-        $sql_extras = "CREATE TABLE {$this->table_extras} (
+        $sql_extras = "CREATE TABLE {$table_extras} (
             id bigint(20) NOT NULL,
             yacht_id bigint(20) NOT NULL,
             name varchar(255) NOT NULL,
@@ -95,7 +102,7 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         
         // Equipment table
-        $sql_equipment = "CREATE TABLE {$this->table_equipment} (
+        $sql_equipment = "CREATE TABLE {$table_equipment} (
             id bigint(20) NOT NULL AUTO_INCREMENT,
             yacht_id bigint(20) NOT NULL,
             equipment_id bigint(20) NOT NULL,
