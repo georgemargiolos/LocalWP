@@ -1,0 +1,47 @@
+LocalWP Repository Structure
+============================
+
+📁 LocalWP/
+│
+├── 📄 README.md (Project overview and documentation)
+├── 📄 REPOSITORY_STRUCTURE.txt (This file)
+│
+├── 📚 DOCUMENTATION/
+│   ├── 📄 BookingManagerAPIManual.md (15KB)
+│   │   └── Complete API reference for Booking Manager
+│   │       • Authentication
+│   │       • Endpoints (offers, reservations, yachts, etc.)
+│   │       • Code examples (Python, JavaScript, cURL)
+│   │       • Integration analysis
+│   │
+│   ├── 📄 yolo-search-analysis.md (2.7KB)
+│   │   └── Frontend search block analysis
+│   │       • Form elements
+│   │       • CSS structure
+│   │       • Integration points
+│   │
+│   └── 📄 javascript-libraries-analysis.md (4.3KB)
+│       └── JavaScript libraries breakdown
+│           • Litepicker configuration
+│           • Business logic
+│           • WordPress integration plan
+│
+├── 💻 JAVASCRIPT LIBRARIES/
+│   ├── 📄 litepicker.js (63KB)
+│   │   └── MIT licensed date range picker v2.0.12
+│   │
+│   ├── 📄 mobilefriendly.js (12KB)
+│   │   └── Litepicker mobile responsive plugin
+│   │
+│   ├── 📄 plugins.min.js (558KB)
+│   │   └── Bundled libraries (jQuery, PhotoSwipe, Select2)
+│   │
+│   └── 📄 custom.min.js (9KB)
+│       └── Custom UI/UX logic and form validation
+│
+└── 🔍 REFERENCE/
+    └── 📄 yolo-homepage.html (71KB)
+        └── Full HTML source for implementation reference
+
+TOTAL SIZE: ~738KB
+FILES: 9
