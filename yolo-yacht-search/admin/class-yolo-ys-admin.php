@@ -13,6 +13,7 @@ class YOLO_YS_Admin {
         
         // Add AJAX handlers
         add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
+        add_action('wp_ajax_yolo_ys_sync_prices', array($this, 'ajax_sync_prices'));
     }
     
     /**
@@ -162,6 +163,15 @@ class YOLO_YS_Admin {
             'yolo_ys_general_settings'
         );
         
+        register_setting('yolo-yacht-search', 'yolo_ys_google_maps_api_key');
+        add_settings_field(
+            'yolo_ys_google_maps_api_key',
+            __('Google Maps API Key', 'yolo-yacht-search'),
+            array($this, 'google_maps_api_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_general_settings'
+        );
+        
         // Styling Settings Section
         add_settings_section(
             'yolo_ys_styling_settings',
@@ -280,6 +290,12 @@ class YOLO_YS_Admin {
         echo '</select>';
     }
     
+    public function google_maps_api_key_callback() {
+        $value = get_option('yolo_ys_google_maps_api_key', 'AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4');
+        echo '<input type="text" name="yolo_ys_google_maps_api_key" value="' . esc_attr($value) . '" class="large-text code" />';
+        echo '<p class="description">' . __('Google Maps API key for displaying yacht locations on maps', 'yolo-yacht-search') . '</p>';
+    }
+    
     public function primary_color_callback() {
         $value = get_option('yolo_ys_primary_color', '#1e3a8a');
         echo '<input type="text" name="yolo_ys_primary_color" value="' . esc_attr($value) . '" class="color-picker" />';
@@ -307,6 +323,29 @@ class YOLO_YS_Admin {
         
         $sync = new YOLO_YS_Sync();
         $result = $sync->sync_all_yachts();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX handler for offers sync
+     */
+    public function ajax_sync_prices() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        // Get year parameter (default to next year)
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_all_offers($year);
         
         if ($result['success']) {
             wp_send_json_success($result);

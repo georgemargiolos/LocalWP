@@ -12,7 +12,7 @@ $sync_status = $sync->get_sync_status();
 <div class="wrap">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
     
-    <!-- Sync Section -->
+    <!-- Yacht Sync Section -->
     <div class="yolo-ys-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <h2 style="margin-top: 0; color: #dc2626;">⚓ Yacht Database Sync</h2>
         
@@ -31,23 +31,63 @@ $sync_status = $sync->get_sync_status();
             </div>
             <div style="background: #f3f4f6; padding: 15px; border-radius: 8px;">
                 <div style="font-size: 16px; font-weight: 600; color: #374151;"><?php echo $sync_status['last_sync_human']; ?></div>
-                <div style="color: #6b7280; font-size: 14px;">Last Sync</div>
+                <div style="color: #6b7280; font-size: 14px;">Last Yacht Sync</div>
             </div>
         </div>
         
         <button type="button" id="yolo-ys-sync-button" class="button button-primary button-hero" style="background: #dc2626; border-color: #dc2626; text-shadow: none; box-shadow: none;">
             <span class="dashicons dashicons-update" style="margin-top: 8px;"></span>
-            Sync All Yachts Now
+            Sync Yachts Now
         </button>
         
         <div id="yolo-ys-sync-message" style="margin-top: 15px;"></div>
         
         <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
-            <strong>What happens when you sync:</strong><br>
+            <strong>What happens when you sync yachts:</strong><br>
             • Fetches all yachts from YOLO (7850) and partner companies (4366, 3604, 6711)<br>
             • Stores complete yacht data in WordPress database<br>
             • Updates images, specifications, equipment, and extras<br>
-            • Makes search faster by querying local database instead of API
+            • Makes search faster by querying local database instead of API<br>
+            • <strong>Note:</strong> This does NOT sync prices. Use the separate "Sync Prices" button below.
+        </p>
+    </div>
+    
+    <!-- Offers Sync Section -->
+    <div class="yolo-ys-price-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #2563eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #2563eb;">💰 Weekly Offers Sync</h2>
+        
+        <div style="background: #dbeafe; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="font-size: 16px; font-weight: 600; color: #374151;"><?php echo $sync_status['last_price_sync_human']; ?></div>
+            <div style="color: #6b7280; font-size: 14px;">Last Offers Sync</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="yolo-ys-sync-year" style="font-weight: 600; margin-right: 10px;">Select Year:</label>
+            <select id="yolo-ys-sync-year" style="padding: 8px 12px; font-size: 16px; border: 2px solid #2563eb; border-radius: 6px;">
+                <?php 
+                $current_year = date('Y');
+                for ($y = $current_year; $y <= $current_year + 3; $y++) {
+                    $selected = ($y == $current_year + 1) ? 'selected' : '';
+                    echo "<option value='$y' $selected>$y</option>";
+                }
+                ?>
+            </select>
+        </div>
+        
+        <button type="button" id="yolo-ys-sync-prices-button" class="button button-primary button-hero" style="background: #2563eb; border-color: #2563eb; text-shadow: none; box-shadow: none;">
+            <span class="dashicons dashicons-tag" style="margin-top: 8px;"></span>
+            Sync Weekly Offers
+        </button>
+        
+        <div id="yolo-ys-price-sync-message" style="margin-top: 15px;"></div>
+        
+        <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
+            <strong>What happens when you sync offers:</strong><br>
+            • Fetches ALL weekly charter offers (Saturday-to-Saturday) for the entire selected year<br>
+            • Single API call retrieves offers from all companies (YOLO + partners)<br>
+            • Stores weekly availability with prices, discounts, and start/end bases<br>
+            • Updates the price carousel on yacht details pages<br>
+            • <strong>Recommended:</strong> Sync for next year (<?php echo date('Y') + 1; ?>) before booking season starts
         </p>
     </div>
     
@@ -86,6 +126,7 @@ $sync_status = $sync->get_sync_status();
 
 <script>
 jQuery(document).ready(function($) {
+    // Yacht Sync Handler
     $('#yolo-ys-sync-button').on('click', function() {
         var $button = $(this);
         var $message = $('#yolo-ys-sync-message');
@@ -111,16 +152,66 @@ jQuery(document).ready(function($) {
                         '</p></div>'
                     );
                     
-                    // Reload page after 2 seconds to show updated stats
+                    // Reload page after 5 seconds to show updated stats
                     setTimeout(function() {
                         location.reload();
-                    }, 2000);
+                    }, 5000);
                 } else {
                     $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> ' + response.data.message + '</p></div>');
                 }
             },
             error: function() {
                 $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> Failed to sync yachts. Please try again.</p></div>');
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+                $button.find('.dashicons').removeClass('dashicons-update-spin');
+            }
+        });
+    });
+    
+    // Offers Sync Handler
+    $('#yolo-ys-sync-prices-button').on('click', function() {
+        var $button = $(this);
+        var $message = $('#yolo-ys-price-sync-message');
+        var year = $('#yolo-ys-sync-year').val();
+        
+        $button.prop('disabled', true);
+        $button.find('.dashicons').addClass('dashicons-update-spin');
+        $message.html('<div class="notice notice-info"><p>⏳ Syncing weekly offers for ' + year + '... This may take 1-2 minutes.</p></div>');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_ys_sync_prices',
+                nonce: yoloYsAdmin.nonce,
+                year: year
+            },
+            success: function(response) {
+                if (response.success) {
+                    var message = '<div class="notice notice-success"><p>' +
+                        '<strong>✅ Success!</strong> ' + response.data.message;
+                    
+                    if (response.data.offers_synced > 0) {
+                        message += '<br>Weekly offers synced: ' + response.data.offers_synced;
+                        message += '<br>Yachts with offers: ' + response.data.yachts_with_offers;
+                        message += '<br>Year: ' + response.data.year;
+                    }
+                    
+                    message += '</p></div>';
+                    $message.html(message);
+                    
+                    // Reload page after 5 seconds to show updated stats
+                    setTimeout(function() {
+                        location.reload();
+                    }, 5000);
+                } else {
+                    $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> ' + response.data.message + '</p></div>');
+                }
+            },
+            error: function() {
+                $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> Failed to sync prices. Please try again.</p></div>');
             },
             complete: function() {
                 $button.prop('disabled', false);

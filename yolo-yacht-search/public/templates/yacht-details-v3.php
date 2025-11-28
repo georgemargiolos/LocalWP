@@ -2,6 +2,7 @@
 /**
  * Yacht Details Template v3
  * With Date Picker, Quote Form, and Book Now Button
+ * Price Carousel moved below images at full width
  */
 
 // Get yacht ID from URL
@@ -29,17 +30,27 @@ $images = $wpdb->get_results($wpdb->prepare(
     $yacht_id
 ));
 
-// Get prices - filter for peak season (May-September) only
+// Get weekly offers (already Saturday-to-Saturday from /offers endpoint)
 $all_prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
 $prices = array();
+
 if (!empty($all_prices)) {
+    // Filter to show only future dates and sort by date
+    $today = date('Y-m-d');
     foreach ($all_prices as $price) {
-        $month = (int)date('n', strtotime($price->date_from)); // 1-12
-        // Only include May (5), June (6), July (7), August (8), September (9)
-        if ($month >= 5 && $month <= 9) {
+        // Only include offers that haven't started yet or are current
+        if ($price->date_from >= $today) {
             $prices[] = $price;
         }
     }
+    
+    // Sort by date (earliest first)
+    usort($prices, function($a, $b) {
+        return strtotime($a->date_from) - strtotime($b->date_from);
+    });
+    
+    // Limit to next 20 weeks to keep carousel manageable
+    $prices = array_slice($prices, 0, 20);
 }
 
 // Get equipment
@@ -79,7 +90,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         <?php endif; ?>
     </div>
     
-    <!-- Main Content Grid: Images + Price Carousel -->
+    <!-- Main Content Grid: Images + Booking Section -->
     <div class="yacht-main-grid">
         
         <!-- Image Carousel -->
@@ -112,49 +123,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php endif; ?>
         </div>
         
-        <!-- Weekly Price Carousel + Booking Section -->
+        <!-- Booking Section (Right Sidebar) -->
         <div class="yacht-booking-section">
             <h3>Availability & Pricing</h3>
-            <?php if (!empty($prices)): ?>
-                <div class="price-carousel-container" data-visible-slides="4">
-                    <div class="price-carousel-slides">
-                        <?php foreach ($prices as $index => $price): 
-                            $discount_amount = $price->start_price - $price->price;
-                            $week_start = date('M j', strtotime($price->date_from));
-                            $week_end = date('M j, Y', strtotime($price->date_to));
-                        ?>
-                            <div class="price-slide <?php echo $index === 0 ? 'active' : ''; ?>" 
-                                 data-date-from="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_from))); ?>"
-                                 data-date-to="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_to))); ?>"
-                                 data-price="<?php echo esc_attr($price->price); ?>">
-                                
-                                <div class="price-week"><?php echo $week_start; ?> - <?php echo $week_end; ?></div>
-                                <div class="price-product"><?php echo esc_html($price->product); ?></div>
-                                
-                                <?php if ($price->discount_percentage > 0): ?>
-                                    <div class="price-original">
-                                        <span class="strikethrough"><?php echo number_format($price->start_price, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?></span>
-                                    </div>
-                                    <div class="price-discount-badge">
-                                        <?php echo number_format($price->discount_percentage, 2); ?>% OFF - Save <?php echo number_format($discount_amount, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <div class="price-final">
-                                    <?php echo number_format($price->price, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
-                                </div>
-                                
-                                <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    
-                    <?php if (count($prices) > 1): ?>
-                        <button class="price-carousel-prev" onclick="priceCarousel.prev()">‹</button>
-                        <button class="price-carousel-next" onclick="priceCarousel.next()">›</button>
-                    <?php endif; ?>
-                </div>
-            <?php else: ?>
+            
+            <?php if (empty($prices)): ?>
                 <p>No pricing available. Please contact us for a quote.</p>
             <?php endif; ?>
             
@@ -212,6 +185,51 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         
     </div>
     
+    <!-- Weekly Price Carousel (FULL WIDTH BELOW IMAGES) -->
+    <?php if (!empty($prices)): ?>
+    <div class="yacht-price-carousel-section">
+        <h3>Peak Season Pricing (May - September)</h3>
+        <div class="price-carousel-container" data-visible-slides="4">
+            <div class="price-carousel-slides">
+                <?php foreach ($prices as $index => $price): 
+                    $discount_amount = $price->start_price - $price->price;
+                    $week_start = date('M j', strtotime($price->date_from));
+                    $week_end = date('M j, Y', strtotime($price->date_to));
+                ?>
+                    <div class="price-slide <?php echo $index === 0 ? 'active' : ''; ?>" 
+                         data-date-from="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_from))); ?>"
+                         data-date-to="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_to))); ?>"
+                         data-price="<?php echo esc_attr($price->price); ?>">
+                        
+                        <div class="price-week"><?php echo $week_start; ?> - <?php echo $week_end; ?></div>
+                        <div class="price-product"><?php echo esc_html($price->product); ?></div>
+                        
+                        <?php if ($price->discount_percentage > 0): ?>
+                            <div class="price-original">
+                                <span class="strikethrough"><?php echo number_format($price->start_price, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?></span>
+                            </div>
+                            <div class="price-discount-badge">
+                                <?php echo number_format($price->discount_percentage, 2); ?>% OFF - Save <?php echo number_format($discount_amount, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="price-final">
+                            <?php echo number_format($price->price, 0, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
+                        </div>
+                        
+                        <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <?php if (count($prices) > 1): ?>
+                <button class="price-carousel-prev" onclick="priceCarousel.prev()">‹</button>
+                <button class="price-carousel-next" onclick="priceCarousel.next()">›</button>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <!-- Quick Specs -->
     <div class="yacht-quick-specs">
         <div class="spec-item">
@@ -241,7 +259,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         </div>
     </div>
     
-    <!-- Google Maps -->
+    <!-- Location Section -->
     <?php if ($yacht->home_base): ?>
     <div class="yacht-map-section">
         <h3>Location</h3>
@@ -256,7 +274,21 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php if ($yacht->draft): ?>
                 <div class="tech-item">
                     <div class="tech-label">DRAUGHT</div>
-                    <div class="tech-value"><?php echo $draft_ft; ?> ft</div>
+                    <div class="tech-value"><?php echo $draft_ft; ?> ft (<?php echo number_format($yacht->draft, 2); ?> m)</div>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($yacht->beam): ?>
+                <div class="tech-item">
+                    <div class="tech-label">BEAM</div>
+                    <div class="tech-value"><?php echo $beam_ft; ?> ft (<?php echo number_format($yacht->beam, 2); ?> m)</div>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($yacht->berths): ?>
+                <div class="tech-item">
+                    <div class="tech-label">BERTHS</div>
+                    <div class="tech-value"><?php echo esc_html($yacht->berths); ?></div>
                 </div>
             <?php endif; ?>
             
@@ -267,90 +299,95 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 </div>
             <?php endif; ?>
             
-            <?php if ($yacht->water_capacity): ?>
-                <div class="tech-item">
-                    <div class="tech-label">WATER</div>
-                    <div class="tech-value"><?php echo esc_html($yacht->water_capacity); ?> L</div>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($yacht->beam): ?>
-                <div class="tech-item">
-                    <div class="tech-label">BEAM</div>
-                    <div class="tech-value"><?php echo $beam_ft; ?> ft</div>
-                </div>
-            <?php endif; ?>
-            
             <?php if ($yacht->fuel_capacity): ?>
                 <div class="tech-item">
-                    <div class="tech-label">FUEL</div>
+                    <div class="tech-label">FUEL CAPACITY</div>
                     <div class="tech-value"><?php echo esc_html($yacht->fuel_capacity); ?> L</div>
                 </div>
             <?php endif; ?>
             
-            <?php if ($yacht->berths): ?>
+            <?php if ($yacht->water_capacity): ?>
                 <div class="tech-item">
-                    <div class="tech-label">BERTHS</div>
-                    <div class="tech-value"><?php echo esc_html($yacht->berths); ?></div>
+                    <div class="tech-label">WATER CAPACITY</div>
+                    <div class="tech-value"><?php echo esc_html($yacht->water_capacity); ?> L</div>
                 </div>
             <?php endif; ?>
         </div>
     </div>
     
-    <!-- Description -->
-    <?php if ($yacht->description): ?>
-        <div class="yacht-description">
-            <h3>Description</h3>
-            <p><?php echo nl2br(esc_html($yacht->description)); ?></p>
-        </div>
-    <?php endif; ?>
-    
     <!-- Equipment -->
     <?php if (!empty($equipment)): ?>
-        <div class="yacht-equipment">
-            <h3>Equipment</h3>
-            <p class="equipment-list">
-                <?php 
-                $equipment_names = array_map(function($e) { return $e->equipment_name; }, $equipment);
-                echo esc_html(implode(', ', $equipment_names));
-                ?>
-            </p>
+    <div class="yacht-equipment">
+        <h3>Equipment</h3>
+        <div class="equipment-grid">
+            <?php foreach ($equipment as $item): ?>
+                <div class="equipment-item">
+                    <span class="equipment-icon">✓</span>
+                    <span class="equipment-name"><?php echo esc_html($item->equipment_name); ?></span>
+                </div>
+            <?php endforeach; ?>
         </div>
-    <?php endif; ?>
-    
-    <!-- Optional Extras -->
-    <?php if (!empty($extras)): ?>
-        <div class="yacht-extras">
-            <h3>Optional Extras</h3>
-            <ul class="extras-list">
-                <?php foreach ($extras as $extra): ?>
-                    <li>
-                        <span class="extra-name"><?php echo esc_html($extra->name); ?></span>
-                        <span class="extra-price"><?php echo number_format($extra->price, 0, ',', '.'); ?> <?php echo esc_html($extra->currency); ?> / <?php echo esc_html(str_replace('_', ' ', $extra->unit)); ?></span>
-                        <?php if ($extra->obligatory): ?>
-                            <span class="extra-obligatory">*Obligatory</span>
-                        <?php endif; ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-    
-    <!-- Back Button -->
-    <div class="yacht-actions">
-        <a href="javascript:history.back()" class="btn-back">← Back to Fleet</a>
     </div>
+    <?php endif; ?>
+    
+    <!-- Extras -->
+    <?php if (!empty($extras)): ?>
+        <?php 
+        // Separate obligatory and optional extras
+        $obligatory_extras = array_filter($extras, function($e) { return $e->obligatory == 1; });
+        $optional_extras = array_filter($extras, function($e) { return $e->obligatory == 0; });
+        ?>
+        
+        <?php if (!empty($obligatory_extras)): ?>
+        <div class="yacht-extras obligatory-extras">
+            <h3>Obligatory Extras <span class="extras-note">(Payable at the base)</span></h3>
+            <div class="extras-grid">
+                <?php foreach ($obligatory_extras as $extra): ?>
+                    <div class="extra-item obligatory">
+                        <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
+                        <?php if ($extra->price > 0): ?>
+                            <div class="extra-price">
+                                <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
+                                <?php if (!empty($extra->unit)): ?>
+                                    <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (!empty($optional_extras)): ?>
+        <div class="yacht-extras optional-extras">
+            <h3>Optional Extras <span class="extras-note">(Payable at the base)</span></h3>
+            <div class="extras-grid">
+                <?php foreach ($optional_extras as $extra): ?>
+                    <div class="extra-item optional">
+                        <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
+                        <?php if ($extra->price > 0): ?>
+                            <div class="extra-price">
+                                <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
+                                <?php if (!empty($extra->unit)): ?>
+                                    <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
     
 </div>
 
-<!-- Load Litepicker JS -->
-<script src="<?php echo esc_url($litepicker_url); ?>"></script>
-
-<!-- Load Google Maps -->
 <script>
 var yachtLocation = <?php echo json_encode($yacht->home_base); ?>;
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
+<?php $google_maps_key = get_option('yolo_ys_google_maps_api_key', 'AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4'); ?>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo esc_attr($google_maps_key); ?>&callback=initMap" async defer></script>
 
 <?php include dirname(__FILE__) . '/partials/yacht-details-v3-styles.php'; ?>
 <?php include dirname(__FILE__) . '/partials/yacht-details-v3-scripts.php'; ?>

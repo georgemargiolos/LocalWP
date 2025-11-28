@@ -52,12 +52,57 @@ class YOLO_YS_Booking_Manager_API {
     }
     
     /**
+     * Get weekly offers (availability + prices) for specific parameters
+     * This is the preferred method for getting weekly charter prices
+     */
+    public function get_offers($params) {
+        $endpoint = '/offers';
+        
+        // Build query parameters
+        $query_params = array();
+        
+        // Required parameters
+        if (isset($params['dateFrom'])) {
+            $query_params['dateFrom'] = $params['dateFrom'];
+        }
+        if (isset($params['dateTo'])) {
+            $query_params['dateTo'] = $params['dateTo'];
+        }
+        
+        // Optional parameters
+        if (isset($params['companyId'])) {
+            $query_params['companyId'] = $params['companyId'];
+        }
+        if (isset($params['yachtId'])) {
+            $query_params['yachtId'] = $params['yachtId'];
+        }
+        if (isset($params['tripDuration'])) {
+            $query_params['tripDuration'] = $params['tripDuration'];
+        }
+        if (isset($params['flexibility'])) {
+            $query_params['flexibility'] = $params['flexibility'];
+        }
+        if (isset($params['product'])) {
+            $query_params['product'] = $params['product'];
+        }
+        
+        $result = $this->make_request($endpoint, $query_params);
+        
+        if ($result['success']) {
+            return $result['data'];
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch offers');
+    }
+    
+    /**
      * Get prices for company
+     * @deprecated Use get_offers() instead for weekly charter prices
      */
     public function get_prices($company_id, $date_from, $date_to) {
         $endpoint = '/prices';
         $params = array(
-            'companyId' => $company_id,  // Fixed: was 'company', should be 'companyId'
+            'companyId' => $company_id,
             'dateFrom' => $date_from,
             'dateTo' => $date_to
         );
@@ -102,7 +147,7 @@ class YOLO_YS_Booking_Manager_API {
                 'Authorization' => $this->api_key,
                 'Accept' => 'application/json',
             ),
-            'timeout' => 30,
+            'timeout' => 60,  // Increased from 30 to 60 seconds for price sync
         );
         
         $response = wp_remote_get($url, $args);

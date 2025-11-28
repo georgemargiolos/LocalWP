@@ -594,6 +594,40 @@
     margin-bottom: 15px;
 }
 
+.yacht-extras.obligatory-extras h3 {
+    color: #dc2626;
+}
+
+.yacht-extras .extras-note {
+    font-size: 14px;
+    font-weight: 400;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.extras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.extra-item {
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.extra-item.obligatory {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.extra-item.optional {
+    background: #f0f9ff;
+    border-color: #bfdbfe;
+}
+
 .extras-list {
     list-style: none;
     padding: 0;
@@ -617,6 +651,14 @@
     font-size: 16px;
     font-weight: 600;
     color: #059669;
+    margin-top: 8px;
+}
+
+.price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: #6b7280;
+    margin-left: 4px;
 }
 
 .extra-obligatory {

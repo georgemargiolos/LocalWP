@@ -225,13 +225,36 @@ function bookNow() {
 
 // Initialize Google Maps
 function initMap() {
-    if (typeof google === 'undefined' || !yachtLocation) return;
+    console.log('initMap called');
+    console.log('yachtLocation:', yachtLocation);
+    console.log('google defined:', typeof google !== 'undefined');
+    
+    if (typeof google === 'undefined') {
+        console.error('Google Maps API not loaded');
+        return;
+    }
+    
+    if (!yachtLocation) {
+        console.error('No yacht location provided');
+        return;
+    }
+    
+    const mapElement = document.getElementById('yachtMap');
+    if (!mapElement) {
+        console.error('Map element not found');
+        return;
+    }
+    
+    console.log('Geocoding location:', yachtLocation);
     
     // Geocode the location
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address: yachtLocation }, function(results, status) {
+        console.log('Geocode status:', status);
+        console.log('Geocode results:', results);
+        
         if (status === 'OK') {
-            const map = new google.maps.Map(document.getElementById('yachtMap'), {
+            const map = new google.maps.Map(mapElement, {
                 zoom: 14,
                 center: results[0].geometry.location,
                 mapTypeId: 'satellite'
@@ -242,8 +265,12 @@ function initMap() {
                 position: results[0].geometry.location,
                 title: yachtLocation
             });
+            
+            console.log('Map initialized successfully');
         } else {
             console.error('Geocode was not successful for the following reason: ' + status);
+            // Fallback: show text location if geocoding fails
+            mapElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px; color: #6b7280;">Base Location: ' + yachtLocation + '</div>';
         }
     });
 }

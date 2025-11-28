@@ -1,0 +1,32 @@
+[
+    {
+        "yachtId": 6362109340000107850,
+        "dateFrom": "2026-07-01 00:00:00",
+        "dateTo": "2026-07-07 23:59:59",
+        "product": "Bareboat",
+        "price": 4050,
+        "currency": "EUR",
+        "startPrice": 4500,
+        "discountPercentage": 10
+    },
+    {
+        "yachtId": 7208135200000107850,
+        "dateFrom": "2026-07-01 00:00:00",
+        "dateTo": "2026-07-07 23:59:59",
+        "product": "Bareboat",
+        "price": 4050,
+        "currency": "EUR",
+        "startPrice": 4500,
+        "discountPercentage": 10
+    },
+    {
+        "yachtId": 7136018700000107850,
+        "dateFrom": "2026-07-01 00:00:00",
+        "dateTo": "2026-07-07 23:59:59",
+        "product": "Bareboat",
+        "price": 5270,
+        "currency": "EUR",
+        "startPrice": 6200,
+        "discountPercentage": 15
+    }
+]

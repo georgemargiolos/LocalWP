@@ -112,6 +112,48 @@ class YOLO_YS_Database_Prices {
     }
     
     /**
+     * Store offer data (from /offers endpoint)
+     * This is the preferred method for storing weekly charter availability and prices
+     */
+    public static function store_offer($offer_data, $company_id = null) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'yolo_yacht_prices';
+        
+        // Check if offer already exists
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT id FROM $table_name WHERE yacht_id = %s AND date_from = %s AND date_to = %s AND product = %s",
+            $offer_data['yachtId'],
+            $offer_data['dateFrom'],
+            $offer_data['dateTo'],
+            isset($offer_data['product']) ? $offer_data['product'] : 'Bareboat'
+        ));
+        
+        $data = array(
+            'yacht_id' => $offer_data['yachtId'],
+            'date_from' => $offer_data['dateFrom'],
+            'date_to' => $offer_data['dateTo'],
+            'product' => isset($offer_data['product']) ? $offer_data['product'] : 'Bareboat',
+            'price' => $offer_data['price'],
+            'currency' => isset($offer_data['currency']) ? $offer_data['currency'] : 'EUR',
+            'start_price' => isset($offer_data['startPrice']) ? $offer_data['startPrice'] : null,
+            'discount_percentage' => isset($offer_data['discountPercentage']) ? $offer_data['discountPercentage'] : null,
+            'last_synced' => current_time('mysql')
+        );
+        
+        if ($existing) {
+            // Update
+            $wpdb->update(
+                $table_name,
+                $data,
+                array('id' => $existing->id)
+            );
+        } else {
+            // Insert
+            $wpdb->insert($table_name, $data);
+        }
+    }
+    
+    /**
      * Delete old prices
      */
     public static function delete_old_prices() {
@@ -119,5 +161,12 @@ class YOLO_YS_Database_Prices {
         $table_name = $wpdb->prefix . 'yolo_yacht_prices';
         
         $wpdb->query("DELETE FROM $table_name WHERE date_to < NOW()");
+    }
+    
+    /**
+     * Delete old offers (alias for delete_old_prices)
+     */
+    public static function delete_old_offers() {
+        self::delete_old_prices();
     }
 }
