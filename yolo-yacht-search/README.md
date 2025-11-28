@@ -296,22 +296,42 @@ Click **"Sync All Yachts Now"** to:
 
 ## Version History
 
-### v1.0.2 (Current)
-- ✅ Added database storage for yacht data
-- ✅ Added yacht sync with admin button
-- ✅ Added `[yolo_our_fleet]` shortcode
-- ✅ Added `[yolo_yacht_details]` shortcode
-- ✅ Added image carousel
-- ✅ Added "View Details" buttons
-- ✅ Added sync statistics dashboard
+### v1.5.5 (Latest)
+- **UI/UX Enhancement:** Redesigned the price carousel on yacht detail pages.
+- Shows only peak season (May-Sept) in a 4-week grid.
+- Smart navigation to browse by groups of 4 weeks.
+- Matches professional design of sites like Boataround.com.
+
+### v1.5.4
+- **Performance Fix:** Reduced price sync period from 12 months to 3 months.
+- **Result:** Sync time improved from ~5 minutes to **under 60 seconds**.
+
+### v1.5.3
+- **CRITICAL BUG FIX:** Fixed the sync hanging issue.
+- **Cause:** Incorrect API parameter (`company` vs `companyId`) was causing the API to fetch prices for ALL boats in the Booking Manager system.
+- **Result:** Sync now correctly fetches data for only the 4 specified companies.
+
+### v1.5.2
+- **Feature:** Added a complete quote request system with email notifications.
+- **Feature:** Added Google Maps integration to show yacht home base.
+- **Feature:** Implemented a price carousel on detail pages.
+- **Bug:** Introduced the critical sync performance bug (fixed in v1.5.3).
+
+### v1.1.0 - v1.5.1
+- **Fix:** Resolved a fatal error on activation (`Non-static method create_tables()`).
+- Added various UI improvements and minor bug fixes.
+
+### v1.0.2
+- Added database storage for all yacht data.
+- Implemented the initial "Sync All Yachts Now" functionality.
+- Created `[yolo_our_fleet]` and `[yolo_yacht_details]` shortcodes.
 
 ### v1.0.1
-- Converted blocks to shortcodes
-- Added Litepicker integration
-- Added yolo-charters.com styling
+- Converted initial block-based design to more flexible shortcodes.
+- Integrated Litepicker.js for date selection.
 
 ### v1.0.0
-- Initial release
+- Initial plugin structure and setup.
 
 ---
 
