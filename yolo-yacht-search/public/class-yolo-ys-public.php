@@ -71,6 +71,7 @@ class YOLO_YS_Public {
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('yolo_ys_search_nonce'),
+                'quote_nonce' => wp_create_nonce('yolo_quote_nonce'),
                 'results_page_url' => $this->get_results_page_url(),
             )
         );

@@ -233,21 +233,6 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
     font-weight: 700;
 }
 
-.yolo-ys-details-btn {
-    display: block;
-    width: 100%;
-    padding: 14px 20px;
-    background: #b91c1c;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-}
-
 .yolo-ys-details-btn:hover {
     background: #991b1b;
     transform: translateY(-2px);

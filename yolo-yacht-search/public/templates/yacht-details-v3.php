@@ -52,7 +52,7 @@ $beam_ft = $yacht->beam ? round($yacht->beam * 3.28084, 1) : 0;
 $draft_ft = $yacht->draft ? round($yacht->draft * 3.28084, 1) : 0;
 
 // Get Litepicker JS
-$litepicker_url = plugins_url('assets/js/litepicker.js', dirname(dirname(__FILE__)));
+$litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
 ?>
 
 <!-- Load Litepicker CSS -->

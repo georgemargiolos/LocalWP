@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(quoteForm);
             const data = {
                 action: 'yolo_submit_quote_request',
+                nonce: yoloYSData.quote_nonce,
                 yacht_id: formData.get('yacht_id'),
                 yacht_name: formData.get('yacht_name'),
                 first_name: formData.get('first_name'),
@@ -136,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             
             // Submit via AJAX
-            fetch(yolo_ajax.ajax_url, {
+            fetch(yoloYSData.ajax_url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

@@ -13,8 +13,8 @@ class YOLO_YS_Quote_Handler {
      * Handle quote request submission
      */
     public function handle_quote_request() {
-        // Verify nonce (if you want to add security)
-        // check_ajax_referer('yolo_quote_nonce', 'nonce');
+        // Verify nonce for security
+        check_ajax_referer('yolo_quote_nonce', 'nonce');
         
         // Get form data
         $yacht_id = sanitize_text_field($_POST['yacht_id']);
