@@ -99,9 +99,9 @@ class YOLO_YS_Sync {
      * Sync prices for all companies
      */
     private function sync_prices($company_ids) {
-        // Sync next 12 months of pricing data
+        // Sync next 3 months to avoid timeout (was 12 months)
         $date_from = date('Y-m-d') . 'T00:00:00';
-        $date_to = date('Y-m-d', strtotime('+12 months')) . 'T23:59:59';
+        $date_to = date('Y-m-d', strtotime('+3 months')) . 'T23:59:59';
         
         foreach ($company_ids as $company_id) {
             if (empty($company_id)) continue;

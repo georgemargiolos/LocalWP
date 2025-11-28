@@ -338,9 +338,9 @@ GPL v2 or later
 
 ---
 
-# YOLO Yacht Search & Booking WordPress Plugin (v1.5.3)
+# YOLO Yacht Search & Booking WordPress Plugin (v1.5.4)
 
-**Version:** 1.5.3  
+**Version:** 1.5.4  
 **Author:** Manus AI for George Margiolos  
 **Last Updated:** November 28, 2025
 

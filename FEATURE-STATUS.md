@@ -1,11 +1,18 @@
 # YOLO Yacht Search Plugin - Feature Status
 
-## 🚨 LATEST UPDATE: v1.5.3 (November 28, 2025)
+## 🚨 LATEST UPDATE: v1.5.4 (November 28, 2025)
 
-### Critical Bug Fix: Sync Performance
+### Performance Fix: Reduced Price Sync Period
+**Problem:** v1.5.3 sync still slow (2-5 minutes) even with `companyId` fix  
+**Cause:** Fetching 12 months of pricing data = ~12,000 records  
+**Fix:** Reduced from 12 months to 3 months = ~3,000 records  
+**Result:** Sync now completes in 30-60 seconds  
+**Status:** ✅ FIXED in v1.5.4
+
+### Previous Fix (v1.5.3):
 **Problem:** v1.5.2 sync would hang for 1+ hours  
 **Cause:** API parameter `company` instead of `companyId` caused fetching ALL companies' prices  
-**Fix:** Changed to `companyId` - sync now completes in 1-2 minutes  
+**Fix:** Changed to `companyId`  
 **Status:** ✅ FIXED in v1.5.3
 
 ---
