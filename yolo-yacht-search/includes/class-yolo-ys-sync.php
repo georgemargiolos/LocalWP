@@ -65,6 +65,11 @@ class YOLO_YS_Sync {
             $results['message'] = 'No yachts were synced. Check errors.';
         }
         
+        // Sync prices for next 12 months
+        if ($results['success']) {
+            $this->sync_prices($all_companies);
+        }
+        
         // Update last sync time
         update_option('yolo_ys_last_sync', current_time('mysql'));
         
@@ -85,5 +90,32 @@ class YOLO_YS_Sync {
             'last_sync' => $last_sync,
             'last_sync_human' => $last_sync ? human_time_diff(strtotime($last_sync), current_time('timestamp')) . ' ago' : 'Never'
         );
+    }
+    
+    /**
+     * Sync prices for all companies
+     */
+    private function sync_prices($company_ids) {
+        $date_from = date('Y-m-d') . 'T00:00:00';
+        $date_to = date('Y-m-d', strtotime('+12 months')) . 'T23:59:59';
+        
+        foreach ($company_ids as $company_id) {
+            if (empty($company_id)) continue;
+            
+            try {
+                $prices = $this->api->get_prices($company_id, $date_from, $date_to);
+                
+                if (!empty($prices) && is_array($prices)) {
+                    foreach ($prices as $price) {
+                        YOLO_YS_Database_Prices::store_price($price);
+                    }
+                }
+            } catch (Exception $e) {
+                error_log('YOLO YS: Failed to sync prices for company ' . $company_id . ': ' . $e->getMessage());
+            }
+        }
+        
+        // Delete old prices
+        YOLO_YS_Database_Prices::delete_old_prices();
     }
 }

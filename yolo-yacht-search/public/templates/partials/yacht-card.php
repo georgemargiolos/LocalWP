@@ -81,6 +81,18 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
             </div>
         </div>
         
+        <?php
+        // Get minimum price
+        $min_price = YOLO_YS_Database_Prices::get_min_price($yacht->id);
+        ?>
+        
+        <!-- Price -->
+        <?php if ($min_price && isset($min_price->min_price)): ?>
+        <div class="yolo-ys-yacht-price">
+            From <strong><?php echo number_format($min_price->min_price, 0, ',', '.'); ?> <?php echo esc_html($min_price->currency); ?></strong> per week
+        </div>
+        <?php endif; ?>
+        
         <!-- Details Button -->
         <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-details-btn">
             DETAILS
@@ -189,6 +201,36 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
 .yolo-ys-spec-label {
     font-size: 13px;
     color: #6b7280;
+}
+
+.yolo-ys-details-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    background: #b91c1c;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.yolo-ys-yacht-price {
+    font-size: 16px;
+    color: #059669;
+    margin-bottom: 15px;
+    padding: 12px;
+    background: #f0fdf4;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.yolo-ys-yacht-price strong {
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .yolo-ys-details-btn {

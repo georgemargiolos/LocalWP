@@ -52,6 +52,26 @@ class YOLO_YS_Booking_Manager_API {
     }
     
     /**
+     * Get prices for company
+     */
+    public function get_prices($company_id, $date_from, $date_to) {
+        $endpoint = '/prices';
+        $params = array(
+            'company' => $company_id,
+            'dateFrom' => $date_from,
+            'dateTo' => $date_to
+        );
+        
+        $result = $this->make_request($endpoint, $params);
+        
+        if ($result['success']) {
+            return $result['data'];
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch prices');
+    }
+    
+    /**
      * Get all yachts for a company
      */
     public function get_yachts_by_company($company_id) {
