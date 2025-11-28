@@ -1,0 +1,1525 @@
+[
+    {
+        "id": 7136018700000107850,
+        "name": "Strawberry",
+        "model": "Lagoon 440",
+        "modelId": 509790000100000,
+        "shipyardId": 7,
+        "year": 2008,
+        "kind": "Catamaran",
+        "certificate": "EL-PIRAEUS-9940",
+        "homeBaseId": 1935994390000100000,
+        "homeBase": "Preveza Main Port",
+        "companyId": 7850,
+        "company": "YOLO Charters",
+        "draught": 1.3,
+        "beam": 7.7,
+        "length": 13.61,
+        "waterCapacity": 900,
+        "fuelCapacity": 650,
+        "engine": "2X54hp",
+        "deposit": 2500,
+        "depositWithWaiver": 0,
+        "currency": "EUR",
+        "commissionPercentage": 20,
+        "maxDiscountFromCommissionPercentage": 20,
+        "wc": 4,
+        "berths": 10,
+        "cabins": 4,
+        "wcNote": "",
+        "berthsNote": "(8+2)",
+        "cabinsNote": "",
+        "yearNote": "Refit 2026",
+        "mainsailType": "Full batten",
+        "genoaType": "Furling",
+        "requiredSkipperLicense": 1,
+        "defaultCheckInDay": 7,
+        "allCheckInDays": [
+            7
+        ],
+        "defaultCheckInTime": "17:00",
+        "defaultCheckOutTime": "09:00",
+        "minimumCharterDuration": 7,
+        "maximumCharterDuration": 90,
+        "maxPeopleOnBoard": 10,
+        "comment": "Solar Panels, Espresso Coffee Machine, Extra Cushions &Sunbeds, Free Sup, Free Snorkeling Equipment, Free Outboard Engine, Free 2x50m Floating Stern Lines",
+        "images": [
+            {
+                "id": 7136957950000107850,
+                "name": "Strawberry_16.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957950000107850_Strawberry_16.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957970000107850,
+                "name": "Strawberry_17.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957970000107850_Strawberry_17.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958050000107850,
+                "name": "Strawberry_21.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958050000107850_Strawberry_21.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957830000107850,
+                "name": "Strawberry_10.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957830000107850_Strawberry_10.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957890000107850,
+                "name": "Strawberry_13.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957890000107850_Strawberry_13.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957870000107850,
+                "name": "Strawberry_12.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957870000107850_Strawberry_12.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958090000107850,
+                "name": "Strawberry_23.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958090000107850_Strawberry_23.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957930000107850,
+                "name": "Strawberry_15.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957930000107850_Strawberry_15.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958010000107850,
+                "name": "Strawberry_19.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958010000107850_Strawberry_19.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958150000107850,
+                "name": "Strawberry_4.JPG",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958150000107850_Strawberry_4.JPG",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958170000107850,
+                "name": "Strawberry_5.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958170000107850_Strawberry_5.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136928830000107850,
+                "name": "Strawberry_interior.jpg",
+                "description": "Interior image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136928830000107850_Strawberry_interior.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958030000107850,
+                "name": "Strawberry_20.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958030000107850_Strawberry_20.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136927010000107850,
+                "name": "Strawberry_layout.jpg",
+                "description": "Plan image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136927010000107850_Strawberry_layout.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957910000107850,
+                "name": "Strawberry_14.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957910000107850_Strawberry_14.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957850000107850,
+                "name": "Strawberry_11.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957850000107850_Strawberry_11.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958130000107850,
+                "name": "Strawberry_3.JPG",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958130000107850_Strawberry_3.JPG",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957990000107850,
+                "name": "Strawberry_18.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957990000107850_Strawberry_18.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958110000107850,
+                "name": "Strawberry_24.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958110000107850_Strawberry_24.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958070000107850,
+                "name": "Strawberry_22.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958070000107850_Strawberry_22.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958210000107850,
+                "name": "Strawberry_9.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958210000107850_Strawberry_9.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136926990000107850,
+                "name": "Strawberry_main.JPG",
+                "description": "Main image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136926990000107850_Strawberry_main.JPG",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136957810000107850,
+                "name": "Strawberry_1.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136957810000107850_Strawberry_1.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7136958190000107850,
+                "name": "Strawberry_6.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7136958190000107850_Strawberry_6.jpg",
+                "sortOrder": 0
+            }
+        ],
+        "equipmentIds": [
+            1,
+            2,
+            4,
+            37,
+            5,
+            6,
+            7,
+            40,
+            45,
+            46,
+            16,
+            18,
+            25,
+            27
+        ],
+        "equipment": [
+            {
+                "id": 16,
+                "value": ""
+            },
+            {
+                "id": 46,
+                "value": ""
+            },
+            {
+                "id": 18,
+                "value": ""
+            },
+            {
+                "id": 37,
+                "value": ""
+            },
+            {
+                "id": 37,
+                "value": ""
+            },
+            {
+                "id": 7,
+                "value": ""
+            },
+            {
+                "id": 1,
+                "value": ""
+            },
+            {
+                "id": 4,
+                "value": ""
+            },
+            {
+                "id": 40,
+                "value": ""
+            },
+            {
+                "id": 6,
+                "value": ""
+            },
+            {
+                "id": 27,
+                "value": ""
+            },
+            {
+                "id": 25,
+                "value": ""
+            },
+            {
+                "id": 5,
+                "value": ""
+            },
+            {
+                "id": 45,
+                "value": ""
+            },
+            {
+                "id": 2,
+                "value": ""
+            },
+            {
+                "id": 25,
+                "value": ""
+            },
+            {
+                "id": 25,
+                "value": ""
+            }
+        ],
+        "products": [
+            {
+                "name": "Bareboat",
+                "crewedByDefault": false,
+                "isDefaultProduct": true,
+                "extras": [
+                    {
+                        "id": 6390133980000107850,
+                        "name": "Skipper",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_night",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-08-04 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-08-04 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165960000107850,
+                        "name": "Fishing Rod Set",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166300000107850,
+                        "name": "Deluxe Charter Pack Includes: Transit log, check in\/out service, end cleaning, bed linen & bath towels, bathroom amenities , welcome kit, premium cleaning kit, gas bottle, dinghy with outboard engine, Free SUP.",
+                        "obligatory": true,
+                        "price": 400,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "Deluxe Charter Pack (Strawberry) | Includes: Transit Log, Professional Check-In And Check-Out Service, Final Cleaning, High-Quality Bed Linen And Bath Towels, Bathroom Amenities (Shampoo, Shower Gel, Toilet Paper), Welcome Kit (Coffee Capsules, Ground Coffee, Sugar, Salt, Pepper, Extra Virgin Olive Oil, Vinegar), Premium Cleaning Kit (Sponges, Garbage Bags, Cleaning Gloves, Dishwashing Gloves, Dish Soap, Kitchen Towels, Disinfectant Cleaner, Paper Towels), Gas Bottle, Extra Cushions & Sunbeds, Free 2x50m Floating Stern Lines, Free Dinghy With Outboard Engine and a Free SUP",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166120000107850,
+                        "name": "Beach Towels For All The Crew (per person)",
+                        "obligatory": false,
+                        "price": 40,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking_person",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165800000107850,
+                        "name": "Extra SUP",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7181609200000107850,
+                        "name": "Inflatable Kayak",
+                        "obligatory": false,
+                        "price": 120,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-20 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-20 00:00:00",
+                        "description": "\n\n",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166390000107850,
+                        "name": "Safety Net (supplied and installed)",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166200000107850,
+                        "name": "Crew Change(skipper remains the same, yacht cleaning included)",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 6620154720000107850,
+                        "name": "Extra Bed Linen",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 3511891678907850,
+                        "name": "Wifi",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165880000107850,
+                        "name": "Early Check-in (access to the yacht by 14:00)",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166040000107850,
+                        "name": "Snorkeling Set",
+                        "obligatory": false,
+                        "price": 50,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    }
+                ]
+            }
+        ],
+        "descriptions": [
+            {
+                "category": "general",
+                "text": "STRAWBERRY - LAGOON\u202f440 (2008 | REFIT 2026) | YOUR SPACIOUS IONIAN SEA ESCAPE\n\nEFFORTLESS CRUISING & TWIN-HULL STABILITY\n\nWith her 25 ft beam and shallow 4 ft draft, the Lagoon 440 offers exceptional stability and freedom to explore the Ionian\u2019s hidden coves. \nThe twin 54 hp engines ensure smooth manoeuvring even in tight harbours \u2014 ideal whether you\u2019re a seasoned sailor or new to multihulls.\n\nGENEROUS LIVING AREAS & LIGHT-FILLED INTERIORS\n\nHer four-cabin, four-bath configuration comfortably accommodates up to 10 guests (8 in dedicated cabins + 2 on the convertible saloon bed). \nPanoramic windows flood the interior with light, while the open-plan salon and galley provide the perfect setting for shared meals, socialising or simply relaxing after a day on the water.\n\nPERFECT FOR BOTH EXPERIENCED SAILORS & HOLIDAY SEEKERS\n\nEquipped with full-batten mainsail, furling genoa, electric winch and solar panels, this Lagoon 440 is ready for genuine sailing adventures. At the same time, the generous cockpit, swim platform and sun-pads make it perfect for a relaxed holiday with family or friends.\n\nCOMFORT & STYLE IN EVERY DETAIL\n\nExpect premium touches: espresso machine, well-equipped galley, high-quality linens, fans in cabins, USB & 220 V plugs, a modern sound-system and more. With upgrades (refit 2026) incorporated, she seamlessly blends charter-practical features with luxury-yacht feel.\n\nFREE SERVICES & EXTRAS BECAUSE EVERY SUMMER IS YOLO\n\nOn board you\u2019ll find complimentary snorkeling gear, a dinghy with outboard engine, and floating sternlines for easy mooring. All designed to enhance your holiday experience \u2014 less hassle, more freedom.\n\nBook your week of freedom, sun & sea. Your adventure starts here!\n\nFollow us on Instagram: @yolo_charters\nFind us on Facebook: Yolo Charters \u2013 Discover The Ionian Sea",
+                "documents": []
+            }
+        ],
+        "crew": []
+    },
+    {
+        "id": 7208135200000107850,
+        "name": "Aquilo",
+        "model": "Bavaria Cruiser 46",
+        "modelId": 195,
+        "shipyardId": 1,
+        "year": 2014,
+        "kind": "Sail boat",
+        "certificate": "EL-PIRAEUS-11037",
+        "homeBaseId": 1935994390000100000,
+        "homeBase": "Preveza Main Port",
+        "companyId": 7850,
+        "company": "YOLO Charters",
+        "draught": 2.18,
+        "beam": 4.35,
+        "length": 14.52,
+        "waterCapacity": 350,
+        "fuelCapacity": 210,
+        "engine": "",
+        "deposit": 2500,
+        "depositWithWaiver": 0,
+        "currency": "EUR",
+        "commissionPercentage": 20,
+        "maxDiscountFromCommissionPercentage": 20,
+        "wc": 3,
+        "berths": 8,
+        "cabins": 4,
+        "wcNote": "",
+        "berthsNote": "(8 + 2)",
+        "cabinsNote": "",
+        "yearNote": "",
+        "mainsailType": "Furling",
+        "genoaType": "Furling",
+        "requiredSkipperLicense": 1,
+        "defaultCheckInDay": 7,
+        "allCheckInDays": [
+            7
+        ],
+        "defaultCheckInTime": "17:00",
+        "defaultCheckOutTime": "09:00",
+        "minimumCharterDuration": 7,
+        "maximumCharterDuration": 90,
+        "comment": "Solar Panels, Dinghy with Free Outboard Engine, Espresso Coffee Machine, Bow Thruster, Free Sup",
+        "images": [
+            {
+                "id": 7216949660000107850,
+                "name": "Aquilo_int2.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949650000107850_Aquilo_int2.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949600000107850,
+                "name": "Aquilo_ext3.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949590000107850_Aquilo_ext3.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949750000107850,
+                "name": "Aquilo_int5.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949740000107850_Aquilo_int5.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949480000107850,
+                "name": "Aq_layout.jpg",
+                "description": "Plan image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949470000107850_Aq_layout.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949570000107850,
+                "name": "Aquilo_ext2.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949560000107850_Aquilo_ext2.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949450000107850,
+                "name": "Aq_main.jpg",
+                "description": "Main image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949440000107850_Aq_main.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949720000107850,
+                "name": "Aquilo_int4.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949710000107850_Aquilo_int4.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949690000107850,
+                "name": "Aquilo_int3.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949680000107850_Aquilo_int3.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949510000107850,
+                "name": "Aq_interior.jpg",
+                "description": "Interior image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949500000107850_Aq_interior.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949540000107850,
+                "name": "Aquilo_ext1.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949530000107850_Aquilo_ext1.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 7216949630000107850,
+                "name": "Aquilo_int1.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/7216949620000107850_Aquilo_int1.jpg",
+                "sortOrder": 0
+            }
+        ],
+        "equipmentIds": [
+            33,
+            1,
+            50,
+            18,
+            4,
+            37,
+            5,
+            7,
+            40,
+            25,
+            9,
+            46
+        ],
+        "equipment": [
+            {
+                "id": 33,
+                "value": ""
+            },
+            {
+                "id": 37,
+                "value": ""
+            },
+            {
+                "id": 50,
+                "value": ""
+            },
+            {
+                "id": 25,
+                "value": ""
+            },
+            {
+                "id": 7,
+                "value": ""
+            },
+            {
+                "id": 5,
+                "value": ""
+            },
+            {
+                "id": 1,
+                "value": ""
+            },
+            {
+                "id": 9,
+                "value": ""
+            },
+            {
+                "id": 4,
+                "value": ""
+            },
+            {
+                "id": 40,
+                "value": ""
+            },
+            {
+                "id": 18,
+                "value": ""
+            },
+            {
+                "id": 46,
+                "value": ""
+            }
+        ],
+        "products": [
+            {
+                "name": "Bareboat",
+                "crewedByDefault": false,
+                "isDefaultProduct": true,
+                "extras": [
+                    {
+                        "id": 6390133980000107850,
+                        "name": "Skipper",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_night",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-08-04 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-08-04 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165960000107850,
+                        "name": "Fishing Rod Set",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166120000107850,
+                        "name": "Beach Towels For All The Crew (per person)",
+                        "obligatory": false,
+                        "price": 40,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking_person",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165800000107850,
+                        "name": "Extra SUP",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7181609200000107850,
+                        "name": "Inflatable Kayak",
+                        "obligatory": false,
+                        "price": 120,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-20 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-20 00:00:00",
+                        "description": "\n\n",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166200000107850,
+                        "name": "Crew Change(skipper remains the same, yacht cleaning included)",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165710000107850,
+                        "name": "Deluxe Charter Pack Includes  Transit log, professional check-in and check-out service, final cleaning, gas bottle, dinghy with outboard engine, and free SUP",
+                        "obligatory": true,
+                        "price": 300,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "Deluxe Charter Pack (Lemon)  | Includes: Transit Log, Professional Check-In And Check-Out Service, Final Cleaning, High-Quality Bed Linen And Bath Towels, Bathroom Amenities (Shampoo, Shower Gel, Toilet Paper), Welcome Kit (Coffee Capsules, Ground Coffee, Sugar, Salt, Pepper, Extra Virgin Olive Oil, Vinegar), Premium Cleaning Kit (Sponges, Garbage Bags, Cleaning Gloves, Dishwashing Gloves, Dish Soap, Kitchen Towels, Disinfectant Cleaner, Paper Towels), Gas Bottle, Extra Cushions & Sunbeds, Free 2x50m Floating Stern Lines, Free Dinghy With Outboard Engine and a Free SUP",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 6620154720000107850,
+                        "name": "Extra Bed Linen",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 3511891678907850,
+                        "name": "Wifi",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165880000107850,
+                        "name": "Early Check-in (access to the yacht by 14:00)",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166040000107850,
+                        "name": "Snorkeling Set",
+                        "obligatory": false,
+                        "price": 50,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    }
+                ]
+            }
+        ],
+        "descriptions": [
+            {
+                "category": "general",
+                "text": "AQUILO - BAVARIA CRUISER 46 (2014) | YOUR PERFECT IONIAN SAILING GETAWAY\n\nSet sail aboard Aquilo, a Bavaria Cruiser 46 built for those who seek both authentic sailing performance and the comfort of home at sea. With four spacious cabins and room for up to 10 guests (8 + 2), she?s the perfect choice whether you?re a passionate sailor or simply looking to unwind under the Ionian sun with family and friends.\n\nSMOOTH PERFORMANCE & EASY HANDLING\n\nPowered by a 55 hp engine and featuring bow thruster, autopilot, and rolling mainsail, Aquilo offers effortless control and smooth manoeuvring even in narrow harbours.\nHer beam of 14.2 ft and draft of just 6.9 ft provide ideal stability and freedom to explore the Ionian's most secluded coves - confidently and comfortably.\n\nBRIGHT, WELCOMING INTERIORS\n\nStep below deck and discover a bright, open space designed for relaxed living.\nPanoramic windows flood the salon with natural light, while the well-equipped galley with oven, refrigerator, coffee machine, and kitchen utensils invites you to prepare meals to share with your crew.\nEach of the four cabins offers privacy and comfort, complemented by three electric toilets, fresh linens, pillows, and towels - all ready for your journey.\n\nRELAX & UNWIND ON DECK\n\nThe spacious cockpit, bimini, and wide bathing platform create the perfect outdoor area for sunbathing, swimming, or enjoying sunset drinks with your favorite people.\nA dinghy with outboard, solar panels, and inverter ensure independence and eco-friendly cruising, while the outside speakers, flat-screen TV, and audio system set the mood for every evening onboard.\n\n\nFREE AMENITIES - BECAUSE EVERY SUMMER IS YOLO\n\nEnjoy free SUP , a complimentary outboard engine, and a Nespresso coffee machine - crafted to make every summer moment unforgettable.\n\nBook your week of freedom, sun & sea. Your adventure starts here!\n\n\nFollow us on Instagram: @yolo_charters\nFind us on Facebook: Yolo Charters \u2013 Discover The Ionian Sea",
+                "documents": []
+            }
+        ],
+        "crew": []
+    },
+    {
+        "id": 6362109340000107850,
+        "name": "Lemon",
+        "model": "Sun Odyssey 469",
+        "modelId": 139285200000100000,
+        "shipyardId": 3,
+        "year": 2013,
+        "kind": "Sail boat",
+        "certificate": "EL-IERISSOS-187",
+        "homeBaseId": 1935994390000100000,
+        "homeBase": "Preveza Main Port",
+        "companyId": 7850,
+        "company": "YOLO Charters",
+        "draught": 2.24,
+        "beam": 4.49,
+        "length": 14.05,
+        "waterCapacity": 615,
+        "fuelCapacity": 240,
+        "engine": "54 hp",
+        "deposit": 2000,
+        "depositWithWaiver": 0,
+        "currency": "EUR",
+        "commissionPercentage": 20,
+        "maxDiscountFromCommissionPercentage": 20,
+        "wc": 4,
+        "berths": 10,
+        "cabins": 4,
+        "wcNote": "",
+        "berthsNote": "(8+2)",
+        "cabinsNote": "",
+        "yearNote": "Refit: 2025",
+        "mainsailType": "Furling",
+        "genoaType": "Furling",
+        "requiredSkipperLicense": 1,
+        "defaultCheckInDay": 7,
+        "allCheckInDays": [
+            7
+        ],
+        "defaultCheckInTime": "17:00",
+        "defaultCheckOutTime": "09:00",
+        "minimumCharterDuration": 7,
+        "maximumCharterDuration": 90,
+        "comment": "Solar Panels, Espresso Coffee Machine, Extra Cushions &Sunbeds, Free Sup, Free Snorkeling Equipment, Free Outboard Engine, Free 2x50m Floating Stern Lines",
+        "images": [
+            {
+                "id": 6604179250000107850,
+                "name": "Lemon_0014.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179250000107850_Lemon_0014.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179230000107850,
+                "name": "Lemon_0008.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179230000107850_Lemon_0008.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604177310000107850,
+                "name": "Lemon_0009.jpg",
+                "description": "Main image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604177310000107850_Lemon_0009.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604177350000107850,
+                "name": "sun-odyssey-lemon.jpg",
+                "description": "Plan image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604177350000107850_sun-odyssey-lemon.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179330000107850,
+                "name": "Lemon_0041.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179330000107850_Lemon_0041.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179270000107850,
+                "name": "Lemon_0020.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179270000107850_Lemon_0020.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179290000107850,
+                "name": "Lemon_0023.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179290000107850_Lemon_0023.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179210000107850,
+                "name": "Lemon_0001.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179210000107850_Lemon_0001.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604179310000107850,
+                "name": "Lemon_0031.jpg",
+                "description": "",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604179310000107850_Lemon_0031.jpg",
+                "sortOrder": 0
+            },
+            {
+                "id": 6604177370000107850,
+                "name": "Lemon_0026.jpg",
+                "description": "Interior image",
+                "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6604177370000107850_Lemon_0026.jpg",
+                "sortOrder": 0
+            }
+        ],
+        "equipmentIds": [
+            33,
+            1,
+            4,
+            37,
+            5,
+            6,
+            7,
+            40,
+            9,
+            42,
+            11,
+            45,
+            46,
+            14,
+            18,
+            50,
+            21,
+            23,
+            25,
+            27
+        ],
+        "equipment": [
+            {
+                "id": 27,
+                "value": ""
+            },
+            {
+                "id": 46,
+                "value": ""
+            },
+            {
+                "id": 11,
+                "value": ""
+            },
+            {
+                "id": 21,
+                "value": ""
+            },
+            {
+                "id": 18,
+                "value": ""
+            },
+            {
+                "id": 37,
+                "value": ""
+            },
+            {
+                "id": 33,
+                "value": ""
+            },
+            {
+                "id": 37,
+                "value": ""
+            },
+            {
+                "id": 50,
+                "value": ""
+            },
+            {
+                "id": 25,
+                "value": ""
+            },
+            {
+                "id": 45,
+                "value": ""
+            },
+            {
+                "id": 14,
+                "value": ""
+            },
+            {
+                "id": 42,
+                "value": ""
+            },
+            {
+                "id": 7,
+                "value": ""
+            },
+            {
+                "id": 5,
+                "value": ""
+            },
+            {
+                "id": 1,
+                "value": ""
+            },
+            {
+                "id": 6,
+                "value": ""
+            },
+            {
+                "id": 9,
+                "value": ""
+            },
+            {
+                "id": 4,
+                "value": ""
+            },
+            {
+                "id": 23,
+                "value": ""
+            },
+            {
+                "id": 40,
+                "value": ""
+            },
+            {
+                "id": 18,
+                "value": ""
+            }
+        ],
+        "products": [
+            {
+                "name": "Bareboat",
+                "crewedByDefault": false,
+                "isDefaultProduct": true,
+                "extras": [
+                    {
+                        "id": 6390133980000107850,
+                        "name": "Skipper",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_night",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-08-04 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-08-04 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165960000107850,
+                        "name": "Fishing Rod Set",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166120000107850,
+                        "name": "Beach Towels For All The Crew (per person)",
+                        "obligatory": false,
+                        "price": 40,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking_person",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165800000107850,
+                        "name": "Extra SUP",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7181609200000107850,
+                        "name": "Inflatable Kayak",
+                        "obligatory": false,
+                        "price": 120,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_week",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-20 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-20 00:00:00",
+                        "description": "\n\n",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166200000107850,
+                        "name": "Crew Change(skipper remains the same, yacht cleaning included)",
+                        "obligatory": false,
+                        "price": 200,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165710000107850,
+                        "name": "Deluxe Charter Pack Includes  Transit log, professional check-in and check-out service, final cleaning, gas bottle, dinghy with outboard engine, and free SUP",
+                        "obligatory": true,
+                        "price": 300,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "Deluxe Charter Pack (Lemon)  | Includes: Transit Log, Professional Check-In And Check-Out Service, Final Cleaning, High-Quality Bed Linen And Bath Towels, Bathroom Amenities (Shampoo, Shower Gel, Toilet Paper), Welcome Kit (Coffee Capsules, Ground Coffee, Sugar, Salt, Pepper, Extra Virgin Olive Oil, Vinegar), Premium Cleaning Kit (Sponges, Garbage Bags, Cleaning Gloves, Dishwashing Gloves, Dish Soap, Kitchen Towels, Disinfectant Cleaner, Paper Towels), Gas Bottle, Extra Cushions & Sunbeds, Free 2x50m Floating Stern Lines, Free Dinghy With Outboard Engine and a Free SUP",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 6620154720000107850,
+                        "name": "Extra Bed Linen",
+                        "obligatory": false,
+                        "price": 80,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 3511891678907850,
+                        "name": "Wifi",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2130-11-02 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2130-11-02 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175165880000107850,
+                        "name": "Early Check-in (access to the yacht by 14:00)",
+                        "obligatory": false,
+                        "price": 100,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    },
+                    {
+                        "id": 7175166040000107850,
+                        "name": "Snorkeling Set",
+                        "obligatory": false,
+                        "price": 50,
+                        "percentage": 0,
+                        "kind": 1,
+                        "currency": "EUR",
+                        "unit": "per_booking",
+                        "payableInBase": true,
+                        "includesDepositWaiver": false,
+                        "validDaysFrom": 0,
+                        "validDaysTo": 365,
+                        "sailingDateFrom": "1970-01-01 00:00:00",
+                        "sailingDateTo": "2131-03-17 23:59:59",
+                        "validDateFrom": "1970-01-01 00:00:00",
+                        "validDateTo": "2131-03-17 00:00:00",
+                        "description": "",
+                        "includedExtras": [],
+                        "availableInBase": -1,
+                        "validSailingAreas": []
+                    }
+                ]
+            }
+        ],
+        "descriptions": [
+            {
+                "category": "general",
+                "text": "LEMON \u2013 JEANNEAU SUN ODYSSEY 469 | REFIT 2025 | YOUR PERFECT SUMMER ESCAPE\n\nSet sail on Lemon, a Jeanneau Sun Odyssey 469 designed for those who crave the perfect balance of comfort, style, and adventure. With 4 spacious cabins, it\u2019s the ideal yacht for both experienced sailors and those looking to try sailing for the first time in complete comfort.\n\nEFFORTLESS SAILING & SMOOTH PERFORMANCE\n\nSleek, fast, and stable, this yacht glides through the water effortlessly, making every journey smooth and enjoyable. The twin helms and easy sail handling let you embrace the thrill of sailing while enjoying a stress-free experience.\n\nSPACIOUS, LIGHT-FILLED INTERIORS\n\nInside, large panoramic windows flood the space with natural light, creating an inviting, airy atmosphere. The open-plan salon and galley provide the perfect setting for shared meals and unforgettable moments at sea. Each cabin has its own private bathroom, ensuring comfort and privacy for all guests.\n\nDESIGNED FOR PURE RELAXATION\n\nLemon is a wide and well-balanced yacht with generously sized spaces that invite you to relax. The large cockpit is built for easy lounging, and the swim platform gives you direct access to the refreshing blue waters. Comfortable sun pads at both the bow and the aft let you enjoy the Ionian sunshine in total bliss. Whether you're sunbathing, island-hopping, or enjoying sunset drinks on deck, Lemon offers the ultimate sailing escape.\n\nCOMFORT & STYLE IN EVERY DETAIL\n\nEnjoy an espresso from the machine or a classic brew from the coffee makers on board \u2014 Lemon caters to every taste. The fully equipped galley has everything you need, from cooking utensils to premium cotton bed linen, specially designed for the yacht and embroidered with its name.\n\nSMART, ECO-FRIENDLY ENERGY\n\nSolar panels integrated into the bimini simplify your day-to-day life at sea, providing clean energy throughout your journey. The yacht also features an electric outboard engine that both skippers and guests have praised for its smooth performance. A brand-new, spacious dinghy awaits for your shore explorations.\n\nFREE AMENITIES \u2013 BECAUSE EVERY SUMMER IS YOLO\n\nWe offer free SUP snorkeling equipment,  a free electric outboard engine, and two 50m floating stern lines \u2014 all to make your holiday completely carefree.\n\nBook your week of freedom, sun & sea. Your adventure starts here!\n\nFollow us on Instagram: @yolo_charters\nFind us on Facebook: Yolo Charters \u2013 Discover The Ionian Sea",
+                "documents": [
+                    {
+                        "id": 6731595560000107850,
+                        "name": "Lemon_welcome_brochure_full.pdf",
+                        "description": "",
+                        "url": "https:\/\/www.booking-manager.com\/cbm\/documents\/6731595560000107850_Lemon_welcome_brochure_full.pdf",
+                        "sortOrder": 0
+                    }
+                ]
+            }
+        ],
+        "crew": []
+    }
+]

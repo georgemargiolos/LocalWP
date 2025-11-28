@@ -10,9 +10,6 @@ class YOLO_YS_Public {
     public function __construct($plugin_name, $version) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        
-        add_filter('render_block', array($this, 'render_search_widget_block'), 10, 2);
-        add_filter('render_block', array($this, 'render_search_results_block'), 10, 2);
     }
     
     /**
@@ -88,32 +85,6 @@ class YOLO_YS_Public {
             return get_permalink($results_page_id);
         }
         return '';
-    }
-    
-    /**
-     * Render search widget block
-     */
-    public function render_search_widget_block($block_content, $block) {
-        if ($block['blockName'] !== 'yolo-ys/search-widget') {
-            return $block_content;
-        }
-        
-        ob_start();
-        include YOLO_YS_PLUGIN_DIR . 'public/templates/search-form.php';
-        return ob_get_clean();
-    }
-    
-    /**
-     * Render search results block
-     */
-    public function render_search_results_block($block_content, $block) {
-        if ($block['blockName'] !== 'yolo-ys/search-results') {
-            return $block_content;
-        }
-        
-        ob_start();
-        include YOLO_YS_PLUGIN_DIR . 'public/templates/search-results.php';
-        return ob_get_clean();
     }
     
     /**

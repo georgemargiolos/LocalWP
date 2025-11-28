@@ -20,9 +20,9 @@ class YOLO_YS_Yacht_Search {
     private function load_dependencies() {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-loader.php';
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-booking-manager-api.php';
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
         require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin.php';
         require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public.php';
-        require_once YOLO_YS_PLUGIN_DIR . 'public/blocks/class-yolo-ys-blocks.php';
         
         $this->loader = new YOLO_YS_Loader();
     }
@@ -43,10 +43,6 @@ class YOLO_YS_Yacht_Search {
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
         $this->loader->add_action('wp_ajax_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
         $this->loader->add_action('wp_ajax_nopriv_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
-        
-        // Register blocks
-        $plugin_blocks = new YOLO_YS_Blocks();
-        $this->loader->add_action('init', $plugin_blocks, 'register_blocks');
     }
     
     public function run() {

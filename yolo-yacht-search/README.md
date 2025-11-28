@@ -1,185 +1,336 @@
 # YOLO Yacht Search & Booking Plugin
 
-WordPress plugin for YOLO Charters with Booking Manager API integration, featuring search widget and results blocks with company prioritization.
+WordPress plugin for YOLO Charters with Booking Manager API integration, featuring search widget, fleet display, yacht details, and database storage.
 
 ## Features
 
-✅ **Search Widget Block** - Yacht search form styled like yolo-charters.com  
-✅ **Search Results Block** - Display results with YOLO boats prioritized  
+✅ **Search Widget** - Yacht search form styled like yolo-charters.com  
+✅ **Search Results** - Display results with YOLO boats prioritized  
+✅ **Our Fleet** - Beautiful grid display of all yachts  
+✅ **Yacht Details** - Individual yacht pages with image carousel  
+✅ **Database Storage** - All yacht data stored in WordPress database  
+✅ **One-Click Sync** - Fetch and update yacht data from Booking Manager API  
 ✅ **Litepicker Integration** - Beautiful date range picker with mobile support  
-✅ **Booking Manager API** - Real-time yacht availability from Booking Manager  
 ✅ **Company Prioritization** - YOLO boats (7850) shown first, then partner companies  
-✅ **Database Caching** - Configurable cache duration for API responses  
-✅ **Admin Settings** - Easy configuration via WordPress admin panel  
+✅ **Admin Dashboard** - Sync statistics and easy configuration  
 ✅ **Responsive Design** - Mobile-friendly interface  
+✅ **Easy Shortcodes** - No block editor needed!
 
 ## Installation
 
-1. Upload the `yolo-yacht-search` folder to `/wp-content/plugins/`
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to **YOLO Yacht Search** in the admin menu to configure settings
+1. Upload `yolo-yacht-search.zip` to WordPress → Plugins → Add New
+2. Activate the plugin
+3. Go to **YOLO Yacht Search** in the admin menu
+4. Click **"Sync All Yachts Now"** to fetch yacht data
+5. Configure page settings (already prefilled!)
 
-## Configuration
+## Quick Setup (4 Steps!)
 
-### Admin Settings
+### Step 1: Sync Yacht Data
+1. Go to **YOLO Yacht Search** in WordPress admin
+2. Click **"Sync All Yachts Now"** button
+3. Wait 1-2 minutes for sync to complete
+4. See statistics: Total yachts, YOLO yachts, Partner yachts
 
-Navigate to **YOLO Yacht Search** in WordPress admin:
+### Step 2: Create Required Pages
 
-#### API & Company Settings
+**Search Results Page:**
+1. Create new page: "Search Results"
+2. Add shortcode: `[yolo_search_results]`
+3. Publish
+
+**Yacht Details Page:**
+1. Create new page: "Yacht Details"
+2. Add shortcode: `[yolo_yacht_details]`
+3. Publish
+
+**Our Fleet Page (Optional):**
+1. Create new page: "Our Fleet"
+2. Add shortcode: `[yolo_our_fleet]`
+3. Publish
+
+### Step 3: Configure Settings
+1. Go to **YOLO Yacht Search** settings
+2. Select "Search Results" page in dropdown
+3. Select "Yacht Details" page in dropdown
+4. Save settings (all other settings prefilled!)
+
+### Step 4: Add Search Widget
+1. Edit your homepage
+2. Add shortcode: `[yolo_search_widget]`
+3. Publish
+
+**Done!** 🎉
+
+## Shortcodes
+
+### `[yolo_search_widget]`
+Displays the yacht search form with boat type dropdown and date picker.
+
+**Usage:**
+```
+[yolo_search_widget]
+```
+
+**Where:** Homepage or any search page
+
+---
+
+### `[yolo_search_results]`
+Displays search results with YOLO boats first, then partner boats.
+
+**Usage:**
+```
+[yolo_search_results]
+```
+
+**Where:** Dedicated search results page (select in settings)
+
+---
+
+### `[yolo_our_fleet]`
+Displays all yachts in beautiful cards - YOLO boats first, then partners.
+
+**Usage:**
+```
+[yolo_our_fleet]`
+```
+
+**Where:** Fleet browsing page
+
+**Features:**
+- Grid layout (3 columns → 2 → 1 responsive)
+- Yacht image or placeholder
+- Name, model, specs (year, cabins, berths, length)
+- Short description
+- "View Details" button
+
+---
+
+### `[yolo_yacht_details]`
+Displays individual yacht with complete information and image carousel.
+
+**Usage:**
+```
+[yolo_yacht_details]
+```
+
+**Where:** Dedicated yacht details page (select in settings)
+
+**Features:**
+- Image carousel with navigation arrows
+- Auto-advance every 5 seconds
+- Dots navigation
+- Complete specifications grid
+- Full description
+- Charter types (Bareboat, Crewed, etc.)
+- Equipment list
+- Available extras with pricing
+- Back button to fleet
+
+---
+
+## How It Works
+
+### Customer Journey
+
+1. **Homepage** → See search widget
+2. **Select boat type & dates** → Click "SEARCH"
+3. **Search Results** → YOLO boats appear first (red badges)
+4. **Click "View Details"** on any yacht
+5. **Yacht Details** → Image carousel, specs, equipment, extras
+6. **Back to Fleet** or browser back
+
+### Database Sync
+
+The plugin stores ALL yacht data in WordPress database:
+- Fetches from YOLO (Company 7850)
+- Fetches from partners (4366, 3604, 6711)
+- Stores: images, specs, equipment, extras, products
+- Makes search and display super fast!
+
+**When to sync:**
+- First time setup
+- When yachts are added/updated in Booking Manager
+- Recommended: Once per week
+
+---
+
+## Admin Dashboard
+
+### Sync Section
+Shows real-time statistics:
+- **Total Yachts**: All yachts in database
+- **YOLO Yachts**: Your boats (7850)
+- **Partner Yachts**: Partner boats
+- **Last Sync**: Time since last sync
+
+### Sync Button
+Click **"Sync All Yachts Now"** to:
+1. Fetch all yachts from API
+2. Store in WordPress database
+3. Update images, specs, equipment
+4. Show success message with count
+
+---
+
+## Settings
+
+### API Settings
 - **API Key**: Your Booking Manager API key (prefilled)
-- **My Company ID**: YOLO company ID - 7850 (prefilled)
-- **Friend Companies IDs**: Partner company IDs - 4366, 3604, 6711 (prefilled)
-- **Search Results Page**: Select the page where results will be displayed
 
-#### General Settings
-- **Cache Duration**: How long to cache API results (default: 24 hours)
-- **Currency**: Display currency (EUR, USD, GBP)
+### Company Settings
+- **My Company ID**: 7850 (YOLO) - boats appear first
+- **Friend Companies**: 4366, 3604, 6711 - partner companies
+- **Search Results Page**: Select page with `[yolo_search_results]`
+- **Yacht Details Page**: Select page with `[yolo_yacht_details]`
 
-#### Styling Settings
-- **Primary Color**: Main theme color
-- **Button Colors**: Search button styling
-- **Custom CSS**: Additional styling options
+### General Settings
+- **Cache Duration**: 1-168 hours (default: 24)
+- **Currency**: EUR, USD, GBP
 
-## Usage
+### Styling Settings
+- **Primary Color**: #1e3a8a (blue)
+- **Button Background**: #dc2626 (red)
+- **Button Text**: #ffffff (white)
 
-### 1. Create Results Page
+---
 
-1. Create a new page (e.g., "Search Results")
-2. Add the **YOLO Search Results** block to the page
-3. Publish the page
-4. Go to plugin settings and select this page as the "Search Results Page"
+## Yacht Card Design
 
-### 2. Add Search Widget
+### In Fleet Display
+- Yacht image (220px height)
+- Name in large blue text
+- Model in gray
+- Specs: Year, Cabins, Berths, Length
+- Short description (20 words)
+- Charter type badge
+- **"View Details" button** (blue for partners, red for YOLO)
 
-1. Edit any page where you want the search form
-2. Add the **YOLO Search Widget** block
-3. Publish the page
+### YOLO Boats Special Styling
+- Red "YOLO" badge in corner
+- Red border (2px)
+- Red "View Details" button
+- Displayed in first section
 
-### 3. How It Works
+---
 
-- Users fill out the search form (boat type, dates)
-- Form submits to the results page with search parameters
-- Results are fetched from Booking Manager API
-- **YOLO boats** (Company ID: 7850) are displayed first
-- **Partner boats** (Companies: 4366, 3604, 6711) are displayed below
-- Results are cached for better performance
+## Database Structure
 
-## Blocks
+### Tables Created
 
-### YOLO Search Widget
-- Boat type dropdown (Sailing yacht, Catamaran, Motor yacht)
-- Date range picker (Litepicker with Saturday-to-Saturday booking)
-- Search button
-- Optional: Include unconfirmed availability checkbox
+**`wp_yolo_yachts`**
+- Main yacht info (name, model, year, specs, description)
 
-### YOLO Search Results
-- Results header with count
-- YOLO boats section (highlighted with badge)
-- Partner boats section
-- Yacht cards with:
-  - Yacht name and type
-  - Location (base/marina)
-  - Price and currency
-  - View details button
+**`wp_yolo_yacht_images`**
+- Image URLs with sort order
 
-## API Integration
+**`wp_yolo_yacht_products`**
+- Charter types (Bareboat, Crewed, etc.)
 
-The plugin integrates with Booking Manager REST API v2:
+**`wp_yolo_yacht_equipment`**
+- Equipment list per yacht
 
-- **Base URL**: `https://www.booking-manager.com/api/v2`
-- **Endpoints Used**:
-  - `/offers` - Search for available yachts
-  - `/yacht/{id}` - Get yacht details
-  - `/company/{id}` - Get company details
+**`wp_yolo_yacht_extras`**
+- Available extras with pricing
 
-### Search Flow
+---
 
-1. User submits search form
-2. AJAX request to WordPress backend
-3. Backend makes API call to Booking Manager for YOLO boats (7850)
-4. Backend makes API calls for each partner company (4366, 3604, 6711)
-5. Results are combined and cached
-6. Results are returned to frontend
-7. Frontend renders results with YOLO boats first
+## Troubleshooting
 
-## Customization
+### No yachts displayed
+✅ Click "Sync All Yachts Now" in admin  
+✅ Check API key is correct  
+✅ Verify company IDs: 7850, 4366, 3604, 6711
 
-### Date Picker
+### Search not working
+✅ Select "Search Results Page" in settings  
+✅ Ensure page has `[yolo_search_results]` shortcode
 
-The Litepicker is configured to:
-- Allow only Saturday-to-Saturday bookings (configurable)
-- Show 2 months at a time
-- Mobile-responsive (breakpoint: 480px)
-- Calculate nights automatically
-- Prevent past date selection
+### View Details button not working
+✅ Select "Yacht Details Page" in settings  
+✅ Ensure page has `[yolo_yacht_details]` shortcode
 
-### Styling
+### Images not loading
+✅ Run sync again  
+✅ Check image URLs in database  
+✅ Verify Booking Manager API is accessible
 
-All styles can be customized via:
-- Admin settings (colors)
-- Custom CSS in theme
-- Modifying plugin CSS files
+### Sync fails
+✅ Check API key  
+✅ Verify internet connection  
+✅ Check PHP error logs
+
+---
 
 ## Technical Details
 
-### File Structure
-
-```
-yolo-yacht-search/
-├── admin/
-│   ├── css/
-│   ├── js/
-│   ├── partials/
-│   └── class-yolo-ys-admin.php
-├── assets/
-│   ├── css/
-│   │   └── litepicker.css
-│   └── js/
-│       ├── litepicker.js
-│       └── mobilefriendly.js
-├── includes/
-│   ├── class-yolo-ys-activator.php
-│   ├── class-yolo-ys-deactivator.php
-│   ├── class-yolo-ys-loader.php
-│   ├── class-yolo-ys-booking-manager-api.php
-│   └── class-yolo-ys-yacht-search.php
-├── public/
-│   ├── blocks/
-│   │   ├── yacht-search/
-│   │   └── yacht-results/
-│   ├── css/
-│   ├── js/
-│   ├── templates/
-│   └── class-yolo-ys-public.php
-└── yolo-yacht-search.php
-```
-
 ### Requirements
-
 - WordPress 5.8+
 - PHP 7.4+
+- MySQL 5.6+
 - Active Booking Manager API key
+
+### API Integration
+- **Base URL**: `https://www.booking-manager.com/api/v2`
+- **Endpoint**: `/yachts?companyId={id}`
+- **Auth**: API key in Authorization header
+
+### JavaScript Libraries
+- **Litepicker**: Date range picker (MIT)
+- **jQuery**: AJAX and DOM manipulation
+
+---
+
+## What's Prefilled
+
+✅ **Booking Manager API Key**: Your full API key  
+✅ **YOLO Company ID**: 7850  
+✅ **Partner Companies**: 4366, 3604, 6711  
+✅ **Cache Duration**: 24 hours  
+✅ **Currency**: EUR  
+✅ **Primary Color**: #1e3a8a (blue)  
+✅ **Button Color**: #dc2626 (red)
+
+---
+
+## Version History
+
+### v1.0.2 (Current)
+- ✅ Added database storage for yacht data
+- ✅ Added yacht sync with admin button
+- ✅ Added `[yolo_our_fleet]` shortcode
+- ✅ Added `[yolo_yacht_details]` shortcode
+- ✅ Added image carousel
+- ✅ Added "View Details" buttons
+- ✅ Added sync statistics dashboard
+
+### v1.0.1
+- Converted blocks to shortcodes
+- Added Litepicker integration
+- Added yolo-charters.com styling
+
+### v1.0.0
+- Initial release
+
+---
 
 ## Support
 
-For issues or questions, contact: george@yolocharters.com
+For issues or questions:
+- GitHub: https://github.com/georgemargiolos/LocalWP
+
+---
 
 ## License
 
 GPL v2 or later
 
+---
+
 ## Credits
 
 - **Author**: George Margiolos
-- **Litepicker**: MIT License (https://github.com/wakirin/Litepicker)
-- **Booking Manager API**: MMK Systems
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- Search widget block with Litepicker
-- Search results block with company prioritization
-- Booking Manager API integration
-- Admin settings page
-- Database caching
+- **API**: Booking Manager (MMK Systems)
+- **Litepicker**: MIT License
+- **Inspired by**: yolo-charters.com

@@ -52,6 +52,22 @@ class YOLO_YS_Booking_Manager_API {
     }
     
     /**
+     * Get all yachts for a company
+     */
+    public function get_yachts_by_company($company_id) {
+        $endpoint = '/yachts';
+        $params = array('companyId' => $company_id);
+        
+        $result = $this->make_request($endpoint, $params);
+        
+        if ($result['success']) {
+            return $result['data'];
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch yachts');
+    }
+    
+    /**
      * Make API request
      */
     private function make_request($endpoint, $params = array()) {

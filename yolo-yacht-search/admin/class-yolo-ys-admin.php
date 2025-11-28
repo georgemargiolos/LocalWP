@@ -10,6 +10,9 @@ class YOLO_YS_Admin {
     public function __construct($plugin_name, $version) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
+        
+        // Add AJAX handlers
+        add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
     }
     
     /**
@@ -37,6 +40,12 @@ class YOLO_YS_Admin {
             $this->version,
             true
         );
+        
+        // Localize script for AJAX
+        wp_localize_script($this->plugin_name, 'yoloYsAdmin', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('yolo_ys_admin_nonce')
+        ));
     }
     
     /**
@@ -114,6 +123,15 @@ class YOLO_YS_Admin {
             'yolo_ys_results_page',
             __('Search Results Page', 'yolo-yacht-search'),
             array($this, 'results_page_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_company_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_yacht_details_page');
+        add_settings_field(
+            'yolo_ys_yacht_details_page',
+            __('Yacht Details Page', 'yolo-yacht-search'),
+            array($this, 'yacht_details_page_callback'),
             'yolo-yacht-search',
             'yolo_ys_company_settings'
         );
@@ -227,7 +245,21 @@ class YOLO_YS_Admin {
             echo '<option value="' . esc_attr($page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
         }
         echo '</select>';
-        echo '<p class="description">' . __('Select the page where search results will be displayed (must contain the Search Results block)', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description">' . __('Select the page where search results will be displayed (must contain [yolo_search_results] shortcode)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function yacht_details_page_callback() {
+        $value = get_option('yolo_ys_yacht_details_page', '');
+        $pages = get_pages();
+        
+        echo '<select name="yolo_ys_yacht_details_page" class="regular-text">';
+        echo '<option value="">' . __('Select a page...', 'yolo-yacht-search') . '</option>';
+        foreach ($pages as $page) {
+            $selected = ($value == $page->ID) ? 'selected' : '';
+            echo '<option value="' . esc_attr($page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
+        }
+        echo '</select>';
+        echo '<p class="description">' . __('Select the page where yacht details will be displayed (must contain [yolo_yacht_details] shortcode)', 'yolo-yacht-search') . '</p>';
     }
     
     public function cache_duration_callback() {
@@ -261,5 +293,25 @@ class YOLO_YS_Admin {
     public function button_text_color_callback() {
         $value = get_option('yolo_ys_button_text_color', '#ffffff');
         echo '<input type="text" name="yolo_ys_button_text_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    /**
+     * AJAX handler for yacht sync
+     */
+    public function ajax_sync_yachts() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_all_yachts();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
     }
 }
