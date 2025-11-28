@@ -15,6 +15,8 @@ class YOLO_YS_Yacht_Search {
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->init_shortcodes();
+        $this->init_quote_handler();
     }
     
     private function load_dependencies() {
@@ -44,6 +46,14 @@ class YOLO_YS_Yacht_Search {
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
         $this->loader->add_action('wp_ajax_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
         $this->loader->add_action('wp_ajax_nopriv_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
+    }
+    
+    private function init_shortcodes() {
+        $shortcodes = new YOLO_YS_Shortcodes();
+    }
+    
+    private function init_quote_handler() {
+        $quote_handler = new YOLO_YS_Quote_Handler();
     }
     
     public function run() {

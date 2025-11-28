@@ -5,6 +5,14 @@
 class YOLO_YS_Shortcodes {
     
     public function __construct() {
+        // Register shortcodes on init hook
+        add_action('init', array($this, 'register_shortcodes'));
+    }
+    
+    /**
+     * Register all shortcodes
+     */
+    public function register_shortcodes() {
         add_shortcode('yolo_search_widget', array($this, 'search_widget_shortcode'));
         add_shortcode('yolo_search_results', array($this, 'search_results_shortcode'));
         add_shortcode('yolo_our_fleet', array($this, 'our_fleet_shortcode'));
