@@ -37,6 +37,7 @@ class YOLO_YS_Database {
             shipyard_id bigint(20) DEFAULT NULL,
             year_of_build int(11) DEFAULT NULL,
             refit_year int(11) DEFAULT NULL,
+            home_base varchar(255) DEFAULT NULL,
             length decimal(10,2) DEFAULT NULL,
             beam decimal(10,2) DEFAULT NULL,
             draft decimal(10,2) DEFAULT NULL,
@@ -126,11 +127,12 @@ class YOLO_YS_Database {
             'name' => $yacht_data['name'],
             'model' => isset($yacht_data['model']) ? $yacht_data['model'] : null,
             'shipyard_id' => isset($yacht_data['shipyardId']) ? $yacht_data['shipyardId'] : null,
-            'year_of_build' => isset($yacht_data['yearOfBuild']) ? $yacht_data['yearOfBuild'] : null,
-            'refit_year' => isset($yacht_data['refitYear']) ? $yacht_data['refitYear'] : null,
+            'year_of_build' => isset($yacht_data['year']) ? $yacht_data['year'] : null,
+            'refit_year' => $this->parse_refit_year($yacht_data),
+            'home_base' => isset($yacht_data['homeBase']) ? $yacht_data['homeBase'] : null,
             'length' => isset($yacht_data['length']) ? $yacht_data['length'] : null,
             'beam' => isset($yacht_data['beam']) ? $yacht_data['beam'] : null,
-            'draft' => isset($yacht_data['draft']) ? $yacht_data['draft'] : null,
+            'draft' => isset($yacht_data['draught']) ? $yacht_data['draught'] : null,
             'cabins' => isset($yacht_data['cabins']) ? $yacht_data['cabins'] : null,
             'wc' => isset($yacht_data['wc']) ? $yacht_data['wc'] : null,
             'berths' => isset($yacht_data['berths']) ? $yacht_data['berths'] : null,
@@ -238,6 +240,19 @@ class YOLO_YS_Database {
         }
         
         return $yachts;
+    }
+    
+    /**
+     * Parse refit year from yearNote field
+     */
+    private function parse_refit_year($yacht_data) {
+        if (isset($yacht_data['yearNote']) && !empty($yacht_data['yearNote'])) {
+            // Extract year from "Refit 2026" or "Refit: 2025" format
+            if (preg_match('/(\d{4})/', $yacht_data['yearNote'], $matches)) {
+                return intval($matches[1]);
+            }
+        }
+        return null;
     }
     
     /**

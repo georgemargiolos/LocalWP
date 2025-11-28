@@ -1,14 +1,18 @@
 <?php
 /**
- * Yacht Card Partial
- * Displays a single yacht card
- * 
- * Variables available:
- * $yacht - yacht object from database
+ * Yacht Card Partial Template
+ * Displays a single yacht card (matches yolo-charters.com design)
+ *
+ * @var object $yacht Yacht object from database
+ * @var bool $is_yolo Whether this is a YOLO yacht
  */
 
+$is_yolo = ($yacht->company_id == get_option('yolo_ys_my_company_id', 7850));
+$details_page_id = get_option('yolo_ys_yacht_details_page', '');
+$details_url = $details_page_id ? add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id)) : '#';
+
 // Get primary image
-$primary_image = null;
+$primary_image = '';
 if (!empty($yacht->images)) {
     foreach ($yacht->images as $img) {
         if ($img->is_primary) {
@@ -16,110 +20,82 @@ if (!empty($yacht->images)) {
             break;
         }
     }
-    if (!$primary_image && !empty($yacht->images[0])) {
+    if (empty($primary_image)) {
         $primary_image = $yacht->images[0]->image_url;
     }
 }
 
-// Check if this is a YOLO yacht
-$yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
-$is_yolo = ($yacht->company_id == $yolo_company_id);
-
-// Get product info
-$product_type = 'Charter';
-if (!empty($yacht->products)) {
-    $product_type = $yacht->products[0]->product_type;
+// Format refit display
+$refit_display = '';
+if ($yacht->refit_year) {
+    $refit_display = 'Refit: ' . $yacht->refit_year;
 }
 
+// Convert meters to feet
+$length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
 ?>
 
-<div class="yolo-ys-yacht-card <?php echo $is_yolo ? 'yolo-ys-yolo-yacht' : ''; ?>">
-    
-    <?php if ($is_yolo): ?>
-        <div class="yolo-ys-yacht-badge">YOLO</div>
-    <?php endif; ?>
-    
+<div class="yolo-ys-yacht-card <?php echo $is_yolo ? 'yolo-yacht' : ''; ?>">
     <div class="yolo-ys-yacht-image">
         <?php if ($primary_image): ?>
-            <img src="<?php echo esc_url($primary_image); ?>" alt="<?php echo esc_attr($yacht->name); ?>" loading="lazy">
+            <img src="<?php echo esc_url($primary_image); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
         <?php else: ?>
             <div class="yolo-ys-yacht-placeholder">⛵</div>
         <?php endif; ?>
     </div>
     
     <div class="yolo-ys-yacht-content">
-        <h3 class="yolo-ys-yacht-name"><?php echo esc_html($yacht->name); ?></h3>
-        
-        <p class="yolo-ys-yacht-model"><?php echo esc_html($yacht->model); ?></p>
-        
-        <div class="yolo-ys-yacht-specs">
-            <?php if ($yacht->year_of_build): ?>
-                <span class="yolo-ys-spec">
-                    <strong>Year:</strong> <?php echo esc_html($yacht->year_of_build); ?>
-                </span>
-            <?php endif; ?>
-            
-            <?php if ($yacht->cabins): ?>
-                <span class="yolo-ys-spec">
-                    <strong>Cabins:</strong> <?php echo esc_html($yacht->cabins); ?>
-                </span>
-            <?php endif; ?>
-            
-            <?php if ($yacht->berths): ?>
-                <span class="yolo-ys-spec">
-                    <strong>Berths:</strong> <?php echo esc_html($yacht->berths); ?>
-                </span>
-            <?php endif; ?>
-            
-            <?php if ($yacht->length): ?>
-                <span class="yolo-ys-spec">
-                    <strong>Length:</strong> <?php echo esc_html(number_format($yacht->length, 1)); ?>m
-                </span>
-            <?php endif; ?>
-        </div>
-        
-        <?php if ($yacht->description): ?>
-            <div class="yolo-ys-yacht-description">
-                <?php 
-                $short_desc = wp_trim_words($yacht->description, 20, '...');
-                echo wp_kses_post($short_desc);
-                ?>
+        <!-- Location -->
+        <?php if ($yacht->home_base): ?>
+            <div class="yolo-ys-yacht-location">
+                📍 <?php echo esc_html($yacht->home_base); ?>
             </div>
         <?php endif; ?>
         
-        <div class="yolo-ys-yacht-footer">
-            <span class="yolo-ys-yacht-type"><?php echo esc_html($product_type); ?></span>
-            <?php if (!$is_yolo): ?>
-                <span class="yolo-ys-partner-label">Partner Company</span>
-            <?php endif; ?>
+        <!-- Name and Model -->
+        <div class="yolo-ys-yacht-header">
+            <h3 class="yolo-ys-yacht-name"><?php echo esc_html($yacht->name); ?></h3>
+            <h4 class="yolo-ys-yacht-model"><?php echo esc_html($yacht->model); ?></h4>
         </div>
         
-        <?php
-        // Get yacht details page URL
-        $details_page_id = get_option('yolo_ys_yacht_details_page', '');
-        if ($details_page_id) {
-            $details_url = add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id));
-        } else {
-            $details_url = add_query_arg('yacht_id', $yacht->id, home_url('/yacht-details/'));
-        }
-        ?>
+        <!-- Specs Grid (matches yolo-charters.com exactly) -->
+        <div class="yolo-ys-yacht-specs-grid">
+            <div class="yolo-ys-spec-item">
+                <div class="yolo-ys-spec-value"><?php echo esc_html($yacht->cabins); ?></div>
+                <div class="yolo-ys-spec-label">Cabins</div>
+            </div>
+            
+            <div class="yolo-ys-spec-item">
+                <div class="yolo-ys-spec-value">
+                    <?php echo esc_html($yacht->year_of_build); ?>
+                    <?php if ($refit_display): ?>
+                        <span class="yolo-ys-refit-note"><?php echo esc_html($refit_display); ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="yolo-ys-spec-label">Built year</div>
+            </div>
+            
+            <div class="yolo-ys-spec-item">
+                <div class="yolo-ys-spec-value"><?php echo esc_html($length_ft); ?> ft</div>
+                <div class="yolo-ys-spec-label">Length</div>
+            </div>
+        </div>
         
-        <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-view-details-btn">
-            View Details →
+        <!-- Details Button -->
+        <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-details-btn">
+            DETAILS
         </a>
     </div>
-    
 </div>
 
 <style>
 .yolo-ys-yacht-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     position: relative;
-    border: 2px solid #e5e7eb;
 }
 
 .yolo-ys-yacht-card:hover {
@@ -127,27 +103,9 @@ if (!empty($yacht->products)) {
     box-shadow: 0 8px 16px rgba(0,0,0,0.15);
 }
 
-.yolo-ys-yolo-yacht {
-    border-color: #dc2626;
-}
-
-.yolo-ys-yacht-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #dc2626;
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 700;
-    z-index: 10;
-    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
-}
-
 .yolo-ys-yacht-image {
     width: 100%;
-    height: 220px;
+    height: 240px;
     overflow: hidden;
     background: #f3f4f6;
     position: relative;
@@ -178,96 +136,81 @@ if (!empty($yacht->products)) {
     padding: 20px;
 }
 
+.yolo-ys-yacht-location {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.yolo-ys-yacht-header {
+    margin-bottom: 20px;
+}
+
 .yolo-ys-yacht-name {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    color: #1e3a8a;
-    margin: 0 0 8px 0;
+    color: #1f2937;
+    margin: 0 0 4px 0;
 }
 
 .yolo-ys-yacht-model {
     font-size: 16px;
-    color: #6b7280;
-    margin: 0 0 15px 0;
-}
-
-.yolo-ys-yacht-specs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.yolo-ys-spec {
-    font-size: 14px;
-    color: #374151;
-}
-
-.yolo-ys-spec strong {
-    color: #1f2937;
-}
-
-.yolo-ys-yacht-description {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #4b5563;
-    margin-bottom: 15px;
-}
-
-.yolo-ys-yacht-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 15px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.yolo-ys-yacht-type {
-    font-size: 13px;
-    color: #1e3a8a;
     font-weight: 600;
-    background: #dbeafe;
-    padding: 4px 12px;
-    border-radius: 12px;
+    color: #1e3a8a;
+    margin: 0;
 }
 
-.yolo-ys-partner-label {
+.yolo-ys-yacht-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.yolo-ys-spec-item {
+    text-align: center;
+}
+
+.yolo-ys-spec-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.yolo-ys-refit-note {
+    display: block;
     font-size: 12px;
+    font-weight: 400;
     color: #6b7280;
-    font-style: italic;
+    margin-top: 2px;
 }
 
-.yolo-ys-view-details-btn {
+.yolo-ys-spec-label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yolo-ys-details-btn {
     display: block;
     width: 100%;
-    padding: 12px 20px;
-    margin-top: 15px;
-    background: #1e3a8a;
+    padding: 14px 20px;
+    background: #b91c1c;
     color: white;
     text-align: center;
     text-decoration: none;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 15px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
     transition: all 0.3s ease;
 }
 
-.yolo-ys-view-details-btn:hover {
-    background: #1e40af;
+.yolo-ys-details-btn:hover {
+    background: #991b1b;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
     color: white;
-}
-
-.yolo-ys-yolo-yacht .yolo-ys-view-details-btn {
-    background: #dc2626;
-}
-
-.yolo-ys-yolo-yacht .yolo-ys-view-details-btn:hover {
-    background: #b91c1c;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -275,8 +218,12 @@ if (!empty($yacht->products)) {
         height: 200px;
     }
     
-    .yolo-ys-yacht-name {
-        font-size: 20px;
+    .yolo-ys-yacht-specs-grid {
+        gap: 10px;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 16px;
     }
 }
 </style>
