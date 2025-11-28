@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Yacht Cards - Test Display</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 40px;
+        }
+        
+        .fleet-section {
+            margin-bottom: 60px;
+        }
+        
+        .fleet-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1e3a8a;
+            text-align: center;
+        }
+        
+        .fleet-badge {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .yacht-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .yacht-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .yacht-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .yolo-yacht {
+            border-color: #dc2626;
+        }
+        
+        .yacht-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc2626;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
+        }
+        
+        .yacht-image {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: #f3f4f6;
+            position: relative;
+        }
+        
+        .yacht-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .yacht-card:hover .yacht-image img {
+            transform: scale(1.05);
+        }
+        
+        .yacht-content {
+            padding: 20px;
+        }
+        
+        .yacht-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin: 0 0 8px 0;
+        }
+        
+        .yacht-model {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 0 0 15px 0;
+        }
+        
+        .yacht-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .spec {
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .spec strong {
+            color: #1f2937;
+        }
+        
+        .yacht-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4b5563;
+            margin-bottom: 15px;
+        }
+        
+        .yacht-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .yacht-type {
+            font-size: 13px;
+            color: #1e3a8a;
+            font-weight: 600;
+            background: #dbeafe;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+        
+        .partner-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .view-details-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            margin-top: 15px;
+            background: #1e3a8a;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .view-details-btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+        
+        .yolo-yacht .view-details-btn {
+            background: #dc2626;
+        }
+        
+        .yolo-yacht .view-details-btn:hover {
+            background: #b91c1c;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .yacht-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 YOLO Yacht Cards - Live Preview</h1>
+        
+        <!-- YOLO Fleet Section -->
+        <div class="fleet-section">
+            <h2 class="fleet-title">
+                <span class="fleet-badge">YOLO Charters</span>
+                Our Fleet
+            </h2>
+            
+            <div class="yacht-grid">
+                <!-- YOLO Yacht Card -->
+                <div class="yacht-card yolo-yacht">
+                    <div class="yacht-badge">YOLO</div>
+                    
+                    <div class="yacht-image">
+                        <img src="https://www.booking-manager.com/cbm/documents/7136926990000107850_Strawberry_main.JPG" alt="Strawberry">
+                    </div>
+                    
+                    <div class="yacht-content">
+                        <h3 class="yacht-name">Strawberry</h3>
+                        <p class="yacht-model">Lagoon 440</p>
+                        
+                        <div class="yacht-specs">
+                            <span class="spec"><strong>Year:</strong> 2008</span>
+                            <span class="spec"><strong>Cabins:</strong> 4</span>
+                            <span class="spec"><strong>Berths:</strong> 10</span>
+                            <span class="spec"><strong>Length:</strong> 13.6m</span>
+                        </div>
+                        
+                        <div class="yacht-description">
+                            Solar Panels, Espresso Coffee Machine, Extra Cushions & Sunbeds, Free SUP, Free Snorkeling Equipment, Free Outboard Engine, Free 2x50m Floating Stern Lines. Refit 2026.
+                        </div>
+                        
+                        <div class="yacht-footer">
+                            <span class="yacht-type">Catamaran</span>
+                        </div>
+                        
+                        <a href="#" class="view-details-btn">View Details →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Partner Fleet Section -->
+        <div class="fleet-section">
+            <h2 class="fleet-title">Partner Companies</h2>
+            
+            <div class="yacht-grid">
+                <!-- Partner Yacht Card Example 1 -->
+                <div class="yacht-card">
+                    <div class="yacht-image">
+                        <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=400&h=300&fit=crop" alt="Sample Yacht">
+                    </div>
+                    
+                    <div class="yacht-content">
+                        <h3 class="yacht-name">Ocean Dream</h3>
+                        <p class="yacht-model">Bavaria 46 Cruiser</p>
+                        
+                        <div class="yacht-specs">
+                            <span class="spec"><strong>Year:</strong> 2019</span>
+                            <span class="spec"><strong>Cabins:</strong> 4</span>
+                            <span class="spec"><strong>Berths:</strong> 8</span>
+                            <span class="spec"><strong>Length:</strong> 14.3m</span>
+                        </div>
+                        
+                        <div class="yacht-description">
+                            Fully equipped sailing yacht with modern amenities. Perfect for family cruising in the Greek islands. Air conditioning, generator, and water maker included.
+                        </div>
+                        
+                        <div class="yacht-footer">
+                            <span class="yacht-type">Sailing yacht</span>
+                            <span class="partner-label">Partner Company</span>
+                        </div>
+                        
+                        <a href="#" class="view-details-btn">View Details →</a>
+                    </div>
+                </div>
+                
+                <!-- Partner Yacht Card Example 2 -->
+                <div class="yacht-card">
+                    <div class="yacht-image">
+                        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop" alt="Sample Yacht">
+                    </div>
+                    
+                    <div class="yacht-content">
+                        <h3 class="yacht-name">Blue Horizon</h3>
+                        <p class="yacht-model">Jeanneau Sun Odyssey 469</p>
+                        
+                        <div class="yacht-specs">
+                            <span class="spec"><strong>Year:</strong> 2015</span>
+                            <span class="spec"><strong>Cabins:</strong> 4</span>
+                            <span class="spec"><strong>Berths:</strong> 10</span>
+                            <span class="spec"><strong>Length:</strong> 14.4m</span>
+                        </div>
+                        
+                        <div class="yacht-description">
+                            Spacious and comfortable cruising yacht. Ideal for larger groups. Features bow thruster, electric winches, and full navigation equipment for safe sailing.
+                        </div>
+                        
+                        <div class="yacht-footer">
+                            <span class="yacht-type">Sailing yacht</span>
+                            <span class="partner-label">Partner Company</span>
+                        </div>
+                        
+                        <a href="#" class="view-details-btn">View Details →</a>
+                    </div>
+                </div>
+                
+                <!-- Partner Yacht Card Example 3 -->
+                <div class="yacht-card">
+                    <div class="yacht-image">
+                        <img src="https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=400&h=300&fit=crop" alt="Sample Yacht">
+                    </div>
+                    
+                    <div class="yacht-content">
+                        <h3 class="yacht-name">Sea Breeze</h3>
+                        <p class="yacht-model">Lagoon 42</p>
+                        
+                        <div class="yacht-specs">
+                            <span class="spec"><strong>Year:</strong> 2021</span>
+                            <span class="spec"><strong>Cabins:</strong> 4</span>
+                            <span class="spec"><strong>Berths:</strong> 12</span>
+                            <span class="spec"><strong>Length:</strong> 12.8m</span>
+                        </div>
+                        
+                        <div class="yacht-description">
+                            Brand new catamaran with luxury finishes. Spacious flybridge, modern galley, and comfortable cabins. Perfect for those seeking comfort and style on the water.
+                        </div>
+                        
+                        <div class="yacht-footer">
+                            <span class="yacht-type">Catamaran</span>
+                            <span class="partner-label">Partner Company</span>
+                        </div>
+                        
+                        <a href="#" class="view-details-btn">View Details →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
