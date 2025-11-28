@@ -234,11 +234,19 @@
         const yoloClass = isYolo ? 'yolo-boat' : '';
         const companyInfo = !isYolo ? '<p class="yolo-ys-company-info">Partner Company</p>' : '';
         
+        // Image or placeholder
+        const imageHtml = boat.image_url 
+            ? `<img src="${boat.image_url}" alt="${boat.yacht}" style="width:100%;height:200px;object-fit:cover;border-radius:8px 8px 0 0;">` 
+            : '<span class="yolo-ys-yacht-image-placeholder">⛵</span>';
+        
+        // Details URL
+        const detailsUrl = boat.details_url || '#';
+        
         return `
             <div class="yolo-ys-yacht-card ${yoloClass}">
                 ${badgeHtml}
                 <div class="yolo-ys-yacht-image">
-                    <span class="yolo-ys-yacht-image-placeholder">⛵</span>
+                    ${imageHtml}
                 </div>
                 <div class="yolo-ys-yacht-info">
                     <h3 class="yolo-ys-yacht-name">${boat.yacht || 'Unknown'}</h3>
@@ -251,7 +259,7 @@
                             <span class="yolo-ys-price-amount">${boat.price || '0'}</span>
                             <span class="yolo-ys-price-currency">${boat.currency || 'EUR'}</span>
                         </div>
-                        <a href="#" class="yolo-ys-view-button">View Details</a>
+                        <a href="${detailsUrl}" class="yolo-ys-view-button">View Details</a>
                     </div>
                     ${companyInfo}
                 </div>

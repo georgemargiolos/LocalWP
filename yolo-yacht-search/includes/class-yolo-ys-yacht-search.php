@@ -24,6 +24,7 @@ class YOLO_YS_Yacht_Search {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-quote-handler.php';
         require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin.php';
         require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public.php';
+        require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public-search.php';
         
         $this->loader = new YOLO_YS_Loader();
     }
