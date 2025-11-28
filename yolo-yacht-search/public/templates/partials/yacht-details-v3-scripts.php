@@ -34,68 +34,50 @@ const yachtCarousel = {
     }
 };
 
-// Price Carousel - Show 4 weeks at a time
+// Price Carousel - Horizontal scroll showing 4 weeks at a time
 const priceCarousel = {
-    currentIndex: 0,
-    visibleSlides: 4,
-    slides: document.querySelectorAll('.price-slide'),
     container: document.querySelector('.price-carousel-slides'),
+    slideWidth: 265, // 250px width + 15px gap
+    visibleSlides: 4,
     
     init: function() {
-        this.updateView();
-    },
-    
-    updateView: function() {
-        if (this.slides.length === 0) return;
-        
-        // Hide all slides
-        this.slides.forEach(slide => {
-            slide.style.display = 'none';
-            slide.classList.remove('active');
-        });
-        
-        // Show 4 slides starting from currentIndex
-        for (let i = 0; i < this.visibleSlides && (this.currentIndex + i) < this.slides.length; i++) {
-            this.slides[this.currentIndex + i].style.display = 'block';
-            if (i === 0) {
-                this.slides[this.currentIndex + i].classList.add('active');
-            }
-        }
-        
-        // Update arrow visibility
+        if (!this.container) return;
+        // All slides are visible, just scrolled
         this.updateArrows();
     },
     
     updateArrows: function() {
+        if (!this.container) return;
+        
         const prevBtn = document.querySelector('.price-carousel-prev');
         const nextBtn = document.querySelector('.price-carousel-next');
         
         if (prevBtn) {
-            prevBtn.style.opacity = this.currentIndex > 0 ? '1' : '0.3';
-            prevBtn.style.cursor = this.currentIndex > 0 ? 'pointer' : 'not-allowed';
+            const canScrollLeft = this.container.scrollLeft > 0;
+            prevBtn.style.opacity = canScrollLeft ? '1' : '0.3';
+            prevBtn.style.cursor = canScrollLeft ? 'pointer' : 'not-allowed';
         }
         
         if (nextBtn) {
-            const hasMore = (this.currentIndex + this.visibleSlides) < this.slides.length;
-            nextBtn.style.opacity = hasMore ? '1' : '0.3';
-            nextBtn.style.cursor = hasMore ? 'pointer' : 'not-allowed';
+            const maxScroll = this.container.scrollWidth - this.container.clientWidth;
+            const canScrollRight = this.container.scrollLeft < maxScroll - 10;
+            nextBtn.style.opacity = canScrollRight ? '1' : '0.3';
+            nextBtn.style.cursor = canScrollRight ? 'pointer' : 'not-allowed';
         }
     },
     
     next: function() {
-        if (this.slides.length === 0) return;
-        if ((this.currentIndex + this.visibleSlides) < this.slides.length) {
-            this.currentIndex += this.visibleSlides;
-            this.updateView();
-        }
+        if (!this.container) return;
+        const scrollAmount = this.slideWidth * this.visibleSlides;
+        this.container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        setTimeout(() => this.updateArrows(), 300);
     },
     
     prev: function() {
-        if (this.slides.length === 0) return;
-        if (this.currentIndex > 0) {
-            this.currentIndex = Math.max(0, this.currentIndex - this.visibleSlides);
-            this.updateView();
-        }
+        if (!this.container) return;
+        const scrollAmount = this.slideWidth * this.visibleSlides;
+        this.container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        setTimeout(() => this.updateArrows(), 300);
     }
 };
 
@@ -179,6 +161,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+        
+        // Auto-populate with first week's dates and price
+        setTimeout(() => {
+            const firstSlide = document.querySelector('.price-slide');
+            if (firstSlide) {
+                const dateFrom = firstSlide.dataset.dateFrom;
+                const dateTo = firstSlide.dataset.dateTo;
+                const price = firstSlide.dataset.price;
+                const startPrice = firstSlide.dataset.startPrice;
+                const discount = firstSlide.dataset.discount;
+                const currency = firstSlide.dataset.currency;
+                
+                // Set date picker
+                if (dateFrom && dateTo && window.datePicker) {
+                    window.datePicker.setDateRange(dateFrom, dateTo);
+                }
+                
+                // Set price display
+                const priceDisplay = document.getElementById('selectedPriceDisplay');
+                const priceOriginal = document.getElementById('selectedPriceOriginal');
+                const priceDiscount = document.getElementById('selectedPriceDiscount');
+                const priceFinal = document.getElementById('selectedPriceFinal');
+                
+                if (priceDisplay && priceFinal) {
+                    priceDisplay.style.display = 'block';
+                    
+                    const formatPrice = (num) => Math.floor(num).toLocaleString('en-US').replace(/,/g, '.');
+                    
+                    if (discount > 0) {
+                        const discountAmount = startPrice - price;
+                        priceOriginal.innerHTML = `<span class="strikethrough">${formatPrice(startPrice)} ${currency}</span>`;
+                        priceDiscount.innerHTML = `${parseFloat(discount).toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${currency}`;
+                        priceOriginal.style.display = 'block';
+                        priceDiscount.style.display = 'block';
+                    } else {
+                        priceOriginal.style.display = 'none';
+                        priceDiscount.style.display = 'none';
+                    }
+                    
+                    priceFinal.innerHTML = `${formatPrice(price)} ${currency}`;
+                }
+            }
+        }, 500);
     }
 });
 

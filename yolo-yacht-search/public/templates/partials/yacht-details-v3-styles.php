@@ -168,11 +168,12 @@
 }
 
 .price-carousel-slides {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    display: flex;
+    gap: 15px;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 0 50px; /* Space for arrows */
     min-height: 200px;
-    padding: 0 40px; /* Space for arrows */
 }
 
 @media (max-width: 968px) {
@@ -195,6 +196,8 @@
     border-radius: 8px;
     background: white;
     transition: all 0.3s;
+    min-width: 250px;
+    flex-shrink: 0;
 }
 
 .price-slide:hover {
