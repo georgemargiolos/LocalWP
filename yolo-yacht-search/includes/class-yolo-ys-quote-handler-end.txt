@@ -1,0 +1,1 @@
+// Check if quote handler needs self-instantiation at end of file

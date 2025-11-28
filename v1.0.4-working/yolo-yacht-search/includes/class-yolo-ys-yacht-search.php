@@ -21,7 +21,6 @@ class YOLO_YS_Yacht_Search {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-loader.php';
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-booking-manager-api.php';
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
-        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-quote-handler.php';
         require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin.php';
         require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public.php';
         

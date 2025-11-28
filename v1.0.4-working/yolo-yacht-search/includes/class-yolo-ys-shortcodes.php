@@ -43,7 +43,7 @@ class YOLO_YS_Shortcodes {
      */
     public function yacht_details_shortcode($atts) {
         ob_start();
-        include YOLO_YS_PLUGIN_DIR . 'public/templates/yacht-details-v3.php';
+        include YOLO_YS_PLUGIN_DIR . 'public/templates/yacht-details.php';
         return ob_get_clean();
     }
 }
