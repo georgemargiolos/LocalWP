@@ -299,17 +299,63 @@
 
 #dateRangePicker {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
+    padding: 14px;
+    border: 2px solid #212529;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 500;
     text-align: center;
     cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+}
+
+#dateRangePicker:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 #dateRangePicker:focus {
     outline: none;
-    border-color: #1e3a8a;
+    border-color: #212529;
+    box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.1);
+}
+
+/* Selected Price Display */
+.selected-price-display {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.selected-price-original {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+
+.selected-price-original .strikethrough {
+    text-decoration: line-through;
+}
+
+.selected-price-discount {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.selected-price-final {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a8a;
 }
 
 /* Book Now Button */
@@ -490,6 +536,62 @@
 
 /* Description Section */
 .yacht-description-section {
+    margin-bottom: 40px;
+}
+
+.yacht-description-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #1e3a8a;
+}
+
+.yacht-description-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4b5563;
+}
+
+/* Equipment Section */
+.yacht-equipment-section {
+    margin-bottom: 40px;
+}
+
+.yacht-equipment-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #1e3a8a;
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.equipment-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.equipment-item i {
+    color: #10b981;
+    font-size: 16px;
+}
+
+/* Old Description Section */
+.old-yacht-description-section {
     margin-bottom: 40px;
 }
 

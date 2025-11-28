@@ -112,6 +112,38 @@ function selectWeek(button) {
     const dateFrom = slide.dataset.dateFrom;
     const dateTo = slide.dataset.dateTo;
     const price = slide.dataset.price;
+    const startPrice = slide.dataset.startPrice;
+    const discount = slide.dataset.discount;
+    const currency = slide.dataset.currency;
+    
+    // Update price display above Book Now
+    const priceDisplay = document.getElementById('selectedPriceDisplay');
+    const priceOriginal = document.getElementById('selectedPriceOriginal');
+    const priceDiscount = document.getElementById('selectedPriceDiscount');
+    const priceFinal = document.getElementById('selectedPriceFinal');
+    
+    if (priceDisplay && priceFinal) {
+        // Show price display
+        priceDisplay.style.display = 'block';
+        
+        // Format numbers with thousand separators
+        const formatPrice = (num) => Math.floor(num).toLocaleString('en-US').replace(/,/g, '.');
+        
+        // Show original price if there's a discount
+        if (discount > 0) {
+            const discountAmount = startPrice - price;
+            priceOriginal.innerHTML = `<span class="strikethrough">${formatPrice(startPrice)} ${currency}</span>`;
+            priceDiscount.innerHTML = `${parseFloat(discount).toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${currency}`;
+            priceOriginal.style.display = 'block';
+            priceDiscount.style.display = 'block';
+        } else {
+            priceOriginal.style.display = 'none';
+            priceDiscount.style.display = 'none';
+        }
+        
+        // Show final price
+        priceFinal.innerHTML = `${formatPrice(price)} ${currency}`;
+    }
     
     // Populate date picker
     if (window.datePicker) {

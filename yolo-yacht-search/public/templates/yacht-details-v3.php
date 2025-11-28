@@ -131,6 +131,13 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 <p>No pricing available. Please contact us for a quote.</p>
             <?php endif; ?>
             
+            <!-- Selected Week Price Display -->
+            <div id="selectedPriceDisplay" class="selected-price-display" style="display: none;">
+                <div id="selectedPriceOriginal" class="selected-price-original"></div>
+                <div id="selectedPriceDiscount" class="selected-price-discount"></div>
+                <div id="selectedPriceFinal" class="selected-price-final"></div>
+            </div>
+            
             <!-- Date Picker -->
             <div class="date-picker-section">
                 <h4>Or Choose Custom Dates</h4>
@@ -199,10 +206,12 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     <div class="price-slide <?php echo $index === 0 ? 'active' : ''; ?>" 
                          data-date-from="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_from))); ?>"
                          data-date-to="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_to))); ?>"
-                         data-price="<?php echo esc_attr($price->price); ?>">
+                         data-price="<?php echo esc_attr($price->price); ?>"
+                         data-start-price="<?php echo esc_attr($price->start_price); ?>"
+                         data-discount="<?php echo esc_attr($price->discount_percentage); ?>"
+                         data-currency="<?php echo esc_attr($price->currency); ?>">
                         
                         <div class="price-week"><?php echo $week_start; ?> - <?php echo $week_end; ?></div>
-                        <div class="price-product"><?php echo esc_html($price->product); ?></div>
                         
                         <?php if ($price->discount_percentage > 0): ?>
                             <div class="price-original">
@@ -269,11 +278,34 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     </div>
     <?php endif; ?>
     
+    <!-- Equipment Section -->
+    <?php if (!empty($equipment)): ?>
+    <div class="yacht-equipment-section">
+        <h3>Equipment</h3>
+        <div class="equipment-grid">
+            <?php foreach ($equipment as $item): ?>
+                <div class="equipment-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span><?php echo esc_html($item->name); ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    
     <!-- Location Section -->
     <?php if ($yacht->home_base): ?>
     <div class="yacht-map-section">
         <h3>Location</h3>
-        <div id="yachtMap" style="width: 100%; height: 400px; background: #f3f4f6; border-radius: 8px;"></div>
+        <div class="map-container">
+            <iframe 
+                src="https://www.google.com/maps/embed/v1/place?key=<?php echo esc_attr(get_option('yolo_ys_google_maps_api_key', 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8')); ?>&q=<?php echo urlencode($yacht->home_base . ', Greece'); ?>&zoom=12"
+                style="width: 100%; height: 400px; border: 0; border-radius: 8px;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
     </div>
     <?php endif; ?>
     
@@ -393,11 +425,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     
 </div>
 
-<script>
-var yachtLocation = <?php echo json_encode($yacht->home_base); ?>;
-</script>
-<?php $google_maps_key = get_option('yolo_ys_google_maps_api_key', 'AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4'); ?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo esc_attr($google_maps_key); ?>&callback=initMap" async defer></script>
+<!-- Google Maps now using iframe embed -->
 
 <?php include dirname(__FILE__) . '/partials/yacht-details-v3-styles.php'; ?>
 <?php include dirname(__FILE__) . '/partials/yacht-details-v3-scripts.php'; ?>
