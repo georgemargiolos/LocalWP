@@ -334,3 +334,116 @@ GPL v2 or later
 - **API**: Booking Manager (MMK Systems)
 - **Litepicker**: MIT License
 - **Inspired by**: yolo-charters.com
+
+
+---
+
+# YOLO Yacht Search & Booking WordPress Plugin (v1.5.2)
+
+**Version:** 1.5.2  
+**Author:** Manus AI for George Margiolos  
+**Last Updated:** November 28, 2025
+
+## 🚀 Overview
+
+YOLO Yacht Search is a powerful WordPress plugin designed for yacht charter businesses. It allows you to display your fleet, show real-time pricing from Booking Manager API, and capture leads with a professional quote request system.
+
+### Key Features:
+
+- **Database Caching:** Fetches all yacht data and prices from Booking Manager API and stores it locally for fast performance.
+- **YOLO First Display:** Prioritizes your company's boats (YOLO) in all displays with special styling.
+- **Our Fleet Page:** Showcase your entire fleet (YOLO + partners) with beautiful, responsive yacht cards.
+- **Yacht Details Page:** Individual pages for each yacht with image carousels, weekly price carousels, full specifications, and Google Maps integration.
+- **Quote Request System:** Capture leads with a professional quote request form that sends email notifications and stores requests in the database.
+- **Booking System UI:** Complete user interface for selecting dates, viewing prices with discounts, and proceeding to book.
+- **Shortcode-Based:** Easy to use shortcodes for displaying search widgets, fleet, and yacht details.
+- **Admin Panel:** Simple admin page to sync data and configure settings.
+
+## 📋 Requirements
+
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+- Booking Manager API Key
+- Google Maps API Key
+
+## ⚙️ Installation
+
+1. **Download:** Get the latest `yolo-yacht-search-vX.X.X.zip` file.
+2. **Upload:** In WordPress admin, go to `Plugins > Add New > Upload Plugin`.
+3. **Activate:** Click "Activate Plugin".
+
+## 🚀 Quick Start Guide
+
+### 1. Sync Data
+
+- Go to **YOLO Yacht Search** in the admin menu.
+- Click the **"Sync All Yachts Now"** button. This will fetch all yacht data and prices from the Booking Manager API. This may take a few minutes.
+
+### 2. Create Pages
+
+Create the following pages in WordPress:
+
+- **Our Fleet:** Add the shortcode `[yolo_our_fleet]`
+- **Yacht Details:** Add the shortcode `[yolo_yacht_details]`
+- **Search Results:** Add the shortcode `[yolo_search_results]`
+
+### 3. Configure Settings
+
+- Go to **YOLO Yacht Search** in the admin menu.
+- **Select the pages** you just created in the dropdowns.
+- **Add your Google Maps API Key** in `public/templates/yacht-details-v3.php` (line 295).
+- All other settings (company IDs, API key) are pre-filled.
+
+### 4. Add Search Widget
+
+- On your homepage or any other page, add the shortcode `[yolo_search_widget]`.
+
+## 📚 Shortcodes
+
+- `[yolo_our_fleet]` - Displays the entire fleet of yachts.
+- `[yolo_yacht_details]` - Displays the details for a single yacht (used on the Yacht Details page).
+- `[yolo_search_widget]` - Displays the yacht search form.
+- `[yolo_search_results]` - Displays the search results (used on the Search Results page).
+
+## 🎨 Customization
+
+### Company IDs
+
+- **Your Company ID (YOLO):** 7850
+- **Partner Company IDs:** 4366, 3604, 6711
+
+These are pre-filled in `admin/class-yolo-ys-admin.php`.
+
+### Styling
+
+- All CSS is located in `public/css/yolo-yacht-search-public.css`.
+- Yacht card styles are in `public/templates/partials/yacht-card.php`.
+- Yacht details styles are in `public/templates/partials/yacht-details-v3-styles.php`.
+
+## 🔧 Troubleshooting
+
+### Fatal Error on Activation
+
+**Error:** `Fatal error: Uncaught Error: Non-static method YOLO_YS_Database::create_tables() cannot be called statically`
+
+**Cause:** This was a bug in versions v1.1.0 - v1.5.1 where the activator was calling a non-static method statically.
+
+**Solution:** This is **FIXED in v1.5.2** and later. Please ensure you are using the latest version.
+
+### Sync Not Working
+
+- Check that your Booking Manager API key is correct in `admin/class-yolo-ys-admin.php`.
+- Check your server's firewall is not blocking outbound requests to `https://www.booking-manager.com`.
+
+### Google Maps Not Showing
+
+- Ensure you have a valid Google Maps API key.
+- Add the key to `public/templates/yacht-details-v3.php` (line 295).
+
+## ⏭️ Future Development
+
+- **Search Functionality:** Implement the backend logic for the search widget.
+- **Stripe Integration:** Connect the "Book Now" button to Stripe for payments.
+- **Booking Creation:** Create actual bookings in Booking Manager API after successful payment.
+
+This plugin was custom-built by Manus AI. For support or feature requests, please contact George Margiolos.
