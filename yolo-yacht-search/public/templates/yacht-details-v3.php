@@ -270,10 +270,28 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     
     <!-- Description Section -->
     <?php if (!empty($yacht->description)): ?>
+    <?php
+        // Split description into paragraphs
+        $paragraphs = array_filter(explode("\n", $yacht->description));
+        $preview_paragraphs = array_slice($paragraphs, 0, 2); // First 2 paragraphs
+        $remaining_paragraphs = array_slice($paragraphs, 2); // Rest
+        $has_more = count($remaining_paragraphs) > 0;
+    ?>
     <div class="yacht-description-section">
         <h3>Description</h3>
         <div class="yacht-description-content">
-            <?php echo nl2br(esc_html($yacht->description)); ?>
+            <div class="description-preview">
+                <?php echo nl2br(esc_html(implode("\n", $preview_paragraphs))); ?>
+            </div>
+            <?php if ($has_more): ?>
+                <div class="description-full" style="display: none;">
+                    <?php echo nl2br(esc_html(implode("\n", $remaining_paragraphs))); ?>
+                </div>
+                <button class="description-toggle" onclick="toggleDescription(this)">
+                    <span class="toggle-more">More...</span>
+                    <span class="toggle-less" style="display: none;">Less</span>
+                </button>
+            <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>
@@ -286,7 +304,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php foreach ($equipment as $item): ?>
                 <div class="equipment-item">
                     <i class="fas fa-check-circle"></i>
-                    <span><?php echo esc_html($item->name); ?></span>
+                    <span><?php echo esc_html($item->equipment_name); ?></span>
                 </div>
             <?php endforeach; ?>
         </div>

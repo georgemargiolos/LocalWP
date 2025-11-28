@@ -207,6 +207,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Toggle Description
+function toggleDescription(button) {
+    const section = button.closest('.yacht-description-content');
+    const fullText = section.querySelector('.description-full');
+    const moreSpan = button.querySelector('.toggle-more');
+    const lessSpan = button.querySelector('.toggle-less');
+    
+    if (fullText.style.display === 'none') {
+        fullText.style.display = 'block';
+        moreSpan.style.display = 'none';
+        lessSpan.style.display = 'inline';
+    } else {
+        fullText.style.display = 'none';
+        moreSpan.style.display = 'inline';
+        lessSpan.style.display = 'none';
+    }
+}
+
 // Toggle Quote Form
 function toggleQuoteForm() {
     const form = document.getElementById('quoteForm');

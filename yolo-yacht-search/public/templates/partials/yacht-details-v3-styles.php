@@ -557,6 +557,23 @@
     color: #4b5563;
 }
 
+.description-toggle {
+    background: none;
+    border: none;
+    color: #1e3a8a;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 0;
+    margin-top: 10px;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.description-toggle:hover {
+    color: #1e40af;
+}
+
 /* Equipment Section */
 .yacht-equipment-section {
     margin-bottom: 40px;
