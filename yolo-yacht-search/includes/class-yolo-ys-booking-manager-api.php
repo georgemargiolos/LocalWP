@@ -57,7 +57,7 @@ class YOLO_YS_Booking_Manager_API {
     public function get_prices($company_id, $date_from, $date_to) {
         $endpoint = '/prices';
         $params = array(
-            'company' => $company_id,
+            'companyId' => $company_id,  // Fixed: was 'company', should be 'companyId'
             'dateFrom' => $date_from,
             'dateTo' => $date_to
         );

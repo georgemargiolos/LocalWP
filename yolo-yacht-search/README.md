@@ -338,9 +338,9 @@ GPL v2 or later
 
 ---
 
-# YOLO Yacht Search & Booking WordPress Plugin (v1.5.2)
+# YOLO Yacht Search & Booking WordPress Plugin (v1.5.3)
 
-**Version:** 1.5.2  
+**Version:** 1.5.3  
 **Author:** Manus AI for George Margiolos  
 **Last Updated:** November 28, 2025
 
@@ -429,6 +429,18 @@ These are pre-filled in `admin/class-yolo-ys-admin.php`.
 **Cause:** This was a bug in versions v1.1.0 - v1.5.1 where the activator was calling a non-static method statically.
 
 **Solution:** This is **FIXED in v1.5.2** and later. Please ensure you are using the latest version.
+
+### Sync Hanging or Taking Too Long (v1.5.2 ONLY)
+
+**Error:** The "Sync All Yachts Now" button runs for 1+ hours or appears to hang.
+
+**Cause:** A critical bug in v1.5.2 where the API parameter was `company` instead of `companyId`, causing the API to return prices for ALL companies in the entire Booking Manager system instead of just your 4 companies.
+
+**Solution:** This is **FIXED in v1.5.3**. Upgrade immediately if you're on v1.5.2:
+1. Deactivate and delete v1.5.2
+2. Upload and activate v1.5.3
+3. Click "Sync All Yachts Now" - should complete in 1-2 minutes
+4. (Optional) Truncate `wp_yolo_yacht_prices` table to remove incorrect data from v1.5.2
 
 ### Sync Not Working
 

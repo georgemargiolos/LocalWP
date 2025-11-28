@@ -16,6 +16,9 @@ class YOLO_YS_Sync {
      * Sync all yachts from all companies
      */
     public function sync_all_yachts() {
+        // Increase time limit for sync
+        set_time_limit(300); // 5 minutes
+        ini_set('max_execution_time', 300);
         $results = array(
             'success' => false,
             'message' => '',
@@ -96,6 +99,7 @@ class YOLO_YS_Sync {
      * Sync prices for all companies
      */
     private function sync_prices($company_ids) {
+        // Sync next 12 months of pricing data
         $date_from = date('Y-m-d') . 'T00:00:00';
         $date_to = date('Y-m-d', strtotime('+12 months')) . 'T23:59:59';
         
