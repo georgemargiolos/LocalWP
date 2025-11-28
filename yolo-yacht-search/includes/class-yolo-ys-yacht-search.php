@@ -43,8 +43,7 @@ class YOLO_YS_Yacht_Search {
         
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-        $this->loader->add_action('wp_ajax_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
-        $this->loader->add_action('wp_ajax_nopriv_yolo_ys_search_yachts', $plugin_public, 'ajax_search_yachts');
+        // AJAX handlers are registered in class-yolo-ys-public-search.php
     }
     
     public function run() {
