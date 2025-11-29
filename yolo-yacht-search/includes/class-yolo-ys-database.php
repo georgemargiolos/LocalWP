@@ -235,16 +235,13 @@ class YOLO_YS_Database {
             ));
         }
         
-        // Store equipment
+        // Store equipment (just store IDs, names will be looked up from catalog when displaying)
         if (isset($yacht_data['equipment']) && is_array($yacht_data['equipment'])) {
             foreach ($yacht_data['equipment'] as $equip) {
-                // Get equipment name from catalog
-                $equipment_name = $this->get_equipment_name($equip['id']);
-                
                 $wpdb->insert($this->table_equipment, array(
                     'yacht_id' => $yacht_id,
                     'equipment_id' => $equip['id'],
-                    'equipment_name' => $equipment_name,
+                    'equipment_name' => null, // Will be populated from catalog on display
                     'category' => isset($equip['category']) ? $equip['category'] : null
                 ));
             }

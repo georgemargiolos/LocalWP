@@ -6,7 +6,14 @@
  */
 
 // Include equipment icons mapping
-require_once plugin_dir_path(__FILE__) . '../../includes/equipment-icons.php';
+// Use the plugin base directory constant to ensure the correct file path.
+// YOLO_YS_PLUGIN_DIR is defined in the main plugin file and points to the root of this plugin.
+if (defined('YOLO_YS_PLUGIN_DIR')) {
+    require_once YOLO_YS_PLUGIN_DIR . 'includes/equipment-icons.php';
+} else {
+    // Fallback for direct access (should not happen in WordPress context)
+    require_once dirname(__DIR__, 2) . '/includes/equipment-icons.php';
+}
 
 // Get yacht ID from URL
 $yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : '';
@@ -77,10 +84,14 @@ if (empty($requested_date_from) || empty($requested_date_to)) {
     }
 }
 
-// Get equipment
+// Get equipment with names from catalog
 $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
+$catalog_table = $wpdb->prefix . 'yolo_equipment_catalog';
 $equipment = $wpdb->get_results($wpdb->prepare(
-    "SELECT * FROM $equipment_table WHERE yacht_id = %s",
+    "SELECT e.*, c.name as equipment_name 
+     FROM $equipment_table e 
+     LEFT JOIN $catalog_table c ON e.equipment_id = c.id 
+     WHERE e.yacht_id = %s",
     $yacht_id
 ));
 
@@ -329,7 +340,13 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     <?php if (!empty($equipment)): ?>
     <?php
     // Load equipment icon mapping
-    require_once WP_PLUGIN_DIR . '/yolo-yacht-search/includes/equipment-icons.php';
+    // Use the plugin directory constant to avoid incorrect paths when computing directory names.
+    if (defined('YOLO_YS_PLUGIN_DIR')) {
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/equipment-icons.php';
+    } else {
+        // Fallback: traverse up two levels from this template and include the icons file
+        require_once dirname(__DIR__, 2) . '/includes/equipment-icons.php';
+    }
     ?>
     <!-- Load FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
