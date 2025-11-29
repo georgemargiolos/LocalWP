@@ -12,6 +12,7 @@ class YOLO_YS_Admin {
         $this->version = $version;
         
         // Add AJAX handlers
+        add_action('wp_ajax_yolo_ys_sync_equipment', array($this, 'ajax_sync_equipment'));
         add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
         add_action('wp_ajax_yolo_ys_sync_prices', array($this, 'ajax_sync_prices'));
     }
@@ -309,6 +310,26 @@ class YOLO_YS_Admin {
     public function button_text_color_callback() {
         $value = get_option('yolo_ys_button_text_color', '#ffffff');
         echo '<input type="text" name="yolo_ys_button_text_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    /**
+     * AJAX handler for equipment catalog sync
+     */
+    public function ajax_sync_equipment() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_equipment_catalog();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
     }
     
     /**

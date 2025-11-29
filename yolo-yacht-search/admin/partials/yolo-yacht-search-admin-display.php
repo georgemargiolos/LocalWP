@@ -12,6 +12,31 @@ $sync_status = $sync->get_sync_status();
 <div class="wrap">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
     
+    <!-- Equipment Catalog Sync Section -->
+    <div class="yolo-ys-equipment-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #16a34a; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #16a34a;">🔧 Equipment Catalog Sync</h2>
+        
+        <div style="background: #dcfce7; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="font-size: 16px; font-weight: 600; color: #374151;">Equipment catalog contains names for all equipment IDs</div>
+            <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">⚠️ <strong>IMPORTANT:</strong> Sync this BEFORE syncing yachts!</div>
+        </div>
+        
+        <button type="button" id="yolo-ys-sync-equipment-button" class="button button-primary button-hero" style="background: #16a34a; border-color: #16a34a; text-shadow: none; box-shadow: none;">
+            <span class="dashicons dashicons-admin-tools" style="margin-top: 8px;"></span>
+            Sync Equipment Catalog
+        </button>
+        
+        <div id="yolo-ys-equipment-sync-message" style="margin-top: 15px;"></div>
+        
+        <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
+            <strong>What happens when you sync equipment catalog:</strong><br>
+            • Fetches all 50 equipment items from Booking Manager API<br>
+            • Stores equipment IDs and names in local database<br>
+            • Enables yacht sync to display equipment names correctly<br>
+            • <strong>Note:</strong> This is a one-time sync, only needs to be run once or when new equipment is added
+        </p>
+    </div>
+    
     <!-- Yacht Sync Section -->
     <div class="yolo-ys-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <h2 style="margin-top: 0; color: #dc2626;">⚓ Yacht Database Sync</h2>
@@ -126,6 +151,44 @@ $sync_status = $sync->get_sync_status();
 
 <script>
 jQuery(document).ready(function($) {
+    // Equipment Catalog Sync Handler
+    $('#yolo-ys-sync-equipment-button').on('click', function() {
+        var $button = $(this);
+        var $message = $('#yolo-ys-equipment-sync-message');
+        
+        $button.prop('disabled', true);
+        $button.find('.dashicons').addClass('dashicons-update-spin');
+        $message.html('<div class="notice notice-info"><p>⏳ Syncing equipment catalog... This should only take a few seconds.</p></div>');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_ys_sync_equipment',
+                nonce: yoloYsAdmin.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $message.html(
+                        '<div class="notice notice-success"><p>' +
+                        '<strong>✅ Success!</strong> ' + response.data.message +
+                        '<br>Equipment items synced: ' + response.data.equipment_synced +
+                        '</p></div>'
+                    );
+                } else {
+                    $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> ' + response.data.message + '</p></div>');
+                }
+            },
+            error: function() {
+                $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> Failed to sync equipment catalog. Please try again.</p></div>');
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+                $button.find('.dashicons').removeClass('dashicons-update-spin');
+            }
+        });
+    });
+    
     // Yacht Sync Handler
     $('#yolo-ys-sync-button').on('click', function() {
         var $button = $(this);
