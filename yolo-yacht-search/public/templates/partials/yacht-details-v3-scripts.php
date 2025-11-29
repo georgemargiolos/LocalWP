@@ -440,9 +440,9 @@ function updatePriceDisplayWithDeposit() {
     const remainingBalance = totalPrice - depositAmount;
     
     // Update button text to show deposit amount
-    const bookBtn = document.querySelector('.btn-book-now');
-    if (bookBtn) {
-        bookBtn.innerHTML = `BOOK NOW - Pay ${formatEuropeanPrice(depositAmount, currency)} ${currency} (${depositPercentage}%) Deposit`;
+    const depositText = document.getElementById('depositText');
+    if (depositText) {
+        depositText.textContent = `Pay ${formatEuropeanPrice(depositAmount)} ${currency} (${depositPercentage}%) Deposit`;
     }
     
     // Add deposit info below price

@@ -38,7 +38,7 @@ function yolo_get_equipment_icon($equipment_id) {
         34 => 'fa-solid fa-ice-cream',            // Ice maker
         35 => 'fa-solid fa-bag-shopping',         // Lazy bag
         36 => 'fa-solid fa-border-all',           // Railing net
-        37 => 'fa-solid fa-refrigerator',         // Refrigerator
+        37 => 'fa-solid fa-kitchen-set',          // Refrigerator
         40 => 'fa-solid fa-mask-snorkel',         // Snorkeling equipment
         41 => 'fa-solid fa-flag-checkered',       // Gennaker
         42 => 'fa-solid fa-tv',                   // TV
@@ -49,10 +49,10 @@ function yolo_get_equipment_icon($equipment_id) {
         47 => 'fa-solid fa-tree',                 // Teak Cockpit
         48 => 'fa-solid fa-fire-burner',          // Barbecue grill in cockpit
         49 => 'fa-solid fa-steering-wheel',       // Outside Steering Position
-        50 => 'fa-solid fa-water-ladder',         // Swimming platform
+        50 => 'fa-solid fa-person-swimming',      // Swimming platform
         51 => 'fa-solid fa-water',                // Swimming pool
-        52 => 'fa-solid fa-sink',                 // Dishwasher
-        53 => 'fa-solid fa-washing-machine',      // Washer/Dryer
+        52 => 'fa-solid fa-kitchen-set',          // Dishwasher
+        53 => 'fa-solid fa-shirt',                // Washer/Dryer
         54 => 'fa-solid fa-lightbulb',            // Underwater lights
         55 => 'fa-solid fa-elevator',             // Tenderlift platform
         56 => 'fa-solid fa-warehouse',            // Tender garage

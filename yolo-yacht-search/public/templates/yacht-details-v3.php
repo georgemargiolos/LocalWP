@@ -182,7 +182,10 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             </div>
             
             <!-- Book Now Button -->
-            <button class="btn-book-now" onclick="bookNow()">BOOK NOW</button>
+            <button class="btn-book-now" onclick="bookNow()" id="bookNowBtn">
+                <span class="btn-main-text">BOOK NOW</span>
+                <span class="btn-sub-text" id="depositText">Loading...</span>
+            </button>
             
             <!-- Request Quote Section -->
             <div class="quote-section">
@@ -255,15 +258,15 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         
                         <?php if ($price->discount_percentage > 0): ?>
                             <div class="price-original">
-                                <span class="strikethrough"><?php echo esc_html($price->start_price); ?> <?php echo esc_html($price->currency); ?></span>
+                                <span class="strikethrough"><?php echo number_format($price->start_price, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?></span>
                             </div>
                             <div class="price-discount-badge">
-                                <?php echo number_format($price->discount_percentage, 2); ?>% OFF - Save <?php echo esc_html($discount_amount); ?> <?php echo esc_html($price->currency); ?>
+                                <?php echo number_format($price->discount_percentage, 2, ',', '.'); ?>% OFF - Save <?php echo number_format($discount_amount, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
                             </div>
                         <?php endif; ?>
                         
                         <div class="price-final">
-                            <?php echo esc_html($price->price); ?> <?php echo esc_html($price->currency); ?>
+                            <?php echo number_format($price->price, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
                         </div>
                         
                         <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>

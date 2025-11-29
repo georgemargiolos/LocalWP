@@ -382,6 +382,22 @@
     cursor: pointer;
     transition: all 0.3s;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-book-now .btn-main-text {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.btn-book-now .btn-sub-text {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.95;
 }
 
 .btn-book-now:hover {
