@@ -296,7 +296,21 @@ Click **"Sync All Yachts Now"** to:
 
 ## Version History
 
-### v1.5.5 (Latest)
+### v1.8.0 (Latest)
+- **Date Picker Fix:** Added Litepicker initialization to show search dates on page load.
+- **Carousel Integration:** Date picker now updates when clicking price carousel weeks.
+- **Extras Layout:** Combined extras into one row (obligatory + optional side-by-side).
+- **Responsive Design:** Two-column extras layout with mobile stacking.
+- **Visual Enhancement:** Color-coded extras headings (red for obligatory, blue for optional).
+
+### v1.7.9
+- **Search Flow:** Fixed date continuity from search to details page.
+- **Boat Type Filtering:** Added `type` column to database, mapped "Sailing yacht" → "Sail boat".
+- **Search Results:** Fixed display issues, removed "Motor yacht" option.
+- **Price Formatting:** Unified formatting (PHP sends raw numbers, JS formats with toLocaleString).
+- **UI Improvements:** Fixed search form alignment, added search form to results page.
+
+### v1.5.5
 - **UI/UX Enhancement:** Redesigned the price carousel on yacht detail pages.
 - Shows only peak season (May-Sept) in a 4-week grid.
 - Smart navigation to browse by groups of 4 weeks.
