@@ -6,7 +6,7 @@ function formatPrice(price) {
 }
 
 // Initialize Litepicker
-const dateInput = document.getElementById('yolo-ys-yacht-dates');
+const dateInput = document.getElementById('dateRangePicker');
 if (dateInput && typeof Litepicker !== 'undefined') {
     // Get initial dates from data attributes (passed from search)
     const initDateFrom = dateInput.dataset.initDateFrom;
@@ -176,7 +176,82 @@ document.addEventListener('DOMContentLoaded', function() {
     if (priceCarousel.container) {
         priceCarousel.init();
     }
+    
+    // Auto-select week based on init dates or default to July
+    autoSelectWeek();
 });
+
+// Auto-select week on page load
+function autoSelectWeek() {
+    const priceSlides = document.querySelectorAll('.price-slide');
+    if (priceSlides.length === 0) return;
+    
+    const carouselContainer = document.querySelector('.price-carousel-container');
+    const initDateFrom = carouselContainer ? carouselContainer.dataset.initDateFrom : '';
+    const initDateTo = carouselContainer ? carouselContainer.dataset.initDateTo : '';
+    
+    let selectedSlide = null;
+    
+    // Try to match init dates from URL/server
+    if (initDateFrom && initDateTo) {
+        for (let slide of priceSlides) {
+            if (slide.dataset.dateFrom === initDateFrom && slide.dataset.dateTo === initDateTo) {
+                selectedSlide = slide;
+                break;
+            }
+        }
+    }
+    
+    // If no match, default to first July week
+    if (!selectedSlide) {
+        for (let slide of priceSlides) {
+            const dateFrom = slide.dataset.dateFrom;
+            if (dateFrom && dateFrom.substring(5, 7) === '07') {
+                selectedSlide = slide;
+                break;
+            }
+        }
+    }
+    
+    // If still no match, use first slide
+    if (!selectedSlide) {
+        selectedSlide = priceSlides[0];
+    }
+    
+    // Activate the selected slide and update price display
+    if (selectedSlide) {
+        // Remove active class from all slides
+        priceSlides.forEach(s => s.classList.remove('active'));
+        selectedSlide.classList.add('active');
+        
+        // Update price display
+        const price = selectedSlide.dataset.price;
+        const startPrice = selectedSlide.dataset.startPrice;
+        const discount = selectedSlide.dataset.discount;
+        const currency = selectedSlide.dataset.currency;
+        
+        const priceDisplay = document.getElementById('selectedPriceDisplay');
+        const priceOriginal = document.getElementById('selectedPriceOriginal');
+        const priceDiscount = document.getElementById('selectedPriceDiscount');
+        const priceFinal = document.getElementById('selectedPriceFinal');
+        
+        if (priceDisplay && priceFinal) {
+            priceDisplay.style.display = 'block';
+            
+            if (parseFloat(discount) > 0) {
+                priceOriginal.textContent = formatPrice(startPrice) + ' ' + currency;
+                priceOriginal.style.display = 'block';
+                priceDiscount.textContent = parseFloat(discount).toFixed(2) + '% OFF - Save ' + formatPrice(Math.round(startPrice - price)) + ' ' + currency;
+                priceDiscount.style.display = 'block';
+            } else {
+                priceOriginal.style.display = 'none';
+                priceDiscount.style.display = 'none';
+            }
+            
+            priceFinal.textContent = formatPrice(price) + ' ' + currency;
+        }
+    }
+}
 
 // Select Week Function
 function selectWeek(button) {
@@ -187,6 +262,10 @@ function selectWeek(button) {
     const startPrice = slide.dataset.startPrice;
     const discount = slide.dataset.discount;
     const currency = slide.dataset.currency;
+    
+    // Update active class
+    document.querySelectorAll('.price-slide').forEach(s => s.classList.remove('active'));
+    slide.classList.add('active');
     
     // Update price display above Book Now
     const priceDisplay = document.getElementById('selectedPriceDisplay');

@@ -63,6 +63,17 @@ if (!empty($all_prices)) {
     $prices = array_slice($prices, 0, 20);
 }
 
+// Default to first available July week if no dates provided
+if (empty($requested_date_from) || empty($requested_date_to)) {
+    foreach ($prices as $price) {
+        if (date('m', strtotime($price->date_from)) == '07') {
+            $requested_date_from = substr($price->date_from, 0, 10);
+            $requested_date_to = substr($price->date_to, 0, 10);
+            break;
+        }
+    }
+}
+
 // Get equipment
 $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
 $equipment = $wpdb->get_results($wpdb->prepare(
@@ -151,7 +162,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- Date Picker -->
             <div class="date-picker-section">
                 <h4>Or Choose Custom Dates</h4>
-                <input type="text" id="yolo-ys-yacht-dates" placeholder="Select dates" readonly 
+                <input type="text" id="dateRangePicker" placeholder="Select dates" readonly 
                     data-init-date-from="<?php echo esc_attr($requested_date_from); ?>" 
                     data-init-date-to="<?php echo esc_attr($requested_date_to); ?>" />
             </div>
