@@ -70,3 +70,28 @@ function run_yolo_yacht_search() {
 }
 
 run_yolo_yacht_search();
+
+/**
+ * Check database version and run migrations if needed
+ */
+function yolo_ys_check_db_version() {
+    $current_db_version = get_option('yolo_ys_db_version', '1.0');
+    $required_db_version = '1.1';
+    
+    if (version_compare($current_db_version, $required_db_version, '<')) {
+        error_log('YOLO YS: Database version outdated. Running migrations...');
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-activator.php';
+        
+        // Re-run table creation (dbDelta will update existing tables)
+        YOLO_YS_Database::create_tables();
+        
+        // Run migrations
+        $reflection = new ReflectionClass('YOLO_YS_Activator');
+        $method = $reflection->getMethod('run_migrations');
+        $method->setAccessible(true);
+        $method->invoke(null);
+        
+        error_log('YOLO YS: Database migrations completed');
+    }
+}
+add_action('plugins_loaded', 'yolo_ys_check_db_version');

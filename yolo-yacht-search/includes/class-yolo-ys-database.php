@@ -111,7 +111,7 @@ class YOLO_YS_Database {
             id bigint(20) NOT NULL AUTO_INCREMENT,
             yacht_id bigint(20) NOT NULL,
             equipment_id bigint(20) NOT NULL,
-            equipment_name varchar(255) NOT NULL,
+            equipment_name varchar(255) DEFAULT NULL,
             category varchar(100) DEFAULT NULL,
             PRIMARY KEY  (id),
             KEY yacht_id (yacht_id)
@@ -132,7 +132,7 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment);
         dbDelta($sql_equipment_catalog);
         
-        update_option('yolo_ys_db_version', '1.0');
+        update_option('yolo_ys_db_version', '1.1');
     }
     
     /**

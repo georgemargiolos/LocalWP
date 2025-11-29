@@ -48,6 +48,7 @@ class YOLO_YS_Activator {
         global $wpdb;
         
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
         
         // Migration 1: Add type column if it doesn't exist (v1.7.5)
         $column_exists = $wpdb->get_results(
@@ -62,6 +63,24 @@ class YOLO_YS_Activator {
             );
             
             error_log('YOLO YS: Added type column to yachts table');
+        }
+        
+        // Migration 2: Fix equipment_name to allow NULL (v1.9.3)
+        $equipment_column = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$equipment_table} LIKE 'equipment_name'"
+        );
+        
+        if (!empty($equipment_column)) {
+            // Check if column is NOT NULL
+            $column_info = $equipment_column[0];
+            if (isset($column_info->Null) && $column_info->Null === 'NO') {
+                $wpdb->query(
+                    "ALTER TABLE {$equipment_table} 
+                     MODIFY COLUMN equipment_name varchar(255) DEFAULT NULL"
+                );
+                
+                error_log('YOLO YS: Modified equipment_name column to allow NULL');
+            }
         }
     }
 }
