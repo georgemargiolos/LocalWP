@@ -173,10 +173,10 @@ class YOLO_YS_Booking_Manager_API {
         
         $args = array(
             'headers' => array(
-                'Authorization' => $this->api_key,
+                'Authorization' => 'Bearer ' . $this->api_key,  // Fixed: Added Bearer prefix
                 'Accept' => 'application/json',
             ),
-            'timeout' => 60,  // Increased from 30 to 60 seconds for price sync
+            'timeout' => 180,  // Increased to 180 seconds for large data sets
         );
         
         $response = wp_remote_get($url, $args);

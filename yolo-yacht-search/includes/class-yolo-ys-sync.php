@@ -208,7 +208,15 @@ class YOLO_YS_Sync {
                 
                 // Validate response is an array
                 if (!is_array($offers)) {
-                    $error_msg = "Company $company_id: Unexpected response format";
+                    $error_msg = "Company $company_id: Unexpected response format (not an array): " . print_r($offers, true);
+                    $results['errors'][] = $error_msg;
+                    error_log('YOLO YS: ' . $error_msg);
+                    continue;
+                }
+                
+                // Check if response is empty
+                if (empty($offers)) {
+                    $error_msg = "Company $company_id: No offers returned for year $year";
                     $results['errors'][] = $error_msg;
                     error_log('YOLO YS: ' . $error_msg);
                     continue;

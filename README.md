@@ -1,45 +1,35 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.8.2  
-**Status:** ✅ STABLE - Equipment Sync & All Fixes Implemented!  
+**Current Version:** 1.8.4  
+**Status:** ✅ STABLE - Sync Fixes Implemented!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🎉 Version 1.8.2 - STABLE RELEASE: EQUIPMENT SYNC & ALL FIXES!
+## 🎉 Version 1.8.4 - STABLE RELEASE: SYNC FIXES!
 
-**This version implements a critical fix for the equipment data sync, along with all other fixes from the API documentation.**
+**This version implements critical fixes for the "syncing forever" issue in the offers sync.**
 
-### What's New in v1.8.2
+### What's New in v1.8.4
 
-1. **Equipment Data Sync (CRITICAL FIX)**
-   - Implemented a robust equipment catalog sync process to fetch equipment names from the `/equipment` endpoint.
-   - Created a new `wp_yolo_equipment_catalog` table to store the master list of all equipment.
-   - Updated the yacht sync process to use the new catalog for name mapping.
-   - **Result:** The equipment for all yachts is now correctly synced and displayed on the yacht details page.
+-   **FIX:** Resolved "syncing forever" issue in offers sync
+-   **FIX:** Added `Bearer` prefix to API authorization header
+-   **FIX:** Increased API request timeout to 180 seconds
+-   **FIX:** Added better error validation and logging for API responses
 
-2. **Date Picker ID Mismatch Fix**
-   - Fixed the date picker initialization issue as described in the API documentation.
-   - Changed the date picker input ID from `yolo-ys-yacht-dates` to `dateRangePicker`.
-   - **Result:** The date picker now correctly initializes and displays the dates passed from the search results page.
+### What Was New in v1.8.3
 
-3. **July Week Default Selection**
-   - Implemented server-side and client-side logic to default to the first available week in July when no dates are provided.
-   - **Result:** Users now see a default price and date selection when visiting a yacht details page without search parameters.
+-   **FIX:** Resolved infinite sync loop by syncing equipment catalog first
+-   **FIX:** Equipment now displays with names instead of "Unknown Equipment"
+-   **FIX:** Removed duplicate equipment section from yacht details page
+-   **FEAT:** Added FontAwesome icons for equipment items
 
-### What Was New in v1.8.0
+### What Was New in v1.8.2
 
-- Added Litepicker initialization to show search dates on page load
-- Date picker now updates when clicking price carousel weeks
-- Combined extras into one row (obligatory + optional side-by-side)
-- Responsive two-column layout for extras (stacks on mobile)
-- Color-coded extras headings (red for obligatory, blue for optional)
-
-### What Was New in v1.7.9
-
-- **Universal Price Formatting Fix:** Applied the price formatting fix universally across ALL pages (search results, yacht details carousel, price display box).
-- **Carousel Click Updates Date Picker:** Clicking a week in the price carousel now updates the date picker.
+-   **FEAT:** Implemented equipment catalog sync from `/equipment` endpoint
+-   **FIX:** Date picker ID mismatch from API documentation
+-   **FIX:** July week default selection on yacht details page
 
 ---
 
@@ -47,7 +37,7 @@
 
 ### Installation
 
-1. Download `yolo-yacht-search-v1.8.2.zip`
+1. Download `yolo-yacht-search-v1.8.4.zip`
 2. WordPress Admin → Plugins → Add New → Upload Plugin
 3. Activate plugin
 4. Configure settings (company IDs, Google Maps API key)
@@ -75,7 +65,7 @@
 - ✅ Database caching system (7 custom tables)
 - ✅ Yacht sync functionality
 - ✅ **Equipment catalog sync** (NEW in v1.8.2!)
-- ✅ **Weekly offers sync** (FIXED in v1.6.3!)
+- ✅ **Weekly offers sync** (FIXED in v1.8.4!)
 - ✅ **Search functionality** (COMPLETE in v1.7.2!)
 - ✅ **Search results with yacht cards** (NEW in v1.7.2!)
 - ✅ **Date-specific pricing display** (NEW in v1.7.2!)
@@ -133,20 +123,25 @@
 
 ## 📝 Complete Version History
 
-### v1.8.2 (November 29, 2025) - CURRENT ✅
+### v1.8.4 (November 29, 2025) - CURRENT ✅
+**SYNC FIXES!**
+- ✅ Resolved "syncing forever" issue in offers sync.
+- ✅ Added `Bearer` prefix to API authorization header.
+- ✅ Increased API request timeout to 180 seconds.
+- ✅ Added better error validation and logging for API responses.
+
+### v1.8.3 (November 29, 2025)
+**EQUIPMENT & SYNC FIXES!**
+- ✅ Resolved infinite sync loop by syncing equipment catalog first.
+- ✅ Fixed equipment display to show names instead of "Unknown Equipment".
+- ✅ Removed duplicate equipment section from yacht details page.
+- ✅ Added FontAwesome icons for equipment items.
+
+### v1.8.2 (November 29, 2025)
 **EQUIPMENT SYNC & ALL FIXES!**
 - ✅ Implemented equipment catalog sync to fix empty equipment section.
 - ✅ Fixed date picker ID mismatch as described in API documentation.
 - ✅ Implemented default July week selection on yacht details page.
-
-### v1.8.0 (November 29, 2025)
-- ✅ Added Litepicker initialization to show search dates on page load
-- ✅ Date picker now updates when clicking price carousel weeks
-- ✅ Combined extras into one row (obligatory + optional side-by-side)
-
-### v1.7.9 (November 29, 2025)
-- ✅ Universal price formatting fix across all pages
-- ✅ Carousel click updates date picker
 
 ---
 
