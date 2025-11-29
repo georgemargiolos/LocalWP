@@ -1,8 +1,14 @@
 <script>
-// Format price with comma thousands separator
+// Format price with European formatting (dot for thousands, comma for decimals)
 function formatPrice(price) {
-    if (!price) return '0';
-    return Number(price).toLocaleString('en-US');
+    if (!price) return '0,00';
+    // Convert to number and format with 2 decimals
+    const num = Number(price);
+    // Format with European style: 18.681,00
+    return num.toLocaleString('de-DE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
 // Initialize Litepicker after DOM is ready

@@ -89,7 +89,7 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
         <!-- Price -->
         <?php if ($min_price && isset($min_price->min_price)): ?>
         <div class="yolo-ys-yacht-price">
-            From <strong><?php echo number_format($min_price->min_price, 0, ',', '.'); ?> <?php echo esc_html($min_price->currency); ?></strong> per week
+            From <strong><?php echo number_format($min_price->min_price, 2, ',', '.'); ?> <?php echo esc_html($min_price->currency); ?></strong> per week
         </div>
         <?php endif; ?>
         

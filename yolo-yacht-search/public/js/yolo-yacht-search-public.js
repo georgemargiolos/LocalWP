@@ -360,10 +360,14 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
-        // Helper function to format price with comma as thousands separator
+        // Helper function to format price with European formatting (dot for thousands, comma for decimals)
         const formatPrice = (price) => {
-            if (!price || isNaN(price)) return '0';
-            return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            if (!price || isNaN(price)) return '0,00';
+            // Format with European style: 18.681,00
+            return Number(price).toLocaleString('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         };
         
         // Price display with discount
