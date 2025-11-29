@@ -145,8 +145,12 @@
         if (!resultsContainer.length) return;
         
         // Show loading
-        const loadingTemplate = $('#yolo-ys-loading-template').html();
-        resultsContainer.html(loadingTemplate);
+        resultsContainer.html(`
+            <div class="yolo-ys-loading">
+                <div class="yolo-ys-loading-spinner"></div>
+                <p>Searching for available yachts...</p>
+            </div>
+        `);
         
         // AJAX request
         $.ajax({
@@ -177,50 +181,52 @@
      */
     function displayResults(data) {
         const resultsContainer = $('#yolo-ys-results-container');
-        const template = $('#yolo-ys-results-template').html();
         
         // Check if no results
-        const noResults = data.total_count === 0;
+        if (data.total_count === 0) {
+            resultsContainer.html(`
+                <div class="yolo-ys-no-results">
+                    <h3>No Yachts Found</h3>
+                    <p>Try adjusting your search criteria or dates.</p>
+                </div>
+            `);
+            return;
+        }
         
-        // Simple template rendering (replace with Handlebars if needed)
-        let html = template;
-        
-        // Replace conditionals and data
-        html = html.replace(/\{\{total_count\}\}/g, data.total_count);
+        // Build HTML directly
+        let html = `
+            <div class="yolo-ys-results-header">
+                <h2>Search Results</h2>
+                <p class="yolo-ys-results-count">Found ${data.total_count} yacht(s) available</p>
+            </div>
+        `;
         
         // Render YOLO boats
         if (data.yolo_boats && data.yolo_boats.length > 0) {
-            html = html.replace(/\{\{#if yolo_boats\.length\}\}/g, '');
-            html = html.replace(/\{\{\/if\}\}/g, '');
-            
-            let yoloBoatsHtml = '';
+            html += `
+                <div class="yolo-ys-section-header">
+                    <h3>YOLO Charters Fleet</h3>
+                </div>
+                <div class="yolo-ys-results-grid">
+            `;
             data.yolo_boats.forEach(boat => {
-                yoloBoatsHtml += renderBoatCard(boat, true);
+                html += renderBoatCard(boat, true);
             });
-            html = html.replace(/\{\{#each yolo_boats\}\}.*?\{\{\/each\}\}/s, yoloBoatsHtml);
-        } else {
-            html = html.replace(/\{\{#if yolo_boats\.length\}\}.*?\{\{\/if\}\}/s, '');
+            html += '</div>';
         }
         
         // Render friend boats
         if (data.friend_boats && data.friend_boats.length > 0) {
-            html = html.replace(/\{\{#if friend_boats\.length\}\}/g, '');
-            
-            let friendBoatsHtml = '';
+            html += `
+                <div class="yolo-ys-section-header friends">
+                    <h3>Partner Fleet</h3>
+                </div>
+                <div class="yolo-ys-results-grid">
+            `;
             data.friend_boats.forEach(boat => {
-                friendBoatsHtml += renderBoatCard(boat, false);
+                html += renderBoatCard(boat, false);
             });
-            html = html.replace(/\{\{#each friend_boats\}\}.*?\{\{\/each\}\}/s, friendBoatsHtml);
-        } else {
-            html = html.replace(/\{\{#if friend_boats\.length\}\}.*?\{\{\/if\}\}/s, '');
-        }
-        
-        // Handle no results
-        if (noResults) {
-            html = html.replace(/\{\{#if no_results\}\}/g, '');
-            html = html.replace(/\{\{\/if\}\}/g, '');
-        } else {
-            html = html.replace(/\{\{#if no_results\}\}.*?\{\{\/if\}\}/s, '');
+            html += '</div>';
         }
         
         resultsContainer.html(html);

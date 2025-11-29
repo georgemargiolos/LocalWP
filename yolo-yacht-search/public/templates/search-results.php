@@ -20,6 +20,51 @@
     
 </div>
 
+<!-- Loading Template -->
+<script type="text/html" id="yolo-ys-loading-template">
+    <div class="yolo-ys-loading">
+        <div class="yolo-ys-loading-spinner"></div>
+        <p>Searching for available yachts...</p>
+    </div>
+</script>
+
+<!-- Results Template -->
+<script type="text/html" id="yolo-ys-results-template">
+    <div class="yolo-ys-results-header">
+        <h2>Search Results</h2>
+        <p class="yolo-ys-results-count">Found {{total_count}} yacht(s) available</p>
+    </div>
+    
+    {{#if yolo_boats.length}}
+    <div class="yolo-ys-section-header">
+        <h3>YOLO Charters Fleet</h3>
+    </div>
+    <div class="yolo-ys-results-grid" id="yolo-boats-grid">
+        {{#each yolo_boats}}
+        <!-- Boat cards will be rendered by JavaScript -->
+        {{/each}}
+    </div>
+    {{/if}}
+    
+    {{#if friend_boats.length}}
+    <div class="yolo-ys-section-header friends">
+        <h3>Partner Fleet</h3>
+    </div>
+    <div class="yolo-ys-results-grid" id="friend-boats-grid">
+        {{#each friend_boats}}
+        <!-- Boat cards will be rendered by JavaScript -->
+        {{/each}}
+    </div>
+    {{/if}}
+    
+    {{#if no_results}}
+    <div class="yolo-ys-no-results">
+        <h3>No Yachts Found</h3>
+        <p>Try adjusting your search criteria or dates.</p>
+    </div>
+    {{/if}}
+</script>
+
 <style>
 .yolo-ys-search-results {
     padding: 40px 20px;
