@@ -1,168 +1,45 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.9  
-**Status:** ✅ STABLE - Price Formatting Universal Fix!  
+**Current Version:** 1.8.2  
+**Status:** ✅ STABLE - Equipment Sync & All Fixes Implemented!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🎉 Version 1.7.9 - STABLE RELEASE: UNIVERSAL PRICE FIX!
+## 🎉 Version 1.8.2 - STABLE RELEASE: EQUIPMENT SYNC & ALL FIXES!
 
-**This version applies the price formatting fix universally across ALL pages (search results, yacht details carousel, price display box) and adds carousel click to update date picker functionality!**
+**This version implements a critical fix for the equipment data sync, along with all other fixes from the API documentation.**
 
-### What's New in v1.7.9
+### What's New in v1.8.2
 
-1. **Universal Price Formatting Fix**
-   - Applied price fix to yacht details carousel
-   - Applied price fix to price display box
-   - PHP sends raw numbers, JavaScript formats with toLocaleString('en-US')
-   - All prices now display as "4,500 EUR" format
+1. **Equipment Data Sync (CRITICAL FIX)**
+   - Implemented a robust equipment catalog sync process to fetch equipment names from the `/equipment` endpoint.
+   - Created a new `wp_yolo_equipment_catalog` table to store the master list of all equipment.
+   - Updated the yacht sync process to use the new catalog for name mapping.
+   - **Result:** The equipment for all yachts is now correctly synced and displayed on the yacht details page.
 
-2. **Carousel Click Updates Date Picker**
-   - Clicking a week in price carousel now updates date picker
-   - selectWeek() function calls window.yoloDatePicker.setDateRange()
-   - Smooth scroll to top after selection
+2. **Date Picker ID Mismatch Fix**
+   - Fixed the date picker initialization issue as described in the API documentation.
+   - Changed the date picker input ID from `yolo-ys-yacht-dates` to `dateRangePicker`.
+   - **Result:** The date picker now correctly initializes and displays the dates passed from the search results page.
 
-3. **Date Picker Overflow Fix**
-   - Litepicker calendar dropdown no longer clipped
-   - Added z-index and overflow CSS fixes
-   - Calendar displays correctly above all content
+3. **July Week Default Selection**
+   - Implemented server-side and client-side logic to default to the first available week in July when no dates are provided.
+   - **Result:** Users now see a default price and date selection when visiting a yacht details page without search parameters.
 
-### What Was New in v1.7.8
+### What Was New in v1.8.0
 
-1. **Fixed Price Formatting**
-   - Prices now display correctly (4,500 EUR instead of 4.32 EUR)
-   - Custom formatPrice() function with regex
-   - Comma as thousands separator
-   - Accurate discount calculations
+- Added Litepicker initialization to show search dates on page load
+- Date picker now updates when clicking price carousel weeks
+- Combined extras into one row (obligatory + optional side-by-side)
+- Responsive two-column layout for extras (stacks on mobile)
+- Color-coded extras headings (red for obligatory, blue for optional)
 
-2. **Improved Code Quality**
-   - PHP sends raw float numbers
-   - JavaScript formats on display
-   - No more locale parsing issues
+### What Was New in v1.7.9
 
-3. **All Features Stable**
-   - Search working perfectly
-   - Grid layout responsive
-   - Navigation working
-   - Professional UX throughout
-
-### What Was New in v1.7.7
-
-1. **Emergency Revert**
-   - Reverted v1.7.6 price formatting that broke search
-   - Restored working search functionality
-   - Kept grid layout improvements
-
-### What Was New in v1.7.6
-
-1. **Professional Grid Layout**
-   - 3 boats per row on desktop
-   - 2 boats per row on tablets
-   - 1 boat per row on mobile
-   - Responsive breakpoints
-
-2. **Fixed Price Formatting**
-   - Comma as thousands separator (4,500 EUR)
-   - Fixed discount calculation
-   - Proper percentage display (10.00% OFF)
-
-3. **Search Form on Results Page**
-   - Pre-filled with current search criteria
-   - Separate Litepicker instance
-   - Re-search without page reload
-   - URL updates automatically
-
-4. **Consistent Styling**
-   - DETAILS button matches Our Yachts section
-   - Search button properly sized and aligned
-   - Professional appearance throughout
-
-5. **No Database Changes**
-   - Pure UI/UX update
-   - No migration required
-   - Just upload and activate
-
-### What Was New in v1.7.5
-
-1. **Boat Type Filtering Now Works**
-   - Added `type` column to database to store boat type
-   - Updated sync code to store `kind` from API as `type`
-   - Fixed type mapping ("Sailing yacht" → "Sail boat" with space!)
-   - Search now correctly filters by boat type
-
-2. **Database Migration**
-   - Automatic migration adds `type` column on plugin activation
-   - **IMPORTANT:** Must re-sync yachts after updating!
-
-3. **UI Improvements**
-   - Removed "Motor yacht" option (YOLO doesn't have motor yachts)
-   - Removed "Include yachts without availability confirmation" checkbox
-   - Fixed search button alignment
-   - Clean 3-field horizontal layout
-
-4. **Search Form Options**
-   - All types (shows everything)
-   - Sailing yacht (monohull sailboats only)
-   - Catamaran (catamarans only)
-
-### What Was New in v1.7.4
-
-1. **Search Results Now Display**
-   - Fixed missing HTML templates that JavaScript expected
-   - Rewrote displayResults() to build HTML directly
-   - Simplified loading state rendering
-
-2. **Improved Code Quality**
-   - Removed complex regex template parsing
-   - Direct HTML construction with template literals
-
-### What Was New in v1.7.3
-
-1. **Search-to-Details Date Continuity**
-   - Search dates now passed through URL parameters
-   - Details page auto-selects the searched week in carousel
-   - Date picker shows the searched dates
-   - Price display matches the searched week
-   - Complete UX flow consistency from search → results → details
-
-2. **Smart Week Matching**
-   - JavaScript finds and activates the matching week
-   - Falls back to first week if no match found
-   - Updates all UI components automatically
-
-3. **Enhanced User Experience**
-   - No more confusion with mismatched dates
-   - Professional and consistent booking flow
-   - Seamless transition from search to details
-
-### What Was New in v1.7.2
-
-1. **Search Results Display**
-   - Yacht card component (matches "Our Yachts" page design)
-   - Responsive grid layout
-   - Real yacht images from database
-   - Specs grid showing cabins, length, berths
-
-2. **Date-Specific Pricing**
-   - Strikethrough original price (if discounted)
-   - Discount badge showing percentage and amount saved
-   - Final price in bold
-   - Prices calculated for user's selected dates
-
-3. **Database Fixes**
-   - Fixed table name: `wp_yolo_yacht_yachts`
-   - Fixed column name: `discount_percentage`
-   - Fixed option name for yacht details page URL
-
-### The Journey: v1.6.0 → v1.7.2 (9 versions!)
-
-This session achieved massive progress with 9 version releases:
-
-**Morning (v1.6.0-v1.6.3):** Fixed critical HTTP 500 sync error  
-**Afternoon (v1.6.4-v1.6.6):** Enhanced UI/UX with carousel, maps, equipment  
-**Evening (v1.7.0-v1.7.2):** Implemented complete search functionality
+- **Universal Price Formatting Fix:** Applied the price formatting fix universally across ALL pages (search results, yacht details carousel, price display box).
+- **Carousel Click Updates Date Picker:** Clicking a week in the price carousel now updates the date picker.
 
 ---
 
@@ -170,14 +47,14 @@ This session achieved massive progress with 9 version releases:
 
 ### Installation
 
-1. Download `yolo-yacht-search-v1.7.5.zip`
+1. Download `yolo-yacht-search-v1.8.2.zip`
 2. WordPress Admin → Plugins → Add New → Upload Plugin
 3. Activate plugin
 4. Configure settings (company IDs, Google Maps API key)
-5. **Sync yachts** (Admin → YOLO Yacht Search → Sync All Yachts Now)
-   - **CRITICAL for v1.7.5:** Must re-sync to populate the new `type` column!
-6. **Sync offers** (Admin → YOLO Yacht Search → Sync Weekly Offers)
-7. Test search on home page
+5. **Sync Equipment Catalog** (Admin → YOLO Yacht Search → Sync Equipment Catalog)
+6. **Sync yachts** (Admin → YOLO Yacht Search → Sync All Yachts Now)
+7. **Sync offers** (Admin → YOLO Yacht Search → Sync Weekly Offers)
+8. Test search on home page
 
 ### Configuration
 
@@ -193,10 +70,11 @@ This session achieved massive progress with 9 version releases:
 
 ## ✅ Features
 
-### Completed ✅ (90%)
+### Completed ✅ (95%)
 - ✅ Booking Manager API integration (GET endpoints)
-- ✅ Database caching system (6 custom tables)
+- ✅ Database caching system (7 custom tables)
 - ✅ Yacht sync functionality
+- ✅ **Equipment catalog sync** (NEW in v1.8.2!)
 - ✅ **Weekly offers sync** (FIXED in v1.6.3!)
 - ✅ **Search functionality** (COMPLETE in v1.7.2!)
 - ✅ **Search results with yacht cards** (NEW in v1.7.2!)
@@ -207,14 +85,14 @@ This session achieved massive progress with 9 version releases:
 - ✅ **Week selection updates date picker** (NEW in v1.6.4!)
 - ✅ **Price display above Book Now** (NEW in v1.6.4!)
 - ✅ **Description accordion** (collapsible, NEW in v1.6.6!)
-- ✅ **Equipment section** (NEW in v1.6.4!)
+- ✅ **Equipment section** (FIXED in v1.8.2!)
 - ✅ **Extras section** (obligatory + optional)
 - ✅ Google Maps integration (iframe embed)
 - ✅ Date picker (Litepicker)
 - ✅ Quote request form
 - ✅ Admin dashboard with sync buttons
 
-### Pending 🚧 (10%)
+### Pending 🚧 (5%)
 - 🔨 Booking flow ("Book Now" button functionality)
 - 🔨 Stripe payment integration
 - 🔨 Booking creation via API POST
@@ -230,14 +108,15 @@ This session achieved massive progress with 9 version releases:
 **Frontend:** WordPress pages with shortcodes  
 **Backend:** PHP with WordPress database  
 **API:** Booking Manager REST API v2  
-**Caching:** Local WordPress database (6 tables)  
+**Caching:** Local WordPress database (7 tables)  
 **Search:** Database-first queries (fast!)
 
 ### Database Tables
 
-- `wp_yolo_yacht_yachts` - Yacht data
+- `wp_yolo_yachts` - Yacht data
 - `wp_yolo_yacht_images` - Yacht images
 - `wp_yolo_yacht_equipment` - Equipment lists
+- `wp_yolo_equipment_catalog` - Master equipment list (NEW in v1.8.2!)
 - `wp_yolo_yacht_extras` - Extras/add-ons
 - `wp_yolo_yacht_prices` - Weekly offers (Saturday-to-Saturday)
 - `wp_yolo_yacht_companies` - Company information
@@ -246,223 +125,28 @@ This session achieved massive progress with 9 version releases:
 
 - ✅ `GET /companies` - Fetch company data
 - ✅ `GET /yachts` - Fetch yacht data
+- ✅ `GET /equipment` - Fetch equipment catalog (NEW in v1.8.2!)
 - ✅ `GET /offers` - Fetch weekly offers (per company)
 - ❌ `POST /bookings` - Create booking (not implemented yet)
-
-### Search Flow
-
-```
-User Input (Home Page)
-    ↓
-[Boat Type] + [Dates] → Click "SEARCH"
-    ↓
-AJAX Request → class-yolo-ys-public-search.php
-    ↓
-Database Query (wp_yolo_yacht_yachts + wp_yolo_yacht_prices)
-    ↓
-JSON Response (yachts + images + pricing)
-    ↓
-JavaScript Renders Yacht Cards
-    ↓
-Display Results in Responsive Grid
-```
 
 ---
 
 ## 📝 Complete Version History
 
-### v1.7.2 (November 29, 2025) - CURRENT ✅
-**SEARCH RESULTS COMPLETE!**
-- ✅ Yacht card component for search results
-- ✅ Date-specific pricing with discount badges
-- ✅ Fixed database table/column names
-- ✅ Real yacht images in results
-- ✅ Responsive grid layout
-- **Files Modified:**
-  - `public/class-yolo-ys-public-search.php` - Database queries
-  - `public/js/yolo-yacht-search-public.js` - Yacht card rendering
-  - `public/templates/search-results.php` - Container template
+### v1.8.2 (November 29, 2025) - CURRENT ✅
+**EQUIPMENT SYNC & ALL FIXES!**
+- ✅ Implemented equipment catalog sync to fix empty equipment section.
+- ✅ Fixed date picker ID mismatch as described in API documentation.
+- ✅ Implemented default July week selection on yacht details page.
 
-### v1.7.1 (November 29, 2025)
-**AJAX FIX**
-- ✅ Fixed "Failed to connect to server" error
-- ✅ Removed duplicate AJAX registration
-- **Files Modified:**
-  - `includes/class-yolo-ys-yacht-search.php` - Removed duplicate hooks
+### v1.8.0 (November 29, 2025)
+- ✅ Added Litepicker initialization to show search dates on page load
+- ✅ Date picker now updates when clicking price carousel weeks
+- ✅ Combined extras into one row (obligatory + optional side-by-side)
 
-### v1.7.0 (November 28, 2025)
-**SEARCH FUNCTIONALITY IMPLEMENTED!**
-- ✅ Database-first search implementation
-- ✅ AJAX handler created
-- ✅ Search results with yacht images
-- ✅ YOLO boats separated from partners
-- **Files Created:**
-  - `public/class-yolo-ys-public-search.php` - AJAX search handler
-- **Files Modified:**
-  - `public/js/yolo-yacht-search-public.js` - Search JavaScript
-  - `includes/class-yolo-ys-yacht-search.php` - Added search handler
-
-### v1.6.6 (November 28, 2025)
-**DESCRIPTION ACCORDION**
-- ✅ Collapsible description (first 2 paragraphs visible)
-- ✅ "More..." / "Less" toggle button
-- ✅ Fixed equipment column name
-- **Files Modified:**
-  - `public/templates/yacht-details-v3.php` - Description accordion
-  - `public/templates/partials/yacht-details-v3-scripts.php` - Toggle function
-  - `public/templates/partials/yacht-details-v3-styles.php` - Button CSS
-
-### v1.6.5 (November 28, 2025)
-**PRICE CAROUSEL HORIZONTAL SCROLL**
-- ✅ All weeks visible in scrollable row
-- ✅ Navigation arrows scroll 4 weeks at a time
-- ✅ Date picker auto-populated on page load
-- **Files Modified:**
-  - `public/templates/partials/yacht-details-v3-styles.php` - Horizontal scroll CSS
-  - `public/templates/partials/yacht-details-v3-scripts.php` - Scroll navigation
-
-### v1.6.4 (November 28, 2025)
-**UI/UX ENHANCEMENTS**
-- ✅ Week selection updates date picker
-- ✅ Price display above "Book Now" button
-- ✅ Date picker CSS matches home page
-- ✅ Equipment section added
-- ✅ Google Maps fixed (iframe embed)
-- ✅ Removed "Bareboat" text from carousel
-- **Files Modified:**
-  - `public/templates/yacht-details-v3.php` - Added equipment, fixed maps
-  - `public/templates/partials/yacht-details-v3-scripts.php` - Week selection logic
-  - `public/templates/partials/yacht-details-v3-styles.php` - Price display CSS
-
-### v1.6.3 (November 28, 2025)
-**SYNC ISSUE SOLVED!**
-- ✅ Fixed custom query encoding in API layer
-- ✅ Proper array parameter handling (no brackets)
-- ✅ Two layers of protection against HTTP 500
-- **Files Modified:**
-  - `includes/class-yolo-ys-booking-manager-api.php` - Custom query encoding
-
-### v1.6.2 (November 28, 2025)
-**PER-COMPANY SYNC**
-- ✅ Fixed HTTP 500 error with per-company loop
-- ✅ Offers sync works reliably
-- ✅ Better error handling
-- **Files Modified:**
-  - `includes/class-yolo-ys-sync.php` - Per-company loop
-
-### v1.6.1 (November 28, 2025)
-**UI FIXES**
-- ✅ Fixed price carousel (4 weeks visible)
-- ✅ Added boat description section
-- ✅ Fixed missing response fields
-- ✅ Fixed last sync time not updating
-- ✅ Removed unused prototype files
-- **Files Modified:**
-  - `includes/class-yolo-ys-sync.php` - Response fields, option name
-  - `public/templates/yacht-details-v3.php` - Description section
-  - `public/templates/partials/yacht-details-v3-styles.php` - Carousel CSS
-  - `admin/partials/yolo-yacht-search-admin-display.php` - Error messages
-
-### v1.6.0 (November 27, 2025)
-**OFFERS ENDPOINT**
-- ✅ Switched to /offers endpoint
-- ✅ Year selector for offers sync
-- ❌ Had HTTP 500 error (fixed in v1.6.2/v1.6.3)
-- **Files Modified:**
-  - `includes/class-yolo-ys-sync.php` - Offers endpoint
-
-### v1.5.9 and earlier
-- Various iterations fixing sync timeout issues
-- Improved UI/UX
-- Added Google Maps configuration
-
----
-
-## 🚀 Usage
-
-### Shortcodes
-
-```
-[yolo_search_widget]          - Search form with boat type and date picker
-[yolo_search_results]         - Display search results (WORKING in v1.7.2!)
-[yolo_our_fleet]              - Display all available yachts
-[yolo_yacht_details]          - Single yacht details page
-```
-
-### Admin Functions
-
-**Sync Yachts:**
-- Fetches all yachts from YOLO (7850) and partners
-- Stores yacht data, images, equipment, extras
-- Run this first before syncing offers
-
-**Sync Weekly Offers:**
-- Fetches weekly charter offers (Saturday-to-Saturday)
-- Select year (e.g., 2026)
-- Stores availability, prices, discounts
-- Run this after yacht sync
-
----
-
-## 🐛 Troubleshooting
-
-### Search Returns No Results
-
-**Check:**
-1. Yachts are synced: `SELECT COUNT(*) FROM wp_yolo_yacht_yachts`
-2. Prices are synced: `SELECT COUNT(*) FROM wp_yolo_yacht_prices`
-3. Images are synced: `SELECT COUNT(*) FROM wp_yolo_yacht_images`
-4. Browser console for JavaScript errors
-
-### Offers Sync Fails
-
-**Check:**
-1. WordPress debug log (`wp-content/debug.log`)
-2. API key is correct
-3. Company IDs are valid
-4. Network connectivity
-
-**Expected log output:**
-```
-YOLO YS: Fetching offers for company 7850 for year 2026
-YOLO YS: Stored 312 offers for company 7850
-YOLO YS: Fetching offers for company 4366 for year 2026
-YOLO YS: Stored 156 offers for company 4366
-...
-```
-
-### Price Carousel Not Showing
-
-**Check:**
-1. Offers are synced for future dates
-2. Database has prices: `SELECT COUNT(*) FROM wp_yolo_yacht_prices`
-3. CSS: `.price-slide` should be `display: block`
-
-### Google Maps Not Loading
-
-**Check:**
-1. API key configured in admin settings
-2. API key has Maps JavaScript API enabled
-3. Browser console for errors
-
----
-
-## 📚 Documentation
-
-### Changelogs
-- `CHANGELOG-v1.7.2.md` - Search results implementation
-- `CHANGELOG-v1.7.1.md` - AJAX fix
-- `CHANGELOG-v1.7.0.md` - Search functionality
-- `CHANGELOG-v1.6.3.md` - Query encoding fix
-- `CHANGELOG-v1.6.2.md` - Per-company sync
-- `CHANGELOG-v1.6.1.md` - UI fixes
-
-### Handoff Documents
-- `HANDOFF-NEXT-SESSION.md` - Current status and next steps
-- `HANDOFF-SESSION-20251128-v1.7.0.md` - Previous session summary
-
-### ChatGPT Analysis
-- `yolo_search_v1_7_1_debug.docx` - Database issues identified and fixed
+### v1.7.9 (November 29, 2025)
+- ✅ Universal price formatting fix across all pages
+- ✅ Carousel click updates date picker
 
 ---
 
@@ -471,151 +155,3 @@ YOLO YS: Stored 156 offers for company 4366
 - [Booking Manager API Documentation](https://support.booking-manager.com/hc/en-us/articles/360015601200)
 - [Swagger UI](https://api.booking-manager.com/swagger-ui.html)
 - GitHub Repository: `georgemargiolos/LocalWP`
-
----
-
-## 👨‍💻 Development
-
-### File Structure
-
-```
-yolo-yacht-search/
-├── admin/                          # Admin panel
-│   ├── class-yolo-ys-admin.php
-│   └── partials/
-│       └── yolo-yacht-search-admin-display.php
-├── includes/                       # Core functionality
-│   ├── class-yolo-ys-sync.php                    # Sync logic (v1.6.1-v1.6.3)
-│   ├── class-yolo-ys-booking-manager-api.php     # API client (v1.6.3)
-│   ├── class-yolo-ys-database.php
-│   ├── class-yolo-ys-database-prices.php
-│   └── class-yolo-ys-yacht-search.php            # Main loader (v1.7.0-v1.7.1)
-├── public/                         # Frontend
-│   ├── class-yolo-ys-public.php
-│   ├── class-yolo-ys-public-search.php           # Search handler (v1.7.0-v1.7.2)
-│   ├── class-yolo-ys-shortcodes.php
-│   ├── js/
-│   │   └── yolo-yacht-search-public.js           # Search JavaScript (v1.7.0-v1.7.2)
-│   └── templates/
-│       ├── search-results.php                    # Search results (v1.7.2)
-│       ├── yacht-details-v3.php                  # Main template (v1.6.1-v1.6.6)
-│       └── partials/
-│           ├── yacht-card.php                    # Yacht card component
-│           ├── yacht-details-v3-styles.php       # CSS (v1.6.1-v1.6.6)
-│           └── yacht-details-v3-scripts.php      # JavaScript (v1.6.4-v1.6.6)
-└── yolo-yacht-search.php           # Main plugin file
-```
-
-### Key Classes
-
-**YOLO_YS_Sync** - Handles yacht and offers synchronization (v1.6.1-v1.6.3)  
-**YOLO_YS_Booking_Manager_API** - API client with custom query encoding (v1.6.3)  
-**YOLO_YS_Database** - Database operations  
-**YOLO_YS_Database_Prices** - Price/offers storage  
-**YOLO_YS_Public_Search** - Search AJAX handler (v1.7.0-v1.7.2)  
-**YOLO_YS_Shortcodes** - Frontend shortcodes
-
-### Code Changes Summary
-
-#### v1.7.2 Changes
-```php
-// public/class-yolo-ys-public-search.php
-// Fixed database queries
-$query = "SELECT DISTINCT y.* FROM {$wpdb->prefix}yolo_yacht_yachts y";  // Fixed table name
-$query .= " WHERE p.discount_percentage > 0";  // Fixed column name
-
-// public/js/yolo-yacht-search-public.js
-// Added yacht card rendering with pricing
-function renderBoatCard(yacht) {
-    // Discount badge: "X% OFF - Save Y EUR"
-    // Strikethrough original price
-    // Final price in bold
-}
-```
-
-#### v1.6.4-v1.6.6 Changes
-```php
-// public/templates/yacht-details-v3.php
-// Week selection updates date picker
-function selectWeek(slideElement) {
-    const dateFrom = slideElement.dataset.dateFrom;
-    const dateTo = slideElement.dataset.dateTo;
-    picker.setDateRange(dateFrom, dateTo);
-}
-
-// Description accordion
-<div id="yacht-description-short">First 2 paragraphs...</div>
-<div id="yacht-description-full" style="display:none">Full text...</div>
-<button onclick="toggleDescription()">More...</button>
-```
-
-#### v1.6.2-v1.6.3 Changes
-```php
-// includes/class-yolo-ys-sync.php
-// Per-company loop
-foreach ($all_companies as $company_id) {
-    $offers = $this->api->get_offers(['companyId' => [$company_id], ...]);
-}
-
-// includes/class-yolo-ys-booking-manager-api.php
-// Custom query encoding (no brackets)
-foreach ($params as $key => $value) {
-    if (is_array($value)) {
-        foreach ($value as $item) {
-            $query_parts[] = urlencode($key) . '=' . urlencode($item);
-        }
-    }
-}
-```
-
----
-
-## 🎯 Next Steps
-
-### Priority 1: Booking Flow (10% Remaining)
-Implement "Book Now" button functionality:
-1. Booking summary modal
-2. Customer information form
-3. Stripe payment integration
-4. POST to `/bookings` API endpoint
-5. Confirmation page
-
-### Priority 2: Advanced Features
-- Automated sync scheduling
-- Email notifications
-- Advanced search filters (price range, cabins, etc.)
-- Pagination for large result sets
-
----
-
-## 📞 Support
-
-**GitHub:** georgemargiolos/LocalWP  
-**Issues:** Check documentation first, then create GitHub issue  
-**Debug:** Enable WordPress debug logging in `wp-config.php`
-
----
-
-## ✨ Credits
-
-**Developer:** Manus AI  
-**Client:** YOLO Charters  
-**API Provider:** Booking Manager  
-**Session Dates:** November 28-29, 2025
-
----
-
-## 📊 Progress Summary
-
-| Feature Category | Progress |
-|-----------------|----------|
-| Data Sync | ✅ 100% |
-| Search | ✅ 100% |
-| Yacht Details | ✅ 100% |
-| UI/UX | ✅ 100% |
-| Booking Flow | ⏳ 0% |
-| **Overall** | **90%** |
-
----
-
-**Version 1.7.2 - Search functionality is complete! Only booking flow remains! 🎉**
