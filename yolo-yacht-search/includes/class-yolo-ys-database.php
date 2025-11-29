@@ -141,6 +141,8 @@ class YOLO_YS_Database {
     public function store_yacht($yacht_data, $company_id) {
         global $wpdb;
         
+        error_log('YOLO YS: Starting store_yacht for yacht ID: ' . $yacht_data['id']);
+        
         // Prepare yacht data
         $yacht_insert = array(
             'id' => $yacht_data['id'],
@@ -168,17 +170,25 @@ class YOLO_YS_Database {
         );
         
         // Insert or update yacht
+        error_log('YOLO YS: Inserting yacht data...');
         $wpdb->replace($this->table_yachts, $yacht_insert);
+        error_log('YOLO YS: Yacht data inserted');
         
         $yacht_id = $yacht_data['id'];
         
         // Delete old related data
+        error_log('YOLO YS: Deleting old products...');
         $wpdb->delete($this->table_products, array('yacht_id' => $yacht_id));
+        error_log('YOLO YS: Deleting old images...');
         $wpdb->delete($this->table_images, array('yacht_id' => $yacht_id));
+        error_log('YOLO YS: Deleting old extras...');
         $wpdb->delete($this->table_extras, array('yacht_id' => $yacht_id));
+        error_log('YOLO YS: Deleting old equipment...');
         $wpdb->delete($this->table_equipment, array('yacht_id' => $yacht_id));
+        error_log('YOLO YS: All old data deleted');
         
         // Store products
+        error_log('YOLO YS: Storing products...');
         if (isset($yacht_data['products']) && is_array($yacht_data['products'])) {
             foreach ($yacht_data['products'] as $product) {
                 $wpdb->insert($this->table_products, array(
@@ -190,9 +200,11 @@ class YOLO_YS_Database {
                     'raw_data' => json_encode($product)
                 ));
             }
+            error_log('YOLO YS: Stored ' . count($yacht_data['products']) . ' products');
         }
         
         // Store images
+        error_log('YOLO YS: Storing images...');
         if (isset($yacht_data['images']) && is_array($yacht_data['images'])) {
             foreach ($yacht_data['images'] as $index => $image) {
                 $wpdb->insert($this->table_images, array(
@@ -203,9 +215,11 @@ class YOLO_YS_Database {
                     'sort_order' => $index
                 ));
             }
+            error_log('YOLO YS: Stored ' . count($yacht_data['images']) . ' images');
         }
         
         // Store extras - collect from ALL products, not just products[0]
+        error_log('YOLO YS: Collecting extras...');
         $extras_to_store = array();
         
         // Collect extras from every product
@@ -223,6 +237,7 @@ class YOLO_YS_Database {
         }
         
         // Store all collected extras
+        error_log('YOLO YS: Storing ' . count($extras_to_store) . ' extras...');
         foreach ($extras_to_store as $extra) {
             $wpdb->insert($this->table_extras, array(
                 'id' => $extra['id'],
@@ -234,8 +249,10 @@ class YOLO_YS_Database {
                 'unit' => isset($extra['unit']) ? $extra['unit'] : null
             ));
         }
+        error_log('YOLO YS: All extras stored');
         
         // Store equipment (just store IDs, names will be looked up from catalog when displaying)
+        error_log('YOLO YS: Storing equipment...');
         if (isset($yacht_data['equipment']) && is_array($yacht_data['equipment'])) {
             foreach ($yacht_data['equipment'] as $equip) {
                 $wpdb->insert($this->table_equipment, array(
@@ -245,8 +262,10 @@ class YOLO_YS_Database {
                     'category' => isset($equip['category']) ? $equip['category'] : null
                 ));
             }
+            error_log('YOLO YS: Stored ' . count($yacht_data['equipment']) . ' equipment items');
         }
         
+        error_log('YOLO YS: Finished storing yacht ID: ' . $yacht_data['id']);
         return true;
     }
     

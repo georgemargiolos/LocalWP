@@ -82,9 +82,13 @@ class YOLO_YS_Sync {
         foreach ($all_companies as $company_id) {
             if (empty($company_id)) continue;
             
+            error_log('YOLO YS: Starting sync for company ID: ' . $company_id);
+            
             try {
                 // Fetch yachts for this company
+                error_log('YOLO YS: Fetching yachts from API for company ' . $company_id);
                 $yachts = $this->api->get_yachts_by_company($company_id);
+                error_log('YOLO YS: Received ' . (is_array($yachts) ? count($yachts) : 'invalid') . ' yachts from API');
                 
                 // Validate response is an array
                 if (!is_array($yachts)) {
@@ -95,17 +99,21 @@ class YOLO_YS_Sync {
                 
                 if (count($yachts) > 0) {
                     foreach ($yachts as $yacht) {
+                        error_log('YOLO YS: Processing yacht: ' . $yacht['name'] . ' (ID: ' . $yacht['id'] . ')');
                         $this->db->store_yacht($yacht, $company_id);
                         $results['yachts_synced']++;
+                        error_log('YOLO YS: Yacht stored successfully. Total synced: ' . $results['yachts_synced']);
                     }
                     $results['companies_synced']++;
+                    error_log('YOLO YS: Completed sync for company ' . $company_id);
                 } else {
                     $results['errors'][] = "Company $company_id: No yachts returned";
                 }
                 
             } catch (Exception $e) {
                 $results['errors'][] = "Company $company_id: " . $e->getMessage();
-                error_log('YOLO YS: Failed to sync yachts for company ' . $company_id . ': ' . $e->getMessage());
+                error_log('YOLO YS: EXCEPTION - Failed to sync yachts for company ' . $company_id . ': ' . $e->getMessage());
+                error_log('YOLO YS: Exception trace: ' . $e->getTraceAsString());
             }
         }
         
