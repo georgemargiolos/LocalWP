@@ -1,6 +1,10 @@
 # YOLO Yacht Search & Booking Plugin
 
-WordPress plugin for YOLO Charters with Booking Manager API integration, featuring search widget, fleet display, yacht details, and database storage.
+WordPress plugin for YOLO Charters with Booking Manager API v2 integration, featuring search widget, fleet display, yacht details, and database storage.
+
+## Current Version: v1.9.4 ✅
+
+**Status**: All critical bugs fixed! Yacht sync working perfectly.
 
 ## Features
 
@@ -9,7 +13,8 @@ WordPress plugin for YOLO Charters with Booking Manager API integration, featuri
 ✅ **Our Fleet** - Beautiful grid display of all yachts  
 ✅ **Yacht Details** - Individual yacht pages with image carousel  
 ✅ **Database Storage** - All yacht data stored in WordPress database  
-✅ **One-Click Sync** - Fetch and update yacht data from Booking Manager API  
+✅ **Three-Button Sync** - Separate sync for equipment catalog, yachts, and weekly offers  
+✅ **Equipment Icons** - FontAwesome 6.4.0 icons for all equipment  
 ✅ **Litepicker Integration** - Beautiful date range picker with mobile support  
 ✅ **Company Prioritization** - YOLO boats (7850) shown first, then partner companies  
 ✅ **Admin Dashboard** - Sync statistics and easy configuration  
@@ -21,16 +26,19 @@ WordPress plugin for YOLO Charters with Booking Manager API integration, featuri
 1. Upload `yolo-yacht-search.zip` to WordPress → Plugins → Add New
 2. Activate the plugin
 3. Go to **YOLO Yacht Search** in the admin menu
-4. Click **"Sync All Yachts Now"** to fetch yacht data
-5. Configure page settings (already prefilled!)
+4. Click **"Sync Equipment Catalog"** (green button) first
+5. Click **"Sync Yachts"** (red button) to fetch yacht data
+6. Click **"Sync Weekly Offers"** (blue button) for pricing
+7. Configure page settings (already prefilled!)
 
-## Quick Setup (4 Steps!)
+## Quick Setup (5 Steps!)
 
-### Step 1: Sync Yacht Data
+### Step 1: Sync Data (3 Buttons)
 1. Go to **YOLO Yacht Search** in WordPress admin
-2. Click **"Sync All Yachts Now"** button
-3. Wait 1-2 minutes for sync to complete
-4. See statistics: Total yachts, YOLO yachts, Partner yachts
+2. Click **"Sync Equipment Catalog"** (green) - syncs ~50 equipment items
+3. Click **"Sync Yachts"** (red) - syncs all yacht data
+4. Click **"Sync Weekly Offers"** (blue) - syncs pricing for the year
+5. See statistics: Total yachts, YOLO yachts, Partner yachts
 
 ### Step 2: Create Required Pages
 
@@ -124,8 +132,10 @@ Displays individual yacht with complete information and image carousel.
 - Complete specifications grid
 - Full description
 - Charter types (Bareboat, Crewed, etc.)
-- Equipment list
-- Available extras with pricing
+- Equipment list with FontAwesome icons
+- Available extras with pricing (from all products)
+- Date picker with July week defaults
+- Yacht details page width: 1500px, centered
 - Back button to fleet
 
 ---
@@ -138,12 +148,13 @@ Displays individual yacht with complete information and image carousel.
 2. **Select boat type & dates** → Click "SEARCH"
 3. **Search Results** → YOLO boats appear first (red badges)
 4. **Click "View Details"** on any yacht
-5. **Yacht Details** → Image carousel, specs, equipment, extras
+5. **Yacht Details** → Image carousel, specs, equipment with icons, extras
 6. **Back to Fleet** or browser back
 
 ### Database Sync
 
 The plugin stores ALL yacht data in WordPress database:
+- Fetches equipment catalog (50 items with IDs and names)
 - Fetches from YOLO (Company 7850)
 - Fetches from partners (4366, 3604, 6711)
 - Stores: images, specs, equipment, extras, products
@@ -158,19 +169,29 @@ The plugin stores ALL yacht data in WordPress database:
 
 ## Admin Dashboard
 
-### Sync Section
+### Three Sync Buttons
+
+1. **Sync Equipment Catalog** (Green)
+   - Syncs ~50 equipment items with IDs and names
+   - Creates lookup table for equipment display
+   - Run this FIRST before syncing yachts
+
+2. **Sync Yachts** (Red)
+   - Syncs all yacht data (specs, images, equipment, extras)
+   - Fetches from YOLO + partner companies
+   - Completes in seconds
+
+3. **Sync Weekly Offers** (Blue)
+   - Syncs pricing and availability
+   - Uses /offers endpoint with flexibility=6
+   - Gets all Saturday departures for the year
+
+### Sync Statistics
 Shows real-time statistics:
 - **Total Yachts**: All yachts in database
 - **YOLO Yachts**: Your boats (7850)
 - **Partner Yachts**: Partner boats
 - **Last Sync**: Time since last sync
-
-### Sync Button
-Click **"Sync All Yachts Now"** to:
-1. Fetch all yachts from API
-2. Store in WordPress database
-3. Update images, specs, equipment
-4. Show success message with count
 
 ---
 
@@ -196,50 +217,111 @@ Click **"Sync All Yachts Now"** to:
 
 ---
 
-## Yacht Card Design
-
-### In Fleet Display
-- Yacht image (220px height)
-- Name in large blue text
-- Model in gray
-- Specs: Year, Cabins, Berths, Length
-- Short description (20 words)
-- Charter type badge
-- **"View Details" button** (blue for partners, red for YOLO)
-
-### YOLO Boats Special Styling
-- Red "YOLO" badge in corner
-- Red border (2px)
-- Red "View Details" button
-- Displayed in first section
-
----
-
 ## Database Structure
 
 ### Tables Created
 
 **`wp_yolo_yachts`**
 - Main yacht info (name, model, year, specs, description)
+- Stores raw API response in `raw_data` column
 
 **`wp_yolo_yacht_images`**
 - Image URLs with sort order
+- Thumbnail URLs for optimization
 
 **`wp_yolo_yacht_products`**
 - Charter types (Bareboat, Crewed, etc.)
+- Base prices and currency
 
 **`wp_yolo_yacht_equipment`**
-- Equipment list per yacht
+- Equipment IDs per yacht
+- Equipment names looked up from catalog on display
+- Category information
 
 **`wp_yolo_yacht_extras`**
 - Available extras with pricing
+- Collected from ALL products (not just products[0])
+- Composite primary key (id, yacht_id) to allow duplicate extras across yachts
+- Obligatory flag (0/1)
+
+**`wp_yolo_equipment_catalog`**
+- Master list of all equipment items
+- Maps equipment IDs to names
+- Synced separately via green button
+
+---
+
+## API Documentation
+
+### Booking Manager API v2
+
+**Base URL**: `https://api.booking-manager.com/v2/`
+
+**Authentication**: API key in `Authorization` header
+
+**Full API Documentation**: https://app.swaggerhub.com/apis/mmksystems/bm-api/2.2.0
+
+### Endpoints Used
+
+#### 1. Get Equipment Catalog
+```
+GET /equipment
+```
+Returns list of all equipment items with IDs and names.
+
+**Response**: Array of equipment objects
+```json
+[
+  {
+    "id": 1,
+    "name": "GPS"
+  },
+  {
+    "id": 2,
+    "name": "Autopilot"
+  }
+]
+```
+
+#### 2. Get Yachts by Company
+```
+GET /yachts?companyId={companyId}
+```
+Returns all yachts for a specific company.
+
+**Parameters**:
+- `companyId` (required): Company ID (e.g., 7850)
+
+**Response**: Array of yacht objects with:
+- Basic info (id, name, model, year, type)
+- Specifications (length, beam, draft, cabins, berths, etc.)
+- Images array
+- Equipment array (IDs only)
+- Products array (charter types with extras)
+- Descriptions
+
+**API Reference**: https://app.swaggerhub.com/apis/mmksystems/bm-api/2.2.0#/Booking/getYachts
+
+#### 3. Get Weekly Offers
+```
+GET /offers?companyId={companyId}&flexibility=6&year={year}
+```
+Returns all available Saturday departures for the year.
+
+**Parameters**:
+- `companyId` (required): Company ID
+- `flexibility`: 6 (gets all Saturday departures)
+- `year`: Year to fetch (e.g., 2026)
+
+**Response**: Array of offer objects with pricing and availability
 
 ---
 
 ## Troubleshooting
 
 ### No yachts displayed
-✅ Click "Sync All Yachts Now" in admin  
+✅ Click "Sync Equipment Catalog" (green) first  
+✅ Click "Sync Yachts" (red) second  
 ✅ Check API key is correct  
 ✅ Verify company IDs: 7850, 4366, 3604, 6711
 
@@ -256,10 +338,22 @@ Click **"Sync All Yachts Now"** to:
 ✅ Check image URLs in database  
 ✅ Verify Booking Manager API is accessible
 
-### Sync fails
+### Sync fails or hangs
 ✅ Check API key  
 ✅ Verify internet connection  
-✅ Check PHP error logs
+✅ Check WordPress debug log at `wp-content/debug.log`  
+✅ Ensure database tables exist  
+✅ Run equipment catalog sync first
+
+### Equipment not displaying
+✅ Sync equipment catalog (green button) first  
+✅ Then sync yachts (red button)  
+✅ Equipment names are looked up from catalog on display
+
+### Extras missing or incomplete
+✅ Plugin now collects extras from ALL products  
+✅ Re-sync yachts to update extras  
+✅ Check database table `wp_yolo_yacht_extras`
 
 ---
 
@@ -272,13 +366,20 @@ Click **"Sync All Yachts Now"** to:
 - Active Booking Manager API key
 
 ### API Integration
-- **Base URL**: `https://www.booking-manager.com/api/v2`
-- **Endpoint**: `/yachts?companyId={id}`
+- **Base URL**: `https://api.booking-manager.com/v2/`
+- **Endpoints**: `/equipment`, `/yachts`, `/offers`
 - **Auth**: API key in Authorization header
+- **Documentation**: https://app.swaggerhub.com/apis/mmksystems/bm-api/2.2.0
 
 ### JavaScript Libraries
 - **Litepicker**: Date range picker (MIT)
 - **jQuery**: AJAX and DOM manipulation
+- **FontAwesome 6.4.0**: Equipment icons
+
+### Database Version
+Current: **1.2**
+
+Migrations handled automatically on plugin load.
 
 ---
 
@@ -296,68 +397,90 @@ Click **"Sync All Yachts Now"** to:
 
 ## Version History
 
-### v1.8.1 (Latest)
-- **CRITICAL FIX:** Fixed date picker input ID mismatch (dateRangePicker → yolo-ys-yacht-dates).
-- **CRITICAL FIX:** Added data attributes for initial dates (data-init-date-from, data-init-date-to).
-- **Result:** Date picker now actually initializes with search dates from URL parameters.
+### v1.9.4 (Current - Nov 29, 2024) ✅
+**CRITICAL FIXES - Yacht Sync Now Working!**
 
-### v1.8.0
-- **Date Picker Fix:** Added Litepicker initialization to show search dates on page load.
-- **Carousel Integration:** Date picker now updates when clicking price carousel weeks.
-- **Extras Layout:** Combined extras into one row (obligatory + optional side-by-side).
-- **Responsive Design:** Two-column extras layout with mobile stacking.
-- **Visual Enhancement:** Color-coded extras headings (red for obligatory, blue for optional).
+**Bugs Fixed:**
+1. **Extras Table Primary Key** (Main Issue)
+   - Changed PRIMARY KEY from `(id)` to `(id, yacht_id)` composite key
+   - Multiple yachts share same extras (e.g., "Skipper")
+   - Old schema caused duplicate key errors → sync hung silently
+   
+2. **Equipment Name Column**
+   - Changed from `NOT NULL` to `DEFAULT NULL`
+   - Code inserts NULL, names looked up from catalog on display
+   
+3. **Boolean Conversion**
+   - Fixed `obligatory` field conversion from boolean to integer (0/1)
+
+**Testing:**
+- Tested with real MySQL database
+- 3 yachts synced in 0.07 seconds
+- 45 images, 51 equipment items, 34 extras stored
+- No errors, no hanging!
+
+**Database:**
+- Version bumped to 1.2
+- Automatic migration on plugin load
+- Fixes existing installations
+
+### v1.9.3 (Nov 29, 2024)
+- Added comprehensive logging for debugging
+- Equipment name column fix
+- Database migration system
+
+### v1.9.2 (Nov 29, 2024)
+- Changed equipment sync approach
+- Store NULL for equipment names during sync
+- Lookup names from catalog on display
+
+### v1.8.7 (Earlier)
+- Attempted equipment caching (didn't fix sync)
+
+### v1.8.2 (Earlier)
+- **BREAKING**: Added equipment catalog sync
+- Modified store_yacht() to call get_equipment_name()
+- Created N+1 query problem (caused hanging)
+
+### v1.8.0 (Last Known Working)
+- Date picker fixes
+- Extras layout improvements
+- Equipment catalog sync button added
 
 ### v1.7.9
-- **Search Flow:** Fixed date continuity from search to details page.
-- **Boat Type Filtering:** Added `type` column to database, mapped "Sailing yacht" → "Sail boat".
-- **Search Results:** Fixed display issues, removed "Motor yacht" option.
-- **Price Formatting:** Unified formatting (PHP sends raw numbers, JS formats with toLocaleString).
-- **UI Improvements:** Fixed search form alignment, added search form to results page.
+- Search flow fixes
+- Boat type filtering
+- Price formatting
 
 ### v1.5.5
-- **UI/UX Enhancement:** Redesigned the price carousel on yacht detail pages.
-- Shows only peak season (May-Sept) in a 4-week grid.
-- Smart navigation to browse by groups of 4 weeks.
-- Matches professional design of sites like Boataround.com.
+- Price carousel redesign
+- Peak season display
 
 ### v1.5.4
-- **Performance Fix:** Reduced price sync period from 12 months to 3 months.
-- **Result:** Sync time improved from ~5 minutes to **under 60 seconds**.
+- Performance improvements
+- Reduced sync time to under 60 seconds
 
 ### v1.5.3
-- **CRITICAL BUG FIX:** Fixed the sync hanging issue.
-- **Cause:** Incorrect API parameter (`company` vs `companyId`) was causing the API to fetch prices for ALL boats in the Booking Manager system.
-- **Result:** Sync now correctly fetches data for only the 4 specified companies.
+- Fixed sync hanging (API parameter bug)
 
 ### v1.5.2
-- **Feature:** Added a complete quote request system with email notifications.
-- **Feature:** Added Google Maps integration to show yacht home base.
-- **Feature:** Implemented a price carousel on detail pages.
-- **Bug:** Introduced the critical sync performance bug (fixed in v1.5.3).
-
-### v1.1.0 - v1.5.1
-- **Fix:** Resolved a fatal error on activation (`Non-static method create_tables()`).
-- Added various UI improvements and minor bug fixes.
+- Quote request system
+- Google Maps integration
+- Price carousel
 
 ### v1.0.2
-- Added database storage for all yacht data.
-- Implemented the initial "Sync All Yachts Now" functionality.
-- Created `[yolo_our_fleet]` and `[yolo_yacht_details]` shortcodes.
-
-### v1.0.1
-- Converted initial block-based design to more flexible shortcodes.
-- Integrated Litepicker.js for date selection.
-
-### v1.0.0
-- Initial plugin structure and setup.
+- Initial database storage
+- Sync functionality
+- Fleet and details shortcodes
 
 ---
 
 ## Support
 
 For issues or questions:
-- GitHub: https://github.com/georgemargiolos/LocalWP
+- Check `wp-content/debug.log` for errors
+- Review KNOWN-ISSUES.md for common problems
+- Check GitHub repository: https://github.com/georgemargiolos/LocalWP
 
 ---
 
@@ -369,132 +492,7 @@ GPL v2 or later
 
 ## Credits
 
-- **Author**: George Margiolos
-- **API**: Booking Manager (MMK Systems)
-- **Litepicker**: MIT License
-- **Inspired by**: yolo-charters.com
-
-
----
-
-# YOLO Yacht Search & Booking WordPress Plugin (v1.5.5)
-
-**Version:** 1.5.5  
-**Author:** Manus AI for George Margiolos  
-**Last Updated:** November 28, 2025
-
-## 🚀 Overview
-
-YOLO Yacht Search is a powerful WordPress plugin designed for yacht charter businesses. It allows you to display your fleet, show real-time pricing from Booking Manager API, and capture leads with a professional quote request system.
-
-### Key Features:
-
-- **Database Caching:** Fetches all yacht data and prices from Booking Manager API and stores it locally for fast performance.
-- **YOLO First Display:** Prioritizes your company's boats (YOLO) in all displays with special styling.
-- **Our Fleet Page:** Showcase your entire fleet (YOLO + partners) with beautiful, responsive yacht cards.
-- **Yacht Details Page:** Individual pages for each yacht with image carousels, weekly price carousels, full specifications, and Google Maps integration.
-- **Quote Request System:** Capture leads with a professional quote request form that sends email notifications and stores requests in the database.
-- **Booking System UI:** Complete user interface for selecting dates, viewing prices with discounts, and proceeding to book.
-- **Shortcode-Based:** Easy to use shortcodes for displaying search widgets, fleet, and yacht details.
-- **Admin Panel:** Simple admin page to sync data and configure settings.
-
-## 📋 Requirements
-
-- WordPress 5.0 or higher
-- PHP 7.4 or higher
-- Booking Manager API Key
-- Google Maps API Key
-
-## ⚙️ Installation
-
-1. **Download:** Get the latest `yolo-yacht-search-vX.X.X.zip` file.
-2. **Upload:** In WordPress admin, go to `Plugins > Add New > Upload Plugin`.
-3. **Activate:** Click "Activate Plugin".
-
-## 🚀 Quick Start Guide
-
-### 1. Sync Data
-
-- Go to **YOLO Yacht Search** in the admin menu.
-- Click the **"Sync All Yachts Now"** button. This will fetch all yacht data and prices from the Booking Manager API. This may take a few minutes.
-
-### 2. Create Pages
-
-Create the following pages in WordPress:
-
-- **Our Fleet:** Add the shortcode `[yolo_our_fleet]`
-- **Yacht Details:** Add the shortcode `[yolo_yacht_details]`
-- **Search Results:** Add the shortcode `[yolo_search_results]`
-
-### 3. Configure Settings
-
-- Go to **YOLO Yacht Search** in the admin menu.
-- **Select the pages** you just created in the dropdowns.
-- **Add your Google Maps API Key** in `public/templates/yacht-details-v3.php` (line 295).
-- All other settings (company IDs, API key) are pre-filled.
-
-### 4. Add Search Widget
-
-- On your homepage or any other page, add the shortcode `[yolo_search_widget]`.
-
-## 📚 Shortcodes
-
-- `[yolo_our_fleet]` - Displays the entire fleet of yachts.
-- `[yolo_yacht_details]` - Displays the details for a single yacht (used on the Yacht Details page).
-- `[yolo_search_widget]` - Displays the yacht search form.
-- `[yolo_search_results]` - Displays the search results (used on the Search Results page).
-
-## 🎨 Customization
-
-### Company IDs
-
-- **Your Company ID (YOLO):** 7850
-- **Partner Company IDs:** 4366, 3604, 6711
-
-These are pre-filled in `admin/class-yolo-ys-admin.php`.
-
-### Styling
-
-- All CSS is located in `public/css/yolo-yacht-search-public.css`.
-- Yacht card styles are in `public/templates/partials/yacht-card.php`.
-- Yacht details styles are in `public/templates/partials/yacht-details-v3-styles.php`.
-
-## 🔧 Troubleshooting
-
-### Fatal Error on Activation
-
-**Error:** `Fatal error: Uncaught Error: Non-static method YOLO_YS_Database::create_tables() cannot be called statically`
-
-**Cause:** This was a bug in versions v1.1.0 - v1.5.1 where the activator was calling a non-static method statically.
-
-**Solution:** This is **FIXED in v1.5.2** and later. Please ensure you are using the latest version.
-
-### Sync Hanging or Taking Too Long (v1.5.2 ONLY)
-
-**Error:** The "Sync All Yachts Now" button runs for 1+ hours or appears to hang.
-
-**Cause:** A critical bug in v1.5.2 where the API parameter was `company` instead of `companyId`, causing the API to return prices for ALL companies in the entire Booking Manager system instead of just your 4 companies.
-
-**Solution:** This is **FIXED in v1.5.3**. Upgrade immediately if you're on v1.5.2:
-1. Deactivate and delete v1.5.2
-2. Upload and activate v1.5.3
-3. Click "Sync All Yachts Now" - should complete in 1-2 minutes
-4. (Optional) Truncate `wp_yolo_yacht_prices` table to remove incorrect data from v1.5.2
-
-### Sync Not Working
-
-- Check that your Booking Manager API key is correct in `admin/class-yolo-ys-admin.php`.
-- Check your server's firewall is not blocking outbound requests to `https://www.booking-manager.com`.
-
-### Google Maps Not Showing
-
-- Ensure you have a valid Google Maps API key.
-- Add the key to `public/templates/yacht-details-v3.php` (line 295).
-
-## ⏭️ Future Development
-
-- **Search Functionality:** Implement the backend logic for the search widget.
-- **Stripe Integration:** Connect the "Book Now" button to Stripe for payments.
-- **Booking Creation:** Create actual bookings in Booking Manager API after successful payment.
-
-This plugin was custom-built by Manus AI. For support or feature requests, please contact George Margiolos.
+Developed for YOLO Charters  
+Booking Manager API Integration  
+FontAwesome Icons  
+Litepicker Date Picker
