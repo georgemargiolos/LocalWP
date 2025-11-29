@@ -151,7 +151,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- Date Picker -->
             <div class="date-picker-section">
                 <h4>Or Choose Custom Dates</h4>
-                <input type="text" id="dateRangePicker" placeholder="Select dates" readonly />
+                <input type="text" id="yolo-ys-yacht-dates" placeholder="Select dates" readonly 
+                    data-init-date-from="<?php echo esc_attr($requested_date_from); ?>" 
+                    data-init-date-to="<?php echo esc_attr($requested_date_to); ?>" />
             </div>
             
             <!-- Book Now Button -->
