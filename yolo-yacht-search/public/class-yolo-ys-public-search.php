@@ -54,8 +54,15 @@ function yolo_ys_ajax_search_yachts() {
     
     // Filter by boat type if specified
     if (!empty($kind)) {
-        $sql .= " AND y.model LIKE %s";
-        $params[] = '%' . $wpdb->esc_like($kind) . '%';
+        // Map search values to database values (API uses 'Sail boat' not 'Sailboat')
+        $type_map = array(
+            'Sailing yacht' => 'Sail boat',
+            'Catamaran' => 'Catamaran'
+        );
+        
+        $db_type = isset($type_map[$kind]) ? $type_map[$kind] : $kind;
+        $sql .= " AND y.type = %s";
+        $params[] = $db_type;
     }
     
     $sql .= " ORDER BY y.company_id = %d DESC, p.price ASC";

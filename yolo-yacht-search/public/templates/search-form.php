@@ -14,7 +14,6 @@
                 <option value=""><?php _e('All types', 'yolo-yacht-search'); ?></option>
                 <option value="Sailing yacht" selected><?php _e('Sailing yacht', 'yolo-yacht-search'); ?></option>
                 <option value="Catamaran"><?php _e('Catamaran', 'yolo-yacht-search'); ?></option>
-                <option value="Motor yacht"><?php _e('Motor yacht', 'yolo-yacht-search'); ?></option>
             </select>
         </div>
         
@@ -26,17 +25,10 @@
         
         <!-- Search Button -->
         <div class="yolo-ys-form-field">
+            <label>&nbsp;</label><!-- Empty label for alignment -->
             <button type="submit" class="yolo-ys-search-button">
                 <?php _e('SEARCH', 'yolo-yacht-search'); ?>
             </button>
-        </div>
-        
-        <!-- Optional: Include yachts without availability confirmation -->
-        <div class="yolo-ys-checkbox-field">
-            <input type="checkbox" id="yolo-ys-include-unconfirmed" name="include_unconfirmed" />
-            <label for="yolo-ys-include-unconfirmed">
-                <?php _e('Include yachts without availability confirmation', 'yolo-yacht-search'); ?>
-            </label>
         </div>
         
     </form>

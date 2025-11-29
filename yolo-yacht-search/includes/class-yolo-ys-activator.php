@@ -34,7 +34,34 @@ class YOLO_YS_Activator {
         // Create prices table
         YOLO_YS_Database_Prices::create_prices_table();
         
+        // Run migrations
+        self::run_migrations();
+        
         // Flush rewrite rules
         flush_rewrite_rules();
+    }
+    
+    /**
+     * Run database migrations
+     */
+    private static function run_migrations() {
+        global $wpdb;
+        
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Migration 1: Add type column if it doesn't exist (v1.7.5)
+        $column_exists = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$yachts_table} LIKE 'type'"
+        );
+        
+        if (empty($column_exists)) {
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD COLUMN type varchar(100) DEFAULT NULL 
+                 AFTER model"
+            );
+            
+            error_log('YOLO YS: Added type column to yachts table');
+        }
     }
 }

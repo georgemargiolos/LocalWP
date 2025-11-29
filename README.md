@@ -1,33 +1,49 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.4  
-**Status:** ✅ 92% COMPLETE - Search Now Working! (CRITICAL FIX)  
+**Current Version:** 1.7.5  
+**Status:** ✅ 92% COMPLETE - Boat Type Filtering Now Working!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🚨 Version 1.7.4 - CRITICAL FIX: SEARCH NOW WORKING!
+## 🚨 Version 1.7.5 - CRITICAL FIX: BOAT TYPE FILTERING NOW WORKING!
 
-**This version fixes the critical bug where search results were not displaying at all! Search was completely broken in v1.7.2 and v1.7.3.**
+**This version fixes the critical bug where boat type filtering was not working! Search returned "No Yachts Found" even when boats were available.**
 
-### What's New in v1.7.4
+### What's New in v1.7.5
+
+1. **Boat Type Filtering Now Works**
+   - Added `type` column to database to store boat type
+   - Updated sync code to store `kind` from API as `type`
+   - Fixed type mapping ("Sailing yacht" → "Sail boat" with space!)
+   - Search now correctly filters by boat type
+
+2. **Database Migration**
+   - Automatic migration adds `type` column on plugin activation
+   - **IMPORTANT:** Must re-sync yachts after updating!
+
+3. **UI Improvements**
+   - Removed "Motor yacht" option (YOLO doesn't have motor yachts)
+   - Removed "Include yachts without availability confirmation" checkbox
+   - Fixed search button alignment
+   - Clean 3-field horizontal layout
+
+4. **Search Form Options**
+   - All types (shows everything)
+   - Sailing yacht (monohull sailboats only)
+   - Catamaran (catamarans only)
+
+### What Was New in v1.7.4
 
 1. **Search Results Now Display**
    - Fixed missing HTML templates that JavaScript expected
    - Rewrote displayResults() to build HTML directly
    - Simplified loading state rendering
-   - Search functionality now actually works!
 
 2. **Improved Code Quality**
    - Removed complex regex template parsing
    - Direct HTML construction with template literals
-   - More reliable and maintainable code
-
-3. **End-to-End Testing**
-   - Verified complete search flow in browser
-   - Tested with real data
-   - No JavaScript errors
 
 ### What Was New in v1.7.3
 
@@ -81,11 +97,12 @@ This session achieved massive progress with 9 version releases:
 
 ### Installation
 
-1. Download `yolo-yacht-search-v1.7.4.zip`
+1. Download `yolo-yacht-search-v1.7.5.zip`
 2. WordPress Admin → Plugins → Add New → Upload Plugin
 3. Activate plugin
 4. Configure settings (company IDs, Google Maps API key)
 5. **Sync yachts** (Admin → YOLO Yacht Search → Sync All Yachts Now)
+   - **CRITICAL for v1.7.5:** Must re-sync to populate the new `type` column!
 6. **Sync offers** (Admin → YOLO Yacht Search → Sync Weekly Offers)
 7. Test search on home page
 
