@@ -298,6 +298,13 @@
 /* Date Picker */
 .date-picker-section {
     margin-bottom: 20px;
+    position: relative;
+    z-index: 100; /* Ensure dropdown appears above other elements */
+}
+
+/* Fix Litepicker dropdown overflow */
+.litepicker {
+    z-index: 9999 !important;
 }
 
 #dateRangePicker {

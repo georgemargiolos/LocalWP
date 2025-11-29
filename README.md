@@ -1,17 +1,35 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.8  
-**Status:** ✅ STABLE - All Search Features Working Perfectly!  
+**Current Version:** 1.7.9  
+**Status:** ✅ STABLE - Price Formatting Universal Fix!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🎉 Version 1.7.8 - STABLE RELEASE: PRICE FORMATTING FIXED!
+## 🎉 Version 1.7.9 - STABLE RELEASE: UNIVERSAL PRICE FIX!
 
-**This version fixes the critical price formatting issue where prices displayed as decimals (4.32 EUR) instead of proper thousands (4,500 EUR). All search features now working perfectly!**
+**This version applies the price formatting fix universally across ALL pages (search results, yacht details carousel, price display box) and adds carousel click to update date picker functionality!**
 
-### What's New in v1.7.8
+### What's New in v1.7.9
+
+1. **Universal Price Formatting Fix**
+   - Applied price fix to yacht details carousel
+   - Applied price fix to price display box
+   - PHP sends raw numbers, JavaScript formats with toLocaleString('en-US')
+   - All prices now display as "4,500 EUR" format
+
+2. **Carousel Click Updates Date Picker**
+   - Clicking a week in price carousel now updates date picker
+   - selectWeek() function calls window.yoloDatePicker.setDateRange()
+   - Smooth scroll to top after selection
+
+3. **Date Picker Overflow Fix**
+   - Litepicker calendar dropdown no longer clipped
+   - Added z-index and overflow CSS fixes
+   - Calendar displays correctly above all content
+
+### What Was New in v1.7.8
 
 1. **Fixed Price Formatting**
    - Prices now display correctly (4,500 EUR instead of 4.32 EUR)
