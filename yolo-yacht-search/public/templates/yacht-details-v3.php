@@ -329,7 +329,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     <?php if (!empty($equipment)): ?>
     <?php
     // Load equipment icon mapping
-    require_once plugin_dir_path(__FILE__) . '../../../includes/equipment-icons.php';
+    require_once plugin_dir_path(dirname(dirname(dirname(__FILE__)))) . 'includes/equipment-icons.php';
     ?>
     <!-- Load FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
