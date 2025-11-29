@@ -296,7 +296,12 @@ Click **"Sync All Yachts Now"** to:
 
 ## Version History
 
-### v1.8.0 (Latest)
+### v1.8.1 (Latest)
+- **CRITICAL FIX:** Fixed date picker input ID mismatch (dateRangePicker → yolo-ys-yacht-dates).
+- **CRITICAL FIX:** Added data attributes for initial dates (data-init-date-from, data-init-date-to).
+- **Result:** Date picker now actually initializes with search dates from URL parameters.
+
+### v1.8.0
 - **Date Picker Fix:** Added Litepicker initialization to show search dates on page load.
 - **Carousel Integration:** Date picker now updates when clicking price carousel weeks.
 - **Extras Layout:** Combined extras into one row (obligatory + optional side-by-side).
