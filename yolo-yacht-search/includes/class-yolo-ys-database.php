@@ -205,19 +205,34 @@ class YOLO_YS_Database {
             }
         }
         
-        // Store extras
-        if (isset($yacht_data['products'][0]['extras']) && is_array($yacht_data['products'][0]['extras'])) {
-            foreach ($yacht_data['products'][0]['extras'] as $extra) {
-                $wpdb->insert($this->table_extras, array(
-                    'id' => $extra['id'],
-                    'yacht_id' => $yacht_id,
-                    'name' => $extra['name'],
-                    'price' => isset($extra['price']) ? $extra['price'] : null,
-                    'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
-                    'obligatory' => isset($extra['obligatory']) ? $extra['obligatory'] : 0,
-                    'unit' => isset($extra['unit']) ? $extra['unit'] : null
-                ));
+        // Store extras - collect from ALL products, not just products[0]
+        $extras_to_store = array();
+        
+        // Collect extras from every product
+        if (!empty($yacht_data['products']) && is_array($yacht_data['products'])) {
+            foreach ($yacht_data['products'] as $product) {
+                if (!empty($product['extras']) && is_array($product['extras'])) {
+                    $extras_to_store = array_merge($extras_to_store, $product['extras']);
+                }
             }
+        }
+        
+        // Collect top-level extras (if any)
+        if (!empty($yacht_data['extras']) && is_array($yacht_data['extras'])) {
+            $extras_to_store = array_merge($extras_to_store, $yacht_data['extras']);
+        }
+        
+        // Store all collected extras
+        foreach ($extras_to_store as $extra) {
+            $wpdb->insert($this->table_extras, array(
+                'id' => $extra['id'],
+                'yacht_id' => $yacht_id,
+                'name' => $extra['name'],
+                'price' => isset($extra['price']) ? $extra['price'] : null,
+                'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
+                'obligatory' => isset($extra['obligatory']) ? $extra['obligatory'] : 0,
+                'unit' => isset($extra['unit']) ? $extra['unit'] : null
+            ));
         }
         
         // Store equipment

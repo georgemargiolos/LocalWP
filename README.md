@@ -1,35 +1,28 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.8.4  
-**Status:** ✅ STABLE - Sync Fixes Implemented!  
+**Current Version:** 1.8.8  
+**Status:** ✅ STABLE - All Critical Fixes Implemented!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🎉 Version 1.8.4 - STABLE RELEASE: SYNC FIXES!
+## 🎉 Version 1.8.8 - STABLE RELEASE: ALL CRITICAL FIXES!
 
-**This version implements critical fixes for the "syncing forever" issue in the offers sync.**
+**This version implements all critical fixes for yacht sync, date picker, and extras display.**
 
-### What's New in v1.8.4
+### What's New in v1.8.8
 
--   **FIX:** Resolved "syncing forever" issue in offers sync
--   **FIX:** Added `Bearer` prefix to API authorization header
--   **FIX:** Increased API request timeout to 180 seconds
--   **FIX:** Added better error validation and logging for API responses
+-   **FIX:** Extras now aggregate from ALL products, not just products[0]
 
-### What Was New in v1.8.3
+### What Was New in v1.8.7
 
--   **FIX:** Resolved infinite sync loop by syncing equipment catalog first
--   **FIX:** Equipment now displays with names instead of "Unknown Equipment"
--   **FIX:** Removed duplicate equipment section from yacht details page
--   **FEAT:** Added FontAwesome icons for equipment items
+-   **FIX:** Yacht sync infinite loop with equipment caching
+-   **FIX:** Date picker initialization from URL parameters
 
-### What Was New in v1.8.2
+### What Was New in v1.8.6
 
--   **FEAT:** Implemented equipment catalog sync from `/equipment` endpoint
--   **FIX:** Date picker ID mismatch from API documentation
--   **FIX:** July week default selection on yacht details page
+-   **FEAT:** Added equipment catalog sync button to admin panel
 
 ---
 
@@ -37,7 +30,7 @@
 
 ### Installation
 
-1. Download `yolo-yacht-search-v1.8.4.zip`
+1. Download `yolo-yacht-search-v1.8.8.zip`
 2. WordPress Admin → Plugins → Add New → Upload Plugin
 3. Activate plugin
 4. Configure settings (company IDs, Google Maps API key)
@@ -76,7 +69,7 @@
 - ✅ **Price display above Book Now** (NEW in v1.6.4!)
 - ✅ **Description accordion** (collapsible, NEW in v1.6.6!)
 - ✅ **Equipment section** (FIXED in v1.8.2!)
-- ✅ **Extras section** (obligatory + optional)
+- ✅ **Extras section** (FIXED in v1.8.8!)
 - ✅ Google Maps integration (iframe embed)
 - ✅ Date picker (Litepicker)
 - ✅ Quote request form
@@ -123,25 +116,18 @@
 
 ## 📝 Complete Version History
 
-### v1.8.4 (November 29, 2025) - CURRENT ✅
-**SYNC FIXES!**
-- ✅ Resolved "syncing forever" issue in offers sync.
-- ✅ Added `Bearer` prefix to API authorization header.
-- ✅ Increased API request timeout to 180 seconds.
-- ✅ Added better error validation and logging for API responses.
+### v1.8.8 (November 29, 2025) - CURRENT ✅
+**EXTRAS FIX!**
+- ✅ Extras now aggregate from ALL products, not just products[0].
 
-### v1.8.3 (November 29, 2025)
-**EQUIPMENT & SYNC FIXES!**
-- ✅ Resolved infinite sync loop by syncing equipment catalog first.
-- ✅ Fixed equipment display to show names instead of "Unknown Equipment".
-- ✅ Removed duplicate equipment section from yacht details page.
-- ✅ Added FontAwesome icons for equipment items.
+### v1.8.7 (November 29, 2025)
+**CRITICAL SYNC & DATE PICKER FIXES!**
+- ✅ Fixed yacht sync infinite loop with equipment caching.
+- ✅ Fixed date picker initialization from URL parameters.
 
-### v1.8.2 (November 29, 2025)
-**EQUIPMENT SYNC & ALL FIXES!**
-- ✅ Implemented equipment catalog sync to fix empty equipment section.
-- ✅ Fixed date picker ID mismatch as described in API documentation.
-- ✅ Implemented default July week selection on yacht details page.
+### v1.8.6 (November 29, 2025)
+**EQUIPMENT SYNC BUTTON!**
+- ✅ Added equipment catalog sync button to admin panel.
 
 ---
 
