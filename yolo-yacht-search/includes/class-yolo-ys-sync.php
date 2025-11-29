@@ -63,6 +63,14 @@ class YOLO_YS_Sync {
         set_time_limit(300); // 5 minutes
         ini_set('max_execution_time', 300);
         
+        // First, sync equipment catalog if it's empty or old
+        global $wpdb;
+        $equipment_count = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}yolo_equipment_catalog");
+        if ($equipment_count == 0) {
+            error_log('YOLO YS: Equipment catalog empty, syncing first...');
+            $this->sync_equipment_catalog();
+        }
+        
         $results = array(
             'success' => false,
             'message' => '',

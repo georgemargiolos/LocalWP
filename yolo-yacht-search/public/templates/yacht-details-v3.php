@@ -5,6 +5,9 @@
  * Price Carousel moved below images at full width
  */
 
+// Include equipment icons mapping
+require_once plugin_dir_path(__FILE__) . '../../includes/equipment-icons.php';
+
 // Get yacht ID from URL
 $yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : '';
 
@@ -401,20 +404,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         </div>
     </div>
     
-    <!-- Equipment -->
-    <?php if (!empty($equipment)): ?>
-    <div class="yacht-equipment">
-        <h3>Equipment</h3>
-        <div class="equipment-grid">
-            <?php foreach ($equipment as $item): ?>
-                <div class="equipment-item">
-                    <span class="equipment-icon">✓</span>
-                    <span class="equipment-name"><?php echo esc_html($item->equipment_name); ?></span>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    <?php endif; ?>
+
     
     <!-- Extras -->
     <?php if (!empty($extras)): ?>

@@ -613,8 +613,14 @@
 }
 
 .equipment-item i {
-    color: #10b981;
-    font-size: 16px;
+    color: #3b82f6;
+    font-size: 18px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.equipment-icon {
+    flex-shrink: 0;
 }
 
 /* Old Description Section */
