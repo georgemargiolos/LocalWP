@@ -303,4 +303,215 @@ function selectWeek(button) {
         behavior: 'smooth'
     });
 }
+
+// Book Now function - Initiates Stripe Checkout
+function bookNow() {
+    // Get selected dates and price
+    const dateInput = document.getElementById('dateRangePicker');
+    const priceFinal = document.getElementById('selectedPriceFinal');
+    
+    if (!dateInput || !priceFinal) {
+        alert('Please select dates first');
+        return;
+    }
+    
+    // Get dates from Litepicker
+    let dateFrom, dateTo;
+    if (window.yoloDatePicker) {
+        const startDate = window.yoloDatePicker.getStartDate();
+        const endDate = window.yoloDatePicker.getEndDate();
+        
+        if (!startDate || !endDate) {
+            alert('Please select your charter dates');
+            return;
+        }
+        
+        dateFrom = startDate.format('YYYY-MM-DD');
+        dateTo = endDate.format('YYYY-MM-DD');
+    } else {
+        alert('Date picker not initialized');
+        return;
+    }
+    
+    // Get price from active price slide
+    const activeSlide = document.querySelector('.price-slide.active');
+    if (!activeSlide) {
+        alert('Please select a week first');
+        return;
+    }
+    
+    const totalPrice = parseFloat(activeSlide.dataset.price);
+    const currency = activeSlide.dataset.currency || 'EUR';
+    
+    if (!totalPrice || totalPrice <= 0) {
+        alert('Invalid price');
+        return;
+    }
+    
+    // Get yacht details
+    const yachtId = <?php echo intval($yacht->id); ?>;
+    const yachtName = <?php echo json_encode($yacht->name); ?>;
+    
+    // Show loading state
+    const bookBtn = document.querySelector('.btn-book-now');
+    const originalText = bookBtn.textContent;
+    bookBtn.textContent = 'Processing...';
+    bookBtn.disabled = true;
+    
+    // Create Stripe Checkout Session via AJAX
+    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'yolo_create_checkout_session',
+            yacht_id: yachtId,
+            yacht_name: yachtName,
+            date_from: dateFrom,
+            date_to: dateTo,
+            total_price: totalPrice
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data.session_id) {
+            // Redirect to Stripe Checkout
+            const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
+            stripe.redirectToCheckout({
+                sessionId: data.data.session_id
+            }).then(function(result) {
+                if (result.error) {
+                    alert(result.error.message);
+                    bookBtn.textContent = originalText;
+                    bookBtn.disabled = false;
+                }
+            });
+        } else {
+            alert('Error creating checkout session: ' + (data.data.message || 'Unknown error'));
+            bookBtn.textContent = originalText;
+            bookBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to initiate checkout. Please try again.');
+        bookBtn.textContent = originalText;
+        bookBtn.disabled = false;
+    });
+}
+
+// Format price with proper European formatting (18.681,00 EUR)
+function formatEuropeanPrice(price, currency) {
+    if (!price) return '0,00';
+    
+    const num = parseFloat(price);
+    if (currency === 'EUR') {
+        // European format: 18.681,00
+        return num.toLocaleString('de-DE', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    } else {
+        // US format: 18,681.00
+        return num.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+}
+
+// Update price display with deposit information
+function updatePriceDisplayWithDeposit() {
+    const depositPercentage = <?php echo intval(get_option('yolo_ys_deposit_percentage', 50)); ?>;
+    const activeSlide = document.querySelector('.price-slide.active');
+    
+    if (!activeSlide) return;
+    
+    const totalPrice = parseFloat(activeSlide.dataset.price);
+    const currency = activeSlide.dataset.currency || 'EUR';
+    const depositAmount = (totalPrice * depositPercentage) / 100;
+    const remainingBalance = totalPrice - depositAmount;
+    
+    // Update button text to show deposit amount
+    const bookBtn = document.querySelector('.btn-book-now');
+    if (bookBtn) {
+        bookBtn.innerHTML = `BOOK NOW - Pay ${formatEuropeanPrice(depositAmount, currency)} ${currency} (${depositPercentage}%) Deposit`;
+    }
+    
+    // Add deposit info below price
+    const priceFinal = document.getElementById('selectedPriceFinal');
+    if (priceFinal && !document.getElementById('depositInfo')) {
+        const depositInfo = document.createElement('div');
+        depositInfo.id = 'depositInfo';
+        depositInfo.style.cssText = 'font-size: 14px; color: #6b7280; margin-top: 8px;';
+        depositInfo.innerHTML = `
+            <div>Deposit (${depositPercentage}%): <strong>${formatEuropeanPrice(depositAmount, currency)} ${currency}</strong></div>
+            <div>Remaining: ${formatEuropeanPrice(remainingBalance, currency)} ${currency}</div>
+        `;
+        priceFinal.parentNode.appendChild(depositInfo);
+    }
+}
+
+// Call on page load and when price changes
+document.addEventListener('DOMContentLoaded', function() {
+    updatePriceDisplayWithDeposit();
+    
+    // Update when date picker changes
+    if (window.yoloDatePicker) {
+        window.yoloDatePicker.on('selected', function(date1, date2) {
+            // Find matching price for selected dates
+            const dateFrom = date1.format('YYYY-MM-DD');
+            const dateTo = date2.format('YYYY-MM-DD');
+            
+            const priceSlides = document.querySelectorAll('.price-slide');
+            let matchingSlide = null;
+            
+            for (let slide of priceSlides) {
+                if (slide.dataset.dateFrom === dateFrom && slide.dataset.dateTo === dateTo) {
+                    matchingSlide = slide;
+                    break;
+                }
+            }
+            
+            if (matchingSlide) {
+                // Activate the matching slide
+                priceSlides.forEach(s => s.classList.remove('active'));
+                matchingSlide.classList.add('active');
+                
+                // Update price display
+                const price = matchingSlide.dataset.price;
+                const startPrice = matchingSlide.dataset.startPrice;
+                const discount = matchingSlide.dataset.discount;
+                const currency = matchingSlide.dataset.currency;
+                
+                const priceOriginal = document.getElementById('selectedPriceOriginal');
+                const priceDiscount = document.getElementById('selectedPriceDiscount');
+                const priceFinal = document.getElementById('selectedPriceFinal');
+                
+                if (parseFloat(discount) > 0) {
+                    priceOriginal.textContent = formatEuropeanPrice(startPrice, currency) + ' ' + currency;
+                    priceOriginal.style.display = 'block';
+                    priceDiscount.textContent = parseFloat(discount).toFixed(2) + '% OFF - Save ' + formatEuropeanPrice(startPrice - price, currency) + ' ' + currency;
+                    priceDiscount.style.display = 'block';
+                } else {
+                    priceOriginal.style.display = 'none';
+                    priceDiscount.style.display = 'none';
+                }
+                
+                priceFinal.textContent = formatEuropeanPrice(price, currency) + ' ' + currency;
+                
+                // Update deposit info
+                const depositInfo = document.getElementById('depositInfo');
+                if (depositInfo) {
+                    depositInfo.remove();
+                }
+                updatePriceDisplayWithDeposit();
+            }
+        });
+    }
+});
 </script>
+
+<!-- Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>

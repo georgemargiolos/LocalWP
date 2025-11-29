@@ -173,6 +173,59 @@ class YOLO_YS_Admin {
             'yolo_ys_general_settings'
         );
         
+        // Stripe Settings Section
+        add_settings_section(
+            'yolo_ys_stripe_settings',
+            __('Stripe Payment Settings', 'yolo-yacht-search'),
+            array($this, 'stripe_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_publishable_key');
+        add_settings_field(
+            'yolo_ys_stripe_publishable_key',
+            __('Stripe Publishable Key', 'yolo-yacht-search'),
+            array($this, 'stripe_publishable_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_secret_key');
+        add_settings_field(
+            'yolo_ys_stripe_secret_key',
+            __('Stripe Secret Key', 'yolo-yacht-search'),
+            array($this, 'stripe_secret_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_webhook_secret');
+        add_settings_field(
+            'yolo_ys_stripe_webhook_secret',
+            __('Stripe Webhook Secret', 'yolo-yacht-search'),
+            array($this, 'stripe_webhook_secret_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_test_mode');
+        add_settings_field(
+            'yolo_ys_stripe_test_mode',
+            __('Test Mode', 'yolo-yacht-search'),
+            array($this, 'stripe_test_mode_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_deposit_percentage');
+        add_settings_field(
+            'yolo_ys_deposit_percentage',
+            __('Deposit Percentage', 'yolo-yacht-search'),
+            array($this, 'deposit_percentage_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
         // Styling Settings Section
         add_settings_section(
             'yolo_ys_styling_settings',
@@ -310,6 +363,44 @@ class YOLO_YS_Admin {
     public function button_text_color_callback() {
         $value = get_option('yolo_ys_button_text_color', '#ffffff');
         echo '<input type="text" name="yolo_ys_button_text_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    // Stripe Settings Callbacks
+    public function stripe_settings_callback() {
+        echo '<p>' . __('Configure Stripe payment gateway for accepting yacht bookings. Get your API keys from <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a>.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_publishable_key_callback() {
+        $value = get_option('yolo_ys_stripe_publishable_key', 'pk_test_51ST5sKEqtLDG25BLYenhP94HzLvKGFhAjOFNTZVZpUZLUNJVUkXoGEYoypHzmqVltBELrX2QpsVhhqzcRgvPyedG00Wpt5SF3d');
+        echo '<input type="text" name="yolo_ys_stripe_publishable_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="pk_test_... or pk_live_..." />';
+        echo '<p class="description">' . __('Your Stripe publishable key (starts with pk_test_ for test mode or pk_live_ for live mode)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_secret_key_callback() {
+        $value = get_option('yolo_ys_stripe_secret_key', 'sk_test_51ST5sKEqtLDG25BLFqTjNKXepps0axIoIafVyOQ1eVn3lRXoTQ3z0oB4TlqLQ8mhM19F5QBrO5MxCMZ1NN7kmITT00IK1vaUhE');
+        echo '<input type="password" name="yolo_ys_stripe_secret_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="sk_test_... or sk_live_..." />';
+        echo '<p class="description">' . __('Your Stripe secret key (starts with sk_test_ for test mode or sk_live_ for live mode) - Keep this secure!', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_webhook_secret_callback() {
+        $value = get_option('yolo_ys_stripe_webhook_secret', '');
+        $webhook_url = home_url('/wp-json/yolo-yacht-search/v1/stripe-webhook');
+        echo '<input type="password" name="yolo_ys_stripe_webhook_secret" value="' . esc_attr($value) . '" class="large-text code" placeholder="whsec_... (optional)" />';
+        echo '<p class="description"><strong style="color: #10b981;">✓ Webhooks are OPTIONAL!</strong> Bookings are automatically created when customers return from payment.</p>';
+        echo '<p class="description">' . __('For production reliability, you can optionally setup webhook at: <code>' . esc_html($webhook_url) . '</code>', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description">' . __('Add this URL to your <a href="https://dashboard.stripe.com/webhooks" target="_blank">Stripe Webhooks</a> and listen for <code>checkout.session.completed</code> event.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_test_mode_callback() {
+        $value = get_option('yolo_ys_stripe_test_mode', '1');
+        echo '<label><input type="checkbox" name="yolo_ys_stripe_test_mode" value="1" ' . checked($value, '1', false) . ' /> ' . __('Enable test mode (use test API keys)', 'yolo-yacht-search') . '</label>';
+        echo '<p class="description">' . __('When enabled, use test API keys (pk_test_ and sk_test_). Disable for live payments.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function deposit_percentage_callback() {
+        $value = get_option('yolo_ys_deposit_percentage', '50');
+        echo '<input type="number" name="yolo_ys_deposit_percentage" value="' . esc_attr($value) . '" class="small-text" min="1" max="100" step="1" /> %';
+        echo '<p class="description">' . __('Percentage of charter price to charge as deposit (1-100%). Customer pays remaining balance later. Example: 50% means customer pays half now, half later.', 'yolo-yacht-search') . '</p>';
     }
     
     /**

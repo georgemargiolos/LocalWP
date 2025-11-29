@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 1.9.4
+ * Version: 2.0.0
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '1.9.4');
+define('YOLO_YS_VERSION', '2.0.0');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -36,6 +36,14 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-booking-manager-api.ph
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database-prices.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-sync.php';
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-price-formatter.php';
+
+// Load Stripe PHP library
+if (file_exists(YOLO_YS_PLUGIN_DIR . 'stripe-php/init.php')) {
+    require_once YOLO_YS_PLUGIN_DIR . 'stripe-php/init.php';
+    require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-stripe.php';
+    require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-stripe-handlers.php';
+}
 
 /**
  * The code that runs during plugin activation.

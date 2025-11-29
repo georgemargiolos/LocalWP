@@ -9,6 +9,7 @@ class YOLO_YS_Shortcodes {
         add_shortcode('yolo_search_results', array($this, 'search_results_shortcode'));
         add_shortcode('yolo_our_fleet', array($this, 'our_fleet_shortcode'));
         add_shortcode('yolo_yacht_details', array($this, 'yacht_details_shortcode'));
+        add_shortcode('yolo_booking_confirmation', array($this, 'booking_confirmation_shortcode'));
     }
     
     /**
@@ -44,6 +45,15 @@ class YOLO_YS_Shortcodes {
     public function yacht_details_shortcode($atts) {
         ob_start();
         include YOLO_YS_PLUGIN_DIR . 'public/templates/yacht-details-v3.php';
+        return ob_get_clean();
+    }
+    
+    /**
+     * Booking Confirmation shortcode - displays booking confirmation after payment
+     */
+    public function booking_confirmation_shortcode($atts) {
+        ob_start();
+        include YOLO_YS_PLUGIN_DIR . 'public/templates/booking-confirmation.php';
         return ob_get_clean();
     }
 }

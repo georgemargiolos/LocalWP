@@ -125,14 +125,42 @@ class YOLO_YS_Database {
             PRIMARY KEY  (id)
         ) $charset_collate;";
         
+        // Bookings table
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        $sql_bookings = "CREATE TABLE {$table_bookings} (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            yacht_id bigint(20) NOT NULL,
+            yacht_name varchar(255) NOT NULL,
+            date_from date NOT NULL,
+            date_to date NOT NULL,
+            total_price decimal(10,2) NOT NULL,
+            deposit_paid decimal(10,2) NOT NULL,
+            remaining_balance decimal(10,2) NOT NULL,
+            currency varchar(10) DEFAULT 'EUR',
+            customer_email varchar(255) NOT NULL,
+            customer_name varchar(255) NOT NULL,
+            stripe_session_id varchar(255) DEFAULT NULL,
+            stripe_payment_intent varchar(255) DEFAULT NULL,
+            payment_status varchar(50) DEFAULT 'pending',
+            booking_status varchar(50) DEFAULT 'pending',
+            booking_manager_id varchar(255) DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY yacht_id (yacht_id),
+            KEY customer_email (customer_email),
+            KEY stripe_session_id (stripe_session_id)
+        ) $charset_collate;";
+        
         dbDelta($sql_yachts);
         dbDelta($sql_products);
         dbDelta($sql_images);
         dbDelta($sql_extras);
         dbDelta($sql_equipment);
         dbDelta($sql_equipment_catalog);
+        dbDelta($sql_bookings);
         
-        update_option('yolo_ys_db_version', '1.2');
+        update_option('yolo_ys_db_version', '1.3');
     }
     
     /**

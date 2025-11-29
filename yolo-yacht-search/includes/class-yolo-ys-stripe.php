@@ -1,0 +1,283 @@
+<?php
+/**
+ * Stripe Checkout Integration
+ */
+class YOLO_YS_Stripe {
+    
+    /**
+     * Initialize Stripe with API key
+     */
+    private function init_stripe() {
+        $secret_key = get_option('yolo_ys_stripe_secret_key', '');
+        
+        if (empty($secret_key)) {
+            throw new Exception('Stripe secret key not configured');
+        }
+        
+        \Stripe\Stripe::setApiKey($secret_key);
+    }
+    
+    /**
+     * Create Stripe Checkout Session for yacht booking
+     * 
+     * @param int $yacht_id Yacht ID
+     * @param string $yacht_name Yacht name
+     * @param string $date_from Start date (Y-m-d)
+     * @param string $date_to End date (Y-m-d)
+     * @param float $total_price Total charter price
+     * @return array Session data with session_id
+     */
+    public function create_checkout_session($yacht_id, $yacht_name, $date_from, $date_to, $total_price) {
+        try {
+            $this->init_stripe();
+            
+            // Get deposit percentage from settings
+            $deposit_percentage = get_option('yolo_ys_deposit_percentage', 50);
+            
+            // Calculate deposit amount
+            $deposit_amount = YOLO_YS_Price_Formatter::calculate_deposit($total_price, $deposit_percentage);
+            $remaining_balance = YOLO_YS_Price_Formatter::calculate_remaining_balance($total_price, $deposit_amount);
+            
+            // Convert to Stripe format (cents)
+            $stripe_amount = YOLO_YS_Price_Formatter::format_for_stripe($deposit_amount, 'EUR');
+            
+            // Get success and cancel URLs
+            $success_url = home_url('/booking-confirmation?session_id={CHECKOUT_SESSION_ID}');
+            $cancel_url = home_url('/yacht-details-page/?yacht_id=' . $yacht_id . '&dateFrom=' . $date_from . '&dateTo=' . $date_to);
+            
+            // Create Checkout Session
+            $session = \Stripe\Checkout\Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'product_data' => [
+                            'name' => 'Yacht Charter: ' . $yacht_name,
+                            'description' => sprintf(
+                                'Deposit (%d%%) for charter from %s to %s. Remaining balance: %s',
+                                $deposit_percentage,
+                                date('M d, Y', strtotime($date_from)),
+                                date('M d, Y', strtotime($date_to)),
+                                YOLO_YS_Price_Formatter::format_price($remaining_balance, 'EUR')
+                            ),
+                        ],
+                        'unit_amount' => $stripe_amount,
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => $success_url,
+                'cancel_url' => $cancel_url,
+                'metadata' => [
+                    'yacht_id' => $yacht_id,
+                    'yacht_name' => $yacht_name,
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'total_price' => $total_price,
+                    'deposit_amount' => $deposit_amount,
+                    'deposit_percentage' => $deposit_percentage,
+                    'remaining_balance' => $remaining_balance,
+                    'currency' => 'EUR',
+                ],
+                'customer_email' => null, // Will be filled by customer on Stripe checkout
+            ]);
+            
+            return array(
+                'success' => true,
+                'session_id' => $session->id,
+                'deposit_amount' => $deposit_amount,
+                'remaining_balance' => $remaining_balance,
+            );
+            
+        } catch (Exception $e) {
+            error_log('YOLO YS Stripe: Failed to create checkout session - ' . $e->getMessage());
+            return array(
+                'success' => false,
+                'error' => $e->getMessage(),
+            );
+        }
+    }
+    
+    /**
+     * Handle Stripe webhook events
+     */
+    public function handle_webhook() {
+        $payload = @file_get_contents('php://input');
+        $sig_header = isset($_SERVER['HTTP_STRIPE_SIGNATURE']) ? $_SERVER['HTTP_STRIPE_SIGNATURE'] : '';
+        $endpoint_secret = get_option('yolo_ys_stripe_webhook_secret', '');
+        
+        try {
+            if (!empty($endpoint_secret)) {
+                // Verify webhook signature
+                $event = \Stripe\Webhook::constructEvent($payload, $sig_header, $endpoint_secret);
+            } else {
+                // For testing without webhook secret
+                $event = json_decode($payload, true);
+            }
+            
+            // Handle the event
+            if ($event['type'] == 'checkout.session.completed') {
+                $session = $event['data']['object'];
+                $this->handle_successful_payment($session);
+            }
+            
+            http_response_code(200);
+            echo json_encode(['status' => 'success']);
+            
+        } catch(\UnexpectedValueException $e) {
+            // Invalid payload
+            error_log('YOLO YS Stripe Webhook: Invalid payload - ' . $e->getMessage());
+            http_response_code(400);
+            exit();
+        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+            // Invalid signature
+            error_log('YOLO YS Stripe Webhook: Invalid signature - ' . $e->getMessage());
+            http_response_code(400);
+            exit();
+        } catch(Exception $e) {
+            error_log('YOLO YS Stripe Webhook: Error - ' . $e->getMessage());
+            http_response_code(500);
+            exit();
+        }
+    }
+    
+    /**
+     * Handle successful payment
+     * 
+     * @param array $session Stripe session data
+     */
+    private function handle_successful_payment($session) {
+        global $wpdb;
+        
+        // Extract booking details from metadata
+        $yacht_id = $session['metadata']['yacht_id'];
+        $yacht_name = $session['metadata']['yacht_name'];
+        $date_from = $session['metadata']['date_from'];
+        $date_to = $session['metadata']['date_to'];
+        $total_price = $session['metadata']['total_price'];
+        $deposit_amount = $session['metadata']['deposit_amount'];
+        $remaining_balance = $session['metadata']['remaining_balance'];
+        
+        // Get customer details
+        $customer_email = isset($session['customer_details']['email']) ? $session['customer_details']['email'] : '';
+        $customer_name = isset($session['customer_details']['name']) ? $session['customer_details']['name'] : '';
+        
+        // Store booking in database
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        $wpdb->insert($table_bookings, array(
+            'yacht_id' => $yacht_id,
+            'yacht_name' => $yacht_name,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'total_price' => $total_price,
+            'deposit_paid' => $deposit_amount,
+            'remaining_balance' => $remaining_balance,
+            'currency' => 'EUR',
+            'customer_email' => $customer_email,
+            'customer_name' => $customer_name,
+            'stripe_session_id' => $session['id'],
+            'stripe_payment_intent' => isset($session['payment_intent']) ? $session['payment_intent'] : '',
+            'payment_status' => 'deposit_paid',
+            'booking_status' => 'confirmed',
+            'created_at' => current_time('mysql'),
+        ));
+        
+        $booking_id = $wpdb->insert_id;
+        
+        // Create reservation in Booking Manager API
+        $this->create_booking_manager_reservation($booking_id, $yacht_id, $date_from, $date_to, $customer_email, $customer_name);
+        
+        // Send confirmation email
+        $this->send_confirmation_email($booking_id);
+        
+        error_log('YOLO YS: Booking created successfully - ID: ' . $booking_id);
+    }
+    
+    /**
+     * Create reservation in Booking Manager API
+     * 
+     * @param int $booking_id Local booking ID
+     * @param int $yacht_id Yacht ID
+     * @param string $date_from Start date
+     * @param string $date_to End date
+     * @param string $customer_email Customer email
+     * @param string $customer_name Customer name
+     */
+    private function create_booking_manager_reservation($booking_id, $yacht_id, $date_from, $date_to, $customer_email, $customer_name) {
+        try {
+            $api = new YOLO_YS_Booking_Manager_API();
+            
+            // TODO: Implement POST /reservation endpoint in API class
+            // For now, just log the attempt
+            error_log('YOLO YS: Would create Booking Manager reservation for booking ID: ' . $booking_id);
+            
+            // Example structure (to be implemented):
+            // $reservation_data = array(
+            //     'yachtId' => $yacht_id,
+            //     'dateFrom' => $date_from . 'T12:00:00',
+            //     'dateTo' => $date_to . 'T11:59:00',
+            //     'customer' => array(
+            //         'email' => $customer_email,
+            //         'name' => $customer_name,
+            //     ),
+            //     'status' => 'confirmed',
+            // );
+            // $result = $api->create_reservation($reservation_data);
+            
+        } catch (Exception $e) {
+            error_log('YOLO YS: Failed to create Booking Manager reservation - ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Send booking confirmation email
+     * 
+     * @param int $booking_id Booking ID
+     */
+    private function send_confirmation_email($booking_id) {
+        global $wpdb;
+        
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table_bookings} WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking) {
+            return;
+        }
+        
+        $to = $booking->customer_email;
+        $subject = 'Booking Confirmation - ' . $booking->yacht_name;
+        
+        $message = sprintf(
+            "Dear %s,\n\n" .
+            "Thank you for your booking!\n\n" .
+            "Booking Details:\n" .
+            "Yacht: %s\n" .
+            "Dates: %s to %s\n" .
+            "Total Price: %s\n" .
+            "Deposit Paid: %s\n" .
+            "Remaining Balance: %s\n\n" .
+            "Your booking reference: #%d\n\n" .
+            "We look forward to welcoming you aboard!\n\n" .
+            "Best regards,\n" .
+            "YOLO Charters Team",
+            $booking->customer_name,
+            $booking->yacht_name,
+            date('F j, Y', strtotime($booking->date_from)),
+            date('F j, Y', strtotime($booking->date_to)),
+            YOLO_YS_Price_Formatter::format_price($booking->total_price, $booking->currency),
+            YOLO_YS_Price_Formatter::format_price($booking->deposit_paid, $booking->currency),
+            YOLO_YS_Price_Formatter::format_price($booking->remaining_balance, $booking->currency),
+            $booking_id
+        );
+        
+        $headers = array('Content-Type: text/plain; charset=UTF-8');
+        
+        wp_mail($to, $subject, $message, $headers);
+        
+        error_log('YOLO YS: Confirmation email sent to ' . $to);
+    }
+}
