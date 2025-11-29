@@ -10,6 +10,7 @@ class YOLO_YS_Database {
     private $table_extras;
     private $table_equipment;
     private $table_equipment_catalog;
+    private $equipment_cache = null; // Cache for equipment catalog
     
     public function __construct() {
         global $wpdb;
@@ -322,14 +323,29 @@ class YOLO_YS_Database {
     /**
      * Get equipment name by ID
      */
+    /**
+     * Load equipment catalog into memory cache
+     */
+    private function load_equipment_cache() {
+        if ($this->equipment_cache === null) {
+            global $wpdb;
+            $results = $wpdb->get_results(
+                "SELECT id, name FROM {$this->table_equipment_catalog}",
+                ARRAY_A
+            );
+            
+            $this->equipment_cache = array();
+            foreach ($results as $row) {
+                $this->equipment_cache[$row['id']] = $row['name'];
+            }
+        }
+    }
+    
+    /**
+     * Get equipment name from cache (much faster than individual queries)
+     */
     public function get_equipment_name($equipment_id) {
-        global $wpdb;
-        
-        $name = $wpdb->get_var($wpdb->prepare(
-            "SELECT name FROM {$this->table_equipment_catalog} WHERE id = %d",
-            $equipment_id
-        ));
-        
-        return $name ? $name : 'Unknown Equipment';
+        $this->load_equipment_cache();
+        return isset($this->equipment_cache[$equipment_id]) ? $this->equipment_cache[$equipment_id] : 'Unknown Equipment';
     }
 }

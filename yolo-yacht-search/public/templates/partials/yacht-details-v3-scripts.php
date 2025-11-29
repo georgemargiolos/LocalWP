@@ -5,39 +5,41 @@ function formatPrice(price) {
     return Number(price).toLocaleString('en-US');
 }
 
-// Initialize Litepicker
-const dateInput = document.getElementById('dateRangePicker');
-if (dateInput && typeof Litepicker !== 'undefined') {
-    // Get initial dates from data attributes (passed from search)
-    const initDateFrom = dateInput.dataset.initDateFrom;
-    const initDateTo = dateInput.dataset.initDateTo;
-    
-    const pickerConfig = {
-        element: dateInput,
-        singleMode: false,
-        numberOfMonths: 2,
-        numberOfColumns: 2,
-        format: 'DD.MM.YYYY',
-        minDate: new Date(),
-        autoApply: true,
-        tooltipText: {
-            one: 'night',
-            other: 'nights'
-        },
-        tooltipNumber: (totalDays) => {
-            return totalDays - 1;
+// Initialize Litepicker after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('dateRangePicker');
+    if (dateInput && typeof Litepicker !== 'undefined') {
+        // Get initial dates from data attributes (passed from search)
+        const initDateFrom = dateInput.dataset.initDateFrom;
+        const initDateTo = dateInput.dataset.initDateTo;
+        
+        const pickerConfig = {
+            element: dateInput,
+            singleMode: false,
+            numberOfMonths: 2,
+            numberOfColumns: 2,
+            format: 'DD.MM.YYYY',
+            minDate: new Date(),
+            autoApply: true,
+            tooltipText: {
+                one: 'night',
+                other: 'nights'
+            },
+            tooltipNumber: (totalDays) => {
+                return totalDays - 1;
+            }
+        };
+        
+        // Set initial date range if provided
+        if (initDateFrom && initDateTo) {
+            pickerConfig.startDate = new Date(initDateFrom);
+            pickerConfig.endDate = new Date(initDateTo);
         }
-    };
-    
-    // Set initial date range if provided
-    if (initDateFrom && initDateTo) {
-        pickerConfig.startDate = new Date(initDateFrom);
-        pickerConfig.endDate = new Date(initDateTo);
+        
+        // Create and store Litepicker instance globally
+        window.yoloDatePicker = new Litepicker(pickerConfig);
     }
-    
-    // Create and store Litepicker instance globally
-    window.yoloDatePicker = new Litepicker(pickerConfig);
-}
+});
 
 // Format all prices on page load
 document.addEventListener('DOMContentLoaded', function() {
