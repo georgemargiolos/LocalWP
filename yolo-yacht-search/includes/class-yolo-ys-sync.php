@@ -13,6 +13,49 @@ class YOLO_YS_Sync {
     }
     
     /**
+     * Sync equipment catalog from API
+     */
+    public function sync_equipment_catalog() {
+        $results = array(
+            'success' => false,
+            'message' => '',
+            'equipment_synced' => 0,
+            'errors' => array()
+        );
+        
+        try {
+            // Fetch equipment catalog from API
+            $equipment = $this->api->get_equipment_catalog();
+            
+            if (!is_array($equipment)) {
+                $results['errors'][] = 'Unexpected response format (not an array)';
+                $results['message'] = 'Failed to sync equipment catalog';
+                return $results;
+            }
+            
+            // Store in database
+            $this->db->store_equipment_catalog($equipment);
+            $results['equipment_synced'] = count($equipment);
+            
+            $results['success'] = true;
+            $results['message'] = sprintf(
+                'Successfully synced %d equipment items',
+                $results['equipment_synced']
+            );
+            
+            // Update last sync time
+            update_option('yolo_ys_last_equipment_sync', current_time('mysql'));
+            
+        } catch (Exception $e) {
+            $results['errors'][] = $e->getMessage();
+            $results['message'] = 'Failed to sync equipment catalog: ' . $e->getMessage();
+            error_log('YOLO YS: Equipment catalog sync failed - ' . $e->getMessage());
+        }
+        
+        return $results;
+    }
+    
+    /**
      * Sync all yachts from all companies (WITHOUT prices)
      */
     public function sync_all_yachts() {

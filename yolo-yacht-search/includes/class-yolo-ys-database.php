@@ -9,6 +9,7 @@ class YOLO_YS_Database {
     private $table_images;
     private $table_extras;
     private $table_equipment;
+    private $table_equipment_catalog;
     
     public function __construct() {
         global $wpdb;
@@ -17,6 +18,7 @@ class YOLO_YS_Database {
         $this->table_images = $wpdb->prefix . 'yolo_yacht_images';
         $this->table_extras = $wpdb->prefix . 'yolo_yacht_extras';
         $this->table_equipment = $wpdb->prefix . 'yolo_yacht_equipment';
+        $this->table_equipment_catalog = $wpdb->prefix . 'yolo_equipment_catalog';
     }
     
     /**
@@ -34,6 +36,7 @@ class YOLO_YS_Database {
         $table_images = $wpdb->prefix . 'yolo_yacht_images';
         $table_extras = $wpdb->prefix . 'yolo_yacht_extras';
         $table_equipment = $wpdb->prefix . 'yolo_yacht_equipment';
+        $table_equipment_catalog = $wpdb->prefix . 'yolo_equipment_catalog';
         
         // Yachts table
         $sql_yachts = "CREATE TABLE {$table_yachts} (
@@ -113,11 +116,20 @@ class YOLO_YS_Database {
             KEY yacht_id (yacht_id)
         ) $charset_collate;";
         
+        // Equipment catalog table (master list of all equipment)
+        $sql_equipment_catalog = "CREATE TABLE {$table_equipment_catalog} (
+            id bigint(20) NOT NULL,
+            name varchar(255) NOT NULL,
+            last_synced datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+        
         dbDelta($sql_yachts);
         dbDelta($sql_products);
         dbDelta($sql_images);
         dbDelta($sql_extras);
         dbDelta($sql_equipment);
+        dbDelta($sql_equipment_catalog);
         
         update_option('yolo_ys_db_version', '1.0');
     }
@@ -210,10 +222,13 @@ class YOLO_YS_Database {
         // Store equipment
         if (isset($yacht_data['equipment']) && is_array($yacht_data['equipment'])) {
             foreach ($yacht_data['equipment'] as $equip) {
+                // Get equipment name from catalog
+                $equipment_name = $this->get_equipment_name($equip['id']);
+                
                 $wpdb->insert($this->table_equipment, array(
                     'yacht_id' => $yacht_id,
                     'equipment_id' => $equip['id'],
-                    'equipment_name' => $equip['name'],
+                    'equipment_name' => $equipment_name,
                     'category' => isset($equip['category']) ? $equip['category'] : null
                 ));
             }
@@ -285,5 +300,36 @@ class YOLO_YS_Database {
         $stats['last_sync'] = $wpdb->get_var("SELECT MAX(last_synced) FROM {$this->table_yachts}");
         
         return $stats;
+    }
+    
+    /**
+     * Store equipment catalog
+     */
+    public function store_equipment_catalog($equipment_items) {
+        global $wpdb;
+        
+        foreach ($equipment_items as $item) {
+            $wpdb->replace($this->table_equipment_catalog, array(
+                'id' => $item['id'],
+                'name' => $item['name'],
+                'last_synced' => current_time('mysql')
+            ));
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get equipment name by ID
+     */
+    public function get_equipment_name($equipment_id) {
+        global $wpdb;
+        
+        $name = $wpdb->get_var($wpdb->prepare(
+            "SELECT name FROM {$this->table_equipment_catalog} WHERE id = %d",
+            $equipment_id
+        ));
+        
+        return $name ? $name : 'Unknown Equipment';
     }
 }

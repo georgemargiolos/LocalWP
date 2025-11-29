@@ -119,6 +119,20 @@ class YOLO_YS_Booking_Manager_API {
     /**
      * Get all yachts for a company
      */
+    /**
+     * Get all equipment definitions
+     */
+    public function get_equipment_catalog() {
+        $endpoint = '/equipment';
+        $result = $this->make_request($endpoint);
+        
+        if ($result['success']) {
+            return $result['data'];
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch equipment catalog');
+    }
+
     public function get_yachts_by_company($company_id) {
         $endpoint = '/yachts';
         $params = array('companyId' => $company_id);
