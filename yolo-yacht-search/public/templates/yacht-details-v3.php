@@ -411,47 +411,52 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         $optional_extras = array_filter($extras, function($e) { return $e->obligatory == 0; });
         ?>
         
-        <?php if (!empty($obligatory_extras)): ?>
-        <div class="yacht-extras obligatory-extras">
-            <h3>Obligatory Extras <span class="extras-note">(Payable at the base)</span></h3>
-            <div class="extras-grid">
-                <?php foreach ($obligatory_extras as $extra): ?>
-                    <div class="extra-item obligatory">
-                        <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
-                        <?php if ($extra->price > 0): ?>
-                            <div class="extra-price">
-                                <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
-                                <?php if (!empty($extra->unit)): ?>
-                                    <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+        <div class="yacht-extras-combined">
+            <h3>Extras <span class="extras-note">(Payable at the base)</span></h3>
+            <div class="extras-two-column">
+                <?php if (!empty($obligatory_extras)): ?>
+                <div class="extras-column">
+                    <h4>Obligatory Extras</h4>
+                    <div class="extras-grid">
+                        <?php foreach ($obligatory_extras as $extra): ?>
+                            <div class="extra-item obligatory">
+                                <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
+                                <?php if ($extra->price > 0): ?>
+                                    <div class="extra-price">
+                                        <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
+                                        <?php if (!empty($extra->unit)): ?>
+                                            <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php endif; ?>
                             </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
-        
-        <?php if (!empty($optional_extras)): ?>
-        <div class="yacht-extras optional-extras">
-            <h3>Optional Extras <span class="extras-note">(Payable at the base)</span></h3>
-            <div class="extras-grid">
-                <?php foreach ($optional_extras as $extra): ?>
-                    <div class="extra-item optional">
-                        <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
-                        <?php if ($extra->price > 0): ?>
-                            <div class="extra-price">
-                                <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
-                                <?php if (!empty($extra->unit)): ?>
-                                    <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($optional_extras)): ?>
+                <div class="extras-column">
+                    <h4>Optional Extras</h4>
+                    <div class="extras-grid">
+                        <?php foreach ($optional_extras as $extra): ?>
+                            <div class="extra-item optional">
+                                <div class="extra-name"><?php echo esc_html($extra->name); ?></div>
+                                <?php if ($extra->price > 0): ?>
+                                    <div class="extra-price">
+                                        <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
+                                        <?php if (!empty($extra->unit)): ?>
+                                            <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php endif; ?>
                             </div>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
-        <?php endif; ?>
     <?php endif; ?>
     
 </div>

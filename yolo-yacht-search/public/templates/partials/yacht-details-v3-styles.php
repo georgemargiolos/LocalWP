@@ -733,32 +733,54 @@
 }
 
 /* Extras */
-.yacht-extras {
+.yacht-extras-combined {
     margin-bottom: 40px;
 }
 
-.yacht-extras h3 {
+.yacht-extras-combined h3 {
     font-size: 24px;
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-.yacht-extras.obligatory-extras h3 {
-    color: #dc2626;
-}
-
-.yacht-extras .extras-note {
+.yacht-extras-combined .extras-note {
     font-size: 14px;
     font-weight: 400;
     color: #6b7280;
     font-style: italic;
 }
 
+.extras-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .extras-two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+.extras-column h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.extras-column:first-child h4 {
+    color: #dc2626;
+}
+
+.extras-column:last-child h4 {
+    color: #1e3a8a;
+}
+
 .extras-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }
 
 .extra-item {
