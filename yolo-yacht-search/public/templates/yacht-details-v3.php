@@ -8,6 +8,16 @@
 // Get yacht ID from URL
 $yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : '';
 
+// Get search dates from URL (passed from search results)
+$requested_date_from = isset($_GET['dateFrom']) ? sanitize_text_field($_GET['dateFrom']) : '';
+$requested_date_to   = isset($_GET['dateTo'])   ? sanitize_text_field($_GET['dateTo']) : '';
+
+if (!empty($requested_date_from))
+    $requested_date_from = substr($requested_date_from, 0, 10);
+
+if (!empty($requested_date_to))
+    $requested_date_to = substr($requested_date_to, 0, 10);
+
 if (empty($yacht_id)) {
     echo '<p>No yacht specified.</p>';
     return;
@@ -196,7 +206,10 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     <?php if (!empty($prices)): ?>
     <div class="yacht-price-carousel-section">
         <h3>Peak Season Pricing (May - September)</h3>
-        <div class="price-carousel-container" data-visible-slides="4">
+        <div class="price-carousel-container" 
+             data-init-date-from="<?php echo esc_attr($requested_date_from); ?>"
+             data-init-date-to="<?php echo esc_attr($requested_date_to); ?>"
+             data-visible-slides="4">
             <div class="price-carousel-slides">
                 <?php foreach ($prices as $index => $price): 
                     $discount_amount = $price->start_price - $price->price;

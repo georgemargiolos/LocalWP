@@ -79,8 +79,15 @@ function yolo_ys_ajax_search_yachts() {
             $row->yacht_id
         ));
         
-        // Build details URL
-        $yacht_url = add_query_arg('yacht_id', $row->yacht_id, $details_page_url);
+        // Build details URL with search dates
+        $search_week_from = date('Y-m-d', strtotime($row->date_from));
+        $search_week_to   = date('Y-m-d', strtotime($row->date_to));
+        
+        $yacht_url = add_query_arg(array(
+            'yacht_id' => $row->yacht_id,
+            'dateFrom' => $search_week_from,
+            'dateTo'   => $search_week_to,
+        ), $details_page_url);
         
         $boat = array(
             'yacht_id' => $row->yacht_id,

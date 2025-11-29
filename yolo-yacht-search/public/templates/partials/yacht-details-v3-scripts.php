@@ -162,46 +162,74 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Auto-populate with first week's dates and price
+        // Auto-select the correct week based on search dates (or first week as fallback)
         setTimeout(() => {
-            const firstSlide = document.querySelector('.price-slide');
-            if (firstSlide) {
-                const dateFrom = firstSlide.dataset.dateFrom;
-                const dateTo = firstSlide.dataset.dateTo;
-                const price = firstSlide.dataset.price;
-                const startPrice = firstSlide.dataset.startPrice;
-                const discount = firstSlide.dataset.discount;
-                const currency = firstSlide.dataset.currency;
-                
-                // Set date picker
-                if (dateFrom && dateTo && window.datePicker) {
-                    window.datePicker.setDateRange(dateFrom, dateTo);
-                }
-                
-                // Set price display
-                const priceDisplay = document.getElementById('selectedPriceDisplay');
-                const priceOriginal = document.getElementById('selectedPriceOriginal');
-                const priceDiscount = document.getElementById('selectedPriceDiscount');
-                const priceFinal = document.getElementById('selectedPriceFinal');
-                
-                if (priceDisplay && priceFinal) {
-                    priceDisplay.style.display = 'block';
-                    
-                    const formatPrice = (num) => Math.floor(num).toLocaleString('en-US').replace(/,/g, '.');
-                    
-                    if (discount > 0) {
-                        const discountAmount = startPrice - price;
-                        priceOriginal.innerHTML = `<span class="strikethrough">${formatPrice(startPrice)} ${currency}</span>`;
-                        priceDiscount.innerHTML = `${parseFloat(discount).toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${currency}`;
-                        priceOriginal.style.display = 'block';
-                        priceDiscount.style.display = 'block';
-                    } else {
-                        priceOriginal.style.display = 'none';
-                        priceDiscount.style.display = 'none';
+            const container = document.querySelector('.price-carousel-container');
+            const slides = document.querySelectorAll('.price-slide');
+            
+            if (!container || slides.length === 0) return;
+            
+            const initFrom = container.dataset.initDateFrom;
+            const initTo = container.dataset.initDateTo;
+            
+            let targetSlide = null;
+            
+            // Find matching slide based on search dates
+            if (initFrom && initTo) {
+                slides.forEach(slide => {
+                    if (slide.dataset.dateFrom === initFrom && slide.dataset.dateTo === initTo) {
+                        targetSlide = slide;
                     }
-                    
-                    priceFinal.innerHTML = `${formatPrice(price)} ${currency}`;
+                });
+            }
+            
+            // Fallback: first slide if no match found
+            if (!targetSlide) {
+                targetSlide = slides[0];
+            }
+            
+            // Remove active class from all slides
+            slides.forEach(s => s.classList.remove('active'));
+            
+            // Add active class to target slide
+            targetSlide.classList.add('active');
+            
+            // Get data from target slide
+            const dateFrom = targetSlide.dataset.dateFrom;
+            const dateTo = targetSlide.dataset.dateTo;
+            const price = targetSlide.dataset.price;
+            const startPrice = targetSlide.dataset.startPrice;
+            const discount = targetSlide.dataset.discount;
+            const currency = targetSlide.dataset.currency;
+            
+            // Update date picker
+            if (window.datePicker && dateFrom && dateTo) {
+                window.datePicker.setDateRange(dateFrom, dateTo);
+            }
+            
+            // Update price summary box
+            const formatPrice = (num) => Math.floor(num).toLocaleString('en-US').replace(/,/g, '.');
+            
+            const priceDisplay = document.getElementById('selectedPriceDisplay');
+            const priceOriginal = document.getElementById('selectedPriceOriginal');
+            const priceDiscount = document.getElementById('selectedPriceDiscount');
+            const priceFinal = document.getElementById('selectedPriceFinal');
+            
+            if (priceDisplay && priceFinal) {
+                priceDisplay.style.display = 'block';
+                
+                if (discount > 0 && startPrice > 0) {
+                    const discountAmount = startPrice - price;
+                    priceOriginal.innerHTML = `<span class="strikethrough">${formatPrice(startPrice)} ${currency}</span>`;
+                    priceDiscount.innerHTML = `${parseFloat(discount).toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${currency}`;
+                    priceOriginal.style.display = 'block';
+                    priceDiscount.style.display = 'block';
+                } else {
+                    priceOriginal.style.display = 'none';
+                    priceDiscount.style.display = 'none';
                 }
+                
+                priceFinal.innerHTML = `${formatPrice(price)} ${currency}`;
             }
         }, 500);
     }

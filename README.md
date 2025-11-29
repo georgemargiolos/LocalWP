@@ -1,17 +1,36 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.2  
-**Status:** ✅ 90% COMPLETE - Search Functionality Working!  
+**Current Version:** 1.7.3  
+**Status:** ✅ 92% COMPLETE - Search-to-Details Flow Complete!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🎉 Version 1.7.2 - SEARCH FUNCTIONALITY COMPLETE!
+## 🎉 Version 1.7.3 - SEARCH-TO-DETAILS FLOW COMPLETE!
 
-**This version implements the complete search functionality with database queries, yacht card components, and date-specific pricing!**
+**This version fixes the critical UX issue where yacht details pages ignored search dates and always defaulted to the first available week!**
 
-### What's New in v1.7.2
+### What's New in v1.7.3
+
+1. **Search-to-Details Date Continuity**
+   - Search dates now passed through URL parameters
+   - Details page auto-selects the searched week in carousel
+   - Date picker shows the searched dates
+   - Price display matches the searched week
+   - Complete UX flow consistency from search → results → details
+
+2. **Smart Week Matching**
+   - JavaScript finds and activates the matching week
+   - Falls back to first week if no match found
+   - Updates all UI components automatically
+
+3. **Enhanced User Experience**
+   - No more confusion with mismatched dates
+   - Professional and consistent booking flow
+   - Seamless transition from search to details
+
+### What Was New in v1.7.2
 
 1. **Search Results Display**
    - Yacht card component (matches "Our Yachts" page design)
@@ -44,7 +63,7 @@ This session achieved massive progress with 9 version releases:
 
 ### Installation
 
-1. Download `yolo-yacht-search-v1.7.2.zip`
+1. Download `yolo-yacht-search-v1.7.3.zip`
 2. WordPress Admin → Plugins → Add New → Upload Plugin
 3. Activate plugin
 4. Configure settings (company IDs, Google Maps API key)
