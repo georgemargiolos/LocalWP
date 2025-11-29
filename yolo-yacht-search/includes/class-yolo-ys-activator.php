@@ -82,5 +82,22 @@ class YOLO_YS_Activator {
                 error_log('YOLO YS: Modified equipment_name column to allow NULL');
             }
         }
+        
+        // Migration 3: Fix extras table primary key to allow duplicate extra IDs across yachts (v1.9.4)
+        $extras_table = $wpdb->prefix . 'yolo_yacht_extras';
+        
+        // Check if table exists and has wrong primary key
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$extras_table}'");
+        if ($table_exists) {
+            // Check current primary key
+            $keys = $wpdb->get_results("SHOW KEYS FROM {$extras_table} WHERE Key_name = 'PRIMARY'");
+            
+            // If primary key is only on 'id' column, we need to fix it
+            if (count($keys) === 1 && $keys[0]->Column_name === 'id') {
+                // Drop old primary key and create composite key
+                $wpdb->query("ALTER TABLE {$extras_table} DROP PRIMARY KEY, ADD PRIMARY KEY (id, yacht_id)");
+                error_log('YOLO YS: Fixed extras table primary key to composite (id, yacht_id)');
+            }
+        }
     }
 }

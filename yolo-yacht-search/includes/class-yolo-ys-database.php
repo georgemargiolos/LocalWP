@@ -102,7 +102,7 @@ class YOLO_YS_Database {
             currency varchar(10) DEFAULT NULL,
             obligatory tinyint(1) DEFAULT 0,
             unit varchar(50) DEFAULT NULL,
-            PRIMARY KEY  (id),
+            PRIMARY KEY  (id, yacht_id),
             KEY yacht_id (yacht_id)
         ) $charset_collate;";
         
@@ -132,7 +132,7 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment);
         dbDelta($sql_equipment_catalog);
         
-        update_option('yolo_ys_db_version', '1.1');
+        update_option('yolo_ys_db_version', '1.2');
     }
     
     /**
@@ -245,7 +245,7 @@ class YOLO_YS_Database {
                 'name' => $extra['name'],
                 'price' => isset($extra['price']) ? $extra['price'] : null,
                 'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
-                'obligatory' => isset($extra['obligatory']) ? $extra['obligatory'] : 0,
+                'obligatory' => !empty($extra['obligatory']) ? 1 : 0,
                 'unit' => isset($extra['unit']) ? $extra['unit'] : null
             ));
         }
