@@ -26,7 +26,7 @@ function yolo_ys_ajax_search_yachts() {
     
     // Query database for available yachts
     $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
-    $yachts_table = $wpdb->prefix . 'yolo_yacht_yachts';
+    $yachts_table = $wpdb->prefix . 'yolo_yachts';
     
     // Build SQL query
     $sql = "SELECT DISTINCT 
@@ -43,7 +43,7 @@ function yolo_ys_ajax_search_yachts() {
                 p.price,
                 p.start_price,
                 p.currency,
-                p.discount,
+                p.discount_percentage as discount,
                 'Bareboat' as product
             FROM {$yachts_table} y
             INNER JOIN {$prices_table} p ON y.id = p.yacht_id
@@ -68,7 +68,7 @@ function yolo_ys_ajax_search_yachts() {
     $friend_boats = array();
     
     // Get yacht details page URL
-    $details_page_id = get_option('yolo_ys_yacht_details_page_id', 0);
+    $details_page_id = get_option('yolo_ys_yacht_details_page', 0);
     $details_page_url = $details_page_id ? get_permalink($details_page_id) : home_url('/yacht-details/');
     
     foreach ($results as $row) {

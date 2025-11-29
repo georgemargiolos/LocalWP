@@ -230,38 +230,70 @@
      * Render boat card
      */
     function renderBoatCard(boat, isYolo) {
-        const badgeHtml = isYolo ? '<div class="yolo-ys-yacht-badge">YOLO</div>' : '';
-        const yoloClass = isYolo ? 'yolo-boat' : '';
-        const companyInfo = !isYolo ? '<p class="yolo-ys-company-info">Partner Company</p>' : '';
+        const yoloClass = isYolo ? 'yolo-yacht' : '';
         
         // Image or placeholder
         const imageHtml = boat.image_url 
-            ? `<img src="${boat.image_url}" alt="${boat.yacht}" style="width:100%;height:200px;object-fit:cover;border-radius:8px 8px 0 0;">` 
-            : '<span class="yolo-ys-yacht-image-placeholder">⛵</span>';
+            ? `<img src="${boat.image_url}" alt="${boat.yacht}">` 
+            : '<div class="yolo-ys-yacht-placeholder">⛵</div>';
         
         // Details URL
         const detailsUrl = boat.details_url || '#';
         
+        // Format specs
+        const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
+        
+        // Price display with discount
+        let priceHtml = '';
+        if (boat.discount && boat.start_price && boat.discount > 0) {
+            const discountAmount = Math.round(boat.start_price - boat.price);
+            priceHtml = `
+                <div class="yolo-ys-yacht-price">
+                    <div style="text-decoration: line-through; color: #9ca3af; font-size: 16px; margin-bottom: 4px;">
+                        ${Number(boat.start_price).toLocaleString('en-US')} ${boat.currency}
+                    </div>
+                    <div style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+                        ${boat.discount}% OFF - Save ${discountAmount.toLocaleString('en-US')} ${boat.currency}
+                    </div>
+                    From <strong>${Number(boat.price).toLocaleString('en-US')} ${boat.currency}</strong> per week
+                </div>
+            `;
+        } else {
+            priceHtml = `
+                <div class="yolo-ys-yacht-price">
+                    From <strong>${Number(boat.price).toLocaleString('en-US')} ${boat.currency}</strong> per week
+                </div>
+            `;
+        }
+        
         return `
             <div class="yolo-ys-yacht-card ${yoloClass}">
-                ${badgeHtml}
                 <div class="yolo-ys-yacht-image">
                     ${imageHtml}
                 </div>
-                <div class="yolo-ys-yacht-info">
-                    <h3 class="yolo-ys-yacht-name">${boat.yacht || 'Unknown'}</h3>
-                    <p class="yolo-ys-yacht-type">${boat.product || ''}</p>
+                <div class="yolo-ys-yacht-content">
                     <div class="yolo-ys-yacht-location">
                         📍 ${boat.startBase || 'Location not specified'}
                     </div>
-                    <div class="yolo-ys-yacht-price">
-                        <div>
-                            <span class="yolo-ys-price-amount">${boat.price || '0'}</span>
-                            <span class="yolo-ys-price-currency">${boat.currency || 'EUR'}</span>
-                        </div>
-                        <a href="${detailsUrl}" class="yolo-ys-view-button">View Details</a>
+                    <div class="yolo-ys-yacht-header">
+                        <h3 class="yolo-ys-yacht-name">${boat.yacht || 'Unknown'}</h3>
                     </div>
-                    ${companyInfo}
+                    <div class="yolo-ys-yacht-specs-grid">
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.cabins || 0}</div>
+                            <div class="yolo-ys-spec-label">Cabins</div>
+                        </div>
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${lengthFt} ft</div>
+                            <div class="yolo-ys-spec-label">Length</div>
+                        </div>
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.berths || 0}</div>
+                            <div class="yolo-ys-spec-label">Berths</div>
+                        </div>
+                    </div>
+                    ${priceHtml}
+                    <a href="${detailsUrl}" class="yolo-ys-details-btn">DETAILS</a>
                 </div>
             </div>
         `;
