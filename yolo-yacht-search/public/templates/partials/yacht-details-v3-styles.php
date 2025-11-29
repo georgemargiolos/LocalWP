@@ -1,6 +1,7 @@
 <style>
 .yolo-yacht-details-v3 {
-    max-width: 1200px;
+    width: 1500px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 20px;
 }

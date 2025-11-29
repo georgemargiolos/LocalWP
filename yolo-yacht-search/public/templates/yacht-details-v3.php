@@ -327,12 +327,20 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     
     <!-- Equipment Section -->
     <?php if (!empty($equipment)): ?>
+    <?php
+    // Load equipment icon mapping
+    require_once plugin_dir_path(__FILE__) . '../../../includes/equipment-icons.php';
+    ?>
+    <!-- Load FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
     <div class="yacht-equipment-section">
         <h3>Equipment</h3>
         <div class="equipment-grid">
             <?php foreach ($equipment as $item): ?>
+                <?php $icon_class = yolo_get_equipment_icon($item->equipment_id); ?>
                 <div class="equipment-item">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="<?php echo esc_attr($icon_class); ?>" style="color: #1e3a8a; margin-right: 8px;"></i>
                     <span><?php echo esc_html($item->equipment_name); ?></span>
                 </div>
             <?php endforeach; ?>
