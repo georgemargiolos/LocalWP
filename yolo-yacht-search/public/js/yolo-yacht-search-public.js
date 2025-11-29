@@ -5,6 +5,7 @@
     $(document).ready(function() {
         initLitepicker();
         initSearchForm();
+        initResultsSearchForm();
         checkForSearchParams();
     });
     
@@ -75,6 +76,52 @@
     }
     
     /**
+     * Initialize results page search form
+     */
+    function initResultsSearchForm() {
+        const dateInput = document.getElementById('yolo-ys-results-dates');
+        if (!dateInput) return;
+        
+        // Initialize Litepicker for results form
+        const picker = new Litepicker({
+            element: dateInput,
+            plugins: ['mobilefriendly'],
+            mobilefriendly: {
+                breakpoint: 480,
+            },
+            format: 'DD.MM.YYYY',
+            firstDay: 0,
+            singleMode: false,
+            minDate: new Date(),
+            numberOfColumns: 2,
+            numberOfMonths: 2,
+            disallowLockDaysInRange: true,
+            position: 'top',
+            tooltipNumber: (totalDays) => {
+                return totalDays - 1;
+            },
+            tooltipText: { 
+                "one": "night", 
+                "other": "nights" 
+            },
+            lockDaysFilter: (date) => {
+                let today = new Date();
+                let saturday = date.getTime() > today.getTime() && date.getDay() === 6;
+                return !saturday;
+            }
+        });
+        
+        // Store picker instance
+        window.yoloResultsDatePicker = picker;
+        
+        // Handle form submission
+        $('#yolo-ys-results-form').on('submit', function(e) {
+            e.preventDefault();
+            performResultsSearch();
+        });
+    }
+    
+    /**
      * Perform search
      */
     function performSearch() {
@@ -133,8 +180,64 @@
         const kind = urlParams.get('kind') || '';
         
         if (dateFrom && dateTo) {
+            // Pre-fill results search form
+            prefillResultsSearchForm(dateFrom, dateTo, kind);
+            
+            // Perform search
             searchYachts(dateFrom, dateTo, kind);
         }
+    }
+    
+    /**
+     * Pre-fill results search form with current search params
+     */
+    function prefillResultsSearchForm(dateFrom, dateTo, kind) {
+        // Show the search form
+        $('#yolo-ys-results-search-form').show();
+        
+        // Set boat type
+        $('#yolo-ys-results-boat-type').val(kind);
+        
+        // Set dates in picker
+        const picker = window.yoloResultsDatePicker;
+        if (picker) {
+            const startDate = new Date(dateFrom);
+            const endDate = new Date(dateTo);
+            picker.setDateRange(startDate, endDate);
+        }
+    }
+    
+    /**
+     * Perform search from results page form
+     */
+    function performResultsSearch() {
+        const picker = window.yoloResultsDatePicker;
+        if (!picker) {
+            alert('Date picker not initialized');
+            return;
+        }
+        
+        const startDate = picker.getStartDate();
+        const endDate = picker.getEndDate();
+        
+        if (!startDate || !endDate) {
+            alert('Please select dates');
+            return;
+        }
+        
+        const dateFrom = formatDateForAPI(startDate);
+        const dateTo = formatDateForAPI(endDate);
+        const kind = $('#yolo-ys-results-boat-type').val();
+        
+        // Update URL and search
+        const url = new URL(window.location.href);
+        url.searchParams.set('dateFrom', dateFrom);
+        url.searchParams.set('dateTo', dateTo);
+        url.searchParams.set('kind', kind);
+        window.history.pushState({}, '', url);
+        
+        // Perform search
+        searchYachts(dateFrom, dateTo, kind);
     }
     
     /**
@@ -249,6 +352,11 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
+        // Helper function to format price with comma thousands separator
+        const formatPrice = (price) => {
+            return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        };
+        
         // Price display with discount
         let priceHtml = '';
         if (boat.discount && boat.start_price && boat.discount > 0) {
@@ -256,18 +364,18 @@
             priceHtml = `
                 <div class="yolo-ys-yacht-price">
                     <div style="text-decoration: line-through; color: #9ca3af; font-size: 16px; margin-bottom: 4px;">
-                        ${Number(boat.start_price).toLocaleString('en-US')} ${boat.currency}
+                        ${formatPrice(boat.start_price)} ${boat.currency}
                     </div>
                     <div style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-                        ${boat.discount}% OFF - Save ${discountAmount.toLocaleString('en-US')} ${boat.currency}
+                        ${boat.discount.toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${boat.currency}
                     </div>
-                    From <strong>${Number(boat.price).toLocaleString('en-US')} ${boat.currency}</strong> per week
+                    From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
                 </div>
             `;
         } else {
             priceHtml = `
                 <div class="yolo-ys-yacht-price">
-                    From <strong>${Number(boat.price).toLocaleString('en-US')} ${boat.currency}</strong> per week
+                    From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
                 </div>
             `;
         }
@@ -299,7 +407,7 @@
                         </div>
                     </div>
                     ${priceHtml}
-                    <a href="${detailsUrl}" class="yolo-ys-details-btn">DETAILS</a>
+                    <a href="${detailsUrl}" class="yolo-ys-view-button">DETAILS</a>
                 </div>
             </div>
         `;

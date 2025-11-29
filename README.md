@@ -1,17 +1,46 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.5  
-**Status:** ✅ 92% COMPLETE - Boat Type Filtering Now Working!  
+**Current Version:** 1.7.6  
+**Status:** ✅ 92% COMPLETE - Professional UX with Grid Layout & Price Formatting!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🚨 Version 1.7.5 - CRITICAL FIX: BOAT TYPE FILTERING NOW WORKING!
+## 🚨 Version 1.7.6 - MAJOR UX IMPROVEMENTS: PROFESSIONAL SEARCH RESULTS!
 
-**This version fixes the critical bug where boat type filtering was not working! Search returned "No Yachts Found" even when boats were available.**
+**This version fixes all UX issues in search results: grid layout (3 per row), price formatting (4,500 EUR not 4.05 EUR), search refinement form, and consistent styling!**
 
-### What's New in v1.7.5
+### What's New in v1.7.6
+
+1. **Professional Grid Layout**
+   - 3 boats per row on desktop
+   - 2 boats per row on tablets
+   - 1 boat per row on mobile
+   - Responsive breakpoints
+
+2. **Fixed Price Formatting**
+   - Comma as thousands separator (4,500 EUR)
+   - Fixed discount calculation
+   - Proper percentage display (10.00% OFF)
+
+3. **Search Form on Results Page**
+   - Pre-filled with current search criteria
+   - Separate Litepicker instance
+   - Re-search without page reload
+   - URL updates automatically
+
+4. **Consistent Styling**
+   - DETAILS button matches Our Yachts section
+   - Search button properly sized and aligned
+   - Professional appearance throughout
+
+5. **No Database Changes**
+   - Pure UI/UX update
+   - No migration required
+   - Just upload and activate
+
+### What Was New in v1.7.5
 
 1. **Boat Type Filtering Now Works**
    - Added `type` column to database to store boat type

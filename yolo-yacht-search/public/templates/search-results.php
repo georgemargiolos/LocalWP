@@ -7,6 +7,30 @@
 
 <div class="yolo-ys-search-results">
     
+    <!-- Search Form at Top of Results -->
+    <div class="yolo-ys-results-search-form" id="yolo-ys-results-search-form" style="display: none;">
+        <form id="yolo-ys-results-form" class="yolo-ys-search-form">
+            <div class="yolo-ys-form-field">
+                <label for="yolo-ys-results-boat-type"><?php _e('Boat Type', 'yolo-yacht-search'); ?></label>
+                <select id="yolo-ys-results-boat-type" name="boat_type">
+                    <option value=""><?php _e('All types', 'yolo-yacht-search'); ?></option>
+                    <option value="Sailing yacht"><?php _e('Sailing yacht', 'yolo-yacht-search'); ?></option>
+                    <option value="Catamaran"><?php _e('Catamaran', 'yolo-yacht-search'); ?></option>
+                </select>
+            </div>
+            <div class="yolo-ys-form-field">
+                <label for="yolo-ys-results-dates"><?php _e('Dates', 'yolo-yacht-search'); ?></label>
+                <input type="text" id="yolo-ys-results-dates" name="dates" placeholder="<?php _e('Select dates...', 'yolo-yacht-search'); ?>" readonly />
+            </div>
+            <div class="yolo-ys-form-field">
+                <label>&nbsp;</label>
+                <button type="submit" class="yolo-ys-search-button">
+                    <?php _e('SEARCH', 'yolo-yacht-search'); ?>
+                </button>
+            </div>
+        </form>
+    </div>
+    
     <!-- Results will be loaded here via JavaScript -->
     <div id="yolo-ys-results-container">
         
@@ -108,7 +132,7 @@
 
 .yolo-ys-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-bottom: 40px;
 }
@@ -156,6 +180,39 @@
     color: #6b7280;
 }
 
+@media (max-width: 1024px) {
+    .yolo-ys-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+.yolo-ys-results-search-form {
+    background: #f9fafb;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.yolo-ys-results-search-form .yolo-ys-search-form {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    align-items: end;
+}
+
+@media (max-width: 1024px) {
+    .yolo-ys-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .yolo-ys-results-search-form .yolo-ys-search-form {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     .yolo-ys-results-grid {
         grid-template-columns: 1fr;
@@ -164,6 +221,10 @@
     
     .yolo-ys-results-header h2 {
         font-size: 24px;
+    }
+    
+    .yolo-ys-results-search-form {
+        padding: 20px;
     }
 }
 </style>

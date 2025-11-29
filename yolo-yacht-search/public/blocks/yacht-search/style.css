@@ -21,6 +21,10 @@
     min-width: 200px;
 }
 
+.yolo-ys-form-field:has(.yolo-ys-search-button) {
+    flex: 0 0 auto;
+}
+
 .yolo-ys-form-field label {
     display: block;
     margin-bottom: 8px;
@@ -58,6 +62,7 @@
     transition: background 0.3s;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .yolo-ys-search-button:hover {
