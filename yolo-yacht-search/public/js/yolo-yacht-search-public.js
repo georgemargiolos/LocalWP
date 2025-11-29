@@ -192,18 +192,26 @@
      * Pre-fill results search form with current search params
      */
     function prefillResultsSearchForm(dateFrom, dateTo, kind) {
+        // Only proceed if the form exists
+        const formElement = $('#yolo-ys-results-search-form');
+        if (!formElement.length) return;
+        
         // Show the search form
-        $('#yolo-ys-results-search-form').show();
+        formElement.show();
         
         // Set boat type
         $('#yolo-ys-results-boat-type').val(kind);
         
-        // Set dates in picker
+        // Set dates in picker (may not be initialized yet, that's OK)
         const picker = window.yoloResultsDatePicker;
-        if (picker) {
-            const startDate = new Date(dateFrom);
-            const endDate = new Date(dateTo);
-            picker.setDateRange(startDate, endDate);
+        if (picker && dateFrom && dateTo) {
+            try {
+                const startDate = new Date(dateFrom);
+                const endDate = new Date(dateTo);
+                picker.setDateRange(startDate, endDate);
+            } catch (e) {
+                console.log('Could not set date range:', e);
+            }
         }
     }
     
@@ -352,8 +360,9 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
-        // Helper function to format price with comma thousands separator
+        // Helper function to format price with comma as thousands separator
         const formatPrice = (price) => {
+            if (!price || isNaN(price)) return '0';
             return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         };
         
@@ -361,13 +370,14 @@
         let priceHtml = '';
         if (boat.discount && boat.start_price && boat.discount > 0) {
             const discountAmount = Math.round(boat.start_price - boat.price);
+            const discountPercent = typeof boat.discount === 'number' ? boat.discount.toFixed(2) : boat.discount;
             priceHtml = `
                 <div class="yolo-ys-yacht-price">
                     <div style="text-decoration: line-through; color: #9ca3af; font-size: 16px; margin-bottom: 4px;">
                         ${formatPrice(boat.start_price)} ${boat.currency}
                     </div>
                     <div style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-                        ${boat.discount.toFixed(2)}% OFF - Save ${formatPrice(discountAmount)} ${boat.currency}
+                        ${discountPercent}% OFF - Save ${formatPrice(discountAmount)} ${boat.currency}
                     </div>
                     From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
                 </div>

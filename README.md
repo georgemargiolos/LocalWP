@@ -1,17 +1,43 @@
 # YOLO Yacht Search & Booking Plugin
 
 **WordPress Plugin for Yacht Charter Businesses**  
-**Current Version:** 1.7.6  
-**Status:** ✅ 92% COMPLETE - Professional UX with Grid Layout & Price Formatting!  
+**Current Version:** 1.7.8  
+**Status:** ✅ STABLE - All Search Features Working Perfectly!  
 **Last Updated:** November 29, 2025
 
 ---
 
-## 🚨 Version 1.7.6 - MAJOR UX IMPROVEMENTS: PROFESSIONAL SEARCH RESULTS!
+## 🎉 Version 1.7.8 - STABLE RELEASE: PRICE FORMATTING FIXED!
 
-**This version fixes all UX issues in search results: grid layout (3 per row), price formatting (4,500 EUR not 4.05 EUR), search refinement form, and consistent styling!**
+**This version fixes the critical price formatting issue where prices displayed as decimals (4.32 EUR) instead of proper thousands (4,500 EUR). All search features now working perfectly!**
 
-### What's New in v1.7.6
+### What's New in v1.7.8
+
+1. **Fixed Price Formatting**
+   - Prices now display correctly (4,500 EUR instead of 4.32 EUR)
+   - Custom formatPrice() function with regex
+   - Comma as thousands separator
+   - Accurate discount calculations
+
+2. **Improved Code Quality**
+   - PHP sends raw float numbers
+   - JavaScript formats on display
+   - No more locale parsing issues
+
+3. **All Features Stable**
+   - Search working perfectly
+   - Grid layout responsive
+   - Navigation working
+   - Professional UX throughout
+
+### What Was New in v1.7.7
+
+1. **Emergency Revert**
+   - Reverted v1.7.6 price formatting that broke search
+   - Restored working search functionality
+   - Kept grid layout improvements
+
+### What Was New in v1.7.6
 
 1. **Professional Grid Layout**
    - 3 boats per row on desktop

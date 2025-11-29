@@ -101,7 +101,7 @@ function yolo_ys_ajax_search_yachts() {
             'yacht' => $row->yacht . ' ' . $row->model,
             'product' => $row->product,
             'startBase' => $row->startBase,
-            'price' => $row->price,  // Send raw number, format in JavaScript
+            'price' => (float)$row->price,
             'start_price' => $row->start_price,
             'currency' => $row->currency,
             'discount' => $row->discount,
