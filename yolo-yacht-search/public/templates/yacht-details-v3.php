@@ -278,8 +278,8 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             </div>
             
             <?php if (count($prices) > 1): ?>
-                <button class="price-carousel-prev" onclick="priceCarousel.prev()">‹</button>
-                <button class="price-carousel-next" onclick="priceCarousel.next()">›</button>
+                <button class="price-carousel-prev" onclick="priceCarousel.scrollPrev()">‹</button>
+                <button class="price-carousel-next" onclick="priceCarousel.scrollNext()">›</button>
             <?php endif; ?>
         </div>
     </div>
@@ -354,18 +354,16 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         require_once dirname(__DIR__, 2) . '/includes/equipment-icons.php';
     }
     ?>
-    <!-- Load FontAwesome if enabled -->
-    <?php if (get_option('yolo_ys_load_fontawesome', '0') === '1'): ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <?php endif; ?>
+    <!-- Load FontAwesome 7 Kit (always loaded for equipment icons) -->
+    <script src="https://kit.fontawesome.com/5514c118d3.js" crossorigin="anonymous"></script>
     
     <div class="yacht-equipment-section">
         <h3>Equipment</h3>
         <div class="equipment-grid">
             <?php foreach ($equipment as $item): ?>
-                <?php $icon_class = yolo_get_equipment_icon($item->equipment_id); ?>
+                <?php $icon_class = yolo_get_equipment_icon($item->equipment_id, $item->equipment_name); ?>
                 <div class="equipment-item">
-                    <i class="<?php echo esc_attr($icon_class); ?>" style="color: #1e3a8a; margin-right: 8px;"></i>
+                    <i class="<?php echo esc_attr($icon_class); ?>" style="margin-right: 8px;"></i>
                     <span><?php echo esc_html($item->equipment_name); ?></span>
                 </div>
             <?php endforeach; ?>

@@ -630,10 +630,14 @@
 }
 
 .equipment-item i {
-    color: #3b82f6;
-    font-size: 18px;
-    min-width: 20px;
+    font-size: 20px;
+    min-width: 24px;
     text-align: center;
+    /* FontAwesome 7 duotone colors */
+    --fa-primary-color: #1e3a8a;
+    --fa-secondary-color: #3b82f6;
+    --fa-primary-opacity: 1.0;
+    --fa-secondary-opacity: 0.6;
 }
 
 .equipment-icon {
