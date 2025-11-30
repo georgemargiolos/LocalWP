@@ -75,6 +75,16 @@ class YOLO_YS_Admin {
             30
         );
         
+        // Add Settings submenu (replaces the auto-generated duplicate)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Settings', 'yolo-yacht-search'),
+            __('Settings', 'yolo-yacht-search'),
+            'manage_options',
+            'yolo-yacht-search',
+            array($this, 'display_plugin_admin_page')
+        );
+        
         // Add Bookings submenu
         add_submenu_page(
             'yolo-yacht-search',
