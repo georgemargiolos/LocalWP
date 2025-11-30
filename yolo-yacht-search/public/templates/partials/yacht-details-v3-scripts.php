@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Format prices in carousel
     document.querySelectorAll('.price-original span, .price-final, .price-discount-badge').forEach(function(el) {
         const text = el.textContent.trim();
-        const match = text.match(/(\d+(?:\.\d+)?)\s*([A-Z]{3})/);
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
         if (match) {
             const price = match[1];
             const currency = match[2];
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (priceOriginal) {
         const text = priceOriginal.textContent.trim();
-        const match = text.match(/(\d+(?:\.\d+)?)\s*([A-Z]{3})/);
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
         if (match) {
             priceOriginal.textContent = formatPrice(match[1]) + ' ' + match[2];
         }
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (priceFinal) {
         const text = priceFinal.textContent.trim();
-        const match = text.match(/(\d+(?:\.\d+)?)\s*([A-Z]{3})/);
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
         if (match) {
             priceFinal.textContent = formatPrice(match[1]) + ' ' + match[2];
         }
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (priceDiscount) {
         const text = priceDiscount.textContent.trim();
-        const match = text.match(/Save\s+(\d+(?:\.\d+)?)\s*([A-Z]{3})/);
+        const match = text.match(/Save\s+([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands
         if (match) {
             priceDiscount.textContent = priceDiscount.textContent.replace(match[1], formatPrice(match[1]));
         }
