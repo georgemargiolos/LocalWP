@@ -803,17 +803,24 @@ function updatePriceDisplayWithDeposit() {
     }
 }
 
-// Call on page load and when price changes
+// CRITICAL: Initialize price display and set up date picker event handlers
+// DO NOT MODIFY without understanding the price carousel bug fix!
 document.addEventListener('DOMContentLoaded', function() {
     updatePriceDisplayWithDeposit();
     
     // Update when date picker changes
     if (window.yoloDatePicker) {
         window.yoloDatePicker.on('selected', function(date1, date2) {
-            // Skip API call on initial page load - use database prices from carousel
+            // CRITICAL FIX (v2.3.5): Skip API call on initial page load
+            // Bug history: Litepicker triggered 'selected' event on page load,
+            // causing automatic API call that overwrote correct database prices
+            // with wrong/failed API responses (showing 925 EUR instead of 2,925 EUR)
+            // 
+            // Solution: Use isInitialLoad flag to prevent first automatic trigger
+            // Only call live API when user manually changes dates
             if (isInitialLoad) {
                 isInitialLoad = false;
-                return;
+                return; // Skip API call, use database prices from carousel
             }
             const dateFrom = date1.format('YYYY-MM-DD');
             const dateTo = date2.format('YYYY-MM-DD');

@@ -120,7 +120,17 @@ class YOLO_YS_Booking_Manager_API {
      * Get all yachts for a company
      */
     /**
-     * Get all equipment definitions
+     * Get all equipment definitions from Booking Manager API
+     * 
+     * CRITICAL: Booking Manager API wraps responses in a 'value' property!
+     * Response format: { "value": [...equipment array...], "Count": N }
+     * 
+     * DO NOT CHANGE: Must extract 'value' array, not return whole response
+     * Bug history: Returning $result['data'] directly broke equipment sync
+     * Fixed in: v2.3.6 (Nov 30, 2025)
+     * 
+     * @return array Array of equipment objects
+     * @throws Exception if API call fails
      */
     public function get_equipment_catalog() {
         $endpoint = '/equipment';
@@ -138,6 +148,20 @@ class YOLO_YS_Booking_Manager_API {
         throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch equipment catalog');
     }
 
+    /**
+     * Get all yachts for a specific company from Booking Manager API
+     * 
+     * CRITICAL: Booking Manager API wraps responses in a 'value' property!
+     * Response format: { "value": [...yacht array...], "Count": N }
+     * 
+     * DO NOT CHANGE: Must extract 'value' array, not return whole response
+     * Bug history: Returning $result['data'] directly broke yacht sync completely
+     * Fixed in: v2.3.6 (Nov 30, 2025)
+     * 
+     * @param string $company_id The company ID to fetch yachts for
+     * @return array Array of yacht objects
+     * @throws Exception if API call fails
+     */
     public function get_yachts_by_company($company_id) {
         $endpoint = '/yachts';
         $params = array('companyId' => $company_id);
@@ -280,9 +304,25 @@ class YOLO_YS_Booking_Manager_API {
     /**
      * Get live price and availability for specific yacht and dates
      * Used for real-time price checking before booking
+     * 
+     * CRITICAL DATE FORMAT: Booking Manager API requires yyyy-MM-ddTHH:mm:ss format!
+     * DO NOT CHANGE: Date format must include 'T' separator and time component
+     * Bug history: Using yyyy-MM-dd caused 422 errors from API
+     * Fixed in: v2.3.5 (Nov 30, 2025)
+     * 
+     * USAGE:
+     * - Called when user selects custom dates in yacht details page
+     * - Checks real-time availability to prevent double bookings
+     * - Returns price including non-payableInBase extras
+     * 
+     * @param string $yacht_id The yacht ID
+     * @param string $date_from Start date (any format parseable by strtotime)
+     * @param string $date_to End date (any format parseable by strtotime)
+     * @return array Result with success, available, price, discount, etc.
      */
     public function get_live_price($yacht_id, $date_from, $date_to) {
-        // Convert dates to required format: yyyy-MM-dd'T'HH:mm:ss
+        // CRITICAL: Convert dates to required format: yyyy-MM-ddTHH:mm:ss
+        // API returns 422 error if format is wrong (e.g., yyyy-MM-dd without time)
         $date_from_formatted = date('Y-m-d', strtotime($date_from)) . 'T17:00:00';
         $date_to_formatted = date('Y-m-d', strtotime($date_to)) . 'T17:00:00';
         

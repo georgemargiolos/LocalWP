@@ -58,8 +58,31 @@ class YOLO_YS_Sync {
     /**
      * Sync all yachts from all companies (WITHOUT prices)
      */
+    /**
+     * Sync all yachts (with details, images, extras, equipment) from all companies
+     * 
+     * CRITICAL: API returns data wrapped in 'value' property!
+     * The get_yachts_by_company() method must extract the 'value' array
+     * 
+     * Bug history:
+     * - v2.3.5 and earlier: API returned {"value": [...], "Count": N} but code
+     *   tried to iterate over the whole object, causing yacht sync to fail
+     * - v2.3.6: Fixed get_yachts_by_company() to extract 'value' array
+     * 
+     * PROCESS:
+     * 1. Fetch yachts for each company from API
+     * 2. For each yacht, store: basic info, products, images, extras, equipment
+     * 3. Old data is deleted before storing new data (prevents duplicates)
+     * 
+     * IMPORTANT:
+     * - Can take 2-3 minutes for all companies (20+ yachts)
+     * - Each yacht has 10-20 images, 5-15 extras, 10-20 equipment items
+     * - WordPress admin may timeout, but CLI works fine
+     * 
+     * @return array Result with success status, counts, and errors
+     */
     public function sync_all_yachts() {
-        // Increase time limit for sync
+        // Increase time limit for sync (can take 2-3 minutes)
         set_time_limit(300); // 5 minutes
         ini_set('max_execution_time', 300);
         
@@ -142,8 +165,29 @@ class YOLO_YS_Sync {
      * @param int $year Year to sync (e.g., 2026)
      * @return array Results with success status, message, and statistics
      */
+    /**
+     * Sync weekly charter offers (prices) for all yachts from all companies
+     * 
+     * CRITICAL PROCESS - DO NOT MODIFY WITHOUT UNDERSTANDING:
+     * 1. DELETE all old prices for the year (prevents price accumulation bug)
+     * 2. Fetch offers from API for each company separately
+     * 3. Store offers in database in batches (fast REPLACE INTO)
+     * 
+     * Bug history:
+     * - v2.3.3 and earlier: DELETE was not working, prices accumulated
+     * - v2.3.4: Fixed DELETE to properly clear old prices before sync
+     * 
+     * IMPORTANT NOTES:
+     * - Must DELETE before INSERT to avoid wrong/duplicate prices
+     * - API called once per company (multiple companies in one call causes 500 error)
+     * - Date format must be yyyy-MM-ddTHH:mm:ss (API requirement)
+     * - Batch insert is much faster than individual inserts
+     * 
+     * @param int|null $year Year to sync (defaults to next year)
+     * @return array Result with success status, counts, and errors
+     */
     public function sync_all_offers($year = null) {
-        // Increase time limit for sync
+        // Increase time limit for sync (can take 2-3 minutes for all companies)
         set_time_limit(300); // 5 minutes should be enough for single API call
         ini_set('max_execution_time', 300);
         
@@ -188,7 +232,9 @@ class YOLO_YS_Sync {
         
         error_log("YOLO YS: ===== ABOUT TO DELETE OLD PRICES FOR YEAR {$year} =====");
         
-        // Delete all existing prices for this year to ensure fresh data
+        // CRITICAL: Delete all existing prices for this year to ensure fresh data
+        // This prevents price accumulation bug where old prices never get removed
+        // Bug was fixed in v2.3.4 - DO NOT REMOVE THIS DELETE!
         $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
         error_log("YOLO YS: Table name: {$prices_table}");
         

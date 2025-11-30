@@ -50,7 +50,10 @@ $images = $wpdb->get_results($wpdb->prepare(
     $yacht_id
 ));
 
+// CRITICAL: Price carousel loads from DATABASE, NOT live API
 // Get weekly offers (already Saturday-to-Saturday from /offers endpoint)
+// These prices are synced via "Sync Weekly Offers" in admin
+// DO NOT call live API here - it's slow and can fail
 $all_prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
 $prices = array();
 
