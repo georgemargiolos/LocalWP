@@ -24,40 +24,8 @@ class YOLO_YS_Admin_Bookings_Manager {
             return false;
         }
         
-        $booking_reference = !empty($booking->bm_reservation_id) 
-            ? 'BM-' . $booking->bm_reservation_id 
-            : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
-        
-        $to = $booking->customer_email;
-        $subject = 'Payment Reminder - ' . $booking->yacht_name;
-        
-        $message = sprintf(
-            "Dear %s,\n\n" .
-            "This is a friendly reminder about your upcoming yacht charter.\n\n" .
-            "Booking Reference: %s\n" .
-            "Yacht: %s\n" .
-            "Charter Dates: %s to %s\n\n" .
-            "Payment Summary:\n" .
-            "Total Price: %s\n" .
-            "Deposit Paid: %s\n" .
-            "Remaining Balance: %s\n\n" .
-            "Please complete your payment before your charter date.\n\n" .
-            "If you have already paid, please disregard this message.\n\n" .
-            "Best regards,\n" .
-            "YOLO Charters Team",
-            $booking->customer_name,
-            $booking_reference,
-            $booking->yacht_name,
-            date('F j, Y', strtotime($booking->date_from)),
-            date('F j, Y', strtotime($booking->date_to)),
-            YOLO_YS_Price_Formatter::format_price($booking->total_price, $booking->currency),
-            YOLO_YS_Price_Formatter::format_price($booking->deposit_paid, $booking->currency),
-            YOLO_YS_Price_Formatter::format_price($booking->remaining_balance, $booking->currency)
-        );
-        
-        $headers = array('Content-Type: text/plain; charset=UTF-8');
-        
-        return wp_mail($to, $subject, $message, $headers);
+        // Send HTML email using template
+        return YOLO_YS_Email::send_payment_reminder($booking);
     }
     
     /**
@@ -90,33 +58,8 @@ class YOLO_YS_Admin_Bookings_Manager {
             ));
             
             if ($booking) {
-                $booking_reference = !empty($booking->bm_reservation_id) 
-                    ? 'BM-' . $booking->bm_reservation_id 
-                    : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
-                
-                $to = $booking->customer_email;
-                $subject = 'Payment Confirmed - ' . $booking->yacht_name;
-                
-                $message = sprintf(
-                    "Dear %s,\n\n" .
-                    "We have received your final payment. Your booking is now fully paid!\n\n" .
-                    "Booking Reference: %s\n" .
-                    "Yacht: %s\n" .
-                    "Charter Dates: %s to %s\n" .
-                    "Total Paid: %s\n\n" .
-                    "We look forward to welcoming you aboard!\n\n" .
-                    "Best regards,\n" .
-                    "YOLO Charters Team",
-                    $booking->customer_name,
-                    $booking_reference,
-                    $booking->yacht_name,
-                    date('F j, Y', strtotime($booking->date_from)),
-                    date('F j, Y', strtotime($booking->date_to)),
-                    YOLO_YS_Price_Formatter::format_price($booking->total_price, $booking->currency)
-                );
-                
-                $headers = array('Content-Type: text/plain; charset=UTF-8');
-                wp_mail($to, $subject, $message, $headers);
+                // Send HTML email using template
+                YOLO_YS_Email::send_payment_received($booking);
             }
         }
         

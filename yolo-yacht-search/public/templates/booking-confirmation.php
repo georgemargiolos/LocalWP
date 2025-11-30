@@ -152,35 +152,11 @@ if (!$booking) {
                     wp_mail($admin_email, $admin_subject, $admin_message, array('Content-Type: text/plain; charset=UTF-8'));
                 }
                 
-                // Send confirmation email
-                $to = $customer_email;
-                $subject = 'Booking Confirmation - ' . $yacht_name;
+                // Send confirmation email using HTML template
+                YOLO_YS_Email::send_booking_confirmation($booking);
                 
-                $message = sprintf(
-                    "Dear %s,\n\n" .
-                    "Thank you for your booking!\n\n" .
-                    "Booking Details:\n" .
-                    "Yacht: %s\n" .
-                    "Dates: %s to %s\n" .
-                    "Total Price: %s\n" .
-                    "Deposit Paid: %s\n" .
-                    "Remaining Balance: %s\n\n" .
-                    "Your booking reference: %s\n\n" .
-                    "We look forward to welcoming you aboard!\n\n" .
-                    "Best regards,\n" .
-                    "YOLO Charters Team",
-                    $customer_name,
-                    $yacht_name,
-                    date('F j, Y', strtotime($date_from)),
-                    date('F j, Y', strtotime($date_to)),
-                    YOLO_YS_Price_Formatter::format_price($total_price, $currency),
-                    YOLO_YS_Price_Formatter::format_price($deposit_amount, $currency),
-                    YOLO_YS_Price_Formatter::format_price($remaining_balance, $currency),
-                    (!empty($bm_reservation_id) ? 'BM-' . $bm_reservation_id : 'YOLO-' . date('Y') . '-' . str_pad($booking_id, 4, '0', STR_PAD_LEFT))
-                );
-                
-                $headers = array('Content-Type: text/plain; charset=UTF-8');
-                wp_mail($to, $subject, $message, $headers);
+                // Send admin notification
+                YOLO_YS_Email::send_admin_notification($booking);
                 
                 // Retrieve the newly created booking
                 $booking = $wpdb->get_row($wpdb->prepare(
