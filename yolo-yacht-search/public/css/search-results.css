@@ -1,7 +1,9 @@
 .yolo-ys-search-results {
     padding: 40px 20px;
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 0 auto !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yolo-ys-results-header {
@@ -43,6 +45,8 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     margin-bottom: 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yolo-ys-no-results {

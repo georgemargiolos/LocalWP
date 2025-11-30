@@ -264,7 +264,7 @@ class YOLO_YS_Sync {
                     'companyId' => array($company_id),  // Single company as array
                     'dateFrom' => $dateFrom,
                     'dateTo' => $dateTo,
-                    'tripDuration' => array(7),         // Weekly charters
+                    // tripDuration removed - API calculates automatically (v2.5.1 fix)
                     'flexibility' => 6,                 // In year (all Saturday departures)
                     'productName' => 'bareboat'         // Focus on bareboat charters
                 ));

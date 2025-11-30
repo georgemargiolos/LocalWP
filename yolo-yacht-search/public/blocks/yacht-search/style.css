@@ -1,8 +1,10 @@
 /* YOLO Search Widget - Yolo-Charters.com Style */
 .yolo-ys-search-widget {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 auto !important;
     padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yolo-ys-search-form {

@@ -116,7 +116,7 @@ class YOLO_YS_Stripe {
      */
     public function create_balance_checkout_session($booking_id, $yacht_id, $yacht_name, $date_from, $date_to, $balance_amount, $currency, $customer_name, $customer_email, $customer_phone) {
         try {
-            \Stripe\Stripe::setApiKey($this->secret_key);
+            $this->init_stripe();
             
             // Create Checkout Session
             $session = \Stripe\Checkout\Session::create([
@@ -252,7 +252,7 @@ class YOLO_YS_Stripe {
             'total_price' => $total_price,
             'deposit_paid' => $deposit_amount,
             'remaining_balance' => $remaining_balance,
-            'currency' => 'EUR',
+            'currency' => isset($session['metadata']['currency']) ? $session['metadata']['currency'] : 'EUR',
             'customer_email' => $customer_email,
             'customer_name' => $customer_name,
             'stripe_session_id' => $session['id'],
@@ -284,28 +284,64 @@ class YOLO_YS_Stripe {
      * @param string $customer_name Customer name
      */
     private function create_booking_manager_reservation($booking_id, $yacht_id, $date_from, $date_to, $customer_email, $customer_name) {
+        global $wpdb;
+        
         try {
             $api = new YOLO_YS_Booking_Manager_API();
             
-            // TODO: Implement POST /reservation endpoint in API class
-            // For now, just log the attempt
-            error_log('YOLO YS: Would create Booking Manager reservation for booking ID: ' . $booking_id);
+            // Prepare reservation data for Booking Manager API
+            $reservation_data = array(
+                'yachtId' => $yacht_id,
+                'dateFrom' => $date_from . 'T12:00:00',
+                'dateTo' => $date_to . 'T11:59:00',
+                'customer' => array(
+                    'email' => $customer_email,
+                    'name' => $customer_name,
+                ),
+                'status' => 'confirmed',
+            );
             
-            // Example structure (to be implemented):
-            // $reservation_data = array(
-            //     'yachtId' => $yacht_id,
-            //     'dateFrom' => $date_from . 'T12:00:00',
-            //     'dateTo' => $date_to . 'T11:59:00',
-            //     'customer' => array(
-            //         'email' => $customer_email,
-            //         'name' => $customer_name,
-            //     ),
-            //     'status' => 'confirmed',
-            // );
-            // $result = $api->create_reservation($reservation_data);
+            // Create reservation in Booking Manager
+            $result = $api->create_reservation($reservation_data);
+            
+            if ($result['success'] && isset($result['reservation_id'])) {
+                // Store Booking Manager reservation ID in database
+                $table_bookings = $wpdb->prefix . 'yolo_bookings';
+                $wpdb->update(
+                    $table_bookings,
+                    array('bm_reservation_id' => $result['reservation_id']),
+                    array('id' => $booking_id),
+                    array('%s'),
+                    array('%d')
+                );
+                
+                error_log('YOLO YS: Created Booking Manager reservation ID: ' . $result['reservation_id'] . ' for booking ID: ' . $booking_id);
+            } else {
+                $error_msg = isset($result['error']) ? $result['error'] : 'Unknown error';
+                error_log('YOLO YS: Failed to create Booking Manager reservation for booking ID ' . $booking_id . ': ' . $error_msg);
+                
+                // Store error in database for debugging
+                $wpdb->update(
+                    $table_bookings,
+                    array('bm_sync_error' => $error_msg),
+                    array('id' => $booking_id),
+                    array('%s'),
+                    array('%d')
+                );
+            }
             
         } catch (Exception $e) {
-            error_log('YOLO YS: Failed to create Booking Manager reservation - ' . $e->getMessage());
+            error_log('YOLO YS: Exception creating Booking Manager reservation - ' . $e->getMessage());
+            
+            // Store exception in database
+            $table_bookings = $wpdb->prefix . 'yolo_bookings';
+            $wpdb->update(
+                $table_bookings,
+                array('bm_sync_error' => $e->getMessage()),
+                array('id' => $booking_id),
+                array('%s'),
+                array('%d')
+            );
         }
     }
     

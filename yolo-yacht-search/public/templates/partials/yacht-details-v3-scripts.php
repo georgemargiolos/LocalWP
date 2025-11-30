@@ -101,6 +101,7 @@ function showCustomDatesModal(dateFrom, dateTo) {
         
         const formData = new FormData(this);
         formData.append('action', 'yolo_submit_custom_quote');
+        formData.append('nonce', yoloYSData.nonce);
         
         // Show loading
         const submitBtn = this.querySelector('button[type="submit"]');
@@ -511,8 +512,18 @@ function bookNow() {
     showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, currency);
 }
 
+// HTML escape function to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Show booking form modal
 function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, currency) {
+    // Escape yacht name to prevent XSS
+    const yachtNameEscaped = escapeHtml(yachtName);
+    
     // Format dates for display
     const dateFromFormatted = new Date(dateFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     const dateToFormatted = new Date(dateTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -558,7 +569,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                     <div style="display: grid; gap: 10px;">
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #6b7280; font-weight: 500;">Yacht:</span>
-                            <span style="color: #111827; font-weight: 600;">${yachtName}</span>
+                            <span style="color: #111827; font-weight: 600;">${yachtNameEscaped}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #6b7280; font-weight: 500;">Check-in:</span>
@@ -715,6 +726,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
             },
             body: new URLSearchParams({
                 action: 'yolo_create_checkout_session',
+                nonce: yoloYSData.nonce,
                 yacht_id: yachtId,
                 yacht_name: yachtName,
                 date_from: dateFrom,
@@ -873,6 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({
                     action: 'yolo_get_live_price',
+                    nonce: yoloYSData.nonce,
                     // CRITICAL FIX v2.5.3: yacht_id as STRING to preserve precision
                     yacht_id: "<?php echo esc_attr($yacht_id); ?>",
                     date_from: dateFrom,

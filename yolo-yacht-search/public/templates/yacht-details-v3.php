@@ -312,6 +312,13 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <div class="spec-value"><?php echo esc_html($yacht->wc); ?></div>
             <div class="spec-label">Head</div>
         </div>
+        <?php if (!empty($yacht->deposit)): ?>
+        <div class="spec-item">
+            <div class="spec-icon">🔒</div>
+            <div class="spec-value"><?php echo number_format($yacht->deposit, 0); ?> €</div>
+            <div class="spec-label">Security Deposit</div>
+        </div>
+        <?php endif; ?>
     </div>
     
     <!-- Description Section -->
@@ -435,7 +442,33 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         </div>
     </div>
     
-
+    <!-- Cancellation Policy -->
+    <div class="yacht-cancellation-policy">
+        <h3>Cancellation Policy</h3>
+        <div class="policy-content">
+            <div class="policy-item">
+                <div class="policy-icon">⚠️</div>
+                <div class="policy-text">
+                    <strong>More than 60 days before charter:</strong> Full refund minus 20% administrative fee
+                </div>
+            </div>
+            <div class="policy-item">
+                <div class="policy-icon">⚠️</div>
+                <div class="policy-text">
+                    <strong>30-60 days before charter:</strong> 50% of total charter fee refunded
+                </div>
+            </div>
+            <div class="policy-item">
+                <div class="policy-icon">❌</div>
+                <div class="policy-text">
+                    <strong>Less than 30 days before charter:</strong> No refund
+                </div>
+            </div>
+            <div class="policy-note">
+                <p><strong>Note:</strong> Cancellation must be made in writing. We strongly recommend purchasing travel insurance to cover unexpected cancellations.</p>
+            </div>
+        </div>
+    </div>
     
     <!-- Extras -->
     <?php if (!empty($extras)): ?>

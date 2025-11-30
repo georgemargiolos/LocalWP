@@ -1,9 +1,10 @@
 <style>
 .yolo-yacht-details-v3 {
-    width: 1500px;
-    max-width: 100%;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto !important;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .yacht-header {
@@ -891,5 +892,87 @@
     height: 500px;
     font-size: 24px;
     color: #9ca3af;
+}
+
+/* Cancellation Policy */
+.yacht-cancellation-policy {
+    margin-bottom: 40px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.yacht-cancellation-policy h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.policy-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.policy-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.policy-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.policy-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.policy-text strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.policy-note {
+    margin-top: 10px;
+    padding: 15px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+}
+
+.policy-note p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #92400e;
+}
+
+.policy-note strong {
+    color: #78350f;
+}
+
+@media (max-width: 768px) {
+    .yacht-cancellation-policy {
+        padding: 20px;
+    }
+    
+    .policy-item {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .policy-icon {
+        font-size: 20px;
+    }
 }
 </style>
