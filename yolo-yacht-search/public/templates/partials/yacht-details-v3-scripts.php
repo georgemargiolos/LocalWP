@@ -849,6 +849,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const startPrice = data.data.price;
                     const discount = data.data.discount;
                     const currency = data.data.currency;
+                    const includedExtras = data.data.included_extras || 0;
+                    const extrasAtBase = data.data.extras_at_base || 0;
+                    const extrasDetails = data.data.extras_details || [];
                     
                     const priceOriginal = document.getElementById('selectedPriceOriginal');
                     const priceDiscount = document.getElementById('selectedPriceDiscount');
@@ -864,6 +867,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     priceFinal.textContent = formatEuropeanPrice(price, currency) + ' ' + currency;
+                    
+                    // Add extras information if present
+                    if (includedExtras > 0) {
+                        const extrasNote = document.createElement('div');
+                        extrasNote.id = 'extrasNote';
+                        extrasNote.style.cssText = 'font-size: 13px; color: #059669; margin-top: 8px; font-weight: 500;';
+                        extrasNote.textContent = `Obligatory extras included (${formatEuropeanPrice(includedExtras, currency)} ${currency})`;
+                        
+                        // Remove existing note if present
+                        const existingNote = document.getElementById('extrasNote');
+                        if (existingNote) existingNote.remove();
+                        
+                        priceFinal.parentNode.insertBefore(extrasNote, priceFinal.nextSibling);
+                    }
                     
                     // Store live price for booking
                     window.yoloLivePrice = {

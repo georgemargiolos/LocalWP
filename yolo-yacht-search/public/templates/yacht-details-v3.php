@@ -460,6 +460,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <?php if (!empty($extra->unit)): ?>
                                             <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
                                         <?php endif; ?>
+                                        <?php if (!empty($extra->payableInBase)): ?>
+                                            <span class="payment-location">(Payable at the base)</span>
+                                        <?php else: ?>
+                                            <span class="payment-location">(Included in price)</span>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -480,6 +485,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <?php echo number_format($extra->price, 2); ?> <?php echo esc_html($extra->currency); ?>
                                         <?php if (!empty($extra->unit)): ?>
                                             <span class="price-unit">(<?php echo esc_html($extra->unit); ?>)</span>
+                                        <?php endif; ?>
+                                        <?php if (!empty($extra->payableInBase)): ?>
+                                            <span class="payment-location">(Payable at the base)</span>
+                                        <?php else: ?>
+                                            <span class="payment-location">(Included in price)</span>
                                         <?php endif; ?>
                                     </div>
                                 <?php endif; ?>

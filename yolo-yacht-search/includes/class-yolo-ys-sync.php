@@ -186,6 +186,23 @@ class YOLO_YS_Sync {
         // Track unique yachts with offers
         $yachtOffersMap = array();
         
+        error_log("YOLO YS: ===== ABOUT TO DELETE OLD PRICES FOR YEAR {$year} =====");
+        
+        // Delete all existing prices for this year to ensure fresh data
+        $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
+        error_log("YOLO YS: Table name: {$prices_table}");
+        
+        $deleted = $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$prices_table} WHERE YEAR(date_from) = %d",
+            $year
+        ));
+        
+        error_log("YOLO YS: ===== DELETE COMPLETED: {$deleted} records deleted =====");
+        
+        if ($deleted === false) {
+            error_log("YOLO YS: DELETE FAILED! wpdb->last_error: " . $wpdb->last_error);
+        }
+        
         // Call API once per company to avoid HTTP 500 error
         // The API fails when multiple companies are passed with array syntax companyId[0]=...
         foreach ($all_companies as $company_id) {

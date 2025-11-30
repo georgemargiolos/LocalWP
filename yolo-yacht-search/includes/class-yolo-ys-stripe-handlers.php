@@ -113,6 +113,10 @@ class YOLO_YS_Stripe_Handlers {
                     'price' => $result['price'],
                     'discount' => $result['discount'],
                     'final_price' => $result['final_price'],
+                    'base_price' => isset($result['base_price']) ? $result['base_price'] : $result['final_price'],
+                    'included_extras' => isset($result['included_extras']) ? $result['included_extras'] : 0,
+                    'extras_at_base' => isset($result['extras_at_base']) ? $result['extras_at_base'] : 0,
+                    'extras_details' => isset($result['extras_details']) ? $result['extras_details'] : array(),
                     'currency' => $result['currency'],
                 ));
             } else if ($result['success'] && !$result['available']) {

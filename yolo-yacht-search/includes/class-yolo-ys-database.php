@@ -102,6 +102,7 @@ class YOLO_YS_Database {
             currency varchar(10) DEFAULT NULL,
             obligatory tinyint(1) DEFAULT 0,
             unit varchar(50) DEFAULT NULL,
+            payableInBase tinyint(1) DEFAULT 0,
             PRIMARY KEY  (id, yacht_id),
             KEY yacht_id (yacht_id)
         ) $charset_collate;";
@@ -277,7 +278,8 @@ class YOLO_YS_Database {
                 'price' => isset($extra['price']) ? $extra['price'] : null,
                 'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
                 'obligatory' => !empty($extra['obligatory']) ? 1 : 0,
-                'unit' => isset($extra['unit']) ? $extra['unit'] : null
+                'unit' => isset($extra['unit']) ? $extra['unit'] : null,
+                'payableInBase' => !empty($extra['payableInBase']) ? 1 : 0
             ));
         }
         error_log('YOLO YS: All extras stored');

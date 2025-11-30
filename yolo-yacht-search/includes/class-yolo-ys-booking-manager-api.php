@@ -285,12 +285,49 @@ class YOLO_YS_Booking_Manager_API {
         // API returns array of offers directly in $result['data'], NOT $result['data']['offers']
         if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
             $offer = $result['data'][0];
+            
+            $base_price = isset($offer['price']) ? $offer['price'] : 0;
+            $start_price = isset($offer['startPrice']) ? $offer['startPrice'] : $base_price;
+            $discount = isset($offer['discountPercentage']) ? $offer['discountPercentage'] : 0;
+            
+            // Calculate obligatory extras that must be paid online (payableInBase = false)
+            $included_extras = 0;
+            $extras_at_base = 0;
+            $extras_details = array();
+            
+            if (isset($offer['obligatoryExtras']) && is_array($offer['obligatoryExtras'])) {
+                foreach ($offer['obligatoryExtras'] as $extra) {
+                    $extra_price = isset($extra['price']) ? floatval($extra['price']) : 0;
+                    $payable_in_base = isset($extra['payableInBase']) ? $extra['payableInBase'] : true;
+                    
+                    $extras_details[] = array(
+                        'name' => isset($extra['name']) ? $extra['name'] : '',
+                        'price' => $extra_price,
+                        'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
+                        'payableInBase' => $payable_in_base,
+                    );
+                    
+                    if (!$payable_in_base) {
+                        $included_extras += $extra_price;
+                    } else {
+                        $extras_at_base += $extra_price;
+                    }
+                }
+            }
+            
+            // Total price = base price + included extras
+            $total_price = $base_price + $included_extras;
+            
             return array(
                 'success' => true,
                 'available' => true,
-                'price' => isset($offer['startPrice']) ? $offer['startPrice'] : (isset($offer['price']) ? $offer['price'] : 0),
-                'discount' => isset($offer['discountPercentage']) ? $offer['discountPercentage'] : 0,
-                'final_price' => isset($offer['price']) ? $offer['price'] : 0,
+                'price' => $start_price,
+                'discount' => $discount,
+                'final_price' => $total_price,
+                'base_price' => $base_price,
+                'included_extras' => $included_extras,
+                'extras_at_base' => $extras_at_base,
+                'extras_details' => $extras_details,
                 'currency' => isset($offer['currency']) ? $offer['currency'] : 'EUR',
             );
         } else if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) === 0) {
