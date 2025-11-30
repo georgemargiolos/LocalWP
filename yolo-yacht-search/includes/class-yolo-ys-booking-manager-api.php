@@ -343,29 +343,24 @@ class YOLO_YS_Booking_Manager_API {
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
         
-        if (!$result['success']) {
-            return array(
-                'success' => false,
-                'available' => false,
-                'error' => isset($result['error']) ? $result['error'] : 'Failed to fetch live price',
-            );
-        }
-        
         $offers = array();
         
-        // Handle different API response formats
-        if (isset($result['data']['offers']) && is_array($result['data']['offers'])) {
-            // Format: { "offers": [...] }
-            $offers = $result['data']['offers'];
-        } elseif (is_array($result['data']) && isset($result['data'][0])) {
-            // Format: [...] - direct array of offers
-            $offers = $result['data'];
-        } elseif (is_array($result['data']) && isset($result['data']['yachtId'])) {
-            // Format: single offer object { "yachtId": ..., "price": ... }
-            $offers = array($result['data']);
-        } elseif (is_array($result['data']) && isset($result['data']['price'])) {
-            // Format: single offer with price
-            $offers = array($result['data']);
+        // Only parse offers if API succeeded
+        if ($result['success']) {
+            // Handle different API response formats
+            if (isset($result['data']['offers']) && is_array($result['data']['offers'])) {
+                // Format: { "offers": [...] }
+                $offers = $result['data']['offers'];
+            } elseif (is_array($result['data']) && isset($result['data'][0])) {
+                // Format: [...] - direct array of offers
+                $offers = $result['data'];
+            } elseif (is_array($result['data']) && isset($result['data']['yachtId'])) {
+                // Format: single offer object { "yachtId": ..., "price": ... }
+                $offers = array($result['data']);
+            } elseif (is_array($result['data']) && isset($result['data']['price'])) {
+                // Format: single offer with price
+                $offers = array($result['data']);
+            }
         }
         
         if (count($offers) > 0) {

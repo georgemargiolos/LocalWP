@@ -500,7 +500,11 @@ function bookNow() {
     }
     
     // Get yacht details
-    const yachtId = <?php echo intval($yacht->id); ?>;
+    // CRITICAL FIX v2.5.3: yachtId MUST be STRING to preserve large integer precision
+    // JavaScript Number type loses precision for integers > 2^53 (9007199254740992)
+    // Large yacht IDs like 7136018700000107850 get corrupted to 7136018700000108000
+    // This causes API lookups to fail with "yacht not found" errors
+    const yachtId = "<?php echo esc_attr($yacht->id); ?>";
     const yachtName = <?php echo json_encode($yacht->name); ?>;
     
     // Show booking form modal
@@ -869,7 +873,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({
                     action: 'yolo_get_live_price',
-                    yacht_id: <?php echo $yacht_id; ?>,
+                    // CRITICAL FIX v2.5.3: yacht_id as STRING to preserve precision
+                    yacht_id: "<?php echo esc_attr($yacht_id); ?>",
                     date_from: dateFrom,
                     date_to: dateTo,
                 })

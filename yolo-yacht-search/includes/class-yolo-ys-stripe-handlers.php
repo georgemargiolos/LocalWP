@@ -28,7 +28,11 @@ class YOLO_YS_Stripe_Handlers {
     public function ajax_create_checkout_session() {
         try {
             // Get POST data
-            $yacht_id = isset($_POST['yacht_id']) ? intval($_POST['yacht_id']) : 0;
+            // CRITICAL FIX v2.5.3: yacht_id MUST be STRING, not integer
+            // Large yacht IDs (e.g., 7136018700000107850) exceed PHP_INT_MAX on 32-bit systems
+            // and lose precision in JavaScript Number type (max safe integer is 2^53)
+            // Using intval() corrupts the ID, causing API lookups to fail
+            $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
             $yacht_name = isset($_POST['yacht_name']) ? sanitize_text_field($_POST['yacht_name']) : '';
             $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
             $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
@@ -91,7 +95,11 @@ class YOLO_YS_Stripe_Handlers {
     public function ajax_get_live_price() {
         try {
             // Get POST data
-            $yacht_id = isset($_POST['yacht_id']) ? intval($_POST['yacht_id']) : 0;
+            // CRITICAL FIX v2.5.3: yacht_id MUST be STRING, not integer
+            // Large yacht IDs (e.g., 7136018700000107850) exceed PHP_INT_MAX on 32-bit systems
+            // and lose precision in JavaScript Number type (max safe integer is 2^53)
+            // Using intval() corrupts the ID, causing API lookups to fail
+            $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
             $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
             $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
             
@@ -147,7 +155,11 @@ class YOLO_YS_Stripe_Handlers {
             $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
             $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
             $message = isset($_POST['message']) ? sanitize_textarea_field($_POST['message']) : '';
-            $yacht_id = isset($_POST['yacht_id']) ? intval($_POST['yacht_id']) : 0;
+            // CRITICAL FIX v2.5.3: yacht_id MUST be STRING, not integer
+            // Large yacht IDs (e.g., 7136018700000107850) exceed PHP_INT_MAX on 32-bit systems
+            // and lose precision in JavaScript Number type (max safe integer is 2^53)
+            // Using intval() corrupts the ID, causing API lookups to fail
+            $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
             $yacht_name = isset($_POST['yacht_name']) ? sanitize_text_field($_POST['yacht_name']) : '';
             $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
             $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
