@@ -193,9 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Format prices in carousel
     document.querySelectorAll('.price-original span, .price-final, .price-discount-badge').forEach(function(el) {
         const text = el.textContent.trim();
-        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands (e.g., 2,925.00)
         if (match) {
-            const price = match[1];
+            const price = match[1].replace(/,/g, ''); // Remove commas before formatting
             const currency = match[2];
             el.textContent = formatPrice(price) + ' ' + currency;
         }
@@ -208,25 +208,28 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (priceOriginal) {
         const text = priceOriginal.textContent.trim();
-        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands
         if (match) {
-            priceOriginal.textContent = formatPrice(match[1]) + ' ' + match[2];
+            const price = match[1].replace(/,/g, ''); // Remove commas before formatting
+            priceOriginal.textContent = formatPrice(price) + ' ' + match[2];
         }
     }
     
     if (priceFinal) {
         const text = priceFinal.textContent.trim();
-        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands (e.g., 2,925.00)
+        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands
         if (match) {
-            priceFinal.textContent = formatPrice(match[1]) + ' ' + match[2];
+            const price = match[1].replace(/,/g, ''); // Remove commas before formatting
+            priceFinal.textContent = formatPrice(price) + ' ' + match[2];
         }
     }
     
     if (priceDiscount) {
         const text = priceDiscount.textContent.trim();
-        const match = text.match(/Save\s+([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.7): Handle comma-separated thousands
+        const match = text.match(/Save\s+([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands
         if (match) {
-            priceDiscount.textContent = priceDiscount.textContent.replace(match[1], formatPrice(match[1]));
+            const price = match[1].replace(/,/g, ''); // Remove commas before formatting
+            priceDiscount.textContent = priceDiscount.textContent.replace(match[1], formatPrice(price));
         }
     }
 });
