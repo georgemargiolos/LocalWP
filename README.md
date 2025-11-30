@@ -1,21 +1,21 @@
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 2.3.7 🎉  
+**Version:** 2.4.1 🎉  
 **Last Updated:** November 30, 2025  
 **WordPress Plugin for Yacht Charter Search and Booking**
 
 ---
 
-## 🚀 What's New in v2.3.7 - CRITICAL BUG FIXES & UI IMPROVEMENTS!
+## 🚀 What's New in v2.4.1 - CAROUSEL & ICONS FIXED!
 
-This version fixes the price carousel flashing bug, improves UI consistency, and organizes code properly. All major issues are now resolved.
+This version fixes carousel navigation arrows and upgrades to FontAwesome 7 with beautiful duotone icons.
 
 ### Handoff Documentation
 
 For a complete overview of the plugin, bug fixes, and critical code sections, please see:
-- **[Handoff Document for v2.3.7](HANDOFF-v2.3.7.md)** ← Latest
-- [Handoff Document for v2.3.6](HANDOFF-v2.3.6.md)
-- [Changelog v2.3.7](CHANGELOG-v2.3.7.md)
+- **[Handoff Document for v2.4.1](HANDOFF-v2.4.1.md)** ← Latest
+- [Handoff Document for v2.3.7](HANDOFF-v2.3.7.md)
+- [Changelog v2.4.1](CHANGELOG-v2.4.1.md)
 
 ---
 
@@ -23,11 +23,14 @@ For a complete overview of the plugin, bug fixes, and critical code sections, pl
 
 | Bug Description | Status | Version Fixed |
 |---|---|---|
-| **Price Carousel Flashing Wrong Prices** | ✅ **FIXED** | **v2.3.7** |
-| **Search Box Defaults to "Sailing Yacht"** | ✅ **FIXED** | **v2.3.7** |
-| **`get_offers()` API Response Parsing** | ✅ **FIXED** | **v2.3.7** |
-| **`get_live_price()` API Response Parsing** | ✅ **FIXED** | **v2.3.7** |
-| **`search_offers()` Inconsistent Return Format** | ✅ **FIXED** | **v2.3.7** |
+| **Carousel Arrows Not Working** | ✅ **FIXED** | **v2.4.1** |
+| **Missing FontAwesome Icons** | ✅ **FIXED** | **v2.4.1** |
+| **Availability Check Failing** | ✅ **FIXED** | **v2.4.0** |
+| Price Carousel Flashing Wrong Prices | ✅ FIXED | v2.3.7 |
+| Search Box Defaults to "Sailing Yacht" | ✅ FIXED | v2.3.7 |
+| `get_offers()` API Response Parsing | ✅ FIXED | v2.3.7 |
+| `get_live_price()` API Response Parsing | ✅ FIXED | v2.3.7 |
+| `search_offers()` Inconsistent Return Format | ✅ FIXED | v2.3.7 |
 | API Response Parsing (`value` property) | ✅ FIXED | v2.3.6 |
 | Yacht Sync Fails Completely | ✅ FIXED | v2.3.6 |
 | Equipment Sync Fails | ✅ FIXED | v2.3.6 |
@@ -37,22 +40,22 @@ For a complete overview of the plugin, bug fixes, and critical code sections, pl
 
 ---
 
-## 🎨 UI Improvements in v2.3.7
+## 🎨 What's New in v2.4.1
 
-- ✅ **Search results yacht cards now match "Our Yachts" design**
-  - Red button instead of blue
-  - Split name/model (e.g., "Lemon" + "Sun Odyssey 469")
-  - Shows: Cabins, Built year, Length (instead of Cabins, Length, Berths)
-  - Cleaner price display (green box, centered)
+### Carousel Navigation Arrows ✅
+- **Fixed:** Method name mismatch (`prev()/next()` → `scrollPrev()/scrollNext()`)
+- **Result:** Both left and right arrows now work correctly
 
-- ✅ **CSS properly organized**
-  - Removed all inline `<style>` tags from templates
-  - Moved all CSS to external files
-  - Proper separation of concerns
-
-- ✅ **Admin panel improvements**
-  - Added 3 missing shortcodes to documentation
-  - All 7 shortcodes now visible
+### FontAwesome 7 Duotone Icons ✅
+- **Upgraded:** From FontAwesome 6.4.0 to FontAwesome 7 kit
+- **Style:** All icons now use duotone (two-color gradient)
+- **Colors:** Primary #1e3a8a (dark blue), Secondary #3b82f6 (light blue)
+- **Fallback:** Added name-based matching for unmapped equipment
+- **Examples:**
+  - ⚙️ Outboard engine → `fa-duotone fa-engine`
+  - 🤿 Snorkeling equipment → `fa-duotone fa-mask-snorkel`
+  - ☀️ Solar Panels → `fa-duotone fa-solar-panel`
+  - 📡 Wi-Fi & Internet → `fa-duotone fa-wifi`
 
 ---
 
@@ -63,7 +66,7 @@ For a complete overview of the plugin, bug fixes, and critical code sections, pl
 1. **Upload Plugin**
    ```bash
    WordPress Admin → Plugins → Add New → Upload Plugin
-   Select: yolo-yacht-search-v2.3.7.zip
+   Select: yolo-yacht-search-v2.4.1.zip
    ```
 
 2. **Activate Plugin**
@@ -129,15 +132,25 @@ Displays balance payment confirmation.
 
 ## 📋 Version History
 
-### v2.3.7 (November 30, 2025) - Current
-- **CRITICAL:** Fixed price carousel flashing wrong prices
-- **CRITICAL:** Fixed `get_live_price()` API response parsing
-- Fixed `get_offers()` API response parsing
-- Fixed `search_offers()` inconsistent return format
-- Fixed search box defaulting to "Sailing yacht"
-- **UI:** Search results yacht cards match "Our Yachts" design
-- **Code:** Removed inline CSS, organized properly
-- **Docs:** Added 3 missing shortcodes to admin panel
+### v2.4.1 (November 30, 2025) - Current ✅
+- **Fixed:** Carousel navigation arrows (method name mismatch)
+- **Upgraded:** FontAwesome 7 duotone icons with gradient colors
+- **Added:** Equipment icon name-based fallback matching
+- **Improved:** Icon display with CSS variables
+
+### v2.4.0 (November 30, 2025)
+- **CRITICAL:** Fixed availability check (reverted broken v2.3.7 changes)
+- **Tested:** Actual API response format (confirmed direct array)
+- **Verified:** API integration with live calls
+
+### v2.3.9 (November 30, 2025) - BROKEN ❌
+- Attempted to remove carousel JavaScript (broke functionality)
+
+### v2.3.8 (November 30, 2025) - BROKEN ❌
+- Attempted regex fix (caused "NaN EUR" display)
+
+### v2.3.7 (November 30, 2025) - BROKEN ❌
+- Incorrectly "fixed" API response parsing (broke availability)
 
 ### v2.3.6 (November 30, 2025)
 - Fixed `get_yachts_by_company()` API response parsing
@@ -165,8 +178,8 @@ The search widget displays but doesn't actually filter yachts. All yachts are sh
 ## 📚 Documentation
 
 - [Installation Guide](INSTALLATION-GUIDE.md)
-- [Handoff Document v2.3.7](HANDOFF-v2.3.7.md)
-- [Changelog v2.3.7](CHANGELOG-v2.3.7.md)
+- [Handoff Document v2.4.1](HANDOFF-v2.4.1.md) ← Latest
+- [Changelog v2.4.1](CHANGELOG-v2.4.1.md)
 - [Booking Manager API Manual](BookingManagerAPIManual.md)
 - [Feature Status](FEATURE-STATUS.md)
 
@@ -175,9 +188,9 @@ The search widget displays but doesn't actually filter yachts. All yachts are sh
 ## 👨‍💻 Credits
 
 **Author:** George Margiolos  
-**Bug Fixes (v2.3.7):** Manus AI  
+**Bug Fixes (v2.4.1):** Manus AI  
 **Bug Identification:** Cursor AI  
-**Version:** 2.3.7  
+**Version:** 2.4.1  
 **License:** GPL v2 or later  
 **Last Updated:** November 30, 2025
 
@@ -188,6 +201,7 @@ The search widget displays but doesn't actually filter yachts. All yachts are sh
 - **GitHub:** https://github.com/georgemargiolos/LocalWP
 - **API:** Booking Manager API v2
 - **Payment:** Stripe
+- **Icons:** FontAwesome 7 Kit
 
 ---
 
