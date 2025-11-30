@@ -351,8 +351,10 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         require_once dirname(__DIR__, 2) . '/includes/equipment-icons.php';
     }
     ?>
-    <!-- Load FontAwesome -->
+    <!-- Load FontAwesome if enabled -->
+    <?php if (get_option('yolo_ys_load_fontawesome', '0') === '1'): ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <?php endif; ?>
     
     <div class="yacht-equipment-section">
         <h3>Equipment</h3>

@@ -74,6 +74,72 @@ if (!$booking) {
                 
                 $booking_id = $wpdb->insert_id;
                 
+                // Create reservation in Booking Manager
+                $api = new YOLO_YS_Booking_Manager_API();
+                
+                // Prepare reservation data
+                $reservation_data = array(
+                    'yachtId' => (int)$yacht_id,
+                    'dateFrom' => date('Y-m-d\TH:i:s', strtotime($date_from)),
+                    'dateTo' => date('Y-m-d\TH:i:s', strtotime($date_to)),
+                    'client' => array(
+                        'name' => $customer_name,
+                        'email' => $customer_email,
+                    ),
+                    'status' => 1, // 1 = Confirmed
+                    'sendNotification' => true,
+                    'note' => 'Online booking via YOLO Charters. Stripe Payment: ' . (isset($session->payment_intent) ? $session->payment_intent : ''),
+                );
+                
+                $result = $api->create_reservation($reservation_data);
+                
+                if ($result['success']) {
+                    $bm_reservation_id = isset($result['data']['id']) ? $result['data']['id'] : null;
+                    
+                    // Update booking with Booking Manager reservation ID
+                    $wpdb->update(
+                        $table_bookings,
+                        array('bm_reservation_id' => $bm_reservation_id),
+                        array('id' => $booking_id)
+                    );
+                    
+                    // Record payment in Booking Manager
+                    if ($bm_reservation_id) {
+                        $payment_data = array(
+                            'amount' => floatval($deposit_amount),
+                            'currency' => $currency,
+                            'paymentDate' => current_time('Y-m-d\TH:i:s'),
+                            'paymentMethod' => 'Credit Card (Stripe)',
+                            'note' => 'Deposit payment. Stripe Payment Intent: ' . (isset($session->payment_intent) ? $session->payment_intent : ''),
+                        );
+                        
+                        $payment_result = $api->create_payment($bm_reservation_id, $payment_data);
+                        
+                        if (!$payment_result['success']) {
+                            error_log('YOLO YS: Failed to record payment in Booking Manager: ' . print_r($payment_result, true));
+                        }
+                    }
+                    
+                    error_log('YOLO YS: Booking Manager reservation created - ID: ' . $bm_reservation_id);
+                } else {
+                    error_log('YOLO YS: Failed to create Booking Manager reservation: ' . print_r($result, true));
+                    
+                    // Send alert email to admin
+                    $admin_email = get_option('admin_email');
+                    $admin_subject = 'ACTION REQUIRED: Booking #' . $booking_id . ' - Manual Confirmation Needed';
+                    $admin_message = "A customer has paid but the automatic reservation in Booking Manager failed.\n\n";
+                    $admin_message .= "Please manually create the reservation in Booking Manager.\n\n";
+                    $admin_message .= "Booking ID: #" . $booking_id . "\n";
+                    $admin_message .= "Yacht: " . $yacht_name . "\n";
+                    $admin_message .= "Customer: " . $customer_name . "\n";
+                    $admin_message .= "Email: " . $customer_email . "\n";
+                    $admin_message .= "Dates: " . date('M d, Y', strtotime($date_from)) . " - " . date('M d, Y', strtotime($date_to)) . "\n";
+                    $admin_message .= "Deposit: " . YOLO_YS_Price_Formatter::format_price($deposit_amount, $currency) . "\n\n";
+                    $admin_message .= "Error: " . (isset($result['error']) ? $result['error'] : 'Unknown error') . "\n";
+                    
+                    wp_mail($admin_email, $admin_subject, $admin_message, array('Content-Type: text/plain; charset=UTF-8'));
+                }
+                
                 // Send confirmation email
                 $to = $customer_email;
                 $subject = 'Booking Confirmation - ' . $yacht_name;

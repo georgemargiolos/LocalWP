@@ -234,6 +234,15 @@ class YOLO_YS_Admin {
             'yolo-yacht-search'
         );
         
+        register_setting('yolo-yacht-search', 'yolo_ys_load_fontawesome');
+        add_settings_field(
+            'yolo_ys_load_fontawesome',
+            __('Load FontAwesome from CDN', 'yolo-yacht-search'),
+            array($this, 'load_fontawesome_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_styling_settings'
+        );
+        
         register_setting('yolo-yacht-search', 'yolo_ys_primary_color', array('sanitize_callback' => 'sanitize_hex_color'));
         add_settings_field(
             'yolo_ys_primary_color',
@@ -348,6 +357,12 @@ class YOLO_YS_Admin {
         $value = get_option('yolo_ys_google_maps_api_key', 'AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4');
         echo '<input type="text" name="yolo_ys_google_maps_api_key" value="' . esc_attr($value) . '" class="large-text code" />';
         echo '<p class="description">' . __('Google Maps API key for displaying yacht locations on maps', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function load_fontawesome_callback() {
+        $value = get_option('yolo_ys_load_fontawesome', '0');
+        echo '<label><input type="checkbox" name="yolo_ys_load_fontawesome" value="1" ' . checked($value, '1', false) . ' /> ' . __('Load FontAwesome 6 from CDN', 'yolo-yacht-search') . '</label>';
+        echo '<p class="description">' . __('Uncheck this if your theme already loads FontAwesome (e.g., FontAwesome 7 Kit). Default: unchecked.', 'yolo-yacht-search') . '</p>';
     }
     
     public function primary_color_callback() {

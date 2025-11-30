@@ -1,4 +1,145 @@
 <script>
+// Show custom dates modal for non-Saturday bookings
+function showCustomDatesModal(dateFrom, dateTo) {
+    // Create modal HTML
+    const modalHTML = `
+        <div id="customDatesModal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        ">
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                max-width: 500px;
+                width: 90%;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            ">
+                <h3 style="margin-top: 0; color: #1e40af; font-size: 20px;">⚠️ Custom Dates Required</h3>
+                <p style="color: #4b5563; line-height: 1.6;">
+                    We charter our yachts from <strong>Saturday to Saturday</strong>. 
+                    If you need something special or custom dates, please fill this form and we'll get back to you.
+                </p>
+                <form id="customDatesForm" style="margin-top: 20px;">
+                    <input type="text" name="name" placeholder="Your Name *" required style="
+                        width: 100%;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        border: 1px solid #d1d5db;
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                    ">
+                    <input type="email" name="email" placeholder="Your Email *" required style="
+                        width: 100%;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        border: 1px solid #d1d5db;
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                    ">
+                    <input type="tel" name="phone" placeholder="Your Phone" style="
+                        width: 100%;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        border: 1px solid #d1d5db;
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                    ">
+                    <textarea name="message" rows="4" placeholder="Message" style="
+                        width: 100%;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        border: 1px solid #d1d5db;
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                        resize: vertical;
+                    ">I would like to charter <?php echo esc_html($yacht_name); ?> from ${dateFrom} to ${dateTo}. Please contact me with availability and pricing.</textarea>
+                    <input type="hidden" name="yacht_id" value="<?php echo $yacht_id; ?>">
+                    <input type="hidden" name="yacht_name" value="<?php echo esc_attr($yacht_name); ?>">
+                    <input type="hidden" name="date_from" value="${dateFrom}">
+                    <input type="hidden" name="date_to" value="${dateTo}">
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="submit" style="
+                            flex: 1;
+                            background: #1e40af;
+                            color: white;
+                            padding: 12px;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        ">SEND REQUEST</button>
+                        <button type="button" onclick="closeCustomDatesModal()" style="
+                            flex: 1;
+                            background: #6b7280;
+                            color: white;
+                            padding: 12px;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        ">CANCEL</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Handle form submission
+    document.getElementById('customDatesForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        formData.append('action', 'yolo_submit_custom_quote');
+        
+        // Show loading
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'SENDING...';
+        submitBtn.disabled = true;
+        
+        // Submit via AJAX
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Thank you! We will contact you shortly about your custom charter request.');
+                closeCustomDatesModal();
+            } else {
+                alert('Failed to send request. Please try again or contact us directly.');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to send request. Please try again.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+function closeCustomDatesModal() {
+    const modal = document.getElementById('customDatesModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // Format price with European formatting (dot for thousands, comma for decimals)
 function formatPrice(price) {
     if (!price) return '0,00';
@@ -466,54 +607,111 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update when date picker changes
     if (window.yoloDatePicker) {
         window.yoloDatePicker.on('selected', function(date1, date2) {
-            // Find matching price for selected dates
             const dateFrom = date1.format('YYYY-MM-DD');
             const dateTo = date2.format('YYYY-MM-DD');
             
-            const priceSlides = document.querySelectorAll('.price-slide');
-            let matchingSlide = null;
+            // Check if both dates are Saturdays
+            const fromDay = date1.getDay();
+            const toDay = date2.getDay();
             
-            for (let slide of priceSlides) {
-                if (slide.dataset.dateFrom === dateFrom && slide.dataset.dateTo === dateTo) {
-                    matchingSlide = slide;
-                    break;
-                }
+            if (fromDay !== 6 || toDay !== 6) {
+                // Not Saturday-to-Saturday
+                showCustomDatesModal(dateFrom, dateTo);
+                return;
             }
             
-            if (matchingSlide) {
-                // Activate the matching slide
-                priceSlides.forEach(s => s.classList.remove('active'));
-                matchingSlide.classList.add('active');
+            // Show loading state
+            const priceFinal = document.getElementById('selectedPriceFinal');
+            const originalText = priceFinal.textContent;
+            priceFinal.textContent = 'Checking availability...';
+            priceFinal.style.opacity = '0.6';
+            
+            // Fetch live price from Booking Manager API
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'yolo_get_live_price',
+                    yacht_id: <?php echo $yacht_id; ?>,
+                    date_from: dateFrom,
+                    date_to: dateTo,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                priceFinal.style.opacity = '1';
                 
-                // Update price display
-                const price = matchingSlide.dataset.price;
-                const startPrice = matchingSlide.dataset.startPrice;
-                const discount = matchingSlide.dataset.discount;
-                const currency = matchingSlide.dataset.currency;
-                
-                const priceOriginal = document.getElementById('selectedPriceOriginal');
-                const priceDiscount = document.getElementById('selectedPriceDiscount');
-                const priceFinal = document.getElementById('selectedPriceFinal');
-                
-                if (parseFloat(discount) > 0) {
-                    priceOriginal.textContent = formatEuropeanPrice(startPrice, currency) + ' ' + currency;
-                    priceOriginal.style.display = 'block';
-                    priceDiscount.textContent = parseFloat(discount).toFixed(2) + '% OFF - Save ' + formatEuropeanPrice(startPrice - price, currency) + ' ' + currency;
-                    priceDiscount.style.display = 'block';
+                if (data.success && data.data.available) {
+                    // Update price display with live data
+                    const price = data.data.final_price;
+                    const startPrice = data.data.price;
+                    const discount = data.data.discount;
+                    const currency = data.data.currency;
+                    
+                    const priceOriginal = document.getElementById('selectedPriceOriginal');
+                    const priceDiscount = document.getElementById('selectedPriceDiscount');
+                    
+                    if (parseFloat(discount) > 0) {
+                        priceOriginal.textContent = formatEuropeanPrice(startPrice, currency) + ' ' + currency;
+                        priceOriginal.style.display = 'block';
+                        priceDiscount.textContent = parseFloat(discount).toFixed(2) + '% OFF - Save ' + formatEuropeanPrice(startPrice - price, currency) + ' ' + currency;
+                        priceDiscount.style.display = 'block';
+                    } else {
+                        priceOriginal.style.display = 'none';
+                        priceDiscount.style.display = 'none';
+                    }
+                    
+                    priceFinal.textContent = formatEuropeanPrice(price, currency) + ' ' + currency;
+                    
+                    // Store live price for booking
+                    window.yoloLivePrice = {
+                        price: price,
+                        startPrice: startPrice,
+                        discount: discount,
+                        currency: currency,
+                        dateFrom: dateFrom,
+                        dateTo: dateTo,
+                    };
+                    
+                    // Update deposit info
+                    const depositInfo = document.getElementById('depositInfo');
+                    if (depositInfo) {
+                        depositInfo.remove();
+                    }
+                    updatePriceDisplayWithDeposit();
+                    
+                    // Enable Book Now button
+                    const bookNowBtn = document.getElementById('bookNowBtn');
+                    if (bookNowBtn) {
+                        bookNowBtn.disabled = false;
+                        bookNowBtn.style.opacity = '1';
+                        bookNowBtn.style.cursor = 'pointer';
+                    }
                 } else {
-                    priceOriginal.style.display = 'none';
-                    priceDiscount.style.display = 'none';
+                    // Yacht not available
+                    priceFinal.textContent = 'Not Available';
+                    priceFinal.style.color = '#dc2626';
+                    
+                    // Show error message
+                    alert(data.data ? data.data.message : 'This yacht is not available for the selected dates. Please choose different dates.');
+                    
+                    // Disable Book Now button
+                    const bookNowBtn = document.getElementById('bookNowBtn');
+                    if (bookNowBtn) {
+                        bookNowBtn.disabled = true;
+                        bookNowBtn.style.opacity = '0.5';
+                        bookNowBtn.style.cursor = 'not-allowed';
+                    }
                 }
-                
-                priceFinal.textContent = formatEuropeanPrice(price, currency) + ' ' + currency;
-                
-                // Update deposit info
-                const depositInfo = document.getElementById('depositInfo');
-                if (depositInfo) {
-                    depositInfo.remove();
-                }
-                updatePriceDisplayWithDeposit();
-            }
+            })
+            .catch(error => {
+                console.error('Error fetching live price:', error);
+                priceFinal.textContent = originalText;
+                priceFinal.style.opacity = '1';
+                alert('Failed to check availability. Please try again.');
+            });
         });
     }
 });
