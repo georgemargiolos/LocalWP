@@ -24,39 +24,17 @@ class YOLO_YS_Sync {
         );
         
         try {
-            error_log('YOLO YS: Starting equipment catalog sync');
-            
             // Fetch equipment catalog from API
             $equipment = $this->api->get_equipment_catalog();
             
-            error_log('YOLO YS: Equipment API response type: ' . gettype($equipment));
-            error_log('YOLO YS: Equipment count: ' . (is_array($equipment) ? count($equipment) : 'N/A'));
-            
             if (!is_array($equipment)) {
-                $results['errors'][] = 'Unexpected response format (not an array): ' . gettype($equipment);
-                $results['message'] = 'Failed to sync equipment catalog - invalid response format';
-                error_log('YOLO YS: Equipment sync failed - not an array');
-                return $results;
-            }
-            
-            if (empty($equipment)) {
-                $results['errors'][] = 'API returned empty equipment list';
-                $results['message'] = 'Failed to sync equipment catalog - no equipment returned';
-                error_log('YOLO YS: Equipment sync failed - empty array');
+                $results['errors'][] = 'Unexpected response format (not an array)';
+                $results['message'] = 'Failed to sync equipment catalog';
                 return $results;
             }
             
             // Store in database
-            error_log('YOLO YS: Storing ' . count($equipment) . ' equipment items in database');
-            $store_result = $this->db->store_equipment_catalog($equipment);
-            
-            if (!$store_result) {
-                $results['errors'][] = 'Failed to store equipment in database';
-                $results['message'] = 'Database storage failed';
-                error_log('YOLO YS: Equipment sync failed - database storage error');
-                return $results;
-            }
-            
+            $this->db->store_equipment_catalog($equipment);
             $results['equipment_synced'] = count($equipment);
             
             $results['success'] = true;
@@ -67,13 +45,11 @@ class YOLO_YS_Sync {
             
             // Update last sync time
             update_option('yolo_ys_last_equipment_sync', current_time('mysql'));
-            error_log('YOLO YS: Equipment catalog sync completed successfully');
             
         } catch (Exception $e) {
             $results['errors'][] = $e->getMessage();
             $results['message'] = 'Failed to sync equipment catalog: ' . $e->getMessage();
-            error_log('YOLO YS: Equipment catalog sync exception - ' . $e->getMessage());
-            error_log('YOLO YS: Exception trace - ' . $e->getTraceAsString());
+            error_log('YOLO YS: Equipment catalog sync failed - ' . $e->getMessage());
         }
         
         return $results;

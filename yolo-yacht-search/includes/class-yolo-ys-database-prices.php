@@ -81,7 +81,9 @@ class YOLO_YS_Database_Prices {
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_yacht_prices';
         
-        return $wpdb->get_results($wpdb->prepare(
+        error_log('YOLO YS: Getting prices for yacht_id: ' . $yacht_id);
+        
+        $results = $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM $table_name 
             WHERE yacht_id = %s 
             AND date_from >= NOW()
@@ -90,6 +92,23 @@ class YOLO_YS_Database_Prices {
             $yacht_id,
             $limit
         ));
+        
+        error_log('YOLO YS: Found ' . count($results) . ' price records');
+        
+        if (empty($results)) {
+            // Debug: Check if ANY prices exist for this yacht
+            $all_prices = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_name WHERE yacht_id = %s",
+                $yacht_id
+            ));
+            error_log('YOLO YS: Total prices for yacht (including past): ' . $all_prices);
+            
+            // Debug: List all yacht IDs in prices table
+            $sample_ids = $wpdb->get_col("SELECT DISTINCT yacht_id FROM $table_name LIMIT 5");
+            error_log('YOLO YS: Sample yacht_ids in prices table: ' . implode(', ', $sample_ids));
+        }
+        
+        return $results;
     }
     
     /**
@@ -168,5 +187,81 @@ class YOLO_YS_Database_Prices {
      */
     public static function delete_old_offers() {
         self::delete_old_prices();
+    }
+    
+    /**
+     * Ensure unique index exists for fast REPLACE operations
+     */
+    public static function ensure_unique_index() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'yolo_yacht_prices';
+        
+        // Check if index exists
+        $index_exists = $wpdb->get_var("SHOW INDEX FROM {$table_name} WHERE Key_name = 'yacht_date_product'");
+        
+        if (!$index_exists) {
+            // Add unique index for faster REPLACE operations
+            $wpdb->query("ALTER TABLE {$table_name} ADD UNIQUE INDEX yacht_date_product (yacht_id, date_from, date_to, product)");
+            error_log('YOLO YS: Created unique index on yacht_prices table');
+        }
+    }
+    
+    /**
+     * Store offers in batch (much faster than individual inserts)
+     * Uses REPLACE INTO with prepared values
+     */
+    public static function store_offers_batch($offers, $company_id = null) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'yolo_yacht_prices';
+        
+        if (empty($offers)) {
+            return;
+        }
+        
+        // Build batch insert query
+        $values = array();
+        $placeholders = array();
+        
+        foreach ($offers as $offer) {
+            $yacht_id = isset($offer['yachtId']) ? $offer['yachtId'] : '';
+            $date_from = isset($offer['dateFrom']) ? $offer['dateFrom'] : '';
+            $date_to = isset($offer['dateTo']) ? $offer['dateTo'] : '';
+            $product = isset($offer['product']) ? $offer['product'] : 'Bareboat';
+            $price = isset($offer['price']) ? floatval($offer['price']) : 0;
+            $currency = isset($offer['currency']) ? $offer['currency'] : 'EUR';
+            $start_price = isset($offer['startPrice']) ? floatval($offer['startPrice']) : $price;
+            $discount_percentage = isset($offer['discountPercentage']) ? floatval($offer['discountPercentage']) : 0;
+            
+            // Skip invalid offers
+            if (empty($yacht_id) || empty($date_from) || empty($date_to)) {
+                continue;
+            }
+            
+            $placeholders[] = "(%s, %s, %s, %s, %f, %s, %f, %f, %s)";
+            $values[] = $yacht_id;
+            $values[] = $date_from;
+            $values[] = $date_to;
+            $values[] = $product;
+            $values[] = $price;
+            $values[] = $currency;
+            $values[] = $start_price;
+            $values[] = $discount_percentage;
+            $values[] = current_time('mysql');
+        }
+        
+        if (empty($placeholders)) {
+            return;
+        }
+        
+        // Use REPLACE INTO to handle duplicates
+        $sql = "REPLACE INTO {$table_name} 
+                (yacht_id, date_from, date_to, product, price, currency, start_price, discount_percentage, last_synced)
+                VALUES " . implode(', ', $placeholders);
+        
+        $wpdb->query($wpdb->prepare($sql, $values));
+        
+        if ($wpdb->last_error) {
+            error_log('YOLO YS: Batch insert error: ' . $wpdb->last_error);
+        }
     }
 }
