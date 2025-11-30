@@ -13,6 +13,10 @@ class YOLO_YS_Booking_Manager_API {
     
     /**
      * Search for available yachts
+     * 
+     * CRITICAL FIX (v2.3.7): Made consistent with other methods
+     * Now returns just the data array (with 'value' extracted), not full result object
+     * This matches the behavior of get_offers(), get_yachts_by_company(), etc.
      */
     public function search_offers($params) {
         $endpoint = '/offers';
@@ -32,7 +36,18 @@ class YOLO_YS_Booking_Manager_API {
             $query_params['companyId'] = $params['companyId'];
         }
         
-        return $this->make_request($endpoint, $query_params);
+        $result = $this->make_request($endpoint, $query_params);
+        
+        if ($result['success']) {
+            // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                return $result['data']['value'];
+            }
+            // Fallback for direct array response
+            return $result['data'];
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to search offers');
     }
     
     /**
@@ -89,6 +104,11 @@ class YOLO_YS_Booking_Manager_API {
         $result = $this->make_request($endpoint, $query_params);
         
         if ($result['success']) {
+            // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                return $result['data']['value'];
+            }
+            // Fallback for direct array response
             return $result['data'];
         }
         
@@ -116,9 +136,6 @@ class YOLO_YS_Booking_Manager_API {
         throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch prices');
     }
     
-    /**
-     * Get all yachts for a company
-     */
     /**
      * Get all equipment definitions from Booking Manager API
      * 
@@ -336,9 +353,21 @@ class YOLO_YS_Booking_Manager_API {
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
         
-        // API returns array of offers directly in $result['data'], NOT $result['data']['offers']
-        if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
-            $offer = $result['data'][0];
+        // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
+        // Bug was: Code expected direct array but API wraps in 'value' property
+        // This caused wrong prices or NULL values in price carousel
+        $offers_array = array();
+        if ($result['success'] && isset($result['data'])) {
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                $offers_array = $result['data']['value'];
+            } elseif (is_array($result['data']) && isset($result['data'][0])) {
+                // Fallback for direct array response (shouldn't happen but safe)
+                $offers_array = $result['data'];
+            }
+        }
+        
+        if ($result['success'] && count($offers_array) > 0) {
+            $offer = $offers_array[0];
             
             $base_price = isset($offer['price']) ? $offer['price'] : 0;
             $start_price = isset($offer['startPrice']) ? $offer['startPrice'] : $base_price;
@@ -384,7 +413,7 @@ class YOLO_YS_Booking_Manager_API {
                 'extras_details' => $extras_details,
                 'currency' => isset($offer['currency']) ? $offer['currency'] : 'EUR',
             );
-        } else if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) === 0) {
+        } else if ($result['success'] && count($offers_array) === 0) {
             // No offers found = yacht not available
             return array(
                 'success' => true,
@@ -413,12 +442,15 @@ class YOLO_YS_Booking_Manager_API {
             return $cached_data;
         }
         
-        $result = $this->search_offers($params);
-        
-        if ($result['success']) {
-            set_transient($cache_key, $result, $cache_duration);
+        // CRITICAL FIX (v2.3.7): search_offers now returns data array directly, not result object
+        // It throws exception on failure, so no need to check ['success']
+        try {
+            $data = $this->search_offers($params);
+            set_transient($cache_key, $data, $cache_duration);
+            return $data;
+        } catch (Exception $e) {
+            // Return empty array on error
+            return array();
         }
-        
-        return $result;
     }
 }

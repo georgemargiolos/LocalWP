@@ -134,7 +134,19 @@ $sync_status = $sync->get_sync_status();
             </tr>
             <tr>
                 <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_yacht_details]</td>
-                <td style="padding: 12px; border: 1px solid #e5e7eb;"><strong>NEW!</strong> Yacht details page with image carousel and complete info</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Yacht details page with image carousel and complete info</td>
+            </tr>
+            <tr style="background: white;">
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_booking_confirmation]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Booking confirmation page (shown after successful deposit payment)</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_balance_payment]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Balance payment page (for paying remaining 50% before charter)</td>
+            </tr>
+            <tr style="background: white;">
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_balance_confirmation]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Balance payment confirmation page (shown after successful balance payment)</td>
             </tr>
         </table>
     </div>

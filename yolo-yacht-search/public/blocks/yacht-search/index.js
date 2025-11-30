@@ -13,6 +13,7 @@ registerBlockType('yolo-ys/search-widget', {
                         <div className="preview-field">
                             <label>Boat Type</label>
                             <select disabled>
+                                <option>All types</option>
                                 <option>Sailing yacht</option>
                                 <option>Catamaran</option>
                             </select>

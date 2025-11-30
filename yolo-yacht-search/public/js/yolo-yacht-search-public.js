@@ -345,6 +345,12 @@
     
     /**
      * Render boat card
+     * 
+     * UPDATED (v2.3.7): Match "Our Yachts" design for consistency
+     * - Split yacht name and model into two lines
+     * - Show Cabins, Built year, Length (instead of Cabins, Length, Berths)
+     * - Red button instead of blue
+     * - Cleaner price display (green box, centered)
      */
     function renderBoatCard(boat, isYolo) {
         const yoloClass = isYolo ? 'yolo-yacht' : '';
@@ -360,39 +366,37 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
-        // Helper function to format price with standard formatting (comma for thousands, dot for decimals)
+        // Split yacht name into name and model
+        // Example: "Lemon Sun Odyssey 469" -> "Lemon" + "Sun Odyssey 469"
+        let yachtName = boat.yacht || 'Unknown';
+        let yachtModel = '';
+        const nameParts = yachtName.split(' ');
+        if (nameParts.length > 1) {
+            yachtName = nameParts[0]; // First word is the name
+            yachtModel = nameParts.slice(1).join(' '); // Rest is the model
+        }
+        
+        // Helper function to format price with comma for thousands, dot for decimals
         const formatPrice = (price) => {
             if (!price || isNaN(price)) return '0.00';
-            // Format with standard style: 18,681.00
             return Number(price).toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
         };
         
-        // Price display with discount
-        let priceHtml = '';
-        if (boat.discount && boat.start_price && boat.discount > 0) {
-            const discountAmount = Math.round(boat.start_price - boat.price);
-            const discountPercent = typeof boat.discount === 'number' ? boat.discount.toFixed(2) : boat.discount;
-            priceHtml = `
-                <div class="yolo-ys-yacht-price">
-                    <div style="text-decoration: line-through; color: #9ca3af; font-size: 16px; margin-bottom: 4px;">
-                        ${formatPrice(boat.start_price)} ${boat.currency}
-                    </div>
-                    <div style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
-                        ${discountPercent}% OFF - Save ${formatPrice(discountAmount)} ${boat.currency}
-                    </div>
-                    From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
-                </div>
-            `;
-        } else {
-            priceHtml = `
-                <div class="yolo-ys-yacht-price">
-                    From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
-                </div>
-            `;
+        // Refit display (if available)
+        let refitDisplay = '';
+        if (boat.refit_year) {
+            refitDisplay = `<span class="yolo-ys-refit-note">Refit: ${boat.refit_year}</span>`;
         }
+        
+        // Price display - cleaner format matching "Our Yachts"
+        const priceHtml = `
+            <div class="yolo-ys-yacht-price">
+                From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
+            </div>
+        `;
         
         return `
             <div class="yolo-ys-yacht-card ${yoloClass}">
@@ -404,7 +408,8 @@
                         📍 ${boat.startBase || 'Location not specified'}
                     </div>
                     <div class="yolo-ys-yacht-header">
-                        <h3 class="yolo-ys-yacht-name">${boat.yacht || 'Unknown'}</h3>
+                        <h3 class="yolo-ys-yacht-name">${yachtName}</h3>
+                        ${yachtModel ? `<h4 class="yolo-ys-yacht-model">${yachtModel}</h4>` : ''}
                     </div>
                     <div class="yolo-ys-yacht-specs-grid">
                         <div class="yolo-ys-spec-item">
@@ -412,16 +417,19 @@
                             <div class="yolo-ys-spec-label">Cabins</div>
                         </div>
                         <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">
+                                ${boat.year_of_build || 'N/A'}
+                                ${refitDisplay}
+                            </div>
+                            <div class="yolo-ys-spec-label">Built year</div>
+                        </div>
+                        <div class="yolo-ys-spec-item">
                             <div class="yolo-ys-spec-value">${lengthFt} ft</div>
                             <div class="yolo-ys-spec-label">Length</div>
                         </div>
-                        <div class="yolo-ys-spec-item">
-                            <div class="yolo-ys-spec-value">${boat.berths || 0}</div>
-                            <div class="yolo-ys-spec-label">Berths</div>
-                        </div>
                     </div>
                     ${priceHtml}
-                    <a href="${detailsUrl}" class="yolo-ys-view-button">DETAILS</a>
+                    <a href="${detailsUrl}" class="yolo-ys-details-btn">DETAILS</a>
                 </div>
             </div>
         `;
