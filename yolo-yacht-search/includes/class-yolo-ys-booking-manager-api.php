@@ -356,15 +356,24 @@ class YOLO_YS_Booking_Manager_API {
         // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
         // Bug was: Code expected direct array but API wraps in 'value' property
         // This caused wrong prices or NULL values in price carousel
+        error_log('YOLO DEBUG get_live_price: API result = ' . print_r($result, true));
         $offers_array = array();
         if ($result['success'] && isset($result['data'])) {
+            error_log('YOLO DEBUG: result[data] = ' . print_r($result['data'], true));
             if (isset($result['data']['value']) && is_array($result['data']['value'])) {
                 $offers_array = $result['data']['value'];
+                error_log('YOLO DEBUG: Extracted from value array, count = ' . count($offers_array));
             } elseif (is_array($result['data']) && isset($result['data'][0])) {
                 // Fallback for direct array response (shouldn't happen but safe)
                 $offers_array = $result['data'];
+                error_log('YOLO DEBUG: Used direct array fallback, count = ' . count($offers_array));
+            } else {
+                error_log('YOLO DEBUG: Could not extract offers array! data structure: ' . print_r($result['data'], true));
             }
+        } else {
+            error_log('YOLO DEBUG: result[success]=' . ($result['success'] ? 'true' : 'false') . ', isset(data)=' . (isset($result['data']) ? 'true' : 'false'));
         }
+        error_log('YOLO DEBUG: Final offers_array count = ' . count($offers_array));
         
         if ($result['success'] && count($offers_array) > 0) {
             $offer = $offers_array[0];
