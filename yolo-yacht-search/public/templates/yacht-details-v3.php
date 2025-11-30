@@ -524,28 +524,6 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
         </div>
     </div>
     
-    <!-- Charter Company Section -->
-    <div class="yacht-section company-section">
-        <h3>⚓ Charter Company</h3>
-        <div class="company-content">
-            <div class="company-info">
-                <?php if ($yacht->company_id == 7850): ?>
-                    <div class="company-name">YOLO Charters</div>
-                    <div class="company-badge yolo-badge">⭐ Our Fleet</div>
-                    <p>This yacht is part of the YOLO Charters premium fleet. You'll receive direct service from our experienced team, ensuring the highest standards of quality and customer care.</p>
-                <?php else: ?>
-                    <div class="company-name">Partner Charter Company</div>
-                    <div class="company-badge partner-badge">🤝 Trusted Partner</div>
-                    <p>This yacht is operated by one of our carefully selected partner companies. All our partners meet strict quality standards and are fully licensed and insured.</p>
-                <?php endif; ?>
-                <div class="company-details">
-                    <p><strong>Base Location:</strong> <?php echo !empty($yacht->home_base) ? esc_html($yacht->home_base) : 'Contact for details'; ?></p>
-                    <p><strong>Company ID:</strong> #<?php echo esc_html($yacht->company_id); ?></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Extras -->
     <?php if (!empty($extras)): ?>
         <?php 

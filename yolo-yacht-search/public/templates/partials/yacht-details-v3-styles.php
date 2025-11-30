@@ -1108,87 +1108,9 @@
     color: #374151;
 }
 
-/* Charter Company Section */
-.company-section {
-    background: #fef3c7;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 30px;
-}
-
-.company-section h3 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: #111827;
-}
-
-.company-content {
-    background: white;
-    border-radius: 8px;
-    padding: 25px;
-}
-
-.company-name {
-    font-size: 22px;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 10px;
-}
-
-.company-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.yolo-badge {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 2px solid #3b82f6;
-}
-
-.partner-badge {
-    background: #e0e7ff;
-    color: #4338ca;
-    border: 2px solid #6366f1;
-}
-
-.company-info p {
-    margin: 0 0 15px 0;
-    font-size: 15px;
-    line-height: 1.6;
-    color: #374151;
-}
-
-.company-info p:last-child {
-    margin-bottom: 0;
-}
-
-.company-details {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.company-details p {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    color: #6b7280;
-}
-
-.company-details strong {
-    color: #111827;
-    font-weight: 600;
-}
-
 @media (max-width: 768px) {
     .deposit-section,
-    .checkin-section,
-    .company-section {
+    .checkin-section {
         padding: 20px;
     }
     
@@ -1202,10 +1124,6 @@
     
     .checkin-grid {
         grid-template-columns: 1fr;
-    }
-    
-    .company-name {
-        font-size: 20px;
     }
 }
 </style>
