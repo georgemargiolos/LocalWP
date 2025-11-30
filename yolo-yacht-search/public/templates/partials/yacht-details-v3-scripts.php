@@ -193,11 +193,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Format prices in carousel
     document.querySelectorAll('.price-original span, .price-final, .price-discount-badge').forEach(function(el) {
         const text = el.textContent.trim();
+        console.log('Carousel price text:', text);
         const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands (e.g., 2,925.00)
         if (match) {
-            const price = match[1].replace(/,/g, ''); // Remove commas before formatting
+            const priceStr = match[1].replace(/,/g, ''); // Remove commas before formatting
             const currency = match[2];
-            el.textContent = formatPrice(price) + ' ' + currency;
+            console.log('Matched price:', match[1], '→ Cleaned:', priceStr, '→ Number:', Number(priceStr));
+            const formatted = formatPrice(priceStr);
+            console.log('Formatted:', formatted);
+            if (formatted && formatted !== 'NaN') {
+                el.textContent = formatted + ' ' + currency;
+            } else {
+                console.error('formatPrice returned NaN for:', priceStr);
+                // Don't change the text if formatting fails
+            }
         }
     });
     
