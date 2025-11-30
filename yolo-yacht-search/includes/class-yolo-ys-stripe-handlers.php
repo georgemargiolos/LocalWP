@@ -97,7 +97,8 @@ class YOLO_YS_Stripe_Handlers {
     
     /**
      * AJAX handler to get live price from Booking Manager
-        public function ajax_get_live_price() {
+     */
+    public function ajax_get_live_price() {
         try {
             // Note: No nonce check - this is public price checking functionality
             // Get yacht ID and dates        // CRITICAL FIX v2.5.3: yacht_id MUST be STRING, not integer
