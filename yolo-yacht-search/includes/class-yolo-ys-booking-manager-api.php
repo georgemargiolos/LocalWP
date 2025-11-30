@@ -216,7 +216,7 @@ class YOLO_YS_Booking_Manager_API {
         
         $args = array(
             'headers' => array(
-                'Authorization' => 'Bearer ' . $this->api_key,  // Fixed: Added Bearer prefix
+                'Authorization' => $this->api_key,  // Booking Manager API expects raw API key, NOT Bearer token
                 'Accept' => 'application/json',
             ),
             'timeout' => 180,  // Increased to 180 seconds for large data sets
@@ -273,7 +273,7 @@ class YOLO_YS_Booking_Manager_API {
         
         $args = array(
             'headers' => array(
-                'Authorization' => 'Bearer ' . $this->api_key,
+                'Authorization' => $this->api_key,  // Booking Manager API expects raw API key, NOT Bearer token
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ),
@@ -344,6 +344,18 @@ class YOLO_YS_Booking_Manager_API {
         
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
+        
+        // DEBUG: Log API request and response
+        error_log('YOLO DEBUG - get_live_price called with yacht_id: ' . $yacht_id);
+        error_log('YOLO DEBUG - Formatted dates: ' . $date_from_formatted . ' to ' . $date_to_formatted);
+        error_log('YOLO DEBUG - API result success: ' . ($result['success'] ? 'true' : 'false'));
+        if (isset($result['data'])) {
+            error_log('YOLO DEBUG - API data type: ' . gettype($result['data']));
+            error_log('YOLO DEBUG - API data count: ' . (is_array($result['data']) ? count($result['data']) : 'N/A'));
+        }
+        if (isset($result['error'])) {
+            error_log('YOLO DEBUG - API error: ' . $result['error']);
+        }
         
         // NOTE: API returns direct array, not wrapped in {"value": [...], "Count": N}
         // The make_request() method wraps it in ['success' => true, 'data' => [...]]

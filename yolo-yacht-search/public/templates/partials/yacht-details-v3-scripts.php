@@ -765,7 +765,10 @@ function formatEuropeanPrice(price, currency) {
 }
 
 // Flag to track if this is the initial page load
+// CRITICAL FIX (v2.5.0): Set to false after 1 second to allow automatic page load trigger
+// but still check availability when user manually selects dates
 let isInitialLoad = true;
+setTimeout(() => { isInitialLoad = false; }, 1000);
 
 // Update price display with deposit information
 function updatePriceDisplayWithDeposit() {
