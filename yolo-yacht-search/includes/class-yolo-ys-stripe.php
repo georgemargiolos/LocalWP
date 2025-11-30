@@ -25,9 +25,14 @@ class YOLO_YS_Stripe {
      * @param string $date_from Start date (Y-m-d)
      * @param string $date_to End date (Y-m-d)
      * @param float $total_price Total charter price
+     * @param string $currency Currency code (default EUR)
+     * @param string $customer_first_name Customer first name
+     * @param string $customer_last_name Customer last name
+     * @param string $customer_email Customer email
+     * @param string $customer_phone Customer phone
      * @return array Session data with session_id
      */
-    public function create_checkout_session($yacht_id, $yacht_name, $date_from, $date_to, $total_price) {
+    public function create_checkout_session($yacht_id, $yacht_name, $date_from, $date_to, $total_price, $currency = 'EUR', $customer_first_name = '', $customer_last_name = '', $customer_email = '', $customer_phone = '') {
         try {
             $this->init_stripe();
             
@@ -39,18 +44,21 @@ class YOLO_YS_Stripe {
             $remaining_balance = YOLO_YS_Price_Formatter::calculate_remaining_balance($total_price, $deposit_amount);
             
             // Convert to Stripe format (cents)
-            $stripe_amount = YOLO_YS_Price_Formatter::format_for_stripe($deposit_amount, 'EUR');
+            $stripe_amount = YOLO_YS_Price_Formatter::format_for_stripe($deposit_amount, $currency);
             
             // Get success and cancel URLs
             $success_url = home_url('/booking-confirmation?session_id={CHECKOUT_SESSION_ID}');
             $cancel_url = home_url('/yacht-details-page/?yacht_id=' . $yacht_id . '&dateFrom=' . $date_from . '&dateTo=' . $date_to);
+            
+            // Prepare customer name
+            $customer_name = trim($customer_first_name . ' ' . $customer_last_name);
             
             // Create Checkout Session
             $session = \Stripe\Checkout\Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'eur',
+                        'currency' => strtolower($currency),
                         'product_data' => [
                             'name' => 'Yacht Charter: ' . $yacht_name,
                             'description' => sprintf(
@@ -58,7 +66,7 @@ class YOLO_YS_Stripe {
                                 $deposit_percentage,
                                 date('M d, Y', strtotime($date_from)),
                                 date('M d, Y', strtotime($date_to)),
-                                YOLO_YS_Price_Formatter::format_price($remaining_balance, 'EUR')
+                                YOLO_YS_Price_Formatter::format_price($remaining_balance, $currency)
                             ),
                         ],
                         'unit_amount' => $stripe_amount,
@@ -68,6 +76,7 @@ class YOLO_YS_Stripe {
                 'mode' => 'payment',
                 'success_url' => $success_url,
                 'cancel_url' => $cancel_url,
+                'customer_email' => $customer_email,
                 'metadata' => [
                     'yacht_id' => $yacht_id,
                     'yacht_name' => $yacht_name,
@@ -77,9 +86,13 @@ class YOLO_YS_Stripe {
                     'deposit_amount' => $deposit_amount,
                     'deposit_percentage' => $deposit_percentage,
                     'remaining_balance' => $remaining_balance,
-                    'currency' => 'EUR',
+                    'currency' => $currency,
+                    'customer_first_name' => $customer_first_name,
+                    'customer_last_name' => $customer_last_name,
+                    'customer_name' => $customer_name,
+                    'customer_email' => $customer_email,
+                    'customer_phone' => $customer_phone,
                 ],
-                'customer_email' => null, // Will be filled by customer on Stripe checkout
             ]);
             
             return array(

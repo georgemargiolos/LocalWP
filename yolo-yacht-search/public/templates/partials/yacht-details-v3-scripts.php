@@ -451,7 +451,7 @@ function selectWeek(button) {
     });
 }
 
-// Book Now function - Initiates Stripe Checkout
+// Book Now function - Shows booking form modal
 function bookNow() {
     // Get selected dates and price
     const dateInput = document.getElementById('dateRangePicker');
@@ -499,53 +499,261 @@ function bookNow() {
     const yachtId = <?php echo intval($yacht->id); ?>;
     const yachtName = <?php echo json_encode($yacht->name); ?>;
     
-    // Show loading state
-    const bookBtn = document.querySelector('.btn-book-now');
-    const originalText = bookBtn.textContent;
-    bookBtn.textContent = 'Processing...';
-    bookBtn.disabled = true;
+    // Show booking form modal
+    showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, currency);
+}
+
+// Show booking form modal
+function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, currency) {
+    // Format dates for display
+    const dateFromFormatted = new Date(dateFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const dateToFormatted = new Date(dateTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     
-    // Create Stripe Checkout Session via AJAX
-    fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            action: 'yolo_create_checkout_session',
-            yacht_id: yachtId,
-            yacht_name: yachtName,
-            date_from: dateFrom,
-            date_to: dateTo,
-            total_price: totalPrice
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.data.session_id) {
-            // Redirect to Stripe Checkout
-            const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
-            stripe.redirectToCheckout({
-                sessionId: data.data.session_id
-            }).then(function(result) {
-                if (result.error) {
-                    alert(result.error.message);
-                    bookBtn.textContent = originalText;
-                    bookBtn.disabled = false;
-                }
-            });
-        } else {
-            alert('Error creating checkout session: ' + (data.data.message || 'Unknown error'));
-            bookBtn.textContent = originalText;
-            bookBtn.disabled = false;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to initiate checkout. Please try again.');
-        bookBtn.textContent = originalText;
-        bookBtn.disabled = false;
+    // Format price
+    const priceFormatted = formatPrice(totalPrice) + ' ' + currency;
+    
+    // Create modal HTML
+    const modalHTML = `
+        <div id="bookingFormModal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            overflow-y: auto;
+        ">
+            <div style="
+                background: white;
+                padding: 40px;
+                border-radius: 12px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                margin: 20px;
+            ">
+                <h2 style="margin-top: 0; color: #1e40af; font-size: 28px; text-align: center; margin-bottom: 10px;">Complete Your Booking</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Please provide your details to proceed with payment</p>
+                
+                <!-- Booking Summary -->
+                <div style="
+                    background: #f3f4f6;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-bottom: 30px;
+                ">
+                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #374151; font-size: 18px;">📋 Booking Summary</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #6b7280; font-weight: 500;">Yacht:</span>
+                            <span style="color: #111827; font-weight: 600;">${yachtName}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #6b7280; font-weight: 500;">Check-in:</span>
+                            <span style="color: #111827; font-weight: 600;">${dateFromFormatted}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #6b7280; font-weight: 500;">Check-out:</span>
+                            <span style="color: #111827; font-weight: 600;">${dateToFormatted}</span>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #d1d5db; margin: 10px 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #111827; font-weight: 600; font-size: 18px;">Total Price:</span>
+                            <span style="color: #1e40af; font-weight: 700; font-size: 20px;">${priceFormatted}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Information Form -->
+                <form id="bookingForm">
+                    <h3 style="margin-top: 0; margin-bottom: 20px; color: #374151; font-size: 18px;">👤 Your Information</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500; font-size: 14px;">First Name *</label>
+                            <input type="text" name="first_name" required style="
+                                width: 100%;
+                                padding: 12px;
+                                border: 2px solid #d1d5db;
+                                border-radius: 6px;
+                                box-sizing: border-box;
+                                font-size: 15px;
+                                transition: border-color 0.3s;
+                            ">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500; font-size: 14px;">Last Name *</label>
+                            <input type="text" name="last_name" required style="
+                                width: 100%;
+                                padding: 12px;
+                                border: 2px solid #d1d5db;
+                                border-radius: 6px;
+                                box-sizing: border-box;
+                                font-size: 15px;
+                                transition: border-color 0.3s;
+                            ">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500; font-size: 14px;">Email Address *</label>
+                        <input type="email" name="email" required style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #d1d5db;
+                            border-radius: 6px;
+                            box-sizing: border-box;
+                            font-size: 15px;
+                            transition: border-color 0.3s;
+                        ">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500; font-size: 14px;">Mobile Number *</label>
+                        <input type="tel" name="phone" required placeholder="+30 123 456 7890" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #d1d5db;
+                            border-radius: 6px;
+                            box-sizing: border-box;
+                            font-size: 15px;
+                            transition: border-color 0.3s;
+                        ">
+                    </div>
+                    
+                    <input type="hidden" name="yacht_id" value="${yachtId}">
+                    <input type="hidden" name="yacht_name" value="${yachtName}">
+                    <input type="hidden" name="date_from" value="${dateFrom}">
+                    <input type="hidden" name="date_to" value="${dateTo}">
+                    <input type="hidden" name="total_price" value="${totalPrice}">
+                    <input type="hidden" name="currency" value="${currency}">
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button type="button" onclick="closeBookingFormModal()" style="
+                            flex: 1;
+                            background: #e5e7eb;
+                            color: #374151;
+                            padding: 15px;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 600;
+                            font-size: 16px;
+                            transition: background 0.3s;
+                        ">CANCEL</button>
+                        <button type="submit" style="
+                            flex: 2;
+                            background: #1e40af;
+                            color: white;
+                            padding: 15px;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: 700;
+                            font-size: 16px;
+                            transition: background 0.3s;
+                        ">PROCEED TO PAYMENT →</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Add focus styles
+    const inputs = document.querySelectorAll('#bookingForm input[type="text"], #bookingForm input[type="email"], #bookingForm input[type="tel"]');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.borderColor = '#1e40af';
+        });
+        input.addEventListener('blur', function() {
+            this.style.borderColor = '#d1d5db';
+        });
     });
+    
+    // Handle form submission
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const firstName = formData.get('first_name');
+        const lastName = formData.get('last_name');
+        const email = formData.get('email');
+        const phone = formData.get('phone');
+        
+        // Validate form
+        if (!firstName || !lastName || !email || !phone) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
+        
+        // Create Stripe Checkout Session with customer data
+        fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'yolo_create_checkout_session',
+                yacht_id: yachtId,
+                yacht_name: yachtName,
+                date_from: dateFrom,
+                date_to: dateTo,
+                total_price: totalPrice,
+                currency: currency,
+                customer_first_name: firstName,
+                customer_last_name: lastName,
+                customer_email: email,
+                customer_phone: phone
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.session_id) {
+                // Redirect to Stripe Checkout
+                const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
+                stripe.redirectToCheckout({
+                    sessionId: data.data.session_id
+                }).then(function(result) {
+                    if (result.error) {
+                        alert(result.error.message);
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+            } else {
+                alert('Error creating checkout session: ' + (data.data.message || 'Unknown error'));
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to initiate checkout. Please try again.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+// Close booking form modal
+function closeBookingFormModal() {
+    const modal = document.getElementById('bookingFormModal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 // Format price with proper European formatting (18.681,00 EUR)

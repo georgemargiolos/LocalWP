@@ -30,11 +30,26 @@ class YOLO_YS_Stripe_Handlers {
             $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
             $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
             $total_price = isset($_POST['total_price']) ? floatval($_POST['total_price']) : 0;
+            $currency = isset($_POST['currency']) ? sanitize_text_field($_POST['currency']) : 'EUR';
+            
+            // Get customer information
+            $customer_first_name = isset($_POST['customer_first_name']) ? sanitize_text_field($_POST['customer_first_name']) : '';
+            $customer_last_name = isset($_POST['customer_last_name']) ? sanitize_text_field($_POST['customer_last_name']) : '';
+            $customer_email = isset($_POST['customer_email']) ? sanitize_email($_POST['customer_email']) : '';
+            $customer_phone = isset($_POST['customer_phone']) ? sanitize_text_field($_POST['customer_phone']) : '';
             
             // Validate inputs
             if (empty($yacht_id) || empty($date_from) || empty($date_to) || $total_price <= 0) {
                 wp_send_json_error(array(
                     'message' => 'Missing required booking information'
+                ));
+                return;
+            }
+            
+            // Validate customer information
+            if (empty($customer_first_name) || empty($customer_last_name) || empty($customer_email) || empty($customer_phone)) {
+                wp_send_json_error(array(
+                    'message' => 'Missing required customer information'
                 ));
                 return;
             }
@@ -46,7 +61,12 @@ class YOLO_YS_Stripe_Handlers {
                 $yacht_name,
                 $date_from,
                 $date_to,
-                $total_price
+                $total_price,
+                $currency,
+                $customer_first_name,
+                $customer_last_name,
+                $customer_email,
+                $customer_phone
             );
             
             if ($result['success']) {

@@ -139,17 +139,20 @@ class YOLO_YS_Database {
             currency varchar(10) DEFAULT 'EUR',
             customer_email varchar(255) NOT NULL,
             customer_name varchar(255) NOT NULL,
+            customer_phone varchar(50) DEFAULT NULL,
             stripe_session_id varchar(255) DEFAULT NULL,
             stripe_payment_intent varchar(255) DEFAULT NULL,
             payment_status varchar(50) DEFAULT 'pending',
             booking_status varchar(50) DEFAULT 'pending',
             booking_manager_id varchar(255) DEFAULT NULL,
+            bm_reservation_id varchar(255) DEFAULT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             KEY yacht_id (yacht_id),
             KEY customer_email (customer_email),
-            KEY stripe_session_id (stripe_session_id)
+            KEY stripe_session_id (stripe_session_id),
+            KEY bm_reservation_id (bm_reservation_id)
         ) $charset_collate;";
         
         dbDelta($sql_yachts);
@@ -160,7 +163,7 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment_catalog);
         dbDelta($sql_bookings);
         
-        update_option('yolo_ys_db_version', '1.3');
+        update_option('yolo_ys_db_version', '1.4');
     }
     
     /**

@@ -49,9 +49,20 @@ if (!$booking) {
                 $remaining_balance = $session->metadata->remaining_balance;
                 $currency = isset($session->metadata->currency) ? $session->metadata->currency : 'EUR';
                 
-                // Get customer details
-                $customer_email = isset($session->customer_details->email) ? $session->customer_details->email : '';
-                $customer_name = isset($session->customer_details->name) ? $session->customer_details->name : '';
+                // Get customer details from metadata (preferred) or customer_details (fallback)
+                $customer_first_name = isset($session->metadata->customer_first_name) ? $session->metadata->customer_first_name : '';
+                $customer_last_name = isset($session->metadata->customer_last_name) ? $session->metadata->customer_last_name : '';
+                $customer_name = isset($session->metadata->customer_name) ? $session->metadata->customer_name : '';
+                $customer_email = isset($session->metadata->customer_email) ? $session->metadata->customer_email : '';
+                $customer_phone = isset($session->metadata->customer_phone) ? $session->metadata->customer_phone : '';
+                
+                // Fallback to Stripe customer_details if metadata is empty
+                if (empty($customer_email) && isset($session->customer_details->email)) {
+                    $customer_email = $session->customer_details->email;
+                }
+                if (empty($customer_name) && isset($session->customer_details->name)) {
+                    $customer_name = $session->customer_details->name;
+                }
                 
                 // Create booking in database
                 $wpdb->insert($table_bookings, array(
@@ -63,8 +74,9 @@ if (!$booking) {
                     'deposit_paid' => $deposit_amount,
                     'remaining_balance' => $remaining_balance,
                     'currency' => $currency,
-                    'customer_email' => $customer_email,
                     'customer_name' => $customer_name,
+                    'customer_email' => $customer_email,
+                    'customer_phone' => $customer_phone,
                     'stripe_session_id' => $session_id,
                     'stripe_payment_intent' => isset($session->payment_intent) ? $session->payment_intent : '',
                     'payment_status' => 'deposit_paid',
@@ -153,7 +165,7 @@ if (!$booking) {
                     "Total Price: %s\n" .
                     "Deposit Paid: %s\n" .
                     "Remaining Balance: %s\n\n" .
-                    "Your booking reference: #%d\n\n" .
+                    "Your booking reference: %s\n\n" .
                     "We look forward to welcoming you aboard!\n\n" .
                     "Best regards,\n" .
                     "YOLO Charters Team",
@@ -164,7 +176,7 @@ if (!$booking) {
                     YOLO_YS_Price_Formatter::format_price($total_price, $currency),
                     YOLO_YS_Price_Formatter::format_price($deposit_amount, $currency),
                     YOLO_YS_Price_Formatter::format_price($remaining_balance, $currency),
-                    $booking_id
+                    (!empty($bm_reservation_id) ? 'BM-' . $bm_reservation_id : 'YOLO-' . date('Y') . '-' . str_pad($booking_id, 4, '0', STR_PAD_LEFT))
                 );
                 
                 $headers = array('Content-Type: text/plain; charset=UTF-8');
