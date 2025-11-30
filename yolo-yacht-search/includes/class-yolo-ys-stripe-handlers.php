@@ -95,13 +95,7 @@ class YOLO_YS_Stripe_Handlers {
             $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
             $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
             
-            // DEBUG: Log incoming request
-            error_log('YOLO DEBUG - ajax_get_live_price called');
-            error_log('YOLO DEBUG - yacht_id: ' . $yacht_id);
-            error_log('YOLO DEBUG - date_from: ' . $date_from);
-            error_log('YOLO DEBUG - date_to: ' . $date_to);
             
-            // Validate inputs
             if (empty($yacht_id) || empty($date_from) || empty($date_to)) {
                 wp_send_json_error(array(
                     'message' => 'Missing required parameters'
@@ -112,9 +106,6 @@ class YOLO_YS_Stripe_Handlers {
             // Get live price from Booking Manager API
             $api = new YOLO_YS_Booking_Manager_API();
             $result = $api->get_live_price($yacht_id, $date_from, $date_to);
-            
-            // DEBUG: Log API response
-            error_log('YOLO DEBUG - API result: ' . print_r($result, true));
             
             if ($result['success'] && $result['available']) {
                 wp_send_json_success(array(

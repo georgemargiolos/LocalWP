@@ -339,25 +339,13 @@ class YOLO_YS_Booking_Manager_API {
             'yachtId' => $yacht_id,
             'dateFrom' => $date_from_formatted,
             'dateTo' => $date_to_formatted,
-            'tripDuration' => 7, // Weekly charters
+            // REMOVED: tripDuration parameter causes HTTP 404 from API
+            // The API calculates duration from dateFrom/dateTo automatically
         );
         
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
         
-        // DEBUG: Log API request and response
-        error_log('YOLO DEBUG - get_live_price called with yacht_id: ' . $yacht_id);
-        error_log('YOLO DEBUG - Formatted dates: ' . $date_from_formatted . ' to ' . $date_to_formatted);
-        error_log('YOLO DEBUG - API result success: ' . ($result['success'] ? 'true' : 'false'));
-        if (isset($result['data'])) {
-            error_log('YOLO DEBUG - API data type: ' . gettype($result['data']));
-            error_log('YOLO DEBUG - API data count: ' . (is_array($result['data']) ? count($result['data']) : 'N/A'));
-        }
-        if (isset($result['error'])) {
-            error_log('YOLO DEBUG - API error: ' . $result['error']);
-        }
-        
-        // NOTE: API returns direct array, not wrapped in {"value": [...], "Count": N}
         // The make_request() method wraps it in ['success' => true, 'data' => [...]]
         // So we access $result['data'] directly
         if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
