@@ -37,6 +37,9 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database-prices.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-sync.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-price-formatter.php';
 
+// Load guest user management
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-guest-users.php';
+
 // Load Stripe PHP library
 if (file_exists(YOLO_YS_PLUGIN_DIR . 'stripe-php/init.php')) {
     require_once YOLO_YS_PLUGIN_DIR . 'stripe-php/init.php';

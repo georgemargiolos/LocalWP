@@ -23,6 +23,7 @@ class YOLO_YS_Yacht_Search {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-quote-handler.php';
         require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin.php';
+        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-guest-licenses.php';
         require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public.php';
         require_once YOLO_YS_PLUGIN_DIR . 'public/class-yolo-ys-public-search.php';
         
@@ -36,6 +37,12 @@ class YOLO_YS_Yacht_Search {
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
         $this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
         $this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
+        
+        // Initialize guest licenses admin panel
+        new YOLO_YS_Admin_Guest_Licenses();
+        
+        // Initialize guest users
+        new YOLO_YS_Guest_Users();
     }
     
     private function define_public_hooks() {

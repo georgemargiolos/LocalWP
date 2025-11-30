@@ -145,6 +145,7 @@ class YOLO_YS_Database {
             customer_email varchar(255) NOT NULL,
             customer_name varchar(255) NOT NULL,
             customer_phone varchar(50) DEFAULT NULL,
+            user_id bigint(20) DEFAULT NULL,
             stripe_session_id varchar(255) DEFAULT NULL,
             stripe_payment_intent varchar(255) DEFAULT NULL,
             payment_status varchar(50) DEFAULT 'pending',
@@ -157,8 +158,24 @@ class YOLO_YS_Database {
             PRIMARY KEY  (id),
             KEY yacht_id (yacht_id),
             KEY customer_email (customer_email),
+            KEY user_id (user_id),
             KEY stripe_session_id (stripe_session_id),
             KEY bm_reservation_id (bm_reservation_id)
+        ) $charset_collate;";
+        
+        // License uploads table
+        $table_license_uploads = $wpdb->prefix . 'yolo_license_uploads';
+        $sql_license_uploads = "CREATE TABLE {$table_license_uploads} (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            booking_id bigint(20) NOT NULL,
+            user_id bigint(20) NOT NULL,
+            file_type varchar(10) NOT NULL,
+            file_path text NOT NULL,
+            file_url text NOT NULL,
+            uploaded_at datetime NOT NULL,
+            PRIMARY KEY  (id),
+            KEY booking_id (booking_id),
+            KEY user_id (user_id)
         ) $charset_collate;";
         
         dbDelta($sql_yachts);
@@ -168,8 +185,9 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment);
         dbDelta($sql_equipment_catalog);
         dbDelta($sql_bookings);
+        dbDelta($sql_license_uploads);
         
-        update_option('yolo_ys_db_version', '1.4');
+        update_option('yolo_ys_db_version', '1.5');
     }
     
     /**

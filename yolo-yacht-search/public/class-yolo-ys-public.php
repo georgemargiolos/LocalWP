@@ -54,6 +54,16 @@ class YOLO_YS_Public {
                     $this->version
                 );
             }
+            
+            // Guest dashboard page CSS
+            if (has_shortcode($post->post_content, 'yolo_guest_dashboard')) {
+                wp_enqueue_style(
+                    'yolo-ys-guest-dashboard',
+                    YOLO_YS_PLUGIN_URL . 'public/css/guest-dashboard.css',
+                    array(),
+                    $this->version
+                );
+            }
         }
         
         // Booking confirmation page CSS

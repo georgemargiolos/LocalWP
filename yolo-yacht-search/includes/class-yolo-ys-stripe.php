@@ -264,6 +264,9 @@ class YOLO_YS_Stripe {
         
         $booking_id = $wpdb->insert_id;
         
+        // Create guest user account
+        $this->create_guest_user($booking_id, $customer_email, $customer_name, $session['id']);
+        
         // Create reservation in Booking Manager API
         $this->create_booking_manager_reservation($booking_id, $yacht_id, $date_from, $date_to, $customer_email, $customer_name);
         
@@ -394,5 +397,88 @@ class YOLO_YS_Stripe {
         wp_mail($to, $subject, $message, $headers);
         
         error_log('YOLO YS: Confirmation email sent to ' . $to);
+    }
+    
+    /**
+     * Create guest user account after successful booking
+     * 
+     * @param int $booking_id Booking ID
+     * @param string $customer_email Customer email
+     * @param string $customer_name Customer full name
+     * @param string $confirmation_number Stripe session ID used as confirmation
+     */
+    private function create_guest_user($booking_id, $customer_email, $customer_name, $confirmation_number) {
+        // Split customer name into first and last name
+        $name_parts = explode(' ', trim($customer_name), 2);
+        $customer_first_name = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
+        $customer_last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+        
+        // Create guest user
+        $guest_manager = new YOLO_YS_Guest_Users();
+        $result = $guest_manager->create_guest_user(
+            $booking_id,
+            $customer_email,
+            $customer_first_name,
+            $customer_last_name,
+            $booking_id // Use booking ID as confirmation number
+        );
+        
+        if ($result['success']) {
+            error_log('YOLO YS: Guest user created - User ID: ' . $result['user_id'] . ' for booking ID: ' . $booking_id);
+            
+            // Send guest login credentials email
+            $this->send_guest_credentials_email($booking_id, $customer_email, $customer_name, $result['username'], $result['password']);
+        } else {
+            error_log('YOLO YS: Failed to create guest user for booking ID: ' . $booking_id . ' - ' . $result['message']);
+        }
+    }
+    
+    /**
+     * Send guest login credentials email
+     * 
+     * @param int $booking_id Booking ID
+     * @param string $customer_email Customer email
+     * @param string $customer_name Customer name
+     * @param string $username Login username
+     * @param string $password Login password
+     */
+    private function send_guest_credentials_email($booking_id, $customer_email, $customer_name, $username, $password) {
+        // Only send if password was generated (new user)
+        if (!$password) {
+            return;
+        }
+        
+        $dashboard_page = get_page_by_path('guest-dashboard');
+        $dashboard_url = $dashboard_page ? get_permalink($dashboard_page->ID) : home_url();
+        $login_url = wp_login_url($dashboard_url);
+        
+        $to = $customer_email;
+        $subject = 'Your Guest Account - YOLO Charters';
+        
+        $message = sprintf(
+            "Dear %s,\n\n" .
+            "Your guest account has been created!\n\n" .
+            "Login Details:\n" .
+            "Username: %s\n" .
+            "Password: %s\n\n" .
+            "Login here: %s\n\n" .
+            "Once logged in, you can:\n" .
+            "- View your booking details\n" .
+            "- Upload your sailing license (front and back)\n" .
+            "- Track your charter information\n\n" .
+            "Please upload your sailing license before your charter date.\n\n" .
+            "Best regards,\n" .
+            "YOLO Charters Team",
+            $customer_name,
+            $username,
+            $password,
+            $login_url
+        );
+        
+        $headers = array('Content-Type: text/plain; charset=UTF-8');
+        
+        wp_mail($to, $subject, $message, $headers);
+        
+        error_log('YOLO YS: Guest credentials email sent to ' . $to);
     }
 }
