@@ -258,15 +258,15 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         
                         <?php if ($price->discount_percentage > 0): ?>
                             <div class="price-original">
-                                <span class="strikethrough"><?php echo number_format($price->start_price, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?></span>
+                                <span class="strikethrough"><?php echo number_format($price->start_price, 2, '.', ','); ?> <?php echo esc_html($price->currency); ?></span>
                             </div>
                             <div class="price-discount-badge">
-                                <?php echo number_format($price->discount_percentage, 2, ',', '.'); ?>% OFF - Save <?php echo number_format($discount_amount, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
+                                <?php echo number_format($price->discount_percentage, 2, '.', ','); ?>% OFF - Save <?php echo number_format($discount_amount, 2, '.', ','); ?> <?php echo esc_html($price->currency); ?>
                             </div>
                         <?php endif; ?>
                         
                         <div class="price-final">
-                            <?php echo number_format($price->price, 2, ',', '.'); ?> <?php echo esc_html($price->currency); ?>
+                            <?php echo number_format($price->price, 2, '.', ','); ?> <?php echo esc_html($price->currency); ?>
                         </div>
                         
                         <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>

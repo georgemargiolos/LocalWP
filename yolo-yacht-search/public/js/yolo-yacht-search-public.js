@@ -360,11 +360,11 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
-        // Helper function to format price with European formatting (dot for thousands, comma for decimals)
+        // Helper function to format price with standard formatting (comma for thousands, dot for decimals)
         const formatPrice = (price) => {
-            if (!price || isNaN(price)) return '0,00';
-            // Format with European style: 18.681,00
-            return Number(price).toLocaleString('de-DE', {
+            if (!price || isNaN(price)) return '0.00';
+            // Format with standard style: 18,681.00
+            return Number(price).toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });

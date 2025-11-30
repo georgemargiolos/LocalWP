@@ -5,7 +5,7 @@
 class YOLO_YS_Price_Formatter {
     
     /**
-     * Format price with proper European formatting
+     * Format price with standard formatting (comma for thousands, dot for decimals)
      * 
      * @param float $price Price amount
      * @param string $currency Currency code (EUR, USD, GBP)
@@ -17,18 +17,9 @@ class YOLO_YS_Price_Formatter {
             return '';
         }
         
-        // European format: 18.681,00 EUR (dot for thousands, comma for decimals)
-        // US format: 18,681.00 USD (comma for thousands, dot for decimals)
-        
+        // Standard format for all currencies: 18,681.00 (comma for thousands, dot for decimals)
         $decimals = $show_decimals ? 2 : 0;
-        
-        if ($currency === 'EUR') {
-            // European format
-            $formatted = number_format($price, $decimals, ',', '.');
-        } else {
-            // US/UK format
-            $formatted = number_format($price, $decimals, '.', ',');
-        }
+        $formatted = number_format($price, $decimals, '.', ',');
         
         return $formatted . ' ' . $currency;
     }
@@ -55,13 +46,8 @@ class YOLO_YS_Price_Formatter {
         $symbol = isset($symbols[$currency]) ? $symbols[$currency] : $currency;
         $decimals = $show_decimals ? 2 : 0;
         
-        if ($currency === 'EUR') {
-            // European format: €18.681,00
-            $formatted = $symbol . number_format($price, $decimals, ',', '.');
-        } else {
-            // US/UK format: $18,681.00
-            $formatted = $symbol . number_format($price, $decimals, '.', ',');
-        }
+        // Standard format for all currencies: comma for thousands, dot for decimals
+        $formatted = $symbol . number_format($price, $decimals, '.', ',');
         
         return $formatted;
     }

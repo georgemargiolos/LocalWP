@@ -140,13 +140,13 @@ function closeCustomDatesModal() {
     }
 }
 
-// Format price with European formatting (dot for thousands, comma for decimals)
+// Format price with standard formatting (comma for thousands, dot for decimals)
 function formatPrice(price) {
-    if (!price) return '0,00';
+    if (!price) return '0.00';
     // Convert to number and format with 2 decimals
     const num = Number(price);
-    // Format with European style: 18.681,00
-    return num.toLocaleString('de-DE', {
+    // Format with standard style: 18,681.00
+    return num.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -756,24 +756,16 @@ function closeBookingFormModal() {
     }
 }
 
-// Format price with proper European formatting (18.681,00 EUR)
+// Format price with standard formatting (18,681.00 for all currencies)
 function formatEuropeanPrice(price, currency) {
-    if (!price) return '0,00';
+    if (!price) return '0.00';
     
     const num = parseFloat(price);
-    if (currency === 'EUR') {
-        // European format: 18.681,00
-        return num.toLocaleString('de-DE', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    } else {
-        // US format: 18,681.00
-        return num.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-    }
+    // Standard format for all currencies: 18,681.00
+    return num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
 // Update price display with deposit information
