@@ -276,22 +276,24 @@ class YOLO_YS_Booking_Manager_API {
             'yachtId' => $yacht_id,
             'dateFrom' => $date_from,
             'dateTo' => $date_to,
+            'tripDuration' => 7, // Weekly charters
         );
         
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
         
-        if ($result['success'] && isset($result['data']['offers']) && count($result['data']['offers']) > 0) {
-            $offer = $result['data']['offers'][0];
+        // API returns array of offers directly in $result['data'], NOT $result['data']['offers']
+        if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
+            $offer = $result['data'][0];
             return array(
                 'success' => true,
                 'available' => true,
-                'price' => isset($offer['price']) ? $offer['price'] : 0,
-                'discount' => isset($offer['discount']) ? $offer['discount'] : 0,
-                'final_price' => isset($offer['finalPrice']) ? $offer['finalPrice'] : (isset($offer['price']) ? $offer['price'] : 0),
+                'price' => isset($offer['startPrice']) ? $offer['startPrice'] : (isset($offer['price']) ? $offer['price'] : 0),
+                'discount' => isset($offer['discountPercentage']) ? $offer['discountPercentage'] : 0,
+                'final_price' => isset($offer['price']) ? $offer['price'] : 0,
                 'currency' => isset($offer['currency']) ? $offer['currency'] : 'EUR',
             );
-        } else if ($result['success'] && isset($result['data']['offers']) && count($result['data']['offers']) === 0) {
+        } else if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) === 0) {
             // No offers found = yacht not available
             return array(
                 'success' => true,
