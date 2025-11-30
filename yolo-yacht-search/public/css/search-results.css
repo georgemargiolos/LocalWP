@@ -4,7 +4,7 @@ body .yolo-ys-search-results,
 .entry-content .yolo-ys-search-results,
 main .yolo-ys-search-results,
 .site-content .yolo-ys-search-results {
-    max-width: 1400px !important;
+    max-width: 1600px !important;
     margin: 0 auto !important;
     padding: 40px 20px !important;
     width: 100% !important;
@@ -17,7 +17,7 @@ main .yolo-ys-search-results,
 
 .yolo-ys-search-results {
     padding: 40px 20px !important;
-    max-width: 1400px !important;
+    max-width: 1600px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     width: 100% !important;
