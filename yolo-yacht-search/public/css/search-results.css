@@ -1,3 +1,20 @@
+/* Force centering at wrapper level to override theme */
+body .yolo-ys-search-results,
+#content .yolo-ys-search-results,
+.entry-content .yolo-ys-search-results,
+main .yolo-ys-search-results,
+.site-content .yolo-ys-search-results {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 40px 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+}
+
 .yolo-ys-search-results {
     padding: 40px 20px !important;
     max-width: 1400px !important;

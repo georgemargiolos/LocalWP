@@ -822,8 +822,7 @@ function updatePriceDisplayWithDeposit() {
         depositInfo.id = 'depositInfo';
         depositInfo.style.cssText = 'font-size: 14px; color: #6b7280; margin-top: 8px;';
         depositInfo.innerHTML = `
-            <div>Deposit (${depositPercentage}%): <strong>${formatEuropeanPrice(depositAmount, currency)} ${currency}</strong></div>
-            <div>Remaining: ${formatEuropeanPrice(remainingBalance, currency)} ${currency}</div>
+            <div style="font-size: 15px; color: #1f2937; font-weight: 500;">You pay <strong style="color: #b91c1c;">${depositPercentage}%</strong> (<strong style="color: #b91c1c;">${formatEuropeanPrice(depositAmount, currency)} ${currency}</strong>) to reserve this yacht</div>
         `;
         priceFinal.parentNode.appendChild(depositInfo);
     }
