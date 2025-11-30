@@ -433,11 +433,19 @@ function selectWeek(button) {
         priceFinal.textContent = formatPrice(price) + ' ' + currency;
     }
     
-    // Update date picker
+    // Update date picker - set flag to skip API call since we already have cached price
     if (window.yoloDatePicker && dateFrom && dateTo) {
         const from = new Date(dateFrom);
         const to = new Date(dateTo);
+        
+        // CRITICAL: Set flag to prevent API call - we're using cached carousel prices
+        skipApiCallForCarouselSelection = true;
         window.yoloDatePicker.setDateRange(from, to);
+        
+        // Reset flag after a short delay (in case event fires asynchronously)
+        setTimeout(() => {
+            skipApiCallForCarouselSelection = false;
+        }, 100);
     }
     
     // Scroll to top to show the updated price
@@ -770,6 +778,9 @@ function formatEuropeanPrice(price, currency) {
 let isInitialLoad = true;
 setTimeout(() => { isInitialLoad = false; }, 1000);
 
+// Flag to skip API call when date is set programmatically from carousel
+let skipApiCallForCarouselSelection = false;
+
 // Update price display with deposit information
 function updatePriceDisplayWithDeposit() {
     const depositPercentage = <?php echo intval(get_option('yolo_ys_deposit_percentage', 50)); ?>;
@@ -821,6 +832,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 isInitialLoad = false;
                 return; // Skip API call, use database prices from carousel
             }
+            
+            // CRITICAL FIX (v2.5.2): Skip API call when selecting from carousel
+            // Bug: Clicking "SELECT THIS WEEK" on carousel triggers date picker,
+            // which then calls API that may return empty (false "not available" error)
+            // Solution: Skip API call when dates are set programmatically from carousel
+            if (skipApiCallForCarouselSelection) {
+                console.log('YOLO YS: Skipping API call - dates set from carousel');
+                return; // Skip API call, use carousel prices
+            }
+            
             const dateFrom = date1.format('YYYY-MM-DD');
             const dateTo = date2.format('YYYY-MM-DD');
             
