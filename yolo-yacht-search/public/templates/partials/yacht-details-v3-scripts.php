@@ -768,6 +768,9 @@ function formatEuropeanPrice(price, currency) {
     });
 }
 
+// Flag to track if this is the initial page load
+let isInitialLoad = true;
+
 // Update price display with deposit information
 function updatePriceDisplayWithDeposit() {
     const depositPercentage = <?php echo intval(get_option('yolo_ys_deposit_percentage', 50)); ?>;
@@ -807,6 +810,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update when date picker changes
     if (window.yoloDatePicker) {
         window.yoloDatePicker.on('selected', function(date1, date2) {
+            // Skip API call on initial page load - use database prices from carousel
+            if (isInitialLoad) {
+                isInitialLoad = false;
+                return;
+            }
             const dateFrom = date1.format('YYYY-MM-DD');
             const dateTo = date2.format('YYYY-MM-DD');
             

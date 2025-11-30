@@ -272,10 +272,14 @@ class YOLO_YS_Booking_Manager_API {
      * Used for real-time price checking before booking
      */
     public function get_live_price($yacht_id, $date_from, $date_to) {
+        // Convert dates to required format: yyyy-MM-dd'T'HH:mm:ss
+        $date_from_formatted = date('Y-m-d', strtotime($date_from)) . 'T17:00:00';
+        $date_to_formatted = date('Y-m-d', strtotime($date_to)) . 'T17:00:00';
+        
         $params = array(
             'yachtId' => $yacht_id,
-            'dateFrom' => $date_from,
-            'dateTo' => $date_to,
+            'dateFrom' => $date_from_formatted,
+            'dateTo' => $date_to_formatted,
             'tripDuration' => 7, // Weekly charters
         );
         

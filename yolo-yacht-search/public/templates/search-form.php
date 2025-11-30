@@ -11,8 +11,8 @@
         <div class="yolo-ys-form-field">
             <label for="yolo-ys-boat-type"><?php _e('Boat Type', 'yolo-yacht-search'); ?></label>
             <select id="yolo-ys-boat-type" name="boat_type">
-                <option value=""><?php _e('All types', 'yolo-yacht-search'); ?></option>
-                <option value="Sailing yacht" selected><?php _e('Sailing yacht', 'yolo-yacht-search'); ?></option>
+                <option value="" selected><?php _e('All types', 'yolo-yacht-search'); ?></option>
+                <option value="Sailing yacht"><?php _e('Sailing yacht', 'yolo-yacht-search'); ?></option>
                 <option value="Catamaran"><?php _e('Catamaran', 'yolo-yacht-search'); ?></option>
             </select>
         </div>
