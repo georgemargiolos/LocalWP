@@ -39,11 +39,7 @@ class YOLO_YS_Booking_Manager_API {
         $result = $this->make_request($endpoint, $query_params);
         
         if ($result['success']) {
-            // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
-            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
-                return $result['data']['value'];
-            }
-            // Fallback for direct array response
+            // API returns direct array, make_request() wraps it in ['success' => true, 'data' => [...]]
             return $result['data'];
         }
         
@@ -104,11 +100,7 @@ class YOLO_YS_Booking_Manager_API {
         $result = $this->make_request($endpoint, $query_params);
         
         if ($result['success']) {
-            // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
-            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
-                return $result['data']['value'];
-            }
-            // Fallback for direct array response
+            // API returns direct array, make_request() wraps it in ['success' => true, 'data' => [...]]
             return $result['data'];
         }
         
@@ -353,30 +345,11 @@ class YOLO_YS_Booking_Manager_API {
         $endpoint = '/offers';
         $result = $this->make_request($endpoint, $params);
         
-        // CRITICAL FIX (v2.3.7): API returns { "value": [...], "Count": N } - extract the value array
-        // Bug was: Code expected direct array but API wraps in 'value' property
-        // This caused wrong prices or NULL values in price carousel
-        error_log('YOLO DEBUG get_live_price: API result = ' . print_r($result, true));
-        $offers_array = array();
-        if ($result['success'] && isset($result['data'])) {
-            error_log('YOLO DEBUG: result[data] = ' . print_r($result['data'], true));
-            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
-                $offers_array = $result['data']['value'];
-                error_log('YOLO DEBUG: Extracted from value array, count = ' . count($offers_array));
-            } elseif (is_array($result['data']) && isset($result['data'][0])) {
-                // Fallback for direct array response (shouldn't happen but safe)
-                $offers_array = $result['data'];
-                error_log('YOLO DEBUG: Used direct array fallback, count = ' . count($offers_array));
-            } else {
-                error_log('YOLO DEBUG: Could not extract offers array! data structure: ' . print_r($result['data'], true));
-            }
-        } else {
-            error_log('YOLO DEBUG: result[success]=' . ($result['success'] ? 'true' : 'false') . ', isset(data)=' . (isset($result['data']) ? 'true' : 'false'));
-        }
-        error_log('YOLO DEBUG: Final offers_array count = ' . count($offers_array));
-        
-        if ($result['success'] && count($offers_array) > 0) {
-            $offer = $offers_array[0];
+        // NOTE: API returns direct array, not wrapped in {"value": [...], "Count": N}
+        // The make_request() method wraps it in ['success' => true, 'data' => [...]]
+        // So we access $result['data'] directly
+        if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) > 0) {
+            $offer = $result['data'][0];
             
             $base_price = isset($offer['price']) ? $offer['price'] : 0;
             $start_price = isset($offer['startPrice']) ? $offer['startPrice'] : $base_price;
@@ -422,7 +395,7 @@ class YOLO_YS_Booking_Manager_API {
                 'extras_details' => $extras_details,
                 'currency' => isset($offer['currency']) ? $offer['currency'] : 'EUR',
             );
-        } else if ($result['success'] && count($offers_array) === 0) {
+        } else if ($result['success'] && isset($result['data']) && is_array($result['data']) && count($result['data']) === 0) {
             // No offers found = yacht not available
             return array(
                 'success' => true,
