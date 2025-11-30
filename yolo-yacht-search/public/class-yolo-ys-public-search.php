@@ -7,8 +7,7 @@
  * AJAX handler for yacht search - Query from DATABASE first
  */
 function yolo_ys_ajax_search_yachts() {
-    check_ajax_referer('yolo_ys_search_nonce', 'nonce');
-    
+    // Note: Search widget doesn't require nonce (public search functionality)
     global $wpdb;
     
     $date_from = sanitize_text_field($_POST['dateFrom']);
