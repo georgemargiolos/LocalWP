@@ -148,6 +148,10 @@ $sync_status = $sync->get_sync_status();
                 <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_balance_confirmation]</td>
                 <td style="padding: 12px; border: 1px solid #e5e7eb;">Balance payment confirmation page (shown after successful balance payment)</td>
             </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_guest_dashboard]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Guest dashboard with bookings and license upload (NEW in v2.5.6)</td>
+            </tr>
         </table>
     </div>
     
