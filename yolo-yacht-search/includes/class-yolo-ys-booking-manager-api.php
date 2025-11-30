@@ -127,6 +127,11 @@ class YOLO_YS_Booking_Manager_API {
         $result = $this->make_request($endpoint);
         
         if ($result['success']) {
+            // API returns { "value": [...], "Count": N } - extract the value array
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                return $result['data']['value'];
+            }
+            // Fallback for direct array response
             return $result['data'];
         }
         
@@ -140,6 +145,11 @@ class YOLO_YS_Booking_Manager_API {
         $result = $this->make_request($endpoint, $params);
         
         if ($result['success']) {
+            // API returns { "value": [...], "Count": N } - extract the value array
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                return $result['data']['value'];
+            }
+            // Fallback for direct array response
             return $result['data'];
         }
         
