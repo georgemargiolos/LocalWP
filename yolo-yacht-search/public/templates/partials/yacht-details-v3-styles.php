@@ -975,4 +975,237 @@
         font-size: 20px;
     }
 }
+
+/* Security Deposit Section */
+.deposit-section {
+    background: #f0fdf4;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.deposit-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.deposit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-amount {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    border: 2px solid #10b981;
+}
+
+.amount-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.deposit-info {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.deposit-info p {
+    margin: 0 0 15px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.deposit-info p:last-child {
+    margin-bottom: 0;
+}
+
+.deposit-note {
+    padding: 15px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+}
+
+/* Check-in/Check-out Section */
+.checkin-section {
+    background: #eff6ff;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.checkin-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.checkin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.checkin-item {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid #3b82f6;
+}
+
+.checkin-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.checkin-details {
+    flex: 1;
+}
+
+.checkin-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.checkin-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.checkin-info {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.checkin-info p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* Charter Company Section */
+.company-section {
+    background: #fef3c7;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.company-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.company-content {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+}
+
+.company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 10px;
+}
+
+.company-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.yolo-badge {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 2px solid #3b82f6;
+}
+
+.partner-badge {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 2px solid #6366f1;
+}
+
+.company-info p {
+    margin: 0 0 15px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.company-info p:last-child {
+    margin-bottom: 0;
+}
+
+.company-details {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.company-details p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.company-details strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .deposit-section,
+    .checkin-section,
+    .company-section {
+        padding: 20px;
+    }
+    
+    .deposit-amount {
+        padding: 20px;
+    }
+    
+    .amount-value {
+        font-size: 28px;
+    }
+    
+    .checkin-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .company-name {
+        font-size: 20px;
+    }
+}
 </style>

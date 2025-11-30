@@ -312,13 +312,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <div class="spec-value"><?php echo esc_html($yacht->wc); ?></div>
             <div class="spec-label">Head</div>
         </div>
-        <?php if (!empty($yacht->deposit)): ?>
-        <div class="spec-item">
-            <div class="spec-icon">🔒</div>
-            <div class="spec-value"><?php echo number_format($yacht->deposit, 0); ?> €</div>
-            <div class="spec-label">Security Deposit</div>
-        </div>
-        <?php endif; ?>
+
     </div>
     
     <!-- Description Section -->
@@ -466,6 +460,88 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             </div>
             <div class="policy-note">
                 <p><strong>Note:</strong> Cancellation must be made in writing. We strongly recommend purchasing travel insurance to cover unexpected cancellations.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Security Deposit Section -->
+    <?php if (!empty($yacht->deposit)): ?>
+    <div class="yacht-section deposit-section">
+        <h3>🔒 Security Deposit</h3>
+        <div class="deposit-content">
+            <div class="deposit-amount">
+                <span class="amount-value"><?php echo number_format($yacht->deposit, 0); ?> €</span>
+            </div>
+            <div class="deposit-info">
+                <p>A security deposit of <strong><?php echo number_format($yacht->deposit, 0); ?> €</strong> is required at check-in. This deposit is held as a guarantee against any damage to the yacht or its equipment during your charter period.</p>
+                <p>The deposit will be fully refunded after check-out, provided the yacht is returned in the same condition as received, with no damages or missing equipment.</p>
+                <p class="deposit-note"><strong>Payment method:</strong> The deposit is typically held via credit card authorization or bank transfer. Please confirm the exact payment method with the charter company before your departure.</p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    
+    <!-- Check-in / Check-out Section -->
+    <div class="yacht-section checkin-section">
+        <h3>⏰ Check-in & Check-out</h3>
+        <div class="checkin-content">
+            <div class="checkin-grid">
+                <?php if (!empty($yacht->checkin_time)): ?>
+                <div class="checkin-item">
+                    <div class="checkin-icon">✅</div>
+                    <div class="checkin-details">
+                        <div class="checkin-label">Check-in Time</div>
+                        <div class="checkin-value"><?php echo esc_html($yacht->checkin_time); ?></div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($yacht->checkout_time)): ?>
+                <div class="checkin-item">
+                    <div class="checkin-icon">❌</div>
+                    <div class="checkin-details">
+                        <div class="checkin-label">Check-out Time</div>
+                        <div class="checkin-value"><?php echo esc_html($yacht->checkout_time); ?></div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($yacht->checkin_day)): ?>
+                <?php 
+                $days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                $day_name = isset($days[$yacht->checkin_day - 1]) ? $days[$yacht->checkin_day - 1] : '';
+                ?>
+                <div class="checkin-item">
+                    <div class="checkin-icon">📅</div>
+                    <div class="checkin-details">
+                        <div class="checkin-label">Check-in Day</div>
+                        <div class="checkin-value"><?php echo esc_html($day_name); ?></div>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+            <div class="checkin-info">
+                <p>Please arrive at the marina at the specified check-in time. Late arrivals should be communicated to the charter company in advance. Early check-in may be available upon request and subject to availability.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charter Company Section -->
+    <div class="yacht-section company-section">
+        <h3>⚓ Charter Company</h3>
+        <div class="company-content">
+            <div class="company-info">
+                <?php if ($yacht->company_id == 7850): ?>
+                    <div class="company-name">YOLO Charters</div>
+                    <div class="company-badge yolo-badge">⭐ Our Fleet</div>
+                    <p>This yacht is part of the YOLO Charters premium fleet. You'll receive direct service from our experienced team, ensuring the highest standards of quality and customer care.</p>
+                <?php else: ?>
+                    <div class="company-name">Partner Charter Company</div>
+                    <div class="company-badge partner-badge">🤝 Trusted Partner</div>
+                    <p>This yacht is operated by one of our carefully selected partner companies. All our partners meet strict quality standards and are fully licensed and insured.</p>
+                <?php endif; ?>
+                <div class="company-details">
+                    <p><strong>Base Location:</strong> <?php echo !empty($yacht->home_base) ? esc_html($yacht->home_base) : 'Contact for details'; ?></p>
+                    <p><strong>Company ID:</strong> #<?php echo esc_html($yacht->company_id); ?></p>
+                </div>
             </div>
         </div>
     </div>
