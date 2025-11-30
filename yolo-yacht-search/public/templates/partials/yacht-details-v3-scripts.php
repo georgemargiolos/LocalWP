@@ -190,27 +190,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Format all prices on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Format prices in carousel
-    document.querySelectorAll('.price-original span, .price-final, .price-discount-badge').forEach(function(el) {
-        const text = el.textContent.trim();
-        console.log('Carousel price text:', text);
-        const match = text.match(/([\d,]+(?:\.\d+)?)\s*([A-Z]{3})/); // FIXED (v2.3.8): Handle comma-separated thousands (e.g., 2,925.00)
-        if (match) {
-            const priceStr = match[1].replace(/,/g, ''); // Remove commas before formatting
-            const currency = match[2];
-            console.log('Matched price:', match[1], '→ Cleaned:', priceStr, '→ Number:', Number(priceStr));
-            const formatted = formatPrice(priceStr);
-            console.log('Formatted:', formatted);
-            if (formatted && formatted !== 'NaN') {
-                el.textContent = formatted + ' ' + currency;
-            } else {
-                console.error('formatPrice returned NaN for:', priceStr);
-                // Don't change the text if formatting fails
-            }
-        }
-    });
+    // NOTE: Carousel prices are already correctly formatted by PHP from database
+    // DO NOT reformat them with JavaScript - it causes NaN errors!
+    // Only format the price display box which gets updated by live API calls
     
-    // Format prices in price display box
+    // Format prices in price display box (for live API updates)
     const priceOriginal = document.getElementById('selectedPriceOriginal');
     const priceFinal = document.getElementById('selectedPriceFinal');
     const priceDiscount = document.getElementById('selectedPriceDiscount');
