@@ -1,9 +1,11 @@
 .yolo-ys-search-results {
-    padding: 40px 20px;
-    max-width: 1400px;
-    margin: 0 auto !important;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 40px 20px !important;
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
 }
 
 .yolo-ys-results-header {
