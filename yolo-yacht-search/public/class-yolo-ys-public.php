@@ -31,6 +31,40 @@ class YOLO_YS_Public {
             array(),
             $this->version
         );
+        
+        // Template-specific CSS
+        global $post;
+        if (is_a($post, 'WP_Post')) {
+            // Search results page CSS
+            if (has_shortcode($post->post_content, 'yolo_yacht_search')) {
+                wp_enqueue_style(
+                    'yolo-ys-search-results',
+                    YOLO_YS_PLUGIN_URL . 'public/css/search-results.css',
+                    array(),
+                    $this->version
+                );
+            }
+            
+            // Our fleet page CSS
+            if (has_shortcode($post->post_content, 'yolo_our_fleet')) {
+                wp_enqueue_style(
+                    'yolo-ys-our-fleet',
+                    YOLO_YS_PLUGIN_URL . 'public/css/our-fleet.css',
+                    array(),
+                    $this->version
+                );
+            }
+        }
+        
+        // Booking confirmation page CSS
+        if (isset($_GET['session_id'])) {
+            wp_enqueue_style(
+                'yolo-ys-booking-confirmation',
+                YOLO_YS_PLUGIN_URL . 'public/css/booking-confirmation.css',
+                array(),
+                $this->version
+            );
+        }
     }
     
     /**
