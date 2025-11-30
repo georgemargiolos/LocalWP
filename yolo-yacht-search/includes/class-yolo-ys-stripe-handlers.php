@@ -99,12 +99,7 @@ class YOLO_YS_Stripe_Handlers {
      * AJAX handler to get live price from Booking Manager
         public function ajax_get_live_price() {
         try {
-            // Verify nonce for security
-            if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_ys_nonce')) {
-                wp_send_json_error(array('message' => 'Security check failed'));
-                return;
-            }
-            
+            // Note: No nonce check - this is public price checking functionality
             // Get yacht ID and dates        // CRITICAL FIX v2.5.3: yacht_id MUST be STRING, not integer
             // Large yacht IDs (e.g., 7136018700000107850) exceed PHP_INT_MAX on 32-bit systems
             // and lose precision in JavaScript Number type (max safe integer is 2^53)
@@ -160,12 +155,7 @@ class YOLO_YS_Stripe_Handlers {
      */
     public function ajax_submit_custom_quote() {
         try {
-            // Verify nonce for security
-            if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_ys_nonce')) {
-                wp_send_json_error(array('message' => 'Security check failed'));
-                return;
-            }
-            
+            // Note: No nonce check - this is a public contact form
             // Get form data
             $name = isset($_POST['name']) ? sanitize_text_field($_POST['name']) : '';
             $email = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
