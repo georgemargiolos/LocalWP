@@ -10,6 +10,8 @@ class YOLO_YS_Shortcodes {
         add_shortcode('yolo_our_fleet', array($this, 'our_fleet_shortcode'));
         add_shortcode('yolo_yacht_details', array($this, 'yacht_details_shortcode'));
         add_shortcode('yolo_booking_confirmation', array($this, 'booking_confirmation_shortcode'));
+        add_shortcode('yolo_balance_payment', array($this, 'balance_payment_shortcode'));
+        add_shortcode('yolo_balance_confirmation', array($this, 'balance_confirmation_shortcode'));
     }
     
     /**
@@ -54,6 +56,24 @@ class YOLO_YS_Shortcodes {
     public function booking_confirmation_shortcode($atts) {
         ob_start();
         include YOLO_YS_PLUGIN_DIR . 'public/templates/booking-confirmation.php';
+        return ob_get_clean();
+    }
+    
+    /**
+     * Balance Payment shortcode - allows customers to pay remaining balance
+     */
+    public function balance_payment_shortcode($atts) {
+        ob_start();
+        include YOLO_YS_PLUGIN_DIR . 'public/templates/balance-payment.php';
+        return ob_get_clean();
+    }
+    
+    /**
+     * Balance Confirmation shortcode - displays confirmation after balance payment
+     */
+    public function balance_confirmation_shortcode($atts) {
+        ob_start();
+        include YOLO_YS_PLUGIN_DIR . 'public/templates/balance-confirmation.php';
         return ob_get_clean();
     }
 }

@@ -65,6 +65,16 @@ class YOLO_YS_Public {
                 $this->version
             );
         }
+        
+        // Balance payment page CSS
+        if (isset($_GET['ref']) || (is_a($post, 'WP_Post') && (has_shortcode($post->post_content, 'yolo_balance_payment') || has_shortcode($post->post_content, 'yolo_balance_confirmation')))) {
+            wp_enqueue_style(
+                'yolo-ys-balance-payment',
+                YOLO_YS_PLUGIN_URL . 'public/css/balance-payment.css',
+                array(),
+                $this->version
+            );
+        }
     }
     
     /**

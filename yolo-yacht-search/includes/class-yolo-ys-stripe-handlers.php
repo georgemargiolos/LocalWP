@@ -9,6 +9,9 @@ class YOLO_YS_Stripe_Handlers {
         add_action('wp_ajax_yolo_create_checkout_session', array($this, 'ajax_create_checkout_session'));
         add_action('wp_ajax_nopriv_yolo_create_checkout_session', array($this, 'ajax_create_checkout_session'));
         
+        add_action('wp_ajax_yolo_create_balance_checkout', array($this, 'ajax_create_balance_checkout'));
+        add_action('wp_ajax_nopriv_yolo_create_balance_checkout', array($this, 'ajax_create_balance_checkout'));
+        
         add_action('wp_ajax_yolo_get_live_price', array($this, 'ajax_get_live_price'));
         add_action('wp_ajax_nopriv_yolo_get_live_price', array($this, 'ajax_get_live_price'));
         
@@ -195,6 +198,71 @@ class YOLO_YS_Stripe_Handlers {
             'callback' => array($this, 'handle_stripe_webhook'),
             'permission_callback' => '__return_true', // Stripe will verify via signature
         ));
+    }
+    
+    /**
+     * AJAX handler to create Stripe Checkout Session for balance payment
+     */
+    public function ajax_create_balance_checkout() {
+        try {
+            // Get booking ID
+            $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
+            
+            if (!$booking_id) {
+                wp_send_json_error(array('message' => 'Invalid booking ID'));
+                return;
+            }
+            
+            // Get booking from database
+            global $wpdb;
+            $table_bookings = $wpdb->prefix . 'yolo_bookings';
+            $booking = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$table_bookings} WHERE id = %d",
+                $booking_id
+            ));
+            
+            if (!$booking) {
+                wp_send_json_error(array('message' => 'Booking not found'));
+                return;
+            }
+            
+            // Check if already paid
+            if ($booking->payment_status === 'fully_paid') {
+                wp_send_json_error(array('message' => 'This booking is already fully paid'));
+                return;
+            }
+            
+            // Check if there's a balance to pay
+            if ($booking->remaining_balance <= 0) {
+                wp_send_json_error(array('message' => 'No balance due for this booking'));
+                return;
+            }
+            
+            // Create Stripe session for balance payment
+            $stripe = new YOLO_YS_Stripe();
+            $session_url = $stripe->create_balance_checkout_session(
+                $booking->id,
+                $booking->yacht_id,
+                $booking->yacht_name,
+                $booking->date_from,
+                $booking->date_to,
+                $booking->remaining_balance,
+                $booking->currency,
+                $booking->customer_name,
+                $booking->customer_email,
+                $booking->customer_phone
+            );
+            
+            if ($session_url) {
+                wp_send_json_success(array('url' => $session_url));
+            } else {
+                wp_send_json_error(array('message' => 'Failed to create payment session'));
+            }
+            
+        } catch (Exception $e) {
+            error_log('YOLO YS: Balance checkout error - ' . $e->getMessage());
+            wp_send_json_error(array('message' => $e->getMessage()));
+        }
     }
     
     /**

@@ -112,6 +112,72 @@ class YOLO_YS_Stripe {
     }
     
     /**
+     * Create Stripe Checkout Session for balance payment
+     */
+    public function create_balance_checkout_session($booking_id, $yacht_id, $yacht_name, $date_from, $date_to, $balance_amount, $currency, $customer_name, $customer_email, $customer_phone) {
+        try {
+            \Stripe\Stripe::setApiKey($this->secret_key);
+            
+            // Create Checkout Session
+            $session = \Stripe\Checkout\Session::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => strtolower($currency),
+                        'product_data' => [
+                            'name' => $yacht_name . ' - Balance Payment',
+                            'description' => 'Charter from ' . date('M j, Y', strtotime($date_from)) . ' to ' . date('M j, Y', strtotime($date_to)),
+                        ],
+                        'unit_amount' => intval($balance_amount * 100), // Convert to cents
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => $this->get_balance_success_url() . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => $this->get_balance_cancel_url(),
+                'customer_email' => $customer_email,
+                'metadata' => [
+                    'booking_id' => $booking_id,
+                    'yacht_id' => $yacht_id,
+                    'yacht_name' => $yacht_name,
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'balance_amount' => $balance_amount,
+                    'currency' => $currency,
+                    'customer_name' => $customer_name,
+                    'customer_email' => $customer_email,
+                    'customer_phone' => $customer_phone,
+                    'payment_type' => 'balance',
+                ],
+            ]);
+            
+            return $session->url;
+            
+        } catch (Exception $e) {
+            error_log('YOLO YS Stripe: Failed to create balance checkout session - ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get balance payment success URL
+     */
+    private function get_balance_success_url() {
+        $page_id = get_option('yolo_ys_balance_confirmation_page_id');
+        if ($page_id) {
+            return get_permalink($page_id);
+        }
+        return home_url('/balance-confirmation');
+    }
+    
+    /**
+     * Get balance payment cancel URL
+     */
+    private function get_balance_cancel_url() {
+        return home_url('/balance-payment');
+    }
+    
+    /**
      * Handle Stripe webhook events
      */
     public function handle_webhook() {
