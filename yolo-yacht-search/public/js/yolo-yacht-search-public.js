@@ -346,18 +346,20 @@
     /**
      * Render boat card
      * 
-     * UPDATED (v2.3.7): Match "Our Yachts" design for consistency
-     * - Split yacht name and model into two lines
-     * - Show Cabins, Built year, Length (instead of Cabins, Length, Berths)
-     * - Red button instead of blue
-     * - Cleaner price display (green box, centered)
+     * UPDATED (v2.5.4): Complete redesign to match "Our Yachts" section
+     * - Strikethrough original price when discounted
+     * - Discount percentage badge (red)
+     * - Final discounted price (prominent, green)
+     * - 3-column grid layout
+     * - Modern card design with hover effects
+     * - Proper image handling with aspect ratio
      */
     function renderBoatCard(boat, isYolo) {
         const yoloClass = isYolo ? 'yolo-yacht' : '';
         
         // Image or placeholder
         const imageHtml = boat.image_url 
-            ? `<img src="${boat.image_url}" alt="${boat.yacht}">` 
+            ? `<img src="${boat.image_url}" alt="${boat.yacht}" loading="lazy">` 
             : '<div class="yolo-ys-yacht-placeholder">⛵</div>';
         
         // Details URL
@@ -391,21 +393,56 @@
             refitDisplay = `<span class="yolo-ys-refit-note">Refit: ${boat.refit_year}</span>`;
         }
         
-        // Price display - cleaner format matching "Our Yachts"
-        const priceHtml = `
-            <div class="yolo-ys-yacht-price">
-                From <strong>${formatPrice(boat.price)} ${boat.currency}</strong> per week
-            </div>
-        `;
+        // Price display with discount logic
+        let priceHtml = '';
+        
+        // Check if we have discount information
+        const hasDiscount = boat.original_price && boat.discount_percentage && 
+                           parseFloat(boat.original_price) > parseFloat(boat.price);
+        
+        if (hasDiscount) {
+            // Show original price (strikethrough), discount badge, and final price
+            const originalPrice = parseFloat(boat.original_price);
+            const finalPrice = parseFloat(boat.price);
+            const discountPercent = Math.round(parseFloat(boat.discount_percentage));
+            
+            priceHtml = `
+                <div class="yolo-ys-yacht-price-container">
+                    <div class="yolo-ys-price-original">
+                        <span class="yolo-ys-price-strikethrough">${formatPrice(originalPrice)} ${boat.currency}</span>
+                    </div>
+                    <div class="yolo-ys-price-discount-row">
+                        <span class="yolo-ys-discount-badge">-${discountPercent}%</span>
+                        <div class="yolo-ys-price-final">
+                            <strong>${formatPrice(finalPrice)} ${boat.currency}</strong>
+                            <span class="yolo-ys-price-period">per week</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // No discount - show regular price
+            priceHtml = `
+                <div class="yolo-ys-yacht-price-container">
+                    <div class="yolo-ys-price-final">
+                        From <strong>${formatPrice(boat.price)} ${boat.currency}</strong>
+                        <span class="yolo-ys-price-period">per week</span>
+                    </div>
+                </div>
+            `;
+        }
         
         return `
             <div class="yolo-ys-yacht-card ${yoloClass}">
                 <div class="yolo-ys-yacht-image">
-                    ${imageHtml}
+                    <a href="${detailsUrl}">
+                        ${imageHtml}
+                    </a>
                 </div>
                 <div class="yolo-ys-yacht-content">
                     <div class="yolo-ys-yacht-location">
-                        📍 ${boat.startBase || 'Location not specified'}
+                        <span class="yolo-ys-location-icon">📍</span>
+                        <span class="yolo-ys-location-text">${boat.startBase || 'Location not specified'}</span>
                     </div>
                     <div class="yolo-ys-yacht-header">
                         <h3 class="yolo-ys-yacht-name">${yachtName}</h3>
