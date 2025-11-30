@@ -1,0 +1,224 @@
+<?php
+/**
+ * Admin Bookings Manager - Actions and Utilities
+ *
+ * @package    YOLO_Yacht_Search
+ * @subpackage YOLO_Yacht_Search/admin
+ */
+
+class YOLO_YS_Admin_Bookings_Manager {
+    
+    /**
+     * Send payment reminder email
+     */
+    public static function send_payment_reminder($booking_id) {
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table_bookings} WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking || $booking->payment_status !== 'deposit_paid') {
+            return false;
+        }
+        
+        $booking_reference = !empty($booking->bm_reservation_id) 
+            ? 'BM-' . $booking->bm_reservation_id 
+            : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+        
+        $to = $booking->customer_email;
+        $subject = 'Payment Reminder - ' . $booking->yacht_name;
+        
+        $message = sprintf(
+            "Dear %s,\n\n" .
+            "This is a friendly reminder about your upcoming yacht charter.\n\n" .
+            "Booking Reference: %s\n" .
+            "Yacht: %s\n" .
+            "Charter Dates: %s to %s\n\n" .
+            "Payment Summary:\n" .
+            "Total Price: %s\n" .
+            "Deposit Paid: %s\n" .
+            "Remaining Balance: %s\n\n" .
+            "Please complete your payment before your charter date.\n\n" .
+            "If you have already paid, please disregard this message.\n\n" .
+            "Best regards,\n" .
+            "YOLO Charters Team",
+            $booking->customer_name,
+            $booking_reference,
+            $booking->yacht_name,
+            date('F j, Y', strtotime($booking->date_from)),
+            date('F j, Y', strtotime($booking->date_to)),
+            YOLO_YS_Price_Formatter::format_price($booking->total_price, $booking->currency),
+            YOLO_YS_Price_Formatter::format_price($booking->deposit_paid, $booking->currency),
+            YOLO_YS_Price_Formatter::format_price($booking->remaining_balance, $booking->currency)
+        );
+        
+        $headers = array('Content-Type: text/plain; charset=UTF-8');
+        
+        return wp_mail($to, $subject, $message, $headers);
+    }
+    
+    /**
+     * Mark booking as fully paid
+     */
+    public static function mark_as_paid($booking_id) {
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        $result = $wpdb->update(
+            $table_bookings,
+            array(
+                'payment_status' => 'fully_paid',
+                'deposit_paid' => $wpdb->get_var($wpdb->prepare(
+                    "SELECT total_price FROM {$table_bookings} WHERE id = %d",
+                    $booking_id
+                )),
+                'remaining_balance' => 0
+            ),
+            array('id' => $booking_id),
+            array('%s', '%f', '%f'),
+            array('%d')
+        );
+        
+        if ($result) {
+            // Send confirmation email
+            $booking = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$table_bookings} WHERE id = %d",
+                $booking_id
+            ));
+            
+            if ($booking) {
+                $booking_reference = !empty($booking->bm_reservation_id) 
+                    ? 'BM-' . $booking->bm_reservation_id 
+                    : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+                
+                $to = $booking->customer_email;
+                $subject = 'Payment Confirmed - ' . $booking->yacht_name;
+                
+                $message = sprintf(
+                    "Dear %s,\n\n" .
+                    "We have received your final payment. Your booking is now fully paid!\n\n" .
+                    "Booking Reference: %s\n" .
+                    "Yacht: %s\n" .
+                    "Charter Dates: %s to %s\n" .
+                    "Total Paid: %s\n\n" .
+                    "We look forward to welcoming you aboard!\n\n" .
+                    "Best regards,\n" .
+                    "YOLO Charters Team",
+                    $booking->customer_name,
+                    $booking_reference,
+                    $booking->yacht_name,
+                    date('F j, Y', strtotime($booking->date_from)),
+                    date('F j, Y', strtotime($booking->date_to)),
+                    YOLO_YS_Price_Formatter::format_price($booking->total_price, $booking->currency)
+                );
+                
+                $headers = array('Content-Type: text/plain; charset=UTF-8');
+                wp_mail($to, $subject, $message, $headers);
+            }
+        }
+        
+        return $result !== false;
+    }
+    
+    /**
+     * Export bookings to CSV
+     */
+    public static function export_to_csv() {
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        // Get filters from URL
+        $where = array('1=1');
+        $where_values = array();
+        
+        if (!empty($_GET['payment_status'])) {
+            $where[] = 'payment_status = %s';
+            $where_values[] = sanitize_text_field($_GET['payment_status']);
+        }
+        
+        if (!empty($_GET['yacht_id'])) {
+            $where[] = 'yacht_id = %d';
+            $where_values[] = intval($_GET['yacht_id']);
+        }
+        
+        $where_clause = implode(' AND ', $where);
+        
+        // Get bookings
+        if (!empty($where_values)) {
+            $bookings = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM {$table_bookings} WHERE {$where_clause} ORDER BY created_at DESC",
+                $where_values
+            ), ARRAY_A);
+        } else {
+            $bookings = $wpdb->get_results(
+                "SELECT * FROM {$table_bookings} WHERE {$where_clause} ORDER BY created_at DESC",
+                ARRAY_A
+            );
+        }
+        
+        // Set headers for CSV download
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=yolo-bookings-' . date('Y-m-d') . '.csv');
+        
+        // Create output stream
+        $output = fopen('php://output', 'w');
+        
+        // Add BOM for Excel UTF-8 support
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+        
+        // Add headers
+        fputcsv($output, array(
+            'ID',
+            'Booking Reference',
+            'Created Date',
+            'Yacht ID',
+            'Yacht Name',
+            'Customer Name',
+            'Customer Email',
+            'Customer Phone',
+            'Charter From',
+            'Charter To',
+            'Total Price',
+            'Deposit Paid',
+            'Remaining Balance',
+            'Currency',
+            'Payment Status',
+            'Booking Status',
+            'Stripe Session ID',
+            'BM Reservation ID'
+        ));
+        
+        // Add data
+        foreach ($bookings as $booking) {
+            $booking_reference = !empty($booking['bm_reservation_id']) 
+                ? 'BM-' . $booking['bm_reservation_id'] 
+                : 'YOLO-' . date('Y') . '-' . str_pad($booking['id'], 4, '0', STR_PAD_LEFT);
+            
+            fputcsv($output, array(
+                $booking['id'],
+                $booking_reference,
+                $booking['created_at'],
+                $booking['yacht_id'],
+                $booking['yacht_name'],
+                $booking['customer_name'],
+                $booking['customer_email'],
+                $booking['customer_phone'],
+                $booking['date_from'],
+                $booking['date_to'],
+                $booking['total_price'],
+                $booking['deposit_paid'],
+                $booking['remaining_balance'],
+                $booking['currency'],
+                $booking['payment_status'],
+                $booking['booking_status'],
+                $booking['stripe_session_id'],
+                $booking['bm_reservation_id']
+            ));
+        }
+        
+        fclose($output);
+    }
+}

@@ -28,6 +28,17 @@ class YOLO_YS_Admin {
             array(),
             $this->version
         );
+        
+        // Enqueue bookings CSS on bookings page
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-ys-bookings') {
+            wp_enqueue_style(
+                'yolo-ys-admin-bookings',
+                YOLO_YS_PLUGIN_URL . 'admin/css/admin-bookings.css',
+                array(),
+                $this->version
+            );
+        }
     }
     
     /**
@@ -63,6 +74,16 @@ class YOLO_YS_Admin {
             'dashicons-palmtree',
             30
         );
+        
+        // Add Bookings submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Bookings', 'yolo-yacht-search'),
+            __('Bookings', 'yolo-yacht-search'),
+            'manage_options',
+            'yolo-ys-bookings',
+            array($this, 'display_bookings_page')
+        );
     }
     
     /**
@@ -70,6 +91,18 @@ class YOLO_YS_Admin {
      */
     public function display_plugin_admin_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yolo-yacht-search-admin-display.php';
+    }
+    
+    /**
+     * Display bookings page
+     */
+    public function display_bookings_page() {
+        // Load required classes
+        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings.php';
+        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings-manager.php';
+        
+        // Display bookings list
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/bookings-list.php';
     }
     
     /**
