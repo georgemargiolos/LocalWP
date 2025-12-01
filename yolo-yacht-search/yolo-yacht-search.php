@@ -86,7 +86,7 @@ run_yolo_yacht_search();
  */
 function yolo_ys_check_db_version() {
     $current_db_version = get_option('yolo_ys_db_version', '1.0');
-    $required_db_version = '1.2';
+    $required_db_version = '1.6'; // Updated for Skipper 2 and Crew List feature
     
     if (version_compare($current_db_version, $required_db_version, '<')) {
         error_log('YOLO YS: Database version outdated. Running migrations...');

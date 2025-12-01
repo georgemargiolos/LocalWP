@@ -102,6 +102,13 @@ class YOLO_YS_Admin_Guest_Licenses {
 	            if (!isset($grouped_licenses[$booking_id])) {
 	                // Fetch booking info for crew-only bookings
 	                $booking_info = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_bookings} WHERE id = %d", $booking_id));
+	                
+	                // CRITICAL FIX: Check if booking info exists before proceeding
+	                if (!$booking_info) {
+	                    // If the booking is deleted or not found, skip this crew list entry
+	                    continue;
+	                }
+	                
 	                $user_info = $wpdb->get_row($wpdb->prepare("SELECT display_name FROM {$wpdb->users} WHERE ID = %d", $crew_list[0]->user_id));
 	                
 	                $grouped_licenses[$booking_id] = array(
