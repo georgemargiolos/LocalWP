@@ -169,7 +169,7 @@ class YOLO_YS_Database {
             id bigint(20) NOT NULL AUTO_INCREMENT,
             booking_id bigint(20) NOT NULL,
             user_id bigint(20) NOT NULL,
-            file_type varchar(10) NOT NULL,
+            file_type varchar(20) NOT NULL,
             file_path text NOT NULL,
             file_url text NOT NULL,
             uploaded_at datetime NOT NULL,
@@ -186,8 +186,31 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment_catalog);
         dbDelta($sql_bookings);
         dbDelta($sql_license_uploads);
+
+        // Crew list table
+        $table_crew_list = $wpdb->prefix . 'yolo_crew_list';
+        $sql_crew_list = "CREATE TABLE {$table_crew_list} (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            booking_id bigint(20) NOT NULL,
+            user_id bigint(20) NOT NULL,
+            crew_member_index int(2) NOT NULL,
+            first_name varchar(100) NOT NULL,
+            last_name varchar(100) NOT NULL,
+            sex varchar(10) NOT NULL,
+            id_type varchar(20) NOT NULL,
+            id_number varchar(100) NOT NULL,
+            birth_date date NOT NULL,
+            role varchar(20) NOT NULL,
+            mobile_number varchar(50) NOT NULL,
+            nationality varchar(100) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY booking_member (booking_id, crew_member_index),
+            KEY user_id (user_id)
+        ) $charset_collate;";
+        dbDelta($sql_crew_list);
         
-        update_option('yolo_ys_db_version', '1.5');
+        update_option('yolo_ys_db_version', '1.6');
     }
     
     /**

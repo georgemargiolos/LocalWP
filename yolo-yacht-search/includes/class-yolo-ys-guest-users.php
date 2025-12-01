@@ -21,6 +21,7 @@ class YOLO_YS_Guest_Users {
         
         // AJAX handlers
         add_action('wp_ajax_yolo_upload_license', array($this, 'ajax_upload_license'));
+        add_action('wp_ajax_yolo_save_crew_list', array($this, 'ajax_save_crew_list'));
     }
     
     /**
@@ -225,6 +226,12 @@ class YOLO_YS_Guest_Users {
             $licenses[$booking->id] = $booking_licenses;
         }
         
+        // Localize script with fresh nonce
+        wp_localize_script('jquery', 'yolo_guest_vars', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('yolo_upload_license')
+        ));
+        
         ob_start();
         include plugin_dir_path(dirname(__FILE__)) . 'public/partials/yolo-ys-guest-dashboard.php';
         return ob_get_clean();
@@ -235,11 +242,47 @@ class YOLO_YS_Guest_Users {
      */
     public function ajax_upload_license() {
         try {
-            // Verify nonce
-            if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_upload_license')) {
-                wp_send_json_error(array('message' => 'Security check failed'));
+            // Debug logging
+            error_log('YOLO YS License Upload: Starting upload handler');
+            error_log('YOLO YS License Upload: POST data - ' . print_r($_POST, true));
+            
+            // Verify nonce - check both possible field names
+            $nonce = '';
+            if (isset($_POST['nonce'])) {
+                $nonce = $_POST['nonce'];
+            } elseif (isset($_POST['_wpnonce'])) {
+                $nonce = $_POST['_wpnonce'];
+            } elseif (isset($_REQUEST['nonce'])) {
+                $nonce = $_REQUEST['nonce'];
+            }
+            
+            error_log('YOLO YS License Upload: Nonce received - ' . $nonce);
+            
+            if (empty($nonce)) {
+                error_log('YOLO YS License Upload: No nonce found in request');
+                wp_send_json_error(array('message' => 'Security token missing. Please refresh the page and try again.'));
                 return;
             }
+            
+            // Verify nonce
+            $nonce_valid = wp_verify_nonce($nonce, 'yolo_upload_license');
+            error_log('YOLO YS License Upload: Nonce verification result - ' . ($nonce_valid ? 'valid' : 'invalid'));
+            
+            if (!$nonce_valid) {
+                // Try alternative nonce action names
+                $nonce_valid = wp_verify_nonce($nonce, 'yolo_license_upload');
+                if (!$nonce_valid) {
+                    $nonce_valid = wp_verify_nonce($nonce, 'yolo-upload-license');
+                }
+            }
+            
+            if (!$nonce_valid) {
+                error_log('YOLO YS License Upload: Nonce verification failed');
+                wp_send_json_error(array('message' => 'Security check failed. Please refresh the page and try again.'));
+                return;
+            }
+            
+            error_log('YOLO YS License Upload: Nonce verified successfully');
             
             // Check if user is logged in
             if (!is_user_logged_in()) {
@@ -259,8 +302,11 @@ class YOLO_YS_Guest_Users {
             $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
             $file_type = isset($_POST['file_type']) ? sanitize_text_field($_POST['file_type']) : '';
             
-            if (!$booking_id || !in_array($file_type, array('front', 'back'))) {
-                wp_send_json_error(array('message' => 'Invalid parameters'));
+            // Updated file types to include Skipper 2
+            $allowed_file_types = array('front', 'back', 'skipper2_front', 'skipper2_back');
+            
+            if (!$booking_id || !in_array($file_type, $allowed_file_types)) {
+                wp_send_json_error(array('message' => 'Invalid parameters or file type.'));
                 return;
             }
             
@@ -347,10 +393,80 @@ class YOLO_YS_Guest_Users {
         }
     }
     
-    /**
-     * Render guest login form shortcode
-     */
-    public function render_guest_login() {
+	    /**
+	     * AJAX handler for crew list save
+	     */
+	    public function ajax_save_crew_list() {
+	        try {
+	            // Verify nonce
+	            if (!isset($_POST['crew_list_nonce']) || !wp_verify_nonce($_POST['crew_list_nonce'], 'yolo_save_crew_list')) {
+	                wp_send_json_error(array('message' => 'Security check failed.'));
+	                return;
+	            }
+	            
+	            if (!is_user_logged_in()) {
+	                wp_send_json_error(array('message' => 'You must be logged in to save the crew list.'));
+	                return;
+	            }
+	            
+	            $user = wp_get_current_user();
+	            $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
+	            $crew_data = isset($_POST['crew']) ? $_POST['crew'] : array();
+	            
+	            if (!$booking_id || empty($crew_data)) {
+	                wp_send_json_error(array('message' => 'Invalid booking ID or empty crew data.'));
+	                return;
+	            }
+	            
+	            global $wpdb;
+	            $table_crew = $wpdb->prefix . 'yolo_crew_list';
+	            
+	            // 1. Delete existing crew list for this booking
+	            $wpdb->delete($table_crew, array('booking_id' => $booking_id));
+	            
+	            $saved_count = 0;
+	            
+	            // 2. Insert new crew members
+	            foreach ($crew_data as $index => $member) {
+	                // Only save if first name is provided (assuming it's the minimum required field)
+	                if (empty($member['first_name']) || empty($member['last_name'])) {
+	                    continue;
+	                }
+	                
+	                $wpdb->insert(
+	                    $table_crew,
+	                    array(
+	                        'booking_id' => $booking_id,
+	                        'user_id' => $user->ID,
+	                        'crew_member_index' => intval($index),
+	                        'first_name' => sanitize_text_field($member['first_name']),
+	                        'last_name' => sanitize_text_field($member['last_name']),
+	                        'sex' => sanitize_text_field($member['sex']),
+	                        'id_type' => sanitize_text_field($member['id_type']),
+	                        'id_number' => sanitize_text_field($member['id_number']),
+	                        'birth_date' => sanitize_text_field($member['birth_date']),
+	                        'role' => sanitize_text_field($member['role']),
+	                        'mobile_number' => sanitize_text_field($member['mobile_number']),
+	                        'nationality' => sanitize_text_field($member['nationality']),
+	                        'created_at' => current_time('mysql')
+	                    ),
+	                    array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+	                );
+	                $saved_count++;
+	            }
+	            
+	            wp_send_json_success(array('message' => "Crew list saved successfully. $saved_count members recorded."));
+	            
+	        } catch (Exception $e) {
+	            error_log('YOLO YS Crew List: EXCEPTION - ' . $e->getMessage());
+	            wp_send_json_error(array('message' => 'An error occurred while saving the crew list.'));
+	        }
+	    }
+	    
+	    /**
+	     * Render guest login form shortcode
+	     */
+	    public function render_guest_login() {
         // If already logged in, redirect to dashboard
         if (is_user_logged_in()) {
             $user = wp_get_current_user();

@@ -115,7 +115,7 @@ $user = wp_get_current_user();
                                             <span class="yolo-license-uploaded">✓ Uploaded</span>
                                         </div>
                                     <?php endif; ?>
-                                    <form class="yolo-license-form" data-booking-id="<?php echo esc_attr($booking->id); ?>" data-file-type="back">
+                                    <form class="yolo-license-form" data-booking-id="<?php echo esc_attr($booking->id); ?>" data-file-type="skipper1_back">
                                         <input type="file" name="license_file" accept="image/*" required>
                                         <button type="submit" class="yolo-upload-btn">
                                             <?php echo $has_back ? 'Replace Back' : 'Upload Back'; ?>
@@ -125,6 +125,137 @@ $user = wp_get_current_user();
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Skipper 2 License Upload Section -->
+                        <div class="yolo-license-upload yolo-skipper2-upload">
+                            <h3>📜 Skipper 2 License (Optional)</h3>
+                            <p class="yolo-license-note">Please upload both sides of the second skipper's license, if applicable.</p>
+                            
+                            <?php
+                            $has_s2_front = false;
+                            $has_s2_back = false;
+                            $s2_front_url = '';
+                            $s2_back_url = '';
+                            
+                            foreach ($booking_licenses as $license) {
+                                if ($license->file_type === 'skipper2_front') {
+                                    $has_s2_front = true;
+                                    $s2_front_url = $license->file_url;
+                                }
+                                if ($license->file_type === 'skipper2_back') {
+                                    $has_s2_back = true;
+                                    $s2_back_url = $license->file_url;
+                                }
+                            }
+                            ?>
+                            
+                            <div class="yolo-license-grid">
+                                <!-- Skipper 2 Front License -->
+                                <div class="yolo-license-item">
+                                    <label class="yolo-license-label">Skipper 2 Front Side</label>
+                                    <?php if ($has_s2_front): ?>
+                                        <div class="yolo-license-preview">
+                                            <img src="<?php echo esc_url($s2_front_url); ?>" alt="Skipper 2 License Front">
+                                            <span class="yolo-license-uploaded">✓ Uploaded</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <form class="yolo-license-form" data-booking-id="<?php echo esc_attr($booking->id); ?>" data-file-type="skipper2_front">
+                                        <input type="file" name="license_file" accept="image/*" required>
+                                        <button type="submit" class="yolo-upload-btn">
+                                            <?php echo $has_s2_front ? 'Replace Front' : 'Upload Front'; ?>
+                                        </button>
+                                        <div class="yolo-upload-message"></div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Skipper 2 Back License -->
+                                <div class="yolo-license-item">
+                                    <label class="yolo-license-label">Skipper 2 Back Side</label>
+                                    <?php if ($has_s2_back): ?>
+                                        <div class="yolo-license-preview">
+                                            <img src="<?php echo esc_url($s2_back_url); ?>" alt="Skipper 2 License Back">
+                                            <span class="yolo-license-uploaded">✓ Uploaded</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <form class="yolo-license-form" data-booking-id="<?php echo esc_attr($booking->id); ?>" data-file-type="skipper2_back">
+                                        <input type="file" name="license_file" accept="image/*" required>
+                                        <button type="submit" class="yolo-upload-btn">
+                                            <?php echo $has_s2_back ? 'Replace Back' : 'Upload Back'; ?>
+                                        </button>
+                                        <div class="yolo-upload-message"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Crew List Section -->
+                        <div class="yolo-crew-list-section">
+                            <h3>👥 Crew List (Max 12 People)</h3>
+                            <p class="yolo-crew-note">Please provide the details for all crew members, including yourself.</p>
+                            
+                            <form class="yolo-crew-list-form" data-booking-id="<?php echo esc_attr($booking->id); ?>">
+                                <input type="hidden" name="action" value="yolo_save_crew_list">
+                                <input type="hidden" name="booking_id" value="<?php echo esc_attr($booking->id); ?>">
+                                <?php wp_nonce_field('yolo_save_crew_list', 'crew_list_nonce'); ?>
+                                
+                                <table class="yolo-crew-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Surname</th>
+                                            <th>Sex</th>
+                                            <th>ID/Passport</th>
+                                            <th>ID/Passport No.</th>
+                                            <th>Birth Date</th>
+                                            <th>Role</th>
+                                            <th>Mobile</th>
+                                            <th>Nationality</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php for ($i = 1; $i <= 12; $i++): ?>
+                                            <tr class="yolo-crew-row" data-index="<?php echo $i; ?>">
+                                                <td><?php echo $i; ?></td>
+                                                <td><input type="text" name="crew[<?php echo $i; ?>][first_name]" placeholder="Name" required></td>
+                                                <td><input type="text" name="crew[<?php echo $i; ?>][last_name]" placeholder="Surname" required></td>
+                                                <td>
+                                                    <select name="crew[<?php echo $i; ?>][sex]" required>
+                                                        <option value="">Select</option>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select name="crew[<?php echo $i; ?>][id_type]" required>
+                                                        <option value="">Select</option>
+                                                        <option value="national_id">National ID</option>
+                                                        <option value="passport">Passport</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" name="crew[<?php echo $i; ?>][id_number]" placeholder="ID/Passport No." required></td>
+                                                <td><input type="date" name="crew[<?php echo $i; ?>][birth_date]" required></td>
+                                                <td>
+                                                    <select name="crew[<?php echo $i; ?>][role]" required>
+                                                        <option value="">Select</option>
+                                                        <option value="skipper1">Skipper 1</option>
+                                                        <option value="skipper2">Skipper 2</option>
+                                                        <option value="crew">Crew</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="tel" name="crew[<?php echo $i; ?>][mobile_number]" placeholder="Mobile" required></td>
+                                                <td><input type="text" name="crew[<?php echo $i; ?>][nationality]" placeholder="Nationality" required></td>
+                                            </tr>
+                                        <?php endfor; ?>
+                                    </tbody>
+                                </table>
+                                
+                                <button type="submit" class="yolo-save-crew-btn">Save Crew List</button>
+                                <div class="yolo-crew-message"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -134,6 +265,7 @@ $user = wp_get_current_user();
 
 <script>
 jQuery(document).ready(function($) {
+    // License Upload Handler
     $('.yolo-license-form').on('submit', function(e) {
         e.preventDefault();
         
@@ -151,7 +283,8 @@ jQuery(document).ready(function($) {
         
         var formData = new FormData();
         formData.append('action', 'yolo_upload_license');
-        formData.append('nonce', '<?php echo wp_create_nonce('yolo_upload_license'); ?>');
+        formData.append('nonce', yolo_guest_vars.nonce);
+        formData.append('_wpnonce', yolo_guest_vars.nonce);
         formData.append('booking_id', bookingId);
         formData.append('file_type', fileType);
         formData.append('license_file', fileInput.files[0]);
@@ -179,6 +312,38 @@ jQuery(document).ready(function($) {
             error: function() {
                 messageDiv.html('<span class="error">✗ Upload failed. Please try again.</span>');
                 submitBtn.prop('disabled', false).text(fileType === 'front' ? 'Upload Front' : 'Upload Back');
+            }
+        });
+    });
+
+    // Crew List Save Handler
+    $('.yolo-crew-list-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        var form = $(this);
+        var messageDiv = form.find('.yolo-crew-message');
+        var submitBtn = form.find('.yolo-save-crew-btn');
+        
+        var formData = form.serialize();
+        
+        submitBtn.prop('disabled', true).text('Saving...');
+        messageDiv.html('');
+        
+        $.ajax({
+            url: yolo_guest_vars.ajax_url,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    messageDiv.html('<span class="success">✓ Crew list saved successfully!</span>');
+                } else {
+                    messageDiv.html('<span class="error">✗ ' + response.data.message + '</span>');
+                }
+                submitBtn.prop('disabled', false).text('Save Crew List');
+            },
+            error: function() {
+                messageDiv.html('<span class="error">✗ Save failed. Please try again.</span>');
+                submitBtn.prop('disabled', false).text('Save Crew List');
             }
         });
     });
