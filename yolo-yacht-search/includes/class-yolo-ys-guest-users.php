@@ -75,13 +75,23 @@ class YOLO_YS_Guest_Users {
      */
     public function create_guest_user($booking_id, $customer_email, $customer_first_name, $customer_last_name, $confirmation_number) {
         try {
+            error_log('YOLO YS Guest: Starting create_guest_user for email: ' . $customer_email);
+            
+            // CRITICAL: Ensure guest role exists BEFORE creating/updating user
+            // This fixes the bug where role doesn't exist during webhook calls
+            $this->register_guest_role();
+            error_log('YOLO YS Guest: Guest role ensured to exist');
+            
             // Check if user already exists
             $user = get_user_by('email', $customer_email);
             
             if ($user) {
+                error_log('YOLO YS Guest: User already exists with ID: ' . $user->ID);
+                
                 // User exists - update their role to guest if needed
                 if (!in_array('guest', (array) $user->roles)) {
                     $user->add_role('guest');
+                    error_log('YOLO YS Guest: Added guest role to existing user');
                 }
                 
                 // Link booking to existing user
@@ -94,6 +104,7 @@ class YOLO_YS_Guest_Users {
                     array('%d'),
                     array('%d')
                 );
+                error_log('YOLO YS Guest: Linked booking ' . $booking_id . ' to user ' . $user->ID);
                 
                 return array(
                     'success' => true,
@@ -104,35 +115,56 @@ class YOLO_YS_Guest_Users {
                 );
             }
             
-            // Create new user
-            $username = sanitize_user($customer_email);
+            // Create new user - use email as username (WordPress handles special chars)
+            $username = sanitize_user($customer_email, true); // strict mode for safety
+            error_log('YOLO YS Guest: Creating new user with username: ' . $username);
+            
+            // Ensure username is unique
+            $base_username = $username;
+            $counter = 1;
+            while (username_exists($username)) {
+                $username = $base_username . $counter;
+                $counter++;
+            }
+            
             $password = $confirmation_number . 'YoLo';
             
             $user_id = wp_create_user($username, $password, $customer_email);
             
             if (is_wp_error($user_id)) {
+                error_log('YOLO YS Guest: wp_create_user failed: ' . $user_id->get_error_message());
                 throw new Exception($user_id->get_error_message());
             }
+            
+            error_log('YOLO YS Guest: User created with ID: ' . $user_id);
+            
+            // Get the user object and set role
+            $user = new WP_User($user_id);
+            $user->set_role('guest');
+            error_log('YOLO YS Guest: Role set to guest');
             
             // Update user meta
             wp_update_user(array(
                 'ID' => $user_id,
                 'first_name' => $customer_first_name,
                 'last_name' => $customer_last_name,
-                'display_name' => $customer_first_name . ' ' . $customer_last_name,
-                'role' => 'guest'
+                'display_name' => $customer_first_name . ' ' . $customer_last_name
             ));
+            error_log('YOLO YS Guest: User meta updated');
             
             // Link booking to user
             global $wpdb;
             $table_bookings = $wpdb->prefix . 'yolo_bookings';
-            $wpdb->update(
+            $result = $wpdb->update(
                 $table_bookings,
                 array('user_id' => $user_id),
                 array('id' => $booking_id),
                 array('%d'),
                 array('%d')
             );
+            error_log('YOLO YS Guest: Booking link result: ' . ($result !== false ? 'success' : 'failed'));
+            
+            error_log('YOLO YS Guest: Guest user creation completed successfully');
             
             return array(
                 'success' => true,
@@ -143,7 +175,8 @@ class YOLO_YS_Guest_Users {
             );
             
         } catch (Exception $e) {
-            error_log('YOLO YS: Failed to create guest user: ' . $e->getMessage());
+            error_log('YOLO YS Guest: EXCEPTION - ' . $e->getMessage());
+            error_log('YOLO YS Guest: Stack trace - ' . $e->getTraceAsString());
             return array(
                 'success' => false,
                 'message' => $e->getMessage()
