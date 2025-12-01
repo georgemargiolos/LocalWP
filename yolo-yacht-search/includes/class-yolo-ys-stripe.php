@@ -237,9 +237,30 @@ class YOLO_YS_Stripe {
         $deposit_amount = $session['metadata']['deposit_amount'];
         $remaining_balance = $session['metadata']['remaining_balance'];
         
-        // Get customer details
-        $customer_email = isset($session['customer_details']['email']) ? $session['customer_details']['email'] : '';
-        $customer_name = isset($session['customer_details']['name']) ? $session['customer_details']['name'] : '';
+        // Get customer details - prefer Stripe customer_details, fallback to metadata
+        $customer_email = '';
+        $customer_name = '';
+        
+        // Try Stripe customer_details first
+        if (isset($session['customer_details']['email']) && !empty($session['customer_details']['email'])) {
+            $customer_email = $session['customer_details']['email'];
+        } elseif (isset($session['metadata']['customer_email']) && !empty($session['metadata']['customer_email'])) {
+            $customer_email = $session['metadata']['customer_email'];
+        }
+        
+        if (isset($session['customer_details']['name']) && !empty($session['customer_details']['name'])) {
+            $customer_name = $session['customer_details']['name'];
+        } elseif (isset($session['metadata']['customer_name']) && !empty($session['metadata']['customer_name'])) {
+            $customer_name = $session['metadata']['customer_name'];
+        }
+        
+        error_log('YOLO YS: Customer email resolved to: ' . $customer_email);
+        error_log('YOLO YS: Customer name resolved to: ' . $customer_name);
+        
+        // Validate we have required customer info
+        if (empty($customer_email)) {
+            error_log('YOLO YS ERROR: No customer email found in session!');
+        }
         
         // Store booking in database
         $table_bookings = $wpdb->prefix . 'yolo_bookings';

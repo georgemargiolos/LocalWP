@@ -182,19 +182,23 @@ if (!$booking) {
                     wp_mail($admin_email, $admin_subject, $admin_message, array('Content-Type: text/plain; charset=UTF-8'));
                 }
                 
-                // Send confirmation email using HTML template
-                YOLO_YS_Email::send_booking_confirmation($booking);
-                
-                // Send admin notification
-                YOLO_YS_Email::send_admin_notification($booking);
-                
-                // Retrieve the newly created booking
+                // CRITICAL FIX: Retrieve the newly created booking BEFORE sending emails
                 $booking = $wpdb->get_row($wpdb->prepare(
                     "SELECT * FROM {$table_bookings} WHERE id = %d",
                     $booking_id
                 ));
                 
                 error_log('YOLO YS: Booking created on return from Stripe - ID: ' . $booking_id);
+                
+                // Now send confirmation email using HTML template (booking is no longer null)
+                if ($booking) {
+                    YOLO_YS_Email::send_booking_confirmation($booking);
+                    
+                    // Send admin notification
+                    YOLO_YS_Email::send_admin_notification($booking);
+                } else {
+                    error_log('YOLO YS ERROR: Could not retrieve booking after insert!');
+                }
             }
         }
     } catch (Exception $e) {
