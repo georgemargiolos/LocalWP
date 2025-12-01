@@ -126,7 +126,7 @@ if ($booking->remaining_balance <= 0) {
         
         <div class="payment-info">
             <p><strong>Secure Payment:</strong> Your payment is processed securely through Stripe.</p>
-            <p><strong>Questions?</strong> Contact us at <a href="mailto:info@yolocharters.com">info@yolocharters.com</a></p>
+            <p><strong>Questions?</strong> Contact us at <a href="mailto:info@yolo-charters.com">info@yolo-charters.com</a></p>
         </div>
     </div>
 </div>

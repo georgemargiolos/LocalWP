@@ -633,7 +633,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                     
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500; font-size: 14px;">Mobile Number *</label>
-                        <input type="tel" name="phone" required placeholder="+30 123 456 7890" style="
+                        <input type="tel" name="phone" required placeholder="+30 698 506 4875" style="
                             width: 100%;
                             padding: 12px;
                             border: 2px solid #d1d5db;

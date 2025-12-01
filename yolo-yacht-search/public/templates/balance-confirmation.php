@@ -128,7 +128,7 @@ if (isset($booking) && $booking) {
             <ul class="next-steps-list">
                 <li><strong>Confirmation Email:</strong> Check your inbox for a detailed confirmation email.</li>
                 <li><strong>Prepare for Charter:</strong> We'll contact you closer to your charter date with final details.</li>
-                <li><strong>Questions?</strong> Contact us anytime at <a href="mailto:info@yolocharters.com">info@yolocharters.com</a></li>
+                <li><strong>Questions?</strong> Contact us anytime at <a href="mailto:info@yolo-charters.com">info@yolo-charters.com</a></li>
             </ul>
         </div>
         

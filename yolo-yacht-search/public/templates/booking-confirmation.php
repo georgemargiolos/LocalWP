@@ -203,7 +203,7 @@ $deposit_percentage = get_option('yolo_ys_deposit_percentage', 50);
             
             <div class="detail-row">
                 <span class="detail-label">Booking Reference:</span>
-                <span class="detail-value"><strong>#<?php echo esc_html($booking->id); ?></strong></span>
+                <span class="detail-value"><strong><?php echo esc_html($booking->bm_reservation_id ? $booking->bm_reservation_id : '#' . $booking->id); ?></strong></span>
             </div>
             
             <div class="detail-row">
@@ -290,7 +290,7 @@ $deposit_percentage = get_option('yolo_ys_deposit_percentage', 50);
                 </li>
                 <li>
                     <strong>Questions?</strong> 
-                    Contact us anytime at <a href="mailto:info@yolocharters.com">info@yolocharters.com</a> or call us at +30 123 456 7890.
+                    Contact us anytime at <a href="mailto:info@yolo-charters.com">info@yolo-charters.com</a> or call us at +30 698 506 4875.
                 </li>
             </ol>
         </div>

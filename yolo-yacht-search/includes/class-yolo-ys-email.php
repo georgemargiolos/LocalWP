@@ -145,7 +145,7 @@ class YOLO_YS_Email {
         // Set headers
         $headers = array(
             'Content-Type: text/html; charset=UTF-8',
-            'From: YOLO Charters <info@yolocharters.com>',
+            'From: YOLO Charters <info@yolo-charters.com>',
         );
         
         // Send email

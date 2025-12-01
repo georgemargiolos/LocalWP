@@ -170,8 +170,8 @@
         <!-- Footer -->
         <div class="email-footer">
             <p><strong>YOLO Charters</strong></p>
-            <p>Email: <a href="mailto:info@yolocharters.com">info@yolocharters.com</a></p>
-            <p>Phone: +30 123 456 7890</p>
+            <p>Email: <a href="mailto:info@yolo-charters.com">info@yolo-charters.com</a></p>
+            <p>Phone: +30 698 506 4875</p>
             <p>&copy; <?php echo date('Y'); ?> YOLO Charters. All rights reserved.</p>
         </div>
     </div>

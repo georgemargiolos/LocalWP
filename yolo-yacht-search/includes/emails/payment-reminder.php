@@ -83,8 +83,8 @@
 <p><strong>Need Help?</strong> If you have any questions or need assistance, please don't hesitate to contact us:</p>
 
 <ul style="color: #4b5563; line-height: 1.8;">
-    <li>Email: <a href="mailto:info@yolocharters.com" style="color: #dc2626;">info@yolocharters.com</a></li>
-    <li>Phone: +30 123 456 7890</li>
+    <li>Email: <a href="mailto:info@yolo-charters.com" style="color: #dc2626;">info@yolo-charters.com</a></li>
+    <li>Phone: +30 698 506 4875</li>
 </ul>
 
 <p>We look forward to welcoming you aboard!</p>

@@ -81,8 +81,8 @@
 <p><strong>Questions or Special Requests?</strong> Feel free to reach out to us:</p>
 
 <ul style="color: #4b5563; line-height: 1.8;">
-    <li>Email: <a href="mailto:info@yolocharters.com" style="color: #dc2626;">info@yolocharters.com</a></li>
-    <li>Phone: +30 123 456 7890</li>
+    <li>Email: <a href="mailto:info@yolo-charters.com" style="color: #dc2626;">info@yolo-charters.com</a></li>
+    <li>Phone: +30 698 506 4875</li>
 </ul>
 
 <p>We can't wait to welcome you aboard and help you create unforgettable memories!</p>

@@ -83,7 +83,7 @@
 
 <p><strong>3. Prepare for Charter:</strong> We'll contact you 2 weeks before your charter with detailed information about check-in, yacht handover, and local recommendations.</p>
 
-<p><strong>4. Questions?</strong> Our team is here to help! Reply to this email or call us at +30 123 456 7890.</p>
+<p><strong>4. Questions?</strong> Our team is here to help! Reply to this email or call us at +30 698 506 4875.</p>
 
 <div class="success-box">
     <p>🎉 <strong>Get Ready for an Unforgettable Experience!</strong> We can't wait to welcome you aboard and help you create amazing memories on the water.</p>
