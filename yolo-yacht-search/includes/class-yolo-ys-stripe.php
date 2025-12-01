@@ -408,13 +408,25 @@ class YOLO_YS_Stripe {
      * @param string $confirmation_number Stripe session ID used as confirmation
      */
     private function create_guest_user($booking_id, $customer_email, $customer_name, $confirmation_number) {
+        error_log('YOLO YS: Starting guest user creation for booking ID: ' . $booking_id . ', email: ' . $customer_email);
+        
         // Split customer name into first and last name
         $name_parts = explode(' ', trim($customer_name), 2);
         $customer_first_name = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
         $customer_last_name = isset($name_parts[1]) ? $name_parts[1] : '';
         
+        error_log('YOLO YS: Name split - First: ' . $customer_first_name . ', Last: ' . $customer_last_name);
+        
+        // Check if class exists
+        if (!class_exists('YOLO_YS_Guest_Users')) {
+            error_log('YOLO YS ERROR: YOLO_YS_Guest_Users class not found!');
+            return;
+        }
+        
         // Create guest user
         $guest_manager = new YOLO_YS_Guest_Users();
+        error_log('YOLO YS: Guest manager instantiated, calling create_guest_user()');
+        
         $result = $guest_manager->create_guest_user(
             $booking_id,
             $customer_email,
@@ -423,13 +435,15 @@ class YOLO_YS_Stripe {
             $booking_id // Use booking ID as confirmation number
         );
         
+        error_log('YOLO YS: Guest user creation result: ' . print_r($result, true));
+        
         if ($result['success']) {
-            error_log('YOLO YS: Guest user created - User ID: ' . $result['user_id'] . ' for booking ID: ' . $booking_id);
+            error_log('YOLO YS: Guest user created successfully - User ID: ' . $result['user_id'] . ' for booking ID: ' . $booking_id);
             
             // Send guest login credentials email
             $this->send_guest_credentials_email($booking_id, $customer_email, $customer_name, $result['username'], $result['password']);
         } else {
-            error_log('YOLO YS: Failed to create guest user for booking ID: ' . $booking_id . ' - ' . $result['message']);
+            error_log('YOLO YS ERROR: Failed to create guest user for booking ID: ' . $booking_id . ' - ' . $result['message']);
         }
     }
     
