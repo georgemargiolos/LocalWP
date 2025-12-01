@@ -190,6 +190,26 @@ if (!$booking) {
                 
                 error_log('YOLO YS: Booking created on return from Stripe - ID: ' . $booking_id);
                 
+                // Create guest user account
+                if (class_exists('YOLO_YS_Guest_Users') && !empty($customer_email)) {
+                    $guest_manager = new YOLO_YS_Guest_Users();
+                    $guest_result = $guest_manager->create_guest_user(
+                        $booking_id,
+                        $customer_email,
+                        $customer_first_name,
+                        $customer_last_name,
+                        $booking_id // Using booking ID as confirmation number
+                    );
+                    
+                    if ($guest_result['success']) {
+                        error_log('YOLO YS: Guest user created successfully - User ID: ' . $guest_result['user_id']);
+                    } else {
+                        error_log('YOLO YS ERROR: Failed to create guest user - ' . $guest_result['message']);
+                    }
+                } else {
+                    error_log('YOLO YS ERROR: Cannot create guest user - class missing or email empty');
+                }
+                
                 // Now send confirmation email using HTML template (booking is no longer null)
                 if ($booking) {
                     YOLO_YS_Email::send_booking_confirmation($booking);
