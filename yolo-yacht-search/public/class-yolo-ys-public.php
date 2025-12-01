@@ -64,6 +64,16 @@ class YOLO_YS_Public {
                     $this->version
                 );
             }
+            
+            // Guest login page CSS
+            if (has_shortcode($post->post_content, 'yolo_guest_login')) {
+                wp_enqueue_style(
+                    'yolo-ys-guest-login',
+                    YOLO_YS_PLUGIN_URL . 'public/css/guest-login.css',
+                    array(),
+                    $this->version
+                );
+            }
         }
         
         // Booking confirmation page CSS

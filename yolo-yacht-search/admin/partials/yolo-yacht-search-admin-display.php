@@ -152,6 +152,10 @@ $sync_status = $sync->get_sync_status();
                 <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_guest_dashboard]</td>
                 <td style="padding: 12px; border: 1px solid #e5e7eb;">Guest dashboard with bookings and license upload (NEW in v2.5.6)</td>
             </tr>
+            <tr style="background: white;">
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_guest_login]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Custom guest login form - redirects to dashboard after login (NEW in v2.5.9)</td>
+            </tr>
         </table>
     </div>
     

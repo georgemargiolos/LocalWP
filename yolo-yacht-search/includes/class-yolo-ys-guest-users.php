@@ -17,6 +17,7 @@ class YOLO_YS_Guest_Users {
         
         // Register shortcodes
         add_shortcode('yolo_guest_dashboard', array($this, 'render_guest_dashboard'));
+        add_shortcode('yolo_guest_login', array($this, 'render_guest_login'));
         
         // AJAX handlers
         add_action('wp_ajax_yolo_upload_license', array($this, 'ajax_upload_license'));
@@ -344,5 +345,26 @@ class YOLO_YS_Guest_Users {
         } catch (Exception $e) {
             wp_send_json_error(array('message' => $e->getMessage()));
         }
+    }
+    
+    /**
+     * Render guest login form shortcode
+     */
+    public function render_guest_login() {
+        // If already logged in, redirect to dashboard
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            if (in_array('guest', (array) $user->roles)) {
+                $dashboard_page = get_page_by_path('guest-dashboard');
+                if ($dashboard_page) {
+                    wp_redirect(get_permalink($dashboard_page->ID));
+                    exit;
+                }
+            }
+        }
+        
+        ob_start();
+        include plugin_dir_path(dirname(__FILE__)) . 'public/partials/yolo-ys-guest-login.php';
+        return ob_get_clean();
     }
 }

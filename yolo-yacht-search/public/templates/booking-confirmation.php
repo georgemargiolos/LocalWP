@@ -190,32 +190,62 @@ if (!$booking) {
                 
                 error_log('YOLO YS: Booking created on return from Stripe - ID: ' . $booking_id);
                 
-                // Create guest user account
-                if (class_exists('YOLO_YS_Guest_Users') && !empty($customer_email)) {
-                    $guest_manager = new YOLO_YS_Guest_Users();
-                    $guest_result = $guest_manager->create_guest_user(
-                        $booking_id,
-                        $customer_email,
-                        $customer_first_name,
-                        $customer_last_name,
-                        $booking_id // Using booking ID as confirmation number
-                    );
+                // CREATE GUEST USER (critical for guest dashboard access)
+                if ($booking && !empty($customer_email)) {
+                    error_log('YOLO YS: Creating guest user from confirmation page...');
                     
-                    if ($guest_result['success']) {
-                        error_log('YOLO YS: Guest user created successfully - User ID: ' . $guest_result['user_id']);
+                    if (class_exists('YOLO_YS_Guest_Users')) {
+                        $guest_manager = new YOLO_YS_Guest_Users();
+                        
+                        // Split name into first/last if needed
+                        if (empty($customer_first_name) && !empty($customer_name)) {
+                            $name_parts = explode(' ', trim($customer_name), 2);
+                            $customer_first_name = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
+                            $customer_last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+                        }
+                        
+                        $guest_result = $guest_manager->create_guest_user(
+                            $booking_id,
+                            $customer_email,
+                            $customer_first_name,
+                            $customer_last_name,
+                            $booking_id
+                        );
+                        
+                        error_log('YOLO YS: Guest user creation result: ' . print_r($guest_result, true));
+                        
+                        // Send guest credentials email if user was created
+                        if ($guest_result['success'] && !empty($guest_result['password'])) {
+                            $login_url = wp_login_url(home_url('/guest-dashboard'));
+                            $credentials_subject = 'Your Guest Account - YOLO Charters';
+                            $credentials_message = sprintf(
+                                "Your guest account has been created!\n\n" .
+                                "Username: %s\n" .
+                                "Password: %s\n\n" .
+                                "Login here: %s\n\n" .
+                                "You can view your bookings and upload your sailing license after logging in.",
+                                $guest_result['username'],
+                                $guest_result['password'],
+                                $login_url
+                            );
+                            wp_mail($customer_email, $credentials_subject, $credentials_message);
+                            error_log('YOLO YS: Guest credentials email sent to ' . $customer_email);
+                        }
                     } else {
-                        error_log('YOLO YS ERROR: Failed to create guest user - ' . $guest_result['message']);
+                        error_log('YOLO YS ERROR: YOLO_YS_Guest_Users class not found!');
                     }
                 } else {
-                    error_log('YOLO YS ERROR: Cannot create guest user - class missing or email empty');
+                    error_log('YOLO YS ERROR: Cannot create guest user - booking or email missing');
                 }
                 
-                // Now send confirmation email using HTML template (booking is no longer null)
+                // NOW send confirmation emails (booking is no longer null)
                 if ($booking) {
-                    YOLO_YS_Email::send_booking_confirmation($booking);
-                    
-                    // Send admin notification
-                    YOLO_YS_Email::send_admin_notification($booking);
+                    try {
+                        YOLO_YS_Email::send_booking_confirmation($booking);
+                        YOLO_YS_Email::send_admin_notification($booking);
+                    } catch (Exception $email_error) {
+                        error_log('YOLO YS: Email sending error - ' . $email_error->getMessage());
+                    }
                 } else {
                     error_log('YOLO YS ERROR: Could not retrieve booking after insert!');
                 }
