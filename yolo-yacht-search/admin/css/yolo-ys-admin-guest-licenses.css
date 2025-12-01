@@ -2,20 +2,36 @@
 
 .yolo-admin-licenses {
     padding: 20px;
+    background: #fff !important;
+    min-height: 400px;
+    position: relative;
+    z-index: 1;
+}
+
+.yolo-admin-licenses h1 {
+    background: #fff;
+    padding: 10px 0;
+    position: relative;
+    z-index: 2;
 }
 
 .yolo-admin-description {
     font-size: 14px;
     color: #666;
     margin-bottom: 30px;
+    background: #fff;
+    position: relative;
+    z-index: 2;
 }
 
 .yolo-no-licenses {
-    background: #f9fafb;
+    background: #f9fafb !important;
     padding: 60px;
     text-align: center;
     border-radius: 8px;
     border: 2px dashed #d1d5db;
+    position: relative;
+    z-index: 2;
 }
 
 .yolo-no-licenses p {
