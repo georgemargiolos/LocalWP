@@ -18,13 +18,43 @@ if (empty($session_id)) {
     return;
 }
 
-// Check if booking already exists
+// Show loading indicator while checking for booking
+echo '<div id="yolo-booking-loading" style="text-align: center; padding: 40px;">';
+echo '<div class="yolo-spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #dc2626; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>';
+echo '<p style="color: #6b7280; font-size: 16px;">Processing your booking confirmation...</p>';
+echo '</div>';
+echo '<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>';
+
+// Flush output to show loading indicator immediately
+if (ob_get_level() > 0) {
+    ob_flush();
+    flush();
+}
+
+// Check if booking already exists (with retry for webhook race condition)
 global $wpdb;
 $table_bookings = $wpdb->prefix . 'yolo_bookings';
-$booking = $wpdb->get_row($wpdb->prepare(
-    "SELECT * FROM {$table_bookings} WHERE stripe_session_id = %s",
-    $session_id
-));
+
+// Try to find booking with retries (webhook might still be processing)
+$max_retries = 10;
+$retry_delay = 1; // seconds
+$booking = null;
+
+for ($i = 0; $i < $max_retries; $i++) {
+    $booking = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$table_bookings} WHERE stripe_session_id = %s",
+        $session_id
+    ));
+    
+    if ($booking) {
+        break; // Booking found!
+    }
+    
+    // Wait before retry (except on last attempt)
+    if ($i < $max_retries - 1) {
+        sleep($retry_delay);
+    }
+}
 
 // If booking doesn't exist, create it from Stripe session
 if (!$booking) {
@@ -172,11 +202,15 @@ if (!$booking) {
     }
 }
 
+// Hide loading indicator
+echo '<script>document.getElementById("yolo-booking-loading").style.display = "none";</script>';
+
 // If still no booking, show error
 if (!$booking) {
     echo '<div class="yolo-booking-error">';
     echo '<h2>Processing Payment</h2>';
-    echo '<p>We are processing your payment. Please check your email for confirmation or contact us if you have any questions.</p>';
+    echo '<p>We are processing your payment. This may take a few moments. Please check your email for confirmation or contact us if you have any questions.</p>';
+    echo '<p style="margin-top: 20px;"><a href="' . esc_url(home_url()) . '" class="yolo-button">Return to Home</a></p>';
     echo '</div>';
     return;
 }
