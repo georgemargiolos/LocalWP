@@ -2,6 +2,82 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.9] - 2025-12-01
+
+### Added - Custom Guest Login System
+- **`[yolo_guest_login]` shortcode** for branded frontend login page
+- Guest login form template with professional styling
+- Guest login CSS with responsive design
+- Auto-redirect to dashboard after guest login
+- Prevents non-guests from using guest login page
+- Guest credentials email template
+- Detailed code comments for guest system
+- Added to admin shortcodes list
+
+### Fixed - Guest User Creation
+- **Guest user creation now works** (moved from webhook to booking confirmation page)
+- Booking confirmation race condition (added retry mechanism with loading spinner)
+- Customer details fallback to metadata when Stripe customer_details is empty
+- Email null booking error (moved booking retrieval before email calls)
+
+### Changed
+- Updated all contact info to info@yolo-charters.com and +30 698 506 4875
+- Booking reference now shows Booking Manager reservation ID instead of database ID
+- Enhanced error handling for guest user creation
+- Improved logging for debugging
+
+---
+
+## [2.5.8] - 2025-12-01
+
+### Fixed
+- Email null booking error in booking-confirmation.php
+- Customer details fallback logic in Stripe webhook
+- Better error handling for email sending
+
+---
+
+## [2.5.7] - 2025-12-01
+
+### Added
+- Detailed error logging for guest user creation
+- Debug logs for troubleshooting
+
+### Fixed
+- Guest role registration timing issue (now called at start of create_guest_user method)
+
+---
+
+## [2.5.6] - 2025-11-30
+
+### Added - Guest User System
+- `YOLO_YS_Guest_Users` class for guest user management
+- `[yolo_guest_dashboard]` shortcode for guest dashboard
+- Guest dashboard template with booking display
+- License upload functionality (front + back images)
+- Guest license uploads database table
+- Admin panel for viewing guest license uploads
+- Guest role with minimal permissions
+- Auto-redirect guests away from wp-admin
+- Login redirect to guest dashboard
+- AJAX license upload handler
+- Guest dashboard CSS styling
+- Admin guest licenses CSS styling
+
+### Changed
+- Database version updated to 1.5
+- Added `user_id` field to bookings table
+- Updated booking creation to link users
+
+---
+
+## [2.5.5] - 2025-11-29
+
+### Fixed
+- Search results max-width increased to 1600px
+
+---
+
 ## [2.5.4] - 2025-11-30
 
 ### Fixed - Search Results Card Styling

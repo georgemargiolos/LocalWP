@@ -190,14 +190,29 @@ if (!$booking) {
                 
                 error_log('YOLO YS: Booking created on return from Stripe - ID: ' . $booking_id);
                 
-                // CREATE GUEST USER (critical for guest dashboard access)
+                /**
+                 * CREATE GUEST USER
+                 * 
+                 * This is the critical step that creates a WordPress user account for the customer.
+                 * The guest user system allows customers to:
+                 * - Login to a custom frontend dashboard
+                 * - View their booking details
+                 * - Upload sailing license images (front + back)
+                 * - Receive login credentials via email
+                 * 
+                 * Password format: [booking_id]YoLo (e.g., "5YoLo" for booking #5)
+                 * 
+                 * NOTE: This runs on the booking confirmation page (not webhook) because
+                 * we don't use Stripe webhooks - bookings are created when customer returns
+                 * from Stripe checkout.
+                 */
                 if ($booking && !empty($customer_email)) {
                     error_log('YOLO YS: Creating guest user from confirmation page...');
                     
                     if (class_exists('YOLO_YS_Guest_Users')) {
                         $guest_manager = new YOLO_YS_Guest_Users();
                         
-                        // Split name into first/last if needed
+                        // Split customer name into first/last for WordPress user creation
                         if (empty($customer_first_name) && !empty($customer_name)) {
                             $name_parts = explode(' ', trim($customer_name), 2);
                             $customer_first_name = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
