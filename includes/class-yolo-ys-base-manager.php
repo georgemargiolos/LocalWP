@@ -40,9 +40,9 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_bm_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_yolo_bm_send_to_guest', array($this, 'ajax_send_to_guest'));
         add_action('wp_ajax_yolo_bm_save_warehouse_item', array($this, 'ajax_save_warehouse_item'));
-        add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_wa        // AJAX hooks
+        add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_warehouse_items'));
         add_action('wp_ajax_yolo_bm_get_bookings_calendar', array($this, 'ajax_get_bookings_calendar'));
-        add_action('wp_ajax_yolo_guest_sign_document', array($this, 'ajax_guest_sign_document'));     
+        
         // Guest AJAX handlers
         add_action('wp_ajax_yolo_guest_sign_document', array($this, 'ajax_guest_sign_document'));
         add_action('wp_ajax_yolo_guest_get_documents', array($this, 'ajax_guest_get_documents'));

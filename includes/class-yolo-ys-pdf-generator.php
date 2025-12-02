@@ -128,48 +128,61 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Ln(10);
         
         // Signatures
+        // Signatures at bottom of page
+        // Move to bottom of page (leaving 40mm from bottom)
+        $pdf->SetY(-40);
+        
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->Cell(0, 8, 'Signatures', 0, 1);
+        $pdf->SetFont('Arial', '', 10);
         
-        // Base manager signature
+        // Base Manager Signature (Bottom-Left)
+        $bm_x = 10;
+        $bm_y = $pdf->GetY();
+        
+        $pdf->SetXY($bm_x, $bm_y);
+        $pdf->Cell(90, 6, 'Base Manager:', 0, 1);
+        
         if ($checkin->signature) {
-            $pdf->SetFont('Arial', '', 10);
-            $pdf->Cell(0, 6, 'Base Manager Signature:', 0, 1);
-            
-            // Decode base64 signature and add to PDF
             $signature_data = str_replace('data:image/png;base64,', '', $checkin->signature);
             $signature_decoded = base64_decode($signature_data);
             $signature_file = sys_get_temp_dir() . '/signature_' . $checkin_id . '.png';
             file_put_contents($signature_file, $signature_decoded);
             
-            $pdf->Image($signature_file, 10, $pdf->GetY(), 60);
-            $pdf->Ln(30);
-            
+            $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
             unlink($signature_file);
+        } else {
+            $pdf->SetX($bm_x);
+            $pdf->Cell(90, 6, '___________________', 0, 1);
         }
         
-        $pdf->Cell(0, 6, 'Date: ' . date('d/m/Y H:i', strtotime($checkin->created_at)), 0, 1);
-        $pdf->Ln(10);
+        $pdf->SetX($bm_x);
+        $pdf->Cell(90, 6, 'Date: ' . date('d/m/Y', strtotime($checkin->created_at)), 0, 0);
         
-        // Guest signature placeholder
+        // Guest Signature (Bottom-Right)
+        $guest_x = 110;
+        
+        $pdf->SetXY($guest_x, $bm_y);
+        $pdf->Cell(90, 6, 'Guest:', 0, 1);
+        
         if ($checkin->guest_signature) {
-            $pdf->Cell(0, 6, 'Guest Signature:', 0, 1);
-            
             $guest_signature_data = str_replace('data:image/png;base64,', '', $checkin->guest_signature);
             $guest_signature_decoded = base64_decode($guest_signature_data);
             $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkin_id . '.png';
             file_put_contents($guest_signature_file, $guest_signature_decoded);
             
-            $pdf->Image($guest_signature_file, 10, $pdf->GetY(), 60);
-            $pdf->Ln(30);
-            
+            $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
             unlink($guest_signature_file);
-            
-            $pdf->Cell(0, 6, 'Date: ' . date('d/m/Y H:i', strtotime($checkin->guest_signed_at)), 0, 1);
         } else {
-            $pdf->Cell(0, 6, 'Guest Signature: _______________________', 0, 1);
-            $pdf->Ln(10);
-            $pdf->Cell(0, 6, 'Date: _______________________', 0, 1);
+            $pdf->SetX($guest_x);
+            $pdf->Cell(90, 6, '___________________', 0, 1);
+        }
+        
+        $pdf->SetX($guest_x);
+        if ($checkin->guest_signed_at) {
+            $pdf->Cell(90, 6, 'Date: ' . date('d/m/Y', strtotime($checkin->guest_signed_at)), 0, 0);
+        } else {
+            $pdf->Cell(90, 6, 'Date: ___________', 0, 0);
         }
         
         // Save PDF
@@ -298,48 +311,61 @@ class YOLO_YS_PDF_Generator extends FPDF {
         
         $pdf->Ln(10);
         
-        // Signatures
+        // Signatures at bottom of page
+        // Move to bottom of page (leaving 40mm from bottom)
+        $pdf->SetY(-40);
+        
         $pdf->SetFont('Arial', 'B', 12);
         $pdf->Cell(0, 8, 'Signatures', 0, 1);
+        $pdf->SetFont('Arial', '', 10);
         
-        // Base manager signature
+        // Base Manager Signature (Bottom-Left)
+        $bm_x = 10;
+        $bm_y = $pdf->GetY();
+        
+        $pdf->SetXY($bm_x, $bm_y);
+        $pdf->Cell(90, 6, 'Base Manager:', 0, 1);
+        
         if ($checkout->signature) {
-            $pdf->SetFont('Arial', '', 10);
-            $pdf->Cell(0, 6, 'Base Manager Signature:', 0, 1);
-            
             $signature_data = str_replace('data:image/png;base64,', '', $checkout->signature);
             $signature_decoded = base64_decode($signature_data);
             $signature_file = sys_get_temp_dir() . '/signature_' . $checkout_id . '.png';
             file_put_contents($signature_file, $signature_decoded);
             
-            $pdf->Image($signature_file, 10, $pdf->GetY(), 60);
-            $pdf->Ln(30);
-            
+            $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
             unlink($signature_file);
+        } else {
+            $pdf->SetX($bm_x);
+            $pdf->Cell(90, 6, '___________________', 0, 1);
         }
         
-        $pdf->Cell(0, 6, 'Date: ' . date('d/m/Y H:i', strtotime($checkout->created_at)), 0, 1);
-        $pdf->Ln(10);
+        $pdf->SetX($bm_x);
+        $pdf->Cell(90, 6, 'Date: ' . date('d/m/Y', strtotime($checkout->created_at)), 0, 0);
         
-        // Guest signature
+        // Guest Signature (Bottom-Right)
+        $guest_x = 110;
+        
+        $pdf->SetXY($guest_x, $bm_y);
+        $pdf->Cell(90, 6, 'Guest:', 0, 1);
+        
         if ($checkout->guest_signature) {
-            $pdf->Cell(0, 6, 'Guest Signature:', 0, 1);
-            
             $guest_signature_data = str_replace('data:image/png;base64,', '', $checkout->guest_signature);
             $guest_signature_decoded = base64_decode($guest_signature_data);
             $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkout_id . '.png';
             file_put_contents($guest_signature_file, $guest_signature_decoded);
             
-            $pdf->Image($guest_signature_file, 10, $pdf->GetY(), 60);
-            $pdf->Ln(30);
-            
+            $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
             unlink($guest_signature_file);
-            
-            $pdf->Cell(0, 6, 'Date: ' . date('d/m/Y H:i', strtotime($checkout->guest_signed_at)), 0, 1);
         } else {
-            $pdf->Cell(0, 6, 'Guest Signature: _______________________', 0, 1);
-            $pdf->Ln(10);
-            $pdf->Cell(0, 6, 'Date: _______________________', 0, 1);
+            $pdf->SetX($guest_x);
+            $pdf->Cell(90, 6, '___________________', 0, 1);
+        }
+        
+        $pdf->SetX($guest_x);
+        if ($checkout->guest_signed_at) {
+            $pdf->Cell(90, 6, 'Date: ' . date('d/m/Y', strtotime($checkout->guest_signed_at)), 0, 0);
+        } else {
+            $pdf->Cell(90, 6, 'Date: ___________', 0, 0);
         }
         
         // Save PDF
