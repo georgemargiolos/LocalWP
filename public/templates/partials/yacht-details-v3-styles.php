@@ -63,7 +63,8 @@ $colors = array(
     width: 100%;
     max-width: 100vw; /* Constrain to viewport width - fixes WordPress theme overflow */
     margin: 0;
-    padding: var(--yolo-container-padding);
+    padding: 0 var(--yolo-container-padding) var(--yolo-container-padding) var(--yolo-container-padding);
+    /* Remove top padding */
     box-sizing: border-box;
     overflow: visible; /* Allow sticky positioning to work */
 }
