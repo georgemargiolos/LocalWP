@@ -1,0 +1,161 @@
+/* YOLO Yacht Search Widget - Clean Style */
+
+.yolo-ys-search-widget {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.yolo-ys-search-form {
+    display: flex;
+    gap: 15px;
+    align-items: stretch;
+    background: transparent;
+    padding: 0;
+}
+
+.yolo-ys-form-field {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Select Field Styling */
+.yolo-ys-field-select {
+    flex: 0 0 auto;
+    width: 320px;
+}
+
+.yolo-ys-field-select select {
+    width: 100%;
+    height: 56px;
+    padding: 0 20px;
+    font-size: 18px;
+    font-weight: 400;
+    color: #142942;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 8px;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yolo-ys-field-select select:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.yolo-ys-field-select select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(20, 41, 66, 0.1);
+}
+
+/* Date Field Styling */
+.yolo-ys-field-date {
+    flex: 1;
+}
+
+.yolo-ys-field-date input {
+    width: 100%;
+    height: 56px;
+    padding: 0 20px;
+    font-size: 18px;
+    font-weight: 400;
+    color: #142942;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yolo-ys-field-date input::placeholder {
+    color: #142942;
+    opacity: 1;
+}
+
+.yolo-ys-field-date input:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.yolo-ys-field-date input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(20, 41, 66, 0.1);
+}
+
+/* Button Field Styling */
+.yolo-ys-field-button {
+    flex: 0 0 auto;
+    width: 320px;
+}
+
+.yolo-ys-search-button {
+    width: 100%;
+    height: 56px;
+    padding: 0 30px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    background: #C84B4B;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yolo-ys-search-button:hover {
+    background: #B03E3E;
+    box-shadow: 0 4px 12px rgba(200, 75, 75, 0.3);
+    transform: translateY(-1px);
+}
+
+.yolo-ys-search-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(200, 75, 75, 0.3);
+}
+
+.yolo-ys-search-button span {
+    display: inline-block;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .yolo-ys-search-form {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yolo-ys-field-select,
+    .yolo-ys-field-date,
+    .yolo-ys-field-button {
+        width: 100%;
+        flex: 1 1 auto;
+    }
+    
+    .yolo-ys-field-select select,
+    .yolo-ys-field-date input,
+    .yolo-ys-search-button {
+        height: 56px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yolo-ys-search-widget {
+        padding: 0 10px;
+    }
+    
+    .yolo-ys-search-form {
+        gap: 10px;
+    }
+}

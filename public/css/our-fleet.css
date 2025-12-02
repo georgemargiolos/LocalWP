@@ -1,0 +1,54 @@
+.yolo-ys-our-fleet {
+    max-width: none; width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.yolo-ys-fleet-section {
+    margin-bottom: 60px;
+}
+
+.yolo-ys-fleet-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #1e3a8a;
+    text-align: center;
+}
+
+.yolo-ys-fleet-badge {
+    display: inline-block;
+    background: #dc2626;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Bootstrap Grid handles layout via .row and .col-* classes */
+.yolo-ys-yacht-grid {
+    /* DO NOT add display: grid here - it breaks Bootstrap Grid! */
+    margin-top: 30px;
+}
+
+.yolo-ys-no-yachts {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f3f4f6;
+    border-radius: 8px;
+}
+
+.yolo-ys-no-yachts p {
+    font-size: 18px;
+    color: #6b7280;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .yolo-ys-fleet-title {
+        font-size: 24px;
+    }
+}
