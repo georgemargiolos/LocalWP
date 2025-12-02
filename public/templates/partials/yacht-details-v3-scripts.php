@@ -879,6 +879,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
             },
             body: new URLSearchParams({
                 action: 'yolo_create_checkout_session',
+                nonce: yoloYSData.nonce,
                 yacht_id: yachtId,
                 yacht_name: yachtName,
                 date_from: dateFrom,
