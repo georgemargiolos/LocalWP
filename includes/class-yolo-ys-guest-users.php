@@ -281,7 +281,7 @@ class YOLO_YS_Guest_Users {
             $file_type = isset($_POST['file_type']) ? sanitize_text_field($_POST['file_type']) : '';
             
             // Updated file types to include Skipper 2
-            $allowed_file_types = array('front', 'back', 'skipper2_front', 'skipper2_back');
+            $allowed_file_types = array('front', 'back', 'skipper2_front', 'skipper2_back', 'id_front', 'id_back');
             
             if (!$booking_id || !in_array($file_type, $allowed_file_types)) {
                 wp_send_json_error(array('message' => 'Invalid parameters or file type.'));

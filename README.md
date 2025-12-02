@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 16.3
+**Version:** 16.4
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -13,15 +13,16 @@
 
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
-## 🎉 What's New in v16.2
+## 🎉 What's New in v16.4
 
 **Critical Bug Fixes - December 2, 2025 (Session 16)**
 
-*   **Fixed Guest License Upload Errors:** Removed nonce verification from license uploads that was causing persistent "Security check failed" errors. Guests can now upload documents at any time without expiration issues. Security maintained through authentication and booking ownership verification.
-*   **Fixed Checkout Session Security Error:** Resolved "Security check failed" error that prevented customers from completing bookings. Added missing WordPress nonce to the AJAX checkout session creation call.
-*   **Verified All Security Checks:** Conducted comprehensive audit of all AJAX endpoints to ensure proper security throughout the plugin.
+*   **Fixed Guest License Upload - Missing File Types:** Resolved "Upload failed" error when uploading National ID/Passport documents. Added `id_front` and `id_back` to allowed file types array. All 6 document types now work correctly.
+*   **Removed Guest Dashboard Width Restriction:** Removed 900px max-width constraint to allow WordPress theme to handle layout naturally. Dashboard now uses full available width for better display on all screen sizes.
+*   **Fixed Guest License Upload Errors (v16.2):** Removed nonce verification from license uploads that was causing persistent "Security check failed" errors.
+*   **Fixed Checkout Session Security Error (v16.1):** Resolved "Security check failed" error that prevented customers from completing bookings.
 
-See [CHANGELOG-v16.2.md](CHANGELOG-v16.2.md) and [CHANGELOG-v16.1.md](CHANGELOG-v16.1.md) for detailed technical information.
+See [CHANGELOG-v16.4.md](CHANGELOG-v16.4.md), [CHANGELOG-v16.2.md](CHANGELOG-v16.2.md), and [CHANGELOG-v16.1.md](CHANGELOG-v16.1.md) for detailed technical information.
 
 ## Previous Major Features (v3.0.0)
 
@@ -84,7 +85,7 @@ If you encounter any issues with the plugin, please refer to the `TROUBLESHOOTIN
 ## Credits
 
 **Developed for:** YOLO Charters
-**Version:** 16.3
+**Version:** 16.4
 **Database Version:** 1.8
 **Status:** Production Ready ✅
 **Last Updated:** December 2, 2025
