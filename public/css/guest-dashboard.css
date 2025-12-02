@@ -31,9 +31,21 @@
 /* ============================================
    Base Layout
    ============================================ */
+/* Override WordPress theme layout constraints for guest dashboard page */
+.yolo-guest-dashboard,
+.yolo-guest-dashboard .entry-content,
+.entry-content:has(.yolo-guest-dashboard),
+.wp-block-post-content:has(.yolo-guest-dashboard),
+.is-layout-constrained:has(.yolo-guest-dashboard) {
+    max-width: none !important;
+    width: 100% !important;
+}
+
 .yolo-guest-dashboard {
+    max-width: none;
+    width: 100%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 

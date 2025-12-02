@@ -15,8 +15,7 @@ global $wpdb;
 $table_crew = $wpdb->prefix . 'yolo_crew_list';
 ?>
 
-<div class="container-fluid py-5">
-<div class="yolo-guest-dashboard">
+<div class="yolo-guest-dashboard alignfull">
     <div class="yolo-guest-header">
         <h1>Welcome, <?php echo esc_html($user->first_name ?: $user->display_name); ?>!</h1>
         <p class="yolo-guest-subtitle">Manage your bookings and upload documents</p>
@@ -392,4 +391,3 @@ $table_crew = $wpdb->prefix . 'yolo_crew_list';
         </div>
     <?php endif; ?>
 </div>
-</div><!-- /container-fluid -->

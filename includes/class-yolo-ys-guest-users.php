@@ -198,8 +198,8 @@ class YOLO_YS_Guest_Users {
         
         $user = wp_get_current_user();
         
-        // Check if user is a guest
-        if (!in_array('guest', (array) $user->roles)) {
+        // Check if user is a guest (also allow administrators for testing)
+        if (!in_array('guest', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
             return '<div class="yolo-guest-notice">
                 <p>Access denied. This page is only for guests.</p>
             </div>';
@@ -305,6 +305,24 @@ class YOLO_YS_Guest_Users {
             }
             
             $file = $_FILES['license_file'];
+            error_log('YOLO YS License Upload: File received - ' . $file['name'] . ' (' . $file['size'] . ' bytes, type: ' . $file['type'] . ')');
+            
+            // Check for upload errors
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $upload_errors = array(
+                    UPLOAD_ERR_INI_SIZE => 'File exceeds server upload limit',
+                    UPLOAD_ERR_FORM_SIZE => 'File exceeds form limit',
+                    UPLOAD_ERR_PARTIAL => 'File only partially uploaded',
+                    UPLOAD_ERR_NO_FILE => 'No file uploaded',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Server temp folder missing',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write to disk',
+                    UPLOAD_ERR_EXTENSION => 'Upload blocked by extension',
+                );
+                $error_msg = isset($upload_errors[$file['error']]) ? $upload_errors[$file['error']] : 'Unknown error';
+                error_log('YOLO YS License Upload: Upload error - ' . $error_msg);
+                wp_send_json_error(array('message' => 'Upload error: ' . $error_msg));
+                return;
+            }
             
             // Validate file type
             $allowed_types = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
@@ -327,6 +345,12 @@ class YOLO_YS_Guest_Users {
                 wp_mkdir_p($license_dir);
             }
             
+            if (!is_writable($license_dir)) {
+                error_log('YOLO YS License Upload: Directory not writable - ' . $license_dir);
+                wp_send_json_error(array('message' => 'Upload directory is not writable'));
+                return;
+            }
+            
             // Generate unique filename
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = 'license_' . $file_type . '_' . time() . '.' . $extension;
@@ -334,9 +358,12 @@ class YOLO_YS_Guest_Users {
             
             // Move uploaded file
             if (!move_uploaded_file($file['tmp_name'], $file_path)) {
+                error_log('YOLO YS License Upload: Failed to move file from ' . $file['tmp_name'] . ' to ' . $file_path);
                 wp_send_json_error(array('message' => 'Failed to save file'));
                 return;
             }
+            
+            error_log('YOLO YS License Upload: File saved to ' . $file_path);
             
             // Save to database
             $table_licenses = $wpdb->prefix . 'yolo_license_uploads';
