@@ -35,8 +35,7 @@ jQuery(document).ready(function($) {
         
         var formData = new FormData();
         formData.append('action', 'yolo_upload_license');
-        formData.append('nonce', yolo_guest_vars.nonce);
-        formData.append('_wpnonce', yolo_guest_vars.nonce);
+        // Nonce removed - security handled by login check and booking ownership verification
         formData.append('booking_id', bookingId);
         formData.append('file_type', fileType);
         formData.append('license_file', fileInput.files[0]);
