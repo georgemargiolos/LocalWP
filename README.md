@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 16.1
+**Version:** 16.2
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -13,14 +13,22 @@
 
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
-## 🎉 What's New in v3.0.0
+## 🎉 What's New in v16.2
 
-Version 3.0.0 is a major update that introduces a host of new features and improvements, including:
+**Critical Bug Fixes - December 2, 2025 (Session 16)**
 
-*   **Bootstrap 5 Integration:** The plugin now uses the Bootstrap 5.3.2 grid system for a fully responsive layout that looks great on all devices.
-*   **Comprehensive Security Hardening:** All AJAX endpoints and forms are now secured with WordPress nonces to protect against CSRF attacks.
-*   **Dynamic Text Customization:** A new "Texts" admin page allows you to easily customize all user-facing labels and messages.
-*   **Numerous Bug Fixes:** We've squashed a number of bugs to improve the stability and reliability of the plugin.
+*   **Fixed Guest License Upload Errors:** Removed nonce verification from license uploads that was causing persistent "Security check failed" errors. Guests can now upload documents at any time without expiration issues. Security maintained through authentication and booking ownership verification.
+*   **Fixed Checkout Session Security Error:** Resolved "Security check failed" error that prevented customers from completing bookings. Added missing WordPress nonce to the AJAX checkout session creation call.
+*   **Verified All Security Checks:** Conducted comprehensive audit of all AJAX endpoints to ensure proper security throughout the plugin.
+
+See [CHANGELOG-v16.2.md](CHANGELOG-v16.2.md) and [CHANGELOG-v16.1.md](CHANGELOG-v16.1.md) for detailed technical information.
+
+## Previous Major Features (v3.0.0)
+
+*   **Bootstrap 5 Integration:** The plugin uses the Bootstrap 5.3.2 grid system for a fully responsive layout.
+*   **Comprehensive Security Hardening:** All AJAX endpoints and forms secured with WordPress nonces.
+*   **Dynamic Text Customization:** Admin page to customize all user-facing labels and messages.
+*   **Numerous Bug Fixes:** Improved stability and reliability.
 
 ## Features Overview
 
@@ -76,7 +84,7 @@ If you encounter any issues with the plugin, please refer to the `TROUBLESHOOTIN
 ## Credits
 
 **Developed for:** YOLO Charters
-**Version:** 16.1
+**Version:** 16.2
 **Database Version:** 1.8
 **Status:** Production Ready ✅
 **Last Updated:** December 2, 2025
