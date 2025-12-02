@@ -4,6 +4,73 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 
 ---
 
+## v17.0 (December 3, 2025) - Base Manager System
+
+**Status:** Ready for Production Testing ✅
+
+### Major Features
+- **Complete Base Manager System** with dedicated dashboard
+- Base manager user role and permissions
+- Yacht management with equipment categories
+- Check-in/check-out processes with digital signatures
+- PDF generation for check-in/check-out documents
+- Guest signature integration in dashboard
+- Warehouse inventory management
+- Bookings calendar view for base managers
+
+### New Capabilities
+- Create and manage yachts with logos and owner info
+- Define equipment categories and items per yacht
+- Perform digital check-ins with signature capture
+- Perform digital check-outs with signature capture
+- Generate professional PDF documents
+- Send documents to guests via email
+- Guest can sign documents digitally
+- Track warehouse inventory by yacht
+- View all bookings in calendar format
+
+### Database Changes
+- Version 1.6
+- Added `wp_yolo_bm_yachts` table
+- Added `wp_yolo_bm_equipment_categories` table
+- Added `wp_yolo_bm_checkins` table
+- Added `wp_yolo_bm_checkouts` table
+- Added `wp_yolo_bm_warehouse` table
+
+### Technical Improvements
+- FPDF library integration for PDF generation
+- Signature pad library for digital signatures
+- Bootstrap 5 dashboard layout
+- Comprehensive AJAX API for base manager operations
+- Security: Nonce verification, capability checks, booking ownership validation
+- PDF signature placement: Base Manager (bottom-left), Guest (bottom-right)
+
+### Files Added
+- `includes/class-yolo-ys-base-manager.php`
+- `includes/class-yolo-ys-base-manager-database.php`
+- `includes/class-yolo-ys-pdf-generator.php`
+- `public/partials/base-manager-dashboard.php`
+- `public/css/base-manager.css`
+- `public/js/base-manager.js`
+- `vendor/fpdf/fpdf.php`
+- `CHANGELOG_v17.0.md`
+- `HANDOFF_v17.0.md`
+
+### Documentation
+- Comprehensive changelog created
+- Technical handoff document with full specifications
+- Database schema documentation
+- AJAX API reference
+- Deployment and testing guides
+
+### Shortcodes
+- `[base_manager]` - Base manager dashboard
+
+**See:** `CHANGELOG_v17.0.md` for detailed changes  
+**See:** `HANDOFF_v17.0.md` for technical documentation
+
+---
+
 ## v2.5.9 (December 1, 2025) - Custom Guest Login
 
 **Status:** Production Ready ✅
@@ -284,10 +351,10 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 ## Development Timeline
 
 **Total Development Time:** ~2 months  
-**Total Versions:** 25+  
-**Current Version:** 2.5.9  
-**Database Version:** 1.5  
-**Status:** Production Ready ✅
+**Total Versions:** 26+  
+**Current Version:** 17.0  
+**Database Version:** 1.6  
+**Status:** Ready for Production Testing ✅
 
 ---
 
@@ -299,6 +366,7 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 4. **v2.5.0** - UI improvements and bug fixes
 5. **v2.5.6** - Guest user system added
 6. **v2.5.9** - Custom guest login completed
+7. **v17.0** - Complete Base Manager System with digital signatures and PDF generation
 
 ---
 
@@ -311,6 +379,6 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 
 ---
 
-**Last Updated:** December 1, 2025  
-**Current Version:** 2.5.9  
-**Status:** Production Ready ✅
+**Last Updated:** December 3, 2025  
+**Current Version:** 17.0  
+**Status:** Ready for Production Testing ✅
