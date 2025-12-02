@@ -75,35 +75,61 @@ $colors = array(
 }
 
 /* ============================================
-   YACHT HEADER
+   YACHT HEADER - Plugin 3 Version
    ============================================ */
 .yacht-header {
     text-align: center;
     margin-bottom: clamp(20px, 4vw, 30px);
-    padding: 0 10px;
+    margin-top: 0;
+    padding: 0;
+    background-color: var(--yolo-header-bg, #f8f9fa);
+    border-radius: 8px;
+    padding: 15px 20px;
 }
 
 .yacht-name {
-    font-size: clamp(24px, 6vw, 42px);
-    font-weight: 700;
-    color: var(--yolo-text-dark);
-    margin: 0 0 8px 0;
-    letter-spacing: clamp(1px, 0.5vw, 2px);
-    line-height: 1.2;
-    word-wrap: break-word;
-}
-
-.yacht-model {
-    font-size: clamp(16px, 4vw, 24px);
-    font-weight: 600;
-    color: var(--yolo-primary);
-    margin: 0 0 8px 0;
-}
-
-.yacht-location {
-    font-size: clamp(14px, 3vw, 16px);
-    color: var(--yolo-text-light);
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 400;
+    color: #666;
     margin: 0;
+    letter-spacing: 0;
+    line-height: 1.5;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.yacht-name .separator {
+    color: #ccc;
+    font-weight: 300;
+    margin: 0 15px;
+}
+
+.yacht-name .model {
+    font-weight: 400;
+}
+
+.yacht-title {
+    font-weight: 700;
+}
+
+.yacht-name .location {
+    font-size: clamp(20px, 4.5vw, 28px);
+    font-weight: 400;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.yacht-name .location:hover {
+    color: #2563eb;
+}
+
+.yacht-name .location i {
+    margin-right: 10px;
 }
 
 /* ============================================

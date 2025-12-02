@@ -123,11 +123,17 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     
     <!-- Yacht Name Header (Full Width) -->
     <div class="yacht-header">
-        <h1 class="yacht-name"><?php echo esc_html(strtoupper($yacht->name)); ?></h1>
-        <h2 class="yacht-model"><?php echo esc_html($yacht->model); ?></h2>
-        <?php if ($yacht->home_base): ?>
-            <p class="yacht-location"><i class="fa-solid fa-location-dot"></i> <?php echo esc_html($yacht->home_base); ?></p>
-        <?php endif; ?>
+        <h1 class="yacht-name">
+            <span class="yacht-title"><?php echo esc_html(strtoupper($yacht->name)); ?></span>
+            <span class="separator">|</span>
+            <span class="model"><?php echo esc_html($yacht->model); ?></span>
+            <?php if ($yacht->home_base): ?>
+                <span class="separator">|</span>
+                <span class="location" onclick="document.querySelector('h3:has-text(\"Location\")')?.scrollIntoView({behavior: 'smooth'});">
+                    <i class="fa-solid fa-location-dot"></i> <?php echo esc_html($yacht->home_base); ?>, Greece
+                </span>
+            <?php endif; ?>
+        </h1>
     </div>
     
     <!-- MAIN CONTENT WRAPPER: Bootstrap Grid Layout -->
