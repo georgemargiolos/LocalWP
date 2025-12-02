@@ -311,6 +311,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         dateTo: dateTo,
                     };
                     
+                    // Remove active class from all carousel slides so updatePriceDisplayWithDeposit uses yoloLivePrice
+                    document.querySelectorAll('.price-slide').forEach(slide => slide.classList.remove('active'));
+                    
                     // Update deposit info (function will create or update the element)
                     updatePriceDisplayWithDeposit();
                     
