@@ -34,6 +34,10 @@ class YOLO_YS_Activator {
         // Create prices table
         YOLO_YS_Database_Prices::create_prices_table();
         
+        // Create base manager tables
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-base-manager-database.php';
+        YOLO_YS_Base_Manager_Database::create_tables();
+        
         // Run migrations
         self::run_migrations();
         
