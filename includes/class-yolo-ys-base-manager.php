@@ -480,9 +480,15 @@ class YOLO_YS_Base_Manager {
      * Generate PDF document
      */
     private function generate_pdf_document($type, $record_id) {
-        // This will be implemented with FPDF library
-        // For now, return placeholder
-        return '';
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-pdf-generator.php';
+        
+        if ($type === 'checkin') {
+            return YOLO_YS_PDF_Generator::generate_checkin_pdf($record_id);
+        } else if ($type === 'checkout') {
+            return YOLO_YS_PDF_Generator::generate_checkout_pdf($record_id);
+        }
+        
+        return false;
     }
 
     /**
@@ -526,8 +532,60 @@ class YOLO_YS_Base_Manager {
      * Send document to guest via email
      */
     private function send_document_to_guest($booking, $type, $record_id) {
-        // Implementation for sending email with document link
-        return true;
+        global $wpdb;
+        
+        // Get document data
+        $table_name = $type === 'checkin' ? $wpdb->prefix . 'yolo_bm_checkins' : $wpdb->prefix . 'yolo_bm_checkouts';
+        $document = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE id = %d",
+            $record_id
+        ));
+        
+        if (!$document || !$document->pdf_url) {
+            // Generate PDF first if not exists
+            require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-pdf-generator.php';
+            if ($type === 'checkin') {
+                $pdf_url = YOLO_YS_PDF_Generator::generate_checkin_pdf($record_id);
+            } else {
+                $pdf_url = YOLO_YS_PDF_Generator::generate_checkout_pdf($record_id);
+            }
+        } else {
+            $pdf_url = $document->pdf_url;
+        }
+        
+        if (!$pdf_url) {
+            return false;
+        }
+        
+        // Get guest dashboard URL
+        $guest_dashboard_url = home_url('/guest-dashboard/');
+        
+        // Prepare email
+        $to = $booking->customer_email;
+        $subject = 'YOLO Charters - ' . ucfirst($type) . ' Document for Booking #' . $booking->id;
+        
+        $message = '<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
+        $message .= '<div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">';
+        $message .= '<h2 style="color: #1e3a8a; text-align: center;">YOLO Charters</h2>';
+        $message .= '<h3 style="color: #495057;">Yacht ' . ucfirst($type) . ' Document</h3>';
+        $message .= '<p>Dear ' . esc_html($booking->customer_name) . ',</p>';
+        $message .= '<p>Your yacht ' . $type . ' document for booking #' . $booking->id . ' is ready for your review and signature.</p>';
+        $message .= '<p><strong>Please review the document and sign it in your guest dashboard.</strong></p>';
+        $message .= '<div style="text-align: center; margin: 30px 0;">';
+        $message .= '<a href="' . esc_url($guest_dashboard_url) . '" style="background-color: #1e3a8a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">View in Dashboard</a>';
+        $message .= '</div>';
+        $message .= '<p>You can also download the document directly:</p>';
+        $message .= '<p><a href="' . esc_url($pdf_url) . '" style="color: #1e3a8a;">Download PDF Document</a></p>';
+        $message .= '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
+        $message .= '<p style="font-size: 12px; color: #6c757d;">Best regards,<br>YOLO Charters Team</p>';
+        $message .= '</div></body></html>';
+        
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            'From: YOLO Charters <noreply@yolocharters.com>'
+        );
+        
+        return wp_mail($to, $subject, $message, $headers);
     }
 
     /**
