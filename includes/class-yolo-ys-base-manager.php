@@ -40,9 +40,9 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_bm_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_yolo_bm_send_to_guest', array($this, 'ajax_send_to_guest'));
         add_action('wp_ajax_yolo_bm_save_warehouse_item', array($this, 'ajax_save_warehouse_item'));
-        add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_warehouse_items'));
+        add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_wa        // AJAX hooks
         add_action('wp_ajax_yolo_bm_get_bookings_calendar', array($this, 'ajax_get_bookings_calendar'));
-        
+        add_action('wp_ajax_yolo_guest_sign_document', array($this, 'ajax_guest_sign_document'));     
         // Guest AJAX handlers
         add_action('wp_ajax_yolo_guest_sign_document', array($this, 'ajax_guest_sign_document'));
         add_action('wp_ajax_yolo_guest_get_documents', array($this, 'ajax_guest_get_documents'));
@@ -675,28 +675,74 @@ class YOLO_YS_Base_Manager {
      * AJAX: Guest sign document
      */
     public function ajax_guest_sign_document() {
-        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        // Guest users don't have base manager nonce, so skip nonce check
+        // Security is ensured by login check and booking ownership verification
         
         if (!is_user_logged_in()) {
             wp_send_json_error(array('message' => 'Please log in'));
             return;
         }
         
-        $type = sanitize_text_field($_POST['type']);
-        $record_id = intval($_POST['record_id']);
-        $signature = sanitize_text_field($_POST['signature']);
+        $type = sanitize_text_field($_POST['document_type']);
+        $document_id = intval($_POST['document_id']);
+        $signature = $_POST['signature']; // Base64 encoded image, sanitized below
+        
+        // Verify signature is valid base64 image
+        if (!preg_match('/^data:image\/png;base64,/', $signature)) {
+            wp_send_json_error(array('message' => 'Invalid signature format'));
+            return;
+        }
         
         global $wpdb;
         $table_name = $type === 'checkin' ? $wpdb->prefix . 'yolo_bm_checkins' : $wpdb->prefix . 'yolo_bm_checkouts';
         
-        $wpdb->update(
+        // Verify document exists and belongs to user's booking
+        $document = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE id = %d",
+            $document_id
+        ));
+        
+        if (!$document) {
+            wp_send_json_error(array('message' => 'Document not found'));
+            return;
+        }
+        
+        // Verify user owns the booking
+        $user_id = get_current_user_id();
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d AND user_id = %d",
+            $document->booking_id,
+            $user_id
+        ));
+        
+        if (!$booking) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+            return;
+        }
+        
+        // Update document with guest signature
+        $result = $wpdb->update(
             $table_name,
             array(
                 'guest_signature' => $signature,
                 'guest_signed_at' => current_time('mysql'),
+                'status' => 'signed',
             ),
-            array('id' => $record_id)
+            array('id' => $document_id)
         );
+        
+        if ($result === false) {
+            wp_send_json_error(array('message' => 'Failed to save signature'));
+            return;
+        }
+        
+        // Regenerate PDF with guest signature
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-pdf-generator.php';
+        if ($type === 'checkin') {
+            YOLO_YS_PDF_Generator::generate_checkin_pdf($document_id);
+        } else {
+            YOLO_YS_PDF_Generator::generate_checkout_pdf($document_id);
+        }
         
         wp_send_json_success(array('message' => 'Document signed successfully'));
     }

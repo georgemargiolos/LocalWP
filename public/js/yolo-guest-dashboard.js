@@ -120,3 +120,164 @@ jQuery(document).ready(function($) {
         section.find('.yolo-section-content').slideToggle(300);
     });
 });
+
+/**
+ * Guest Signature Functionality for Check-In/Check-Out Documents
+ * @since 17.0
+ */
+
+(function($) {
+    'use strict';
+    
+    let guestSignaturePad;
+    let currentDocumentId;
+    let currentDocumentType;
+    
+    $(document).ready(function() {
+        // Initialize signature modal
+        initializeSignatureModal();
+        
+        // Sign document button click
+        $(document).on('click', '.yolo-sign-doc-btn', function() {
+            currentDocumentId = $(this).data('checkin-id') || $(this).data('checkout-id');
+            currentDocumentType = $(this).data('type');
+            showSignatureModal();
+        });
+        
+        // Clear signature
+        $('.yolo-clear-signature-btn').on('click', function() {
+            if (guestSignaturePad) {
+                guestSignaturePad.clear();
+            }
+        });
+        
+        // Cancel signature
+        $('.yolo-cancel-signature-btn, .yolo-signature-modal-close').on('click', function() {
+            hideSignatureModal();
+        });
+        
+        // Submit signature
+        $('.yolo-submit-signature-btn').on('click', function() {
+            submitGuestSignature();
+        });
+        
+        // Close modal on outside click
+        $('#signatureModal').on('click', function(e) {
+            if ($(e.target).is('#signatureModal')) {
+                hideSignatureModal();
+            }
+        });
+    });
+    
+    /**
+     * Initialize signature modal and pad
+     */
+    function initializeSignatureModal() {
+        const canvas = document.getElementById('guestSignaturePad');
+        
+        if (canvas && typeof SignaturePad !== 'undefined') {
+            guestSignaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)',
+                minWidth: 1,
+                maxWidth: 3
+            });
+            
+            // Resize canvas to fit container
+            resizeCanvas(canvas);
+            
+            // Resize on window resize
+            $(window).on('resize', function() {
+                resizeCanvas(canvas);
+            });
+        }
+    }
+    
+    /**
+     * Resize canvas to fit container
+     */
+    function resizeCanvas(canvas) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        
+        if (guestSignaturePad) {
+            guestSignaturePad.clear();
+        }
+    }
+    
+    /**
+     * Show signature modal
+     */
+    function showSignatureModal() {
+        $('#signatureModal').fadeIn(300);
+        $('body').css('overflow', 'hidden');
+        
+        if (guestSignaturePad) {
+            guestSignaturePad.clear();
+        }
+    }
+    
+    /**
+     * Hide signature modal
+     */
+    function hideSignatureModal() {
+        $('#signatureModal').fadeOut(300);
+        $('body').css('overflow', '');
+        
+        if (guestSignaturePad) {
+            guestSignaturePad.clear();
+        }
+        
+        currentDocumentId = null;
+        currentDocumentType = null;
+    }
+    
+    /**
+     * Submit guest signature
+     */
+    function submitGuestSignature() {
+        if (!guestSignaturePad || guestSignaturePad.isEmpty()) {
+            alert('Please provide your signature before submitting.');
+            return;
+        }
+        
+        if (!currentDocumentId || !currentDocumentType) {
+            alert('Invalid document. Please try again.');
+            return;
+        }
+        
+        const signatureData = guestSignaturePad.toDataURL();
+        
+        // Show loading state
+        $('.yolo-submit-signature-btn').prop('disabled', true).text('Submitting...');
+        
+        $.ajax({
+            url: yolo_guest_vars.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_guest_sign_document',
+                document_id: currentDocumentId,
+                document_type: currentDocumentType,
+                signature: signatureData
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Document signed successfully!');
+                    hideSignatureModal();
+                    location.reload(); // Reload to show updated status
+                } else {
+                    alert('Error: ' + (response.data.message || 'Failed to sign document'));
+                }
+            },
+            error: function() {
+                alert('Network error. Please try again.');
+            },
+            complete: function() {
+                $('.yolo-submit-signature-btn').prop('disabled', false).text('Submit Signature');
+            }
+        });
+    }
+    
+})(jQuery);

@@ -326,6 +326,104 @@ $table_crew = $wpdb->prefix . 'yolo_crew_list';
                             </div>
                         </div>
                         
+                        <!-- Check-In Documents Section -->
+                        <?php
+                        // Fetch check-in documents for this booking
+                        $table_checkins = $wpdb->prefix . 'yolo_bm_checkins';
+                        $checkins = $wpdb->get_results($wpdb->prepare(
+                            "SELECT * FROM {$table_checkins} WHERE booking_id = %d ORDER BY created_at DESC",
+                            $booking->id
+                        ));
+                        ?>
+                        <div class="yolo-accordion-section yolo-checkin-section">
+                            <button type="button" class="yolo-section-toggle">
+                                <span>✅ Check-In Documents <?php echo !empty($checkins) ? '(' . count($checkins) . ')' : ''; ?></span>
+                                <span class="icon">▼</span>
+                            </button>
+                            <div class="yolo-section-content">
+                                <?php if (!empty($checkins)): ?>
+                                    <p class="yolo-docs-note">Review and sign your yacht check-in documents.</p>
+                                    <div class="yolo-checkin-docs-list">
+                                        <?php foreach ($checkins as $checkin): ?>
+                                            <div class="yolo-checkin-doc-item <?php echo $checkin->guest_signature ? 'signed' : 'pending'; ?>">
+                                                <div class="yolo-doc-header">
+                                                    <h4>Check-In Document #<?php echo $checkin->id; ?></h4>
+                                                    <span class="yolo-doc-status <?php echo $checkin->guest_signature ? 'status-signed' : 'status-pending'; ?>">
+                                                        <?php echo $checkin->guest_signature ? '✓ Signed' : '⏳ Pending Signature'; ?>
+                                                    </span>
+                                                </div>
+                                                <p class="yolo-doc-date">Created: <?php echo date('M j, Y g:i A', strtotime($checkin->created_at)); ?></p>
+                                                
+                                                <div class="yolo-doc-actions">
+                                                    <?php if ($checkin->pdf_url): ?>
+                                                        <a href="<?php echo esc_url($checkin->pdf_url); ?>" target="_blank" class="yolo-view-doc-btn">View PDF</a>
+                                                        <a href="<?php echo esc_url($checkin->pdf_url); ?>" download class="yolo-download-doc-btn">Download</a>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if (!$checkin->guest_signature): ?>
+                                                        <button type="button" class="yolo-sign-doc-btn" data-checkin-id="<?php echo $checkin->id; ?>" data-type="checkin">
+                                                            ✍️ Sign Document
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="yolo-no-docs-message">No check-in documents available yet. Your base manager will send check-in documents when ready.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <!-- Check-Out Documents Section -->
+                        <?php
+                        // Fetch check-out documents for this booking
+                        $table_checkouts = $wpdb->prefix . 'yolo_bm_checkouts';
+                        $checkouts = $wpdb->get_results($wpdb->prepare(
+                            "SELECT * FROM {$table_checkouts} WHERE booking_id = %d ORDER BY created_at DESC",
+                            $booking->id
+                        ));
+                        ?>
+                        <div class="yolo-accordion-section yolo-checkout-section">
+                            <button type="button" class="yolo-section-toggle">
+                                <span>📋 Check-Out Documents <?php echo !empty($checkouts) ? '(' . count($checkouts) . ')' : ''; ?></span>
+                                <span class="icon">▼</span>
+                            </button>
+                            <div class="yolo-section-content">
+                                <?php if (!empty($checkouts)): ?>
+                                    <p class="yolo-docs-note">Review and sign your yacht check-out documents.</p>
+                                    <div class="yolo-checkout-docs-list">
+                                        <?php foreach ($checkouts as $checkout): ?>
+                                            <div class="yolo-checkout-doc-item <?php echo $checkout->guest_signature ? 'signed' : 'pending'; ?>">
+                                                <div class="yolo-doc-header">
+                                                    <h4>Check-Out Document #<?php echo $checkout->id; ?></h4>
+                                                    <span class="yolo-doc-status <?php echo $checkout->guest_signature ? 'status-signed' : 'status-pending'; ?>">
+                                                        <?php echo $checkout->guest_signature ? '✓ Signed' : '⏳ Pending Signature'; ?>
+                                                    </span>
+                                                </div>
+                                                <p class="yolo-doc-date">Created: <?php echo date('M j, Y g:i A', strtotime($checkout->created_at)); ?></p>
+                                                
+                                                <div class="yolo-doc-actions">
+                                                    <?php if ($checkout->pdf_url): ?>
+                                                        <a href="<?php echo esc_url($checkout->pdf_url); ?>" target="_blank" class="yolo-view-doc-btn">View PDF</a>
+                                                        <a href="<?php echo esc_url($checkout->pdf_url); ?>" download class="yolo-download-doc-btn">Download</a>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if (!$checkout->guest_signature): ?>
+                                                        <button type="button" class="yolo-sign-doc-btn" data-checkout-id="<?php echo $checkout->id; ?>" data-type="checkout">
+                                                            ✍️ Sign Document
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <p class="yolo-no-docs-message">No check-out documents available yet. Your base manager will send check-out documents when ready.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
                         <!-- Incoming Documents from YOLO Charters -->
                         <?php
                         // Fetch admin-uploaded documents for this booking
@@ -390,4 +488,26 @@ $table_crew = $wpdb->prefix . 'yolo_crew_list';
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
+</div>
+
+
+<!-- Signature Modal -->
+<div class="yolo-signature-modal" id="signatureModal" style="display: none;">
+    <div class="yolo-signature-modal-content">
+        <div class="yolo-signature-modal-header">
+            <h3>Sign Document</h3>
+            <button type="button" class="yolo-signature-modal-close">&times;</button>
+        </div>
+        <div class="yolo-signature-modal-body">
+            <p>Please sign below to confirm you have reviewed and agree to the document.</p>
+            <div class="yolo-signature-pad-wrapper">
+                <canvas id="guestSignaturePad" class="yolo-signature-canvas"></canvas>
+            </div>
+            <button type="button" class="yolo-clear-signature-btn">Clear Signature</button>
+        </div>
+        <div class="yolo-signature-modal-footer">
+            <button type="button" class="yolo-cancel-signature-btn">Cancel</button>
+            <button type="button" class="yolo-submit-signature-btn">Submit Signature</button>
+        </div>
+    </div>
 </div>
