@@ -4,6 +4,96 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [4.4] - 2025-12-02
+
+### Verified
+- Verified `updatePriceDisplayWithDeposit()` function exists and works correctly
+- Confirmed function handles both carousel and date picker prices
+- Tested deposit calculations with multiple price points
+- Verified UI updates (button text and deposit breakdown)
+- No code changes required - function working as intended
+
+### Testing Results
+- ✅ Function exists at line 951 in yacht-details-v3-scripts.php
+- ✅ Executes without errors
+- ✅ Carousel selection: 2,925 EUR → 1,462.50 EUR deposit (correct)
+- ✅ Custom dates (Aug 1-8): 4,320 EUR → 2,160.00 EUR deposit (correct)
+- ✅ Custom dates (Oct 3-10): 2,880 EUR → 1,440.00 EUR deposit (correct)
+
+### Documentation
+- Added `VERIFICATION-v4.4.md` with complete test results
+- Added `HANDOFF-v4.4-December-2-2025.md` with WordPress setup guide
+
+---
+
+## [4.3] - 2025-12-02
+
+### Fixed
+- **Critical:** Fixed deposit amount not updating when users select custom dates via date picker
+- Deposit now recalculates correctly based on custom date selection
+- BOOK NOW button text updates to show correct deposit amount
+
+### Changed
+- Added code to remove 'active' class from carousel slides when date picker is used
+- Forces `updatePriceDisplayWithDeposit()` to use `window.yoloLivePrice` from date picker
+- Improved deposit calculation logic flow
+
+### Technical Details
+- File: `public/templates/partials/yacht-details-v3-scripts.php`
+- Added: `document.querySelectorAll('.price-slide').forEach(slide => slide.classList.remove('active'));`
+- Location: After `yoloLivePrice` assignment, before `updatePriceDisplayWithDeposit()` call
+
+### Testing
+- ✅ Carousel selection works correctly
+- ✅ Custom dates (Aug 1-8): Deposit updates from 1,462.50 to 2,160.00 EUR
+- ✅ Custom dates (Oct 3-10): Deposit updates from 2,160.00 to 1,440.00 EUR
+- ✅ Button text reflects correct deposit amount in all cases
+
+---
+
+## [4.2] - 2025-12-02
+
+### Changed
+- Removed top padding from `.yolo-yacht-details-v3` container
+- Header now sits flush against top of page content area
+- Improved visual layout by eliminating unwanted white space
+
+### Technical Details
+- File: `public/templates/partials/yacht-details-v3-styles.php`
+- Changed padding from `var(--yolo-container-padding)` to `0 var(--yolo-container-padding) var(--yolo-container-padding) var(--yolo-container-padding)`
+
+---
+
+## [4.1] - 2025-12-02
+
+### Added
+- **H1 Header Redesign:** Merged yacht name, model, and location into single H1 element
+- Grey background box (#f8f9fa) with rounded corners (8px)
+- Clickable location that scrolls to Location section
+- Blue hover effect on location (#2563eb)
+- ", Greece" suffix to location display
+- Pipe separators (|) between header elements
+
+### Changed
+- Made yacht name bold (font-weight: 700)
+- Kept model and location at normal weight (font-weight: 400)
+- Increased overall font size (clamp(22px, 5vw, 32px) for main, clamp(20px, 4.5vw, 28px) for location)
+- Improved header visual hierarchy and SEO
+
+### Technical Details
+- Files modified:
+  - `public/templates/yacht-details-v3.php` (HTML structure)
+  - `public/templates/partials/yacht-details-v3-styles.php` (CSS styling)
+- Header now uses flexbox layout with proper spacing
+- Separators styled with grey color (#ccc) and 15px margins
+
+### Result
+- Header displays: "LEMON | Sun Odyssey 469 | 📍 Preveza Main Port, Greece"
+- Single H1 tag improves SEO
+- Better visual hierarchy and user experience
+
+---
+
 ## [3.7.15] - 2025-12-02
 
 ### 🚨 CRITICAL FIX: Yacht Details Page Layout
