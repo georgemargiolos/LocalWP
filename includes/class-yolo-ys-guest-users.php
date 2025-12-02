@@ -268,13 +268,7 @@ class YOLO_YS_Guest_Users {
                 return;
             }
             
-            $user = wp_get_current_user();
-            
-            // Check if user is a guest
-            if (!in_array('guest', (array) $user->roles)) {
-                wp_send_json_error(array('message' => 'Access denied'));
-                return;
-            }
+            $user_id = get_current_user_id();
             
             // Get booking ID and file type
             $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
@@ -291,6 +285,7 @@ class YOLO_YS_Guest_Users {
             // Verify booking belongs to user
             global $wpdb;
             $table_bookings = $wpdb->prefix . 'yolo_bookings';
+            $user = wp_get_current_user();
             $booking = $wpdb->get_row($wpdb->prepare(
                 "SELECT * FROM {$table_bookings} WHERE id = %d AND (user_id = %d OR customer_email = %s)",
                 $booking_id,
