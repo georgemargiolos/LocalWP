@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 16.2
+**Version:** 16.3
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -84,7 +84,7 @@ If you encounter any issues with the plugin, please refer to the `TROUBLESHOOTIN
 ## Credits
 
 **Developed for:** YOLO Charters
-**Version:** 16.2
+**Version:** 16.3
 **Database Version:** 1.8
 **Status:** Production Ready ✅
 **Last Updated:** December 2, 2025
