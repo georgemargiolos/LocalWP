@@ -756,7 +756,6 @@
      * Load bookings for check-out
      */
     function loadBookingsForCheckout() {
-        loadBookingsForCheckin(); // Same logic
         $.ajax({
             url: yoloBaseManager.ajaxurl,
             type: 'POST',

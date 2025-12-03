@@ -304,6 +304,3 @@ class YOLO_YS_Stripe_Handlers {
         return new WP_REST_Response(array('status' => 'success'), 200);
     }
 }
-
-// Initialize handlers
-new YOLO_YS_Stripe_Handlers();

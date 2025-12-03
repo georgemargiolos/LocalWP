@@ -77,6 +77,3 @@ class YOLO_YS_Shortcodes {
         return ob_get_clean();
     }
 }
-
-// Initialize shortcodes
-new YOLO_YS_Shortcodes();

@@ -85,6 +85,25 @@ class YOLO_YS_Quote_Requests {
             check_ajax_referer('yolo_quote_request_nonce', 'nonce');
         }
         
+        // Honeypot check (bot detection)
+        $honeypot = isset($_POST['website_url']) ? $_POST['website_url'] : '';
+        if (!empty($honeypot)) {
+            wp_send_json_error(array('message' => 'Invalid submission'));
+            return;
+        }
+        
+        // Rate limiting by IP (max 5 submissions per hour)
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+        if ($ip) {
+            $rate_key = 'yolo_quote_rate_' . md5($ip);
+            $submissions = get_transient($rate_key);
+            if ($submissions && $submissions > 5) {
+                wp_send_json_error(array('message' => 'Too many requests. Please try again later.'));
+                return;
+            }
+            set_transient($rate_key, ($submissions ? $submissions + 1 : 1), HOUR_IN_SECONDS);
+        }
+        
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_quote_requests';
         

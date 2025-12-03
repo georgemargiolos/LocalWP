@@ -144,13 +144,27 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(90, 6, 'Base Manager:', 0, 1);
         
         if ($checkin->signature) {
-            $signature_data = str_replace('data:image/png;base64,', '', $checkin->signature);
-            $signature_decoded = base64_decode($signature_data);
-            $signature_file = sys_get_temp_dir() . '/signature_' . $checkin_id . '.png';
-            file_put_contents($signature_file, $signature_decoded);
-            
-            $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
-            unlink($signature_file);
+            try {
+                $signature_data = str_replace('data:image/png;base64,', '', $checkin->signature);
+                $signature_decoded = base64_decode($signature_data, true);
+                
+                if ($signature_decoded === false) {
+                    throw new Exception('Invalid base64 signature data');
+                }
+                
+                $signature_file = sys_get_temp_dir() . '/signature_' . $checkin_id . '_' . uniqid() . '.png';
+                
+                if (file_put_contents($signature_file, $signature_decoded) === false) {
+                    throw new Exception('Failed to write signature file');
+                }
+                
+                $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
+                @unlink($signature_file);
+            } catch (Exception $e) {
+                error_log('YOLO YS PDF: Signature error - ' . $e->getMessage());
+                $pdf->SetX($bm_x);
+                $pdf->Cell(90, 6, '[Signature Error]', 0, 1);
+            }
         } else {
             $pdf->SetX($bm_x);
             $pdf->Cell(90, 6, '___________________', 0, 1);
@@ -327,13 +341,27 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(90, 6, 'Base Manager:', 0, 1);
         
         if ($checkout->signature) {
-            $signature_data = str_replace('data:image/png;base64,', '', $checkout->signature);
-            $signature_decoded = base64_decode($signature_data);
-            $signature_file = sys_get_temp_dir() . '/signature_' . $checkout_id . '.png';
-            file_put_contents($signature_file, $signature_decoded);
-            
-            $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
-            unlink($signature_file);
+            try {
+                $signature_data = str_replace('data:image/png;base64,', '', $checkout->signature);
+                $signature_decoded = base64_decode($signature_data, true);
+                
+                if ($signature_decoded === false) {
+                    throw new Exception('Invalid base64 signature data');
+                }
+                
+                $signature_file = sys_get_temp_dir() . '/signature_' . $checkout_id . '_' . uniqid() . '.png';
+                
+                if (file_put_contents($signature_file, $signature_decoded) === false) {
+                    throw new Exception('Failed to write signature file');
+                }
+                
+                $pdf->Image($signature_file, $bm_x, $pdf->GetY(), 50);
+                @unlink($signature_file);
+            } catch (Exception $e) {
+                error_log('YOLO YS PDF: Signature error - ' . $e->getMessage());
+                $pdf->SetX($bm_x);
+                $pdf->Cell(90, 6, '[Signature Error]', 0, 1);
+            }
         } else {
             $pdf->SetX($bm_x);
             $pdf->Cell(90, 6, '___________________', 0, 1);

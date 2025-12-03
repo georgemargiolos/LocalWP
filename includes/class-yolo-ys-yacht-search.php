@@ -57,6 +57,12 @@ class YOLO_YS_Yacht_Search {
         
         // Initialize contact messages system
         new YOLO_YS_Contact_Messages();
+        
+        // Initialize shortcodes
+        new YOLO_YS_Shortcodes();
+        
+        // Initialize Stripe handlers
+        new YOLO_YS_Stripe_Handlers();
     }
     
     private function define_public_hooks() {

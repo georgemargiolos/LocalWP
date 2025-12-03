@@ -67,7 +67,7 @@ function yolo_ys_ajax_search_yachts() {
         $params[] = $db_type;
     }
     
-    $sql .= " ORDER BY y.company_id = %d DESC, p.price ASC";
+    $sql .= " ORDER BY CASE WHEN y.company_id = %d THEN 0 ELSE 1 END, p.price ASC";
     $params[] = $my_company_id;
     
     $results = $wpdb->get_results($wpdb->prepare($sql, $params));

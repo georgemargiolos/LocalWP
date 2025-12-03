@@ -10,6 +10,10 @@ if (!defined('ABSPATH')) {
 
 $user = wp_get_current_user();
 
+// Ensure variables are defined (defensive programming)
+$bookings = isset($bookings) ? $bookings : array();
+$licenses = isset($licenses) ? $licenses : array();
+
 // Get existing crew data
 global $wpdb;
 $table_crew = $wpdb->prefix . 'yolo_crew_list';

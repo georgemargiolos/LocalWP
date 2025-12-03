@@ -215,8 +215,8 @@ class YOLO_YS_Base_Manager {
         );
         
         // Localize script
-        wp_localize_script('yolo-base-manager', 'yolo_base_manager', array(
-            'ajax_url' => admin_url('admin-ajax.php'),
+        wp_localize_script('yolo-base-manager', 'yoloBaseManager', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yolo_base_manager_nonce')
         ));
     }
