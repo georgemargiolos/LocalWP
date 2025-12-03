@@ -74,15 +74,15 @@ if (!defined('ABSPATH')) {
             </a>
         </div>
 
-        <!-- Bookings Calendar -->
+        <!-- Bookings Management -->
         <div class="yolo-bm-operation-card">
             <div class="yolo-bm-operation-icon">
                 <span class="dashicons dashicons-calendar-alt"></span>
             </div>
-            <h3>Bookings Calendar</h3>
-            <p>View all bookings and charter schedules in one place.</p>
-            <a href="<?php echo admin_url('admin.php?page=yolo-bookings'); ?>" class="button button-primary">
-                View Bookings
+            <h3>Bookings Management</h3>
+            <p>View and manage all bookings, calendar view, and customer details.</p>
+            <a href="<?php echo admin_url('admin.php?page=yolo-ys-bookings'); ?>" class="button button-primary">
+                Manage Bookings
             </a>
         </div>
 
