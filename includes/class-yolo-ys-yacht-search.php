@@ -49,6 +49,12 @@ class YOLO_YS_Yacht_Search {
         // Initialize admin documents shortcode
         new YOLO_YS_Admin_Documents_Shortcode();
         
+        // Initialize base manager system
+        new YOLO_YS_Base_Manager();
+        
+        // Initialize quote requests system
+        new YOLO_YS_Quote_Requests();
+        
         // Initialize contact messages system
         new YOLO_YS_Contact_Messages();
     }

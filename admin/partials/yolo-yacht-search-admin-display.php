@@ -156,6 +156,14 @@ $sync_status = $sync->get_sync_status();
                 <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_guest_login]</td>
                 <td style="padding: 12px; border: 1px solid #e5e7eb;">Custom guest login form - redirects to dashboard after login (NEW in v2.5.9)</td>
             </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[base_manager]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Base manager operations dashboard with yacht management, check-in/out, and warehouse (NEW in v17.0)</td>
+            </tr>
+            <tr style="background: white;">
+                <td style="padding: 12px; border: 1px solid #e5e7eb; font-family: monospace; font-weight: 600;">[yolo_contact_form]</td>
+                <td style="padding: 12px; border: 1px solid #e5e7eb;">Contact form with database storage and notifications - replaces Contact Form 7 (NEW in v17.5)</td>
+            </tr>
         </table>
     </div>
     

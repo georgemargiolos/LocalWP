@@ -983,5 +983,3 @@ class YOLO_YS_Base_Manager {
     }
 }
 
-// Initialize the base manager system
-new YOLO_YS_Base_Manager();
