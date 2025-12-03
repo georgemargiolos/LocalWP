@@ -11,6 +11,7 @@ class YOLO_YS_Quote_Handler {
     
     /**
      * Handle quote request submission
+     * Updated to use in-house quote requests system (no email)
      */
     public function handle_quote_request() {
         // Verify nonce for security
@@ -26,6 +27,7 @@ class YOLO_YS_Quote_Handler {
         $special_requests = sanitize_textarea_field($_POST['special_requests']);
         $date_from = sanitize_text_field($_POST['date_from']);
         $date_to = sanitize_text_field($_POST['date_to']);
+        $num_guests = isset($_POST['num_guests']) ? intval($_POST['num_guests']) : null;
         
         // Validate required fields
         if (empty($first_name) || empty($last_name) || empty($email) || empty($phone)) {
@@ -39,96 +41,94 @@ class YOLO_YS_Quote_Handler {
             return;
         }
         
-        // Prepare email content
-        $admin_email = get_option('admin_email');
-        $subject = 'New Quote Request for ' . $yacht_name;
+        // Store in database using new quote requests system
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'yolo_quote_requests';
         
-        $message = "New quote request received:\n\n";
-        $message .= "Yacht: " . $yacht_name . " (ID: " . $yacht_id . ")\n";
-        $message .= "Name: " . $first_name . " " . $last_name . "\n";
-        $message .= "Email: " . $email . "\n";
-        $message .= "Phone: " . $phone . "\n";
+        $data = array(
+            'customer_name' => $first_name . ' ' . $last_name,
+            'customer_email' => $email,
+            'customer_phone' => $phone,
+            'yacht_preference' => $yacht_name,
+            'checkin_date' => !empty($date_from) ? $date_from : null,
+            'checkout_date' => !empty($date_to) ? $date_to : null,
+            'num_guests' => $num_guests,
+            'special_requests' => $special_requests,
+            'status' => 'new'
+        );
         
-        if (!empty($date_from) && !empty($date_to)) {
-            $message .= "Dates: " . $date_from . " to " . $date_to . "\n";
-        }
+        $result = $wpdb->insert($table_name, $data);
         
-        if (!empty($special_requests)) {
-            $message .= "\nSpecial Requests:\n" . $special_requests . "\n";
-        }
-        
-        $message .= "\n---\nSent from YOLO Yacht Search Plugin";
-        
-        // Send email
-        $headers = array('Content-Type: text/plain; charset=UTF-8');
-        $sent = wp_mail($admin_email, $subject, $message, $headers);
-        
-        if ($sent) {
-            // Store in database (optional)
-            $this->store_quote_request(array(
-                'yacht_id' => $yacht_id,
-                'yacht_name' => $yacht_name,
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'email' => $email,
-                'phone' => $phone,
-                'special_requests' => $special_requests,
-                'date_from' => $date_from,
-                'date_to' => $date_to
-            ));
+        if ($result) {
+            $quote_id = $wpdb->insert_id;
             
-            wp_send_json_success(array('message' => 'Quote request sent successfully!'));
+            // Trigger notifications
+            $this->trigger_notifications($quote_id, $data);
+            
+            wp_send_json_success(array(
+                'message' => 'Quote request submitted successfully! We will contact you soon.',
+                'quote_id' => $quote_id
+            ));
         } else {
-            wp_send_json_error(array('message' => 'Failed to send quote request. Please try again.'));
+            wp_send_json_error(array('message' => 'Failed to submit quote request. Please try again.'));
         }
     }
     
     /**
-     * Store quote request in database
+     * Trigger notifications for new quote request
      */
-    private function store_quote_request($data) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'yolo_quote_requests';
+    private function trigger_notifications($quote_id, $data) {
+        // Get users who should be notified
+        $notify_users = $this->get_notification_users();
         
-        // Create table if not exists
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            yacht_id varchar(255) NOT NULL,
-            yacht_name varchar(255) NOT NULL,
-            first_name varchar(100) NOT NULL,
-            last_name varchar(100) NOT NULL,
-            email varchar(100) NOT NULL,
-            phone varchar(50) NOT NULL,
-            special_requests text,
-            date_from date DEFAULT NULL,
-            date_to date DEFAULT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id),
-            KEY yacht_id (yacht_id),
-            KEY email (email)
-        ) $charset_collate;";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-        
-        // Insert data
-        $wpdb->insert(
-            $table_name,
-            array(
-                'yacht_id' => $data['yacht_id'],
-                'yacht_name' => $data['yacht_name'],
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'special_requests' => $data['special_requests'],
-                'date_from' => !empty($data['date_from']) ? $data['date_from'] : null,
-                'date_to' => !empty($data['date_to']) ? $data['date_to'] : null
-            ),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
-        );
+        foreach ($notify_users as $user_id) {
+            // Increment unread count for user
+            $current_count = get_user_meta($user_id, 'yolo_unread_quotes', true);
+            $new_count = intval($current_count) + 1;
+            update_user_meta($user_id, 'yolo_unread_quotes', $new_count);
+            
+            // Store notification data for browser push
+            $notifications = get_user_meta($user_id, 'yolo_pending_notifications', true);
+            if (!is_array($notifications)) {
+                $notifications = array();
+            }
+            
+            $notifications[] = array(
+                'type' => 'quote_request',
+                'quote_id' => $quote_id,
+                'customer_name' => $data['customer_name'],
+                'timestamp' => current_time('timestamp')
+            );
+            
+            update_user_meta($user_id, 'yolo_pending_notifications', $notifications);
+        }
     }
+    
+    /**
+     * Get users who should receive notifications
+     */
+    private function get_notification_users() {
+        $users = array();
+        
+        // Get all administrators
+        $admins = get_users(array('role' => 'administrator'));
+        foreach ($admins as $admin) {
+            $users[] = $admin->ID;
+        }
+        
+        // Get base managers who have notifications enabled
+        $base_managers = get_users(array('role' => 'base_manager'));
+        foreach ($base_managers as $bm) {
+            $notify_enabled = get_user_meta($bm->ID, 'yolo_quote_notifications_enabled', true);
+            if ($notify_enabled === '1' || $notify_enabled === true) {
+                $users[] = $bm->ID;
+            }
+        }
+        
+        return array_unique($users);
+    }
+    
+
 }
 
 // Initialize quote handler

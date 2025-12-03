@@ -104,6 +104,26 @@ class YOLO_YS_Admin {
             'yolo-yacht-texts',
             array($this, 'display_texts_page')
         );
+        
+        // Add Quote Requests submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Quote Requests', 'yolo-yacht-search'),
+            __('Quote Requests', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-quote-requests',
+            array($this, 'display_quote_requests_page')
+        );
+        
+        // Add Notification Settings submenu (admin only)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Notification Settings', 'yolo-yacht-search'),
+            __('Notification Settings', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-notification-settings',
+            array($this, 'display_notification_settings_page')
+        );
     }
     
     /**
@@ -130,6 +150,20 @@ class YOLO_YS_Admin {
      */
     public function display_texts_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/texts-page.php';
+    }
+    
+    /**
+     * Display quote requests page
+     */
+    public function display_quote_requests_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-requests-list.php';
+    }
+    
+    /**
+     * Display notification settings page
+     */
+    public function display_notification_settings_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-notification-settings.php';
     }
     
     /**
