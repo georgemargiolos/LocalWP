@@ -238,7 +238,8 @@ class YOLO_YS_Guest_Users {
         wp_localize_script('yolo-guest-dashboard', 'yolo_guest_vars', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yolo_upload_license'),
-            'crew_nonce' => wp_create_nonce('yolo_save_crew_list')
+            'crew_nonce' => wp_create_nonce('yolo_save_crew_list'),
+            'guest_document_nonce' => wp_create_nonce('yolo_guest_document_nonce')
         ));
         
         ob_start();

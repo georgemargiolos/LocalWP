@@ -13,6 +13,8 @@
     let checkinSignaturePad, checkoutSignaturePad;
     let currentYachtId = null;
     let currentBookingId = null;
+    let currentCheckinId = null;
+    let currentCheckoutId = null;
 
     $(document).ready(function() {
         // Initialize
@@ -449,9 +451,6 @@
         });
     }
 
-    // Continue in next part...
-
-})(jQuery);
 
     /**
      * Show check-in form
@@ -636,8 +635,10 @@
             },
             success: function(response) {
                 if (response.success) {
+                    currentCheckinId = response.data.checkin_id;
                     showAlert('success', 'Check-in completed successfully');
-                    hideCheckinForm();
+                    // Don't hide form immediately - user may want to generate PDF
+                    $('#save-checkin-pdf-btn, #send-checkin-guest-btn').show();
                 } else {
                     showAlert('danger', response.data.message);
                 }
@@ -855,8 +856,10 @@
             },
             success: function(response) {
                 if (response.success) {
+                    currentCheckoutId = response.data.checkout_id;
                     showAlert('success', 'Check-out completed successfully');
-                    hideCheckoutForm();
+                    // Don't hide form immediately - user may want to generate PDF
+                    $('#save-checkout-pdf-btn, #send-checkout-guest-btn').show();
                 } else {
                     showAlert('danger', response.data.message);
                 }
@@ -1061,8 +1064,26 @@
             return;
         }
         
-        // Implementation for delete
-        showAlert('info', 'Delete functionality to be implemented');
+        $.ajax({
+            url: yoloBaseManager.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_delete_warehouse_item',
+                nonce: yoloBaseManager.nonce,
+                item_id: itemId
+            },
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', 'Item deleted successfully');
+                    loadWarehouseItems();
+                } else {
+                    showAlert('danger', response.data.message || 'Failed to delete item');
+                }
+            },
+            error: function() {
+                showAlert('danger', 'Error deleting item');
+            }
+        });
     };
 
     /**

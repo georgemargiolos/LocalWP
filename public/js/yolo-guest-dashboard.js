@@ -258,6 +258,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_guest_sign_document',
+                nonce: yolo_guest_vars.guest_document_nonce,
                 document_id: currentDocumentId,
                 document_type: currentDocumentType,
                 signature: signatureData

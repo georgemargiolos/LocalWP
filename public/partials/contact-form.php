@@ -158,6 +158,10 @@ $form_id = 'yolo-contact-form-' . uniqid();
 </style>
 
 <script>
+var yolo_ajax = {
+    ajax_url: '<?php echo admin_url('admin-ajax.php'); ?>'
+};
+
 jQuery(document).ready(function($) {
     $('#<?php echo esc_js($form_id); ?>').on('submit', function(e) {
         e.preventDefault();

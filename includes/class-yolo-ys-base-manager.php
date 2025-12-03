@@ -41,6 +41,7 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_bm_send_to_guest', array($this, 'ajax_send_to_guest'));
         add_action('wp_ajax_yolo_bm_save_warehouse_item', array($this, 'ajax_save_warehouse_item'));
         add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_warehouse_items'));
+        add_action('wp_ajax_yolo_bm_delete_warehouse_item', array($this, 'ajax_delete_warehouse_item'));
         add_action('wp_ajax_yolo_bm_get_bookings_calendar', array($this, 'ajax_get_bookings_calendar'));
         
         // Guest AJAX handlers
@@ -843,6 +844,33 @@ class YOLO_YS_Base_Manager {
     }
 
     /**
+     * AJAX: Delete warehouse item
+     */
+    public function ajax_delete_warehouse_item() {
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        
+        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+            return;
+        }
+        
+        global $wpdb;
+        $item_id = intval($_POST['item_id']);
+        
+        $result = $wpdb->delete(
+            $wpdb->prefix . 'yolo_bm_warehouse',
+            array('id' => $item_id),
+            array('%d')
+        );
+        
+        if ($result) {
+            wp_send_json_success(array('message' => 'Item deleted successfully'));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to delete item'));
+        }
+    }
+
+    /**
      * AJAX: Get bookings calendar
      */
     public function ajax_get_bookings_calendar() {
@@ -865,8 +893,11 @@ class YOLO_YS_Base_Manager {
      * AJAX: Guest sign document
      */
     public function ajax_guest_sign_document() {
-        // Guest users don't have base manager nonce, so skip nonce check
-        // Security is ensured by login check and booking ownership verification
+        // Verify guest-specific nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_guest_document_nonce')) {
+            wp_send_json_error(array('message' => 'Security verification failed'));
+            return;
+        }
         
         if (!is_user_logged_in()) {
             wp_send_json_error(array('message' => 'Please log in'));
