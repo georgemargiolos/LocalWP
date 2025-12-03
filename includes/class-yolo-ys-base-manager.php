@@ -101,35 +101,23 @@ class YOLO_YS_Base_Manager {
     }
 
     /**
-     * Add custom admin dashboard page for base managers
+     * Add Base Manager submenu items under YOLO Yacht Search menu
      * Uses 'edit_posts' capability which both Admins and Base Managers have
      */
     public function add_admin_dashboard_page() {
-        // Use 'edit_posts' capability - both admins and base managers have this
-        // This is safer than checking current_user_can() during hook registration
-        add_menu_page(
-            'Base Manager Dashboard',
-            'Base Manager',
-            'edit_posts',
-            'yolo-base-manager',
-            array($this, 'render_admin_dashboard'),
-            'dashicons-yacht',
-            3
+        // Add Base Manager Dashboard submenu under YOLO Yacht Search
+        add_submenu_page(
+            'yolo-yacht-search',           // Parent slug (main YOLO menu)
+            'Base Manager Dashboard',       // Page title
+            'Base Manager Dashboard',       // Menu title
+            'edit_posts',                  // Capability
+            'yolo-base-manager',           // Menu slug
+            array($this, 'render_admin_dashboard')  // Callback
         );
         
-        // Add Dashboard submenu (replaces auto-generated duplicate)
+        // Add Yacht Management submenu
         add_submenu_page(
-            'yolo-base-manager',
-            'Dashboard',
-            'Dashboard',
-            'edit_posts',
-            'yolo-base-manager',
-            array($this, 'render_admin_dashboard')
-        );
-        
-        // Add submenu items
-        add_submenu_page(
-            'yolo-base-manager',
+            'yolo-yacht-search',
             'Yacht Management',
             'Yacht Management',
             'edit_posts',
@@ -137,8 +125,9 @@ class YOLO_YS_Base_Manager {
             array($this, 'render_yacht_management_page')
         );
         
+        // Add Check-In submenu
         add_submenu_page(
-            'yolo-base-manager',
+            'yolo-yacht-search',
             'Check-In',
             'Check-In',
             'edit_posts',
@@ -146,8 +135,9 @@ class YOLO_YS_Base_Manager {
             array($this, 'render_checkin_page')
         );
         
+        // Add Check-Out submenu
         add_submenu_page(
-            'yolo-base-manager',
+            'yolo-yacht-search',
             'Check-Out',
             'Check-Out',
             'edit_posts',
@@ -155,9 +145,10 @@ class YOLO_YS_Base_Manager {
             array($this, 'render_checkout_page')
         );
         
+        // Add Warehouse Management submenu
         add_submenu_page(
-            'yolo-base-manager',
-            'Warehouse Management',
+            'yolo-yacht-search',
+            'Warehouse',
             'Warehouse',
             'edit_posts',
             'yolo-warehouse',
