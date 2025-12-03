@@ -226,50 +226,28 @@ class YOLO_YS_Base_Manager {
      * Render yacht management page
      */
     public function render_yacht_management_page() {
-        // Reuse the frontend template but in admin context
-        echo '<div class="wrap"><h1>Yacht Management</h1>';
-        echo '<div class="yolo-bm-admin-content">';
-        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
-        echo '</div></div>';
-        
-        // Add inline script to show only yacht tab
-        echo '<script>jQuery(document).ready(function($) { $("#yachts-tab").click(); });</script>';
+        include YOLO_YS_PLUGIN_DIR . 'admin/partials/base-manager-yacht-management.php';
     }
     
     /**
      * Render check-in page
      */
     public function render_checkin_page() {
-        echo '<div class="wrap"><h1>Check-In</h1>';
-        echo '<div class="yolo-bm-admin-content">';
-        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
-        echo '</div></div>';
-        
-        echo '<script>jQuery(document).ready(function($) { $("#checkin-tab").click(); });</script>';
+        include YOLO_YS_PLUGIN_DIR . 'admin/partials/base-manager-checkin.php';
     }
     
     /**
      * Render check-out page
      */
     public function render_checkout_page() {
-        echo '<div class="wrap"><h1>Check-Out</h1>';
-        echo '<div class="yolo-bm-admin-content">';
-        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
-        echo '</div></div>';
-        
-        echo '<script>jQuery(document).ready(function($) { $("#checkout-tab").click(); });</script>';
+        include YOLO_YS_PLUGIN_DIR . 'admin/partials/base-manager-checkout.php';
     }
     
     /**
      * Render warehouse page
      */
     public function render_warehouse_page() {
-        echo '<div class="wrap"><h1>Warehouse Management</h1>';
-        echo '<div class="yolo-bm-admin-content">';
-        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
-        echo '</div></div>';
-        
-        echo '<script>jQuery(document).ready(function($) { $("#warehouse-tab").click(); });</script>';
+        include YOLO_YS_PLUGIN_DIR . 'admin/partials/base-manager-warehouse.php';
     }
 
     /**
