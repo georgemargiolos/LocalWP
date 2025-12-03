@@ -48,6 +48,9 @@ class YOLO_YS_Yacht_Search {
 
         // Initialize admin documents shortcode
         new YOLO_YS_Admin_Documents_Shortcode();
+        
+        // Initialize contact messages system
+        new YOLO_YS_Contact_Messages();
     }
     
     private function define_public_hooks() {

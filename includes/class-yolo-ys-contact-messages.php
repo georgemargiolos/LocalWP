@@ -440,6 +440,3 @@ class YOLO_YS_Contact_Messages {
         return true;
     }
 }
-
-// Initialize contact messages system
-new YOLO_YS_Contact_Messages();
