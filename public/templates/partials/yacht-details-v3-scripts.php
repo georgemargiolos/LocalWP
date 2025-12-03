@@ -1000,6 +1000,70 @@ function updatePriceDisplayWithDeposit() {
 // Note: Date picker event handler is attached immediately after Litepicker creation (see Litepicker init section)
 document.addEventListener('DOMContentLoaded', function() {
     updatePriceDisplayWithDeposit();
+    
+    // ============================================
+    // QUOTE REQUEST FORM HANDLER
+    // ============================================
+    const quoteForm = document.getElementById('quoteRequestForm');
+    if (quoteForm) {
+        quoteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            formData.append('action', 'yolo_submit_quote_request');
+            formData.append('nonce', '<?php echo wp_create_nonce('yolo_quote_nonce'); ?>');
+            
+            // Get date range from picker if available
+            if (window.yoloDatePicker) {
+                const startDate = window.yoloDatePicker.getStartDate();
+                const endDate = window.yoloDatePicker.getEndDate();
+                if (startDate) formData.append('date_from', startDate.format('YYYY-MM-DD'));
+                if (endDate) formData.append('date_to', endDate.format('YYYY-MM-DD'));
+            }
+            
+            // Get number of guests if available
+            const guestsSelect = document.querySelector('select[name="num_guests"]');
+            if (guestsSelect) {
+                formData.append('num_guests', guestsSelect.value);
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'SENDING...';
+            submitBtn.disabled = true;
+            
+            // Submit via AJAX
+            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('✓ ' + data.data.message);
+                    // Reset form
+                    quoteForm.reset();
+                    // Hide form
+                    toggleQuoteForm();
+                } else {
+                    // Show error message
+                    alert('✗ ' + (data.data.message || 'Failed to submit quote request. Please try again.'));
+                }
+                // Restore button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Quote submission error:', error);
+                alert('✗ Failed to submit quote request. Please try again or contact us directly.');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
 });
 
 // Date picker event handler is now attached immediately after Litepicker creation (see line 237+)

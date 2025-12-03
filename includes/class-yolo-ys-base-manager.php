@@ -102,12 +102,16 @@ class YOLO_YS_Base_Manager {
 
     /**
      * Add custom admin dashboard page for base managers
+     * Admins can access with 'manage_options', Base Managers with 'manage_base_operations'
      */
     public function add_admin_dashboard_page() {
+        // Determine capability: admins use manage_options, base managers use manage_base_operations
+        $menu_capability = current_user_can('manage_options') ? 'manage_options' : 'manage_base_operations';
+        
         add_menu_page(
             'Base Manager Dashboard',
             'Base Manager',
-            'manage_base_operations',
+            $menu_capability,
             'yolo-base-manager',
             array($this, 'render_admin_dashboard'),
             'dashicons-yacht',
@@ -119,17 +123,17 @@ class YOLO_YS_Base_Manager {
             'yolo-base-manager',
             'Dashboard',
             'Dashboard',
-            'manage_base_operations',
+            $menu_capability,
             'yolo-base-manager',
             array($this, 'render_admin_dashboard')
         );
         
-        // Add submenu items
+        // Add submenu items - all use same capability logic
         add_submenu_page(
             'yolo-base-manager',
             'Yacht Management',
             'Yacht Management',
-            'manage_yachts',
+            $menu_capability,
             'yolo-yacht-management',
             array($this, 'render_yacht_management_page')
         );
@@ -138,7 +142,7 @@ class YOLO_YS_Base_Manager {
             'yolo-base-manager',
             'Check-In',
             'Check-In',
-            'manage_checkins',
+            $menu_capability,
             'yolo-checkin',
             array($this, 'render_checkin_page')
         );
@@ -147,7 +151,7 @@ class YOLO_YS_Base_Manager {
             'yolo-base-manager',
             'Check-Out',
             'Check-Out',
-            'manage_checkouts',
+            $menu_capability,
             'yolo-checkout',
             array($this, 'render_checkout_page')
         );
@@ -156,7 +160,7 @@ class YOLO_YS_Base_Manager {
             'yolo-base-manager',
             'Warehouse Management',
             'Warehouse',
-            'manage_warehouse',
+            $menu_capability,
             'yolo-warehouse',
             array($this, 'render_warehouse_page')
         );
