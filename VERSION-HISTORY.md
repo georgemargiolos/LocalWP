@@ -4,6 +4,72 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 
 ---
 
+## v17.5 (December 3, 2025) - Contact Form System
+
+**Status:** Production Ready ✅
+
+### Major Features
+- **Complete In-House Contact Form System** with real-time notifications
+- Contact form shortcode `[yolo_contact_form]` matching CF7 styling
+- Database storage for all contact messages
+- Admin interface with list and detail views
+- WordPress admin bar notification badges
+- Browser push notifications
+- Status tracking (new, reviewed, responded)
+- Internal notes system for team collaboration
+
+### New Capabilities
+- Display contact form on any page via shortcode
+- Store contact messages in database permanently
+- View and manage messages in admin interface
+- Filter messages by status
+- Update message status
+- Add internal notes to messages
+- Receive real-time notifications for new messages
+- Admin bar badge shows unread message count
+- Browser push notifications for new messages
+- Quick contact actions (email, phone)
+
+### Database Changes
+- Added `wp_yolo_contact_messages` table
+- User meta for notification preferences
+
+### Technical Improvements
+- AJAX-powered contact form submission
+- Real-time notification system
+- Matches Contact Form 7 styling for seamless integration
+- Security: Nonce verification, capability checks, input sanitization
+- Efficient database queries with indexes
+- Client-side and server-side validation
+
+### Files Added
+- `includes/class-yolo-ys-contact-messages.php`
+- `admin/partials/contact-messages-list.php`
+- `admin/partials/contact-message-detail.php`
+- `public/partials/contact-form.php`
+- `admin/js/contact-notifications.js`
+- `CHANGELOG_v17.5.md`
+- `HANDOFF_v17.5.md`
+
+### Files Modified
+- `yolo-yacht-search.php` - Added contact messages initialization
+- `admin/class-yolo-ys-admin.php` - Added contact messages menu
+
+### Documentation
+- Comprehensive changelog created
+- Technical handoff document with full specifications
+- Database schema documentation
+- AJAX API reference
+- Notification system documentation
+
+### Shortcodes
+- `[yolo_contact_form]` - Contact form with CF7 styling
+
+**See:** `CHANGELOG_v17.5.md` for detailed changes  
+**See:** `HANDOFF_v17.5.md` for technical documentation
+
+---
+
 ## v17.4 (December 3, 2025) - In-House Quote Request System
 
 **Status:** Production Ready ✅
