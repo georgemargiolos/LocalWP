@@ -93,5 +93,90 @@ Should only appear ONCE in `class-yolo-ys-yacht-search.php`!
 
 ---
 
+---
+
+## ❌ Fatal Error: Class Not Found
+
+### Error Description
+```
+Fatal error: Uncaught Error: Class 'YOLO_YS_ClassName' not found
+Plugin could not be activated because it triggered a fatal error.
+```
+
+### Root Cause
+**Missing `require_once` statements** - Class files exist and are initialized, but never loaded into memory.
+
+When creating new classes, forgot to add `require_once` in main plugin file before initialization.
+
+### Solution
+**ALWAYS add require_once BEFORE initialization:**
+
+#### ❌ WRONG - Class initialized but not loaded:
+```php
+// yolo-yacht-search.php
+// (Missing require_once for class-yolo-ys-example.php!)
+
+// includes/class-yolo-ys-yacht-search.php
+private function define_admin_hooks() {
+    new YOLO_YS_Example();  // ← Fatal error: Class not found!
+}
+```
+
+#### ✅ CORRECT - Load THEN initialize:
+```php
+// yolo-yacht-search.php
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-example.php';  // ← Load first!
+
+// includes/class-yolo-ys-yacht-search.php
+private function define_admin_hooks() {
+    new YOLO_YS_Example();  // ← Now it works!
+}
+```
+
+### Why This Happens
+- Created new class file
+- Added initialization in main class
+- **Forgot to add `require_once` in main plugin file**
+- PHP can't find the class when trying to instantiate
+- Results in fatal error
+
+### Classes Affected (Fixed in v17.8.1)
+- `YOLO_YS_PDF_Generator` - Missing require ✅ Fixed
+- `YOLO_YS_Shortcodes` - Missing require ✅ Fixed
+- `YOLO_YS_Quote_Handler` - Missing require ✅ Fixed
+
+### Prevention Checklist
+When creating new classes:
+- [ ] Create class file in `includes/` (or appropriate directory)
+- [ ] **Add `require_once` in `yolo-yacht-search.php`** ← CRITICAL!
+- [ ] Add initialization in `class-yolo-ys-yacht-search.php`
+- [ ] Test plugin activation
+- [ ] Verify no fatal errors
+
+### Load Order Matters
+Load dependencies BEFORE classes that use them:
+```php
+// CORRECT order:
+require_once 'class-yolo-ys-pdf-generator.php';  // Dependency
+require_once 'class-yolo-ys-base-manager.php';   // Uses PDF generator
+
+// WRONG order:
+require_once 'class-yolo-ys-base-manager.php';   // Will fail!
+require_once 'class-yolo-ys-pdf-generator.php';  // Too late
+```
+
+### Quick Diagnostic
+Check if all initialized classes are loaded:
+```bash
+cd /path/to/plugin
+grep "new YOLO_YS_" includes/class-yolo-ys-yacht-search.php
+# For each class found, verify require_once exists in yolo-yacht-search.php
+```
+
+### Git Commit
+- v17.8.1 (7e00ab6): Added missing require statements
+
+---
+
 **Last Updated:** December 3, 2025  
-**Version:** 17.6
+**Version:** 17.8.1
