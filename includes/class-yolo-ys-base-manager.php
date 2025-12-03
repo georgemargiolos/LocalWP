@@ -47,44 +47,224 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_guest_sign_document', array($this, 'ajax_guest_sign_document'));
         add_action('wp_ajax_yolo_guest_get_documents', array($this, 'ajax_guest_get_documents'));
         
-        // Redirect base managers from wp-admin
-        add_action('admin_init', array($this, 'redirect_base_manager_from_admin'));
+        // Add custom admin dashboard page
+        add_action('admin_menu', array($this, 'add_admin_dashboard_page'));
+        
+        // Remove admin menu items for base managers
+        add_action('admin_menu', array($this, 'remove_admin_menu_items'), 999);
+        
+        // Enqueue admin assets
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
     }
 
     /**
      * Register base manager role
+     * Base Manager = Editor role + Base Manager capabilities
      */
     public function register_base_manager_role() {
+        // Get editor role capabilities
+        $editor = get_role('editor');
+        
         if (!get_role('base_manager')) {
+            // Create base manager with all editor capabilities
+            $capabilities = $editor ? $editor->capabilities : array();
+            
+            // Add custom base manager capabilities
+            $capabilities['manage_base_operations'] = true;
+            $capabilities['manage_yachts'] = true;
+            $capabilities['manage_checkins'] = true;
+            $capabilities['manage_checkouts'] = true;
+            $capabilities['manage_warehouse'] = true;
+            
             add_role(
                 'base_manager',
                 'Base Manager',
-                array(
-                    'read' => true,
-                    'level_0' => true,
-                    'manage_base_operations' => true,
-                )
+                $capabilities
             );
-            error_log('YOLO YS: Base Manager role created');
+            error_log('YOLO YS: Base Manager role created with Editor capabilities');
+        } else {
+            // Update existing base manager role with editor capabilities
+            $base_manager = get_role('base_manager');
+            if ($base_manager && $editor) {
+                foreach ($editor->capabilities as $cap => $granted) {
+                    $base_manager->add_cap($cap);
+                }
+                // Add custom capabilities
+                $base_manager->add_cap('manage_base_operations');
+                $base_manager->add_cap('manage_yachts');
+                $base_manager->add_cap('manage_checkins');
+                $base_manager->add_cap('manage_checkouts');
+                $base_manager->add_cap('manage_warehouse');
+            }
         }
     }
 
     /**
-     * Redirect base managers away from wp-admin
+     * Add custom admin dashboard page for base managers
      */
-    public function redirect_base_manager_from_admin() {
+    public function add_admin_dashboard_page() {
+        add_menu_page(
+            'Base Manager Dashboard',
+            'Base Manager',
+            'manage_base_operations',
+            'yolo-base-manager',
+            array($this, 'render_admin_dashboard'),
+            'dashicons-yacht',
+            3
+        );
+        
+        // Add submenu items
+        add_submenu_page(
+            'yolo-base-manager',
+            'Yacht Management',
+            'Yacht Management',
+            'manage_yachts',
+            'yolo-yacht-management',
+            array($this, 'render_yacht_management_page')
+        );
+        
+        add_submenu_page(
+            'yolo-base-manager',
+            'Check-In',
+            'Check-In',
+            'manage_checkins',
+            'yolo-checkin',
+            array($this, 'render_checkin_page')
+        );
+        
+        add_submenu_page(
+            'yolo-base-manager',
+            'Check-Out',
+            'Check-Out',
+            'manage_checkouts',
+            'yolo-checkout',
+            array($this, 'render_checkout_page')
+        );
+        
+        add_submenu_page(
+            'yolo-base-manager',
+            'Warehouse Management',
+            'Warehouse',
+            'manage_warehouse',
+            'yolo-warehouse',
+            array($this, 'render_warehouse_page')
+        );
+    }
+    
+    /**
+     * Remove admin menu items for base managers
+     */
+    public function remove_admin_menu_items() {
         $user = wp_get_current_user();
         
-        if (in_array('base_manager', (array) $user->roles) && !defined('DOING_AJAX')) {
-            $base_manager_page = get_option('yolo_ys_base_manager_page_id');
-            if ($base_manager_page) {
-                wp_redirect(get_permalink($base_manager_page));
-                exit;
-            } else {
-                wp_redirect(home_url());
-                exit;
-            }
+        // Only restrict base managers, not admins
+        if (in_array('base_manager', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+            // Remove WordPress core admin pages
+            remove_menu_page('plugins.php');              // Plugins
+            remove_menu_page('themes.php');               // Themes
+            remove_menu_page('tools.php');                // Tools
+            remove_menu_page('options-general.php');      // Settings
+            remove_submenu_page('index.php', 'update-core.php'); // Updates
         }
+    }
+    
+    /**
+     * Enqueue admin assets for base manager pages
+     */
+    public function enqueue_admin_assets($hook) {
+        // Only load on base manager pages
+        if (strpos($hook, 'yolo-') === false && strpos($hook, 'yolo_') === false) {
+            return;
+        }
+        
+        // Base manager admin CSS
+        wp_enqueue_style(
+            'yolo-base-manager-admin',
+            YOLO_YS_PLUGIN_URL . 'admin/css/base-manager-admin.css',
+            array(),
+            YOLO_YS_VERSION
+        );
+        
+        // Base manager JS (reuse existing)
+        wp_enqueue_script(
+            'yolo-base-manager',
+            YOLO_YS_PLUGIN_URL . 'public/js/base-manager.js',
+            array('jquery'),
+            YOLO_YS_VERSION,
+            true
+        );
+        
+        // Signature Pad library
+        wp_enqueue_script(
+            'signature-pad',
+            'https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js',
+            array(),
+            '4.1.7',
+            true
+        );
+        
+        // Localize script
+        wp_localize_script('yolo-base-manager', 'yolo_base_manager', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('yolo_base_manager_nonce')
+        ));
+    }
+    
+    /**
+     * Render admin dashboard page
+     */
+    public function render_admin_dashboard() {
+        include YOLO_YS_PLUGIN_DIR . 'admin/partials/base-manager-admin-dashboard.php';
+    }
+    
+    /**
+     * Render yacht management page
+     */
+    public function render_yacht_management_page() {
+        // Reuse the frontend template but in admin context
+        echo '<div class="wrap"><h1>Yacht Management</h1>';
+        echo '<div class="yolo-bm-admin-content">';
+        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
+        echo '</div></div>';
+        
+        // Add inline script to show only yacht tab
+        echo '<script>jQuery(document).ready(function($) { $("#yachts-tab").click(); });</script>';
+    }
+    
+    /**
+     * Render check-in page
+     */
+    public function render_checkin_page() {
+        echo '<div class="wrap"><h1>Check-In</h1>';
+        echo '<div class="yolo-bm-admin-content">';
+        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
+        echo '</div></div>';
+        
+        echo '<script>jQuery(document).ready(function($) { $("#checkin-tab").click(); });</script>';
+    }
+    
+    /**
+     * Render check-out page
+     */
+    public function render_checkout_page() {
+        echo '<div class="wrap"><h1>Check-Out</h1>';
+        echo '<div class="yolo-bm-admin-content">';
+        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
+        echo '</div></div>';
+        
+        echo '<script>jQuery(document).ready(function($) { $("#checkout-tab").click(); });</script>';
+    }
+    
+    /**
+     * Render warehouse page
+     */
+    public function render_warehouse_page() {
+        echo '<div class="wrap"><h1>Warehouse Management</h1>';
+        echo '<div class="yolo-bm-admin-content">';
+        include YOLO_YS_PLUGIN_DIR . 'public/partials/base-manager-dashboard.php';
+        echo '</div></div>';
+        
+        echo '<script>jQuery(document).ready(function($) { $("#warehouse-tab").click(); });</script>';
     }
 
     /**
