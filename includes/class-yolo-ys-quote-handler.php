@@ -131,5 +131,3 @@ class YOLO_YS_Quote_Handler {
 
 }
 
-// Initialize quote handler
-new YOLO_YS_Quote_Handler();

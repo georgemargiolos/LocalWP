@@ -344,6 +344,3 @@ class YOLO_YS_Admin_Colors {
     }
 }
 
-// Initialize the class
-new YOLO_YS_Admin_Colors();
-
