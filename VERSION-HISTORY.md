@@ -4,6 +4,69 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 
 ---
 
+## v17.4 (December 3, 2025) - In-House Quote Request System
+
+**Status:** Production Ready ✅
+
+### Major Features
+- **Complete In-House Quote Request System** with real-time notifications
+- Quote requests database storage (no email dependency)
+- Admin interface for quote management
+- WordPress admin bar notification badges
+- Browser push notifications
+- Notification settings page for base managers
+- Status tracking (new, reviewed, responded)
+- Internal notes system
+
+### New Capabilities
+- Store quote requests in database
+- View and manage quotes in admin interface
+- Filter quotes by status
+- Update quote status
+- Add internal notes to quotes
+- Receive real-time notifications for new quotes
+- Configure which base managers receive notifications
+- Admin bar badge shows unread quote count
+- Browser push notifications for new quotes
+
+### Database Changes
+- Added `wp_yolo_quote_requests` table
+- User meta for notification preferences
+
+### Technical Improvements
+- AJAX-powered quote management interface
+- Real-time notification system
+- Granular notification control per user
+- Security: Nonce verification, capability checks, input sanitization
+- Efficient database queries with indexes
+
+### Files Added
+- `includes/class-yolo-ys-quote-requests.php`
+- `admin/partials/quote-requests-list.php`
+- `admin/partials/quote-request-detail.php`
+- `admin/partials/quote-notification-settings.php`
+- `admin/css/quote-notifications.css`
+- `admin/js/quote-notifications.js`
+- `CHANGELOG_v17.4.md`
+- `HANDOFF_v17.4.md`
+
+### Files Modified
+- `yolo-yacht-search.php` - Added quote requests initialization
+- `admin/class-yolo-ys-admin.php` - Added quote menus
+- `includes/class-yolo-ys-quote-handler.php` - Updated to use database
+
+### Documentation
+- Comprehensive changelog created
+- Technical handoff document with full specifications
+- Database schema documentation
+- AJAX API reference
+- Notification system documentation
+
+**See:** `CHANGELOG_v17.4.md` for detailed changes  
+**See:** `HANDOFF_v17.4.md` for technical documentation
+
+---
+
 ## v17.0 (December 3, 2025) - Base Manager System
 
 **Status:** Ready for Production Testing ✅
