@@ -68,7 +68,7 @@ class YOLO_YS_Admin {
         add_menu_page(
             __('YOLO Yacht Search', 'yolo-yacht-search'),
             __('YOLO Yacht Search', 'yolo-yacht-search'),
-            'manage_options',
+            'edit_posts', // Changed from 'manage_options' to allow base managers (who have editor capabilities)
             'yolo-yacht-search',
             array($this, 'display_plugin_admin_page'),
             'dashicons-palmtree',
@@ -80,7 +80,7 @@ class YOLO_YS_Admin {
             'yolo-yacht-search',
             __('Settings', 'yolo-yacht-search'),
             __('Settings', 'yolo-yacht-search'),
-            'manage_options',
+            'edit_posts', // Changed to allow base managers
             'yolo-yacht-search',
             array($this, 'display_plugin_admin_page')
         );
@@ -90,7 +90,7 @@ class YOLO_YS_Admin {
             'yolo-yacht-search',
             __('Bookings', 'yolo-yacht-search'),
             __('Bookings', 'yolo-yacht-search'),
-            'manage_options',
+            'edit_posts', // Changed to allow base managers
             'yolo-ys-bookings',
             array($this, 'display_bookings_page')
         );
@@ -100,7 +100,7 @@ class YOLO_YS_Admin {
             'yolo-yacht-search',
             __('Texts', 'yolo-yacht-search'),
             __('Texts', 'yolo-yacht-search'),
-            'manage_options',
+            'edit_posts', // Changed to allow base managers
             'yolo-yacht-texts',
             array($this, 'display_texts_page')
         );

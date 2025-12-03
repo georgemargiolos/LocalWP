@@ -113,6 +113,16 @@ class YOLO_YS_Base_Manager {
             3
         );
         
+        // Add Dashboard submenu (replaces auto-generated duplicate)
+        add_submenu_page(
+            'yolo-base-manager',
+            'Dashboard',
+            'Dashboard',
+            'manage_base_operations',
+            'yolo-base-manager',
+            array($this, 'render_admin_dashboard')
+        );
+        
         // Add submenu items
         add_submenu_page(
             'yolo-base-manager',
@@ -148,16 +158,6 @@ class YOLO_YS_Base_Manager {
             'manage_warehouse',
             'yolo-warehouse',
             array($this, 'render_warehouse_page')
-        );
-        
-        // Add Bookings submenu (uses existing admin bookings page)
-        add_submenu_page(
-            'yolo-base-manager',
-            'Bookings',
-            'Bookings',
-            'manage_base_operations',
-            'yolo-ys-bookings',
-            array($this, 'render_bookings_page')
         );
     }
     
@@ -275,18 +275,6 @@ class YOLO_YS_Base_Manager {
         echo '</div></div>';
         
         echo '<script>jQuery(document).ready(function($) { $("#warehouse-tab").click(); });</script>';
-    }
-    
-    /**
-     * Render bookings page (uses existing admin bookings page)
-     */
-    public function render_bookings_page() {
-        // Load required classes
-        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings.php';
-        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings-manager.php';
-        
-        // Display bookings list with tabbed view (table + calendar)
-        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/bookings-list-v2.php';
     }
 
     /**

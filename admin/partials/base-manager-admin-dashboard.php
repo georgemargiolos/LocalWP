@@ -84,6 +84,7 @@ if (!defined('ABSPATH')) {
             <a href="<?php echo admin_url('admin.php?page=yolo-ys-bookings'); ?>" class="button button-primary">
                 Manage Bookings
             </a>
+            <p style="margin-top: 10px; font-size: 12px; color: #666;">Access via: YOLO Yacht Search → Bookings</p>
         </div>
 
         <!-- Documents & PDFs -->
