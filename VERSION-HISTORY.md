@@ -4,6 +4,37 @@ Complete version history of the YOLO Yacht Search & Booking Plugin.
 
 ---
 
+## v17.8 (December 3, 2025) - Critical Bug Fixes ✅
+
+**Status:** Production Ready ✅  
+**Focus:** Stability, Security, Code Quality
+
+### Critical Fixes
+- Fixed admin localization variable mismatch (base manager pages now work)
+- Removed auto-initialization from shortcodes and Stripe handlers
+- Consistent class initialization pattern across all v17 classes
+
+### Security Enhancements
+- Added honeypot protection to quote form
+- Implemented IP-based rate limiting (5 requests/hour)
+- Comprehensive error handling in PDF generation
+
+### Performance Improvements
+- Removed duplicate AJAX call in checkout (50% reduction)
+- Improved SQL ordering syntax
+- Defensive programming in templates
+
+### Files Modified
+- 10 files modified
+- Bugs Fixed: 8/8 (all from Cursor deep debug report)
+- Database Changes: None
+- Breaking Changes: None
+
+**See:** `CHANGELOG_v17.8.md` for detailed changes  
+**See:** `HANDOFF_v17.8.md` for technical documentation
+
+---
+
 ## v17.5 (December 3, 2025) - Contact Form System
 
 **Status:** Production Ready ✅
