@@ -115,6 +115,16 @@ class YOLO_YS_Admin {
             array($this, 'display_quote_requests_page')
         );
         
+        // Add Contact Messages submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Contact Messages', 'yolo-yacht-search'),
+            __('Contact Messages', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-contact-messages',
+            array($this, 'display_contact_messages_page')
+        );
+        
         // Add Notification Settings submenu (admin only)
         add_submenu_page(
             'yolo-yacht-search',
@@ -157,6 +167,19 @@ class YOLO_YS_Admin {
      */
     public function display_quote_requests_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-requests-list.php';
+    }
+    
+    /**
+     * Display contact messages page
+     */
+    public function display_contact_messages_page() {
+        $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : 'list';
+        
+        if ($action === 'view' && isset($_GET['message_id'])) {
+            include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/contact-message-detail.php';
+        } else {
+            include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/contact-messages-list.php';
+        }
     }
     
     /**
