@@ -8,6 +8,11 @@
  */
 
 if (!defined('ABSPATH')) {
+
+// Permission check
+if (!current_user_can('manage_options')) {
+    wp_die(__('Sorry, you are not allowed to access this page.', 'yolo-yacht-search'));
+}
     exit;
 }
 ?>

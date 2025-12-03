@@ -38,11 +38,41 @@ class YOLO_YS_Activator {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-base-manager-database.php';
         YOLO_YS_Base_Manager_Database::create_tables();
         
+        // Create base manager role
+        self::create_base_manager_role();
+        
         // Run migrations
         self::run_migrations();
         
         // Flush rewrite rules
         flush_rewrite_rules();
+    }
+    
+    /**
+     * Create base manager role
+     */
+    private static function create_base_manager_role() {
+        // Get editor role capabilities
+        $editor = get_role('editor');
+        
+        if (!get_role('base_manager') && $editor) {
+            $capabilities = $editor->capabilities;
+            
+            // Add custom base manager capabilities
+            $capabilities['manage_base_operations'] = true;
+            $capabilities['manage_yachts'] = true;
+            $capabilities['manage_checkins'] = true;
+            $capabilities['manage_checkouts'] = true;
+            $capabilities['manage_warehouse'] = true;
+            
+            add_role('base_manager', 'Base Manager', $capabilities);
+            error_log('YOLO YS: Base Manager role created with Editor capabilities');
+        } else if (get_role('base_manager')) {
+            // Update existing role - remove manage_options if it was added
+            $base_manager = get_role('base_manager');
+            $base_manager->remove_cap('manage_options');
+            error_log('YOLO YS: Base Manager role updated - removed manage_options for security');
+        }
     }
     
     /**

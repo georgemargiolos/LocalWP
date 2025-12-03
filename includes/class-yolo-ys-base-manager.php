@@ -49,7 +49,7 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_guest_get_documents', array($this, 'ajax_guest_get_documents'));
         
         // Add custom admin dashboard page
-        add_action('admin_menu', array($this, 'add_admin_dashboard_page'));
+        add_action('admin_menu', array($this, 'add_admin_dashboard_page'), 25); // Priority 25 to run AFTER main menu
         
         // Remove admin menu items for base managers
         add_action('admin_menu', array($this, 'remove_admin_menu_items'), 999);
@@ -76,7 +76,6 @@ class YOLO_YS_Base_Manager {
             $capabilities['manage_checkins'] = true;
             $capabilities['manage_checkouts'] = true;
             $capabilities['manage_warehouse'] = true;
-            $capabilities['manage_options'] = true;  // Allow access to Base Manager admin pages
             
             add_role(
                 'base_manager',
@@ -97,15 +96,14 @@ class YOLO_YS_Base_Manager {
                 $base_manager->add_cap('manage_checkins');
                 $base_manager->add_cap('manage_checkouts');
                 $base_manager->add_cap('manage_warehouse');
-                $base_manager->add_cap('manage_options');  // Allow access to Base Manager admin pages
             }
         }
     }
 
     /**
      * Add Base Manager submenu items under YOLO Yacht Search menu
-     * Uses 'manage_options' capability for Admins
-     * Base Managers will need this capability granted to their role
+     * Uses 'edit_posts' capability to match parent menu
+     * Both Admins and Base Manager role users have this capability
      */
     public function add_admin_dashboard_page() {
         // Add Base Manager Dashboard submenu under YOLO Yacht Search
@@ -113,7 +111,7 @@ class YOLO_YS_Base_Manager {
             'yolo-yacht-search',           // Parent slug (main YOLO menu)
             'Base Manager Dashboard',       // Page title
             'Base Manager Dashboard',       // Menu title
-            'manage_options',              // Capability
+            'edit_posts',                  // Capability (matches parent menu)
             'yolo-base-manager',           // Menu slug
             array($this, 'render_admin_dashboard')  // Callback
         );
@@ -123,7 +121,7 @@ class YOLO_YS_Base_Manager {
             'yolo-yacht-search',
             'Yacht Management',
             'Yacht Management',
-            'manage_options',
+            'edit_posts',
             'yolo-yacht-management',
             array($this, 'render_yacht_management_page')
         );
@@ -133,7 +131,7 @@ class YOLO_YS_Base_Manager {
             'yolo-yacht-search',
             'Check-In',
             'Check-In',
-            'manage_options',
+            'edit_posts',
             'yolo-checkin',
             array($this, 'render_checkin_page')
         );
@@ -143,7 +141,7 @@ class YOLO_YS_Base_Manager {
             'yolo-yacht-search',
             'Check-Out',
             'Check-Out',
-            'manage_options',
+            'edit_posts',
             'yolo-checkout',
             array($this, 'render_checkout_page')
         );
@@ -153,7 +151,7 @@ class YOLO_YS_Base_Manager {
             'yolo-yacht-search',
             'Warehouse',
             'Warehouse',
-            'manage_options',
+            'edit_posts',
             'yolo-warehouse',
             array($this, 'render_warehouse_page')
         );
