@@ -61,8 +61,10 @@ class YOLO_YS_Yacht_Search {
         // Initialize shortcodes
         new YOLO_YS_Shortcodes();
         
-        // Initialize Stripe handlers
-        new YOLO_YS_Stripe_Handlers();
+        // Initialize Stripe handlers (only if class exists - loaded conditionally based on stripe-php)
+        if (class_exists('YOLO_YS_Stripe_Handlers')) {
+            new YOLO_YS_Stripe_Handlers();
+        }
     }
     
     private function define_public_hooks() {

@@ -180,13 +180,27 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(90, 6, 'Guest:', 0, 1);
         
         if ($checkin->guest_signature) {
-            $guest_signature_data = str_replace('data:image/png;base64,', '', $checkin->guest_signature);
-            $guest_signature_decoded = base64_decode($guest_signature_data);
-            $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkin_id . '.png';
-            file_put_contents($guest_signature_file, $guest_signature_decoded);
-            
-            $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
-            unlink($guest_signature_file);
+            try {
+                $guest_signature_data = str_replace('data:image/png;base64,', '', $checkin->guest_signature);
+                $guest_signature_decoded = base64_decode($guest_signature_data, true);
+                
+                if ($guest_signature_decoded === false) {
+                    throw new Exception('Invalid base64 guest signature data');
+                }
+                
+                $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkin_id . '_' . uniqid() . '.png';
+                
+                if (file_put_contents($guest_signature_file, $guest_signature_decoded) === false) {
+                    throw new Exception('Failed to write guest signature file');
+                }
+                
+                $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
+                @unlink($guest_signature_file);
+            } catch (Exception $e) {
+                error_log('YOLO YS PDF: Guest signature error (check-in) - ' . $e->getMessage());
+                $pdf->SetX($guest_x);
+                $pdf->Cell(90, 6, '[Guest Signature Error]', 0, 1);
+            }
         } else {
             $pdf->SetX($guest_x);
             $pdf->Cell(90, 6, '___________________', 0, 1);
@@ -377,13 +391,27 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(90, 6, 'Guest:', 0, 1);
         
         if ($checkout->guest_signature) {
-            $guest_signature_data = str_replace('data:image/png;base64,', '', $checkout->guest_signature);
-            $guest_signature_decoded = base64_decode($guest_signature_data);
-            $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkout_id . '.png';
-            file_put_contents($guest_signature_file, $guest_signature_decoded);
-            
-            $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
-            unlink($guest_signature_file);
+            try {
+                $guest_signature_data = str_replace('data:image/png;base64,', '', $checkout->guest_signature);
+                $guest_signature_decoded = base64_decode($guest_signature_data, true);
+                
+                if ($guest_signature_decoded === false) {
+                    throw new Exception('Invalid base64 guest signature data');
+                }
+                
+                $guest_signature_file = sys_get_temp_dir() . '/guest_signature_' . $checkout_id . '_' . uniqid() . '.png';
+                
+                if (file_put_contents($guest_signature_file, $guest_signature_decoded) === false) {
+                    throw new Exception('Failed to write guest signature file');
+                }
+                
+                $pdf->Image($guest_signature_file, $guest_x, $pdf->GetY(), 50);
+                @unlink($guest_signature_file);
+            } catch (Exception $e) {
+                error_log('YOLO YS PDF: Guest signature error (checkout) - ' . $e->getMessage());
+                $pdf->SetX($guest_x);
+                $pdf->Cell(90, 6, '[Guest Signature Error]', 0, 1);
+            }
         } else {
             $pdf->SetX($guest_x);
             $pdf->Cell(90, 6, '___________________', 0, 1);

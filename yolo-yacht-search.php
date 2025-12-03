@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 17.8.1
+ * Version: 17.8.2
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '17.8.1');
+define('YOLO_YS_VERSION', '17.8.2');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -121,9 +121,6 @@ if (is_admin()) {
     // Initialize admin documents management
     $admin_documents = new YOLO_YS_Admin_Documents();
 }
-
-// Initialize quote requests system
-$quote_requests = new YOLO_YS_Quote_Requests();
 
 /**
  * Check database version and run migrations if needed
