@@ -39,6 +39,7 @@
     grid-template-columns: 2fr 1fr;
     gap: 30px;
     margin-bottom: 40px;
+    align-items: start; /* Required for sticky sidebar */
 }
 
 @media (max-width: 968px) {
@@ -145,6 +146,18 @@
     border: 2px solid #e5e7eb;
     border-radius: 12px;
     padding: 20px;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+@media (max-width: 968px) {
+    .yacht-booking-section {
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
 }
 
 .yacht-booking-section h3 {
