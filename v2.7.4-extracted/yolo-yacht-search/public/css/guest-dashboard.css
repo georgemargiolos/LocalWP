@@ -1,0 +1,492 @@
+/* Guest Dashboard Styles */
+
+.yolo-guest-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.yolo-guest-header {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.yolo-guest-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.yolo-guest-subtitle {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.yolo-logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.yolo-logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.yolo-no-bookings {
+    background: #f9fafb;
+    padding: 60px 40px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.yolo-no-bookings h3 {
+    font-size: 24px;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.yolo-no-bookings p {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.yolo-no-bookings a {
+    color: #b91c1c;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.yolo-no-bookings a:hover {
+    text-decoration: underline;
+}
+
+.yolo-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.yolo-booking-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.yolo-booking-header {
+    background: #f9fafb;
+    padding: 24px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.yolo-booking-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #1f2937;
+}
+
+.yolo-booking-status {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.yolo-status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.yolo-status-confirmed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.yolo-status-completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.yolo-status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.yolo-booking-details {
+    padding: 30px;
+}
+
+.yolo-booking-info {
+    margin-bottom: 40px;
+}
+
+.yolo-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.yolo-info-row:last-child {
+    border-bottom: none;
+}
+
+.yolo-info-label {
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.yolo-info-value {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.yolo-license-upload {
+    background: #f9fafb;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.yolo-license-upload h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.yolo-license-note {
+    margin: 0 0 24px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.yolo-license-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .yolo-license-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+}
+
+.yolo-license-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px dashed #d1d5db;
+}
+
+.yolo-license-label {
+    display: block;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.yolo-license-preview {
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.yolo-license-preview img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 2px solid #059669;
+}
+
+.yolo-license-uploaded {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #059669;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.yolo-license-form input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.yolo-upload-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: #b91c1c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yolo-upload-btn:hover {
+    background: #991b1b;
+}
+
+.yolo-upload-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.yolo-upload-message {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.yolo-upload-message .success {
+    color: #059669;
+    font-weight: 600;
+}
+
+.yolo-upload-message .error {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.yolo-guest-notice {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 40px 0;
+}
+
+.yolo-guest-notice p {
+    margin: 0;
+    color: #92400e;
+    font-size: 16px;
+}
+
+.yolo-guest-notice a {
+    color: #b91c1c;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.yolo-guest-notice a:hover {
+    text-decoration: underline;
+}
+
+/* Crew List Section */
+.yolo-crew-list-section {
+    background: #f0fdf4;
+    padding: 30px;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+    margin-top: 30px;
+}
+
+.yolo-crew-list-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    color: #1f2937;
+}
+
+.yolo-crew-note {
+    margin: 0 0 24px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Crew Table with Horizontal Scroll */
+.yolo-crew-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.yolo-crew-table {
+    width: 100%;
+    min-width: 1200px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.yolo-crew-table thead {
+    background: #f3f4f6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.yolo-crew-table th {
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.yolo-crew-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.yolo-crew-table td:first-child {
+    font-weight: 600;
+    color: #6b7280;
+    text-align: center;
+}
+
+.yolo-crew-table input[type="text"],
+.yolo-crew-table input[type="tel"],
+.yolo-crew-table input[type="date"],
+.yolo-crew-table select {
+    width: 100%;
+    min-width: 120px;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.yolo-crew-table input:focus,
+.yolo-crew-table select:focus {
+    outline: none;
+    border-color: #b91c1c;
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+.yolo-save-crew-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yolo-save-crew-btn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.yolo-save-crew-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.yolo-crew-message {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.yolo-crew-message .success {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.yolo-crew-message .error {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.yolo-skipper2-upload {
+    background: #dbeafe;
+    border-left-color: #3b82f6;
+    margin-top: 30px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .yolo-guest-header {
+        padding: 30px 20px;
+    }
+    
+    .yolo-guest-header h1 {
+        font-size: 24px;
+    }
+    
+    .yolo-logout-btn {
+        position: static;
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .yolo-booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .yolo-license-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yolo-info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .yolo-booking-details {
+        padding: 20px;
+    }
+    
+    .yolo-license-upload,
+    .yolo-crew-list-section {
+        padding: 20px;
+    }
+    
+    .yolo-guest-dashboard {
+        padding: 15px;
+    }
+    
+    /* Scroll hint for crew table on mobile */
+    .yolo-crew-table-wrapper::after {
+        content: "← Scroll horizontally to view all fields →";
+        display: block;
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+        color: #6b7280;
+        background: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .yolo-save-crew-btn {
+        width: 100%;
+    }
+}

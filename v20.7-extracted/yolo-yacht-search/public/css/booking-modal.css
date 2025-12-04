@@ -1,0 +1,272 @@
+/**
+ * Booking Modal Styles
+ * Replaces inline styles in yacht-details-v3-scripts.php
+ * Uses Bootstrap 5 utilities where possible
+ */
+
+/* Modal Overlay */
+.yolo-booking-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Modal Content */
+.yolo-booking-modal-content {
+    background: #fff;
+    padding: clamp(20px, 5vw, 40px);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Header */
+.yolo-booking-modal h2 {
+    margin-top: 0;
+    color: #1e40af;
+    font-size: clamp(22px, 5vw, 28px);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.yolo-booking-modal-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 30px;
+    font-size: clamp(14px, 3vw, 16px);
+}
+
+/* Booking Summary Card */
+.yolo-booking-summary {
+    background: #f3f4f6;
+    padding: clamp(15px, 4vw, 20px);
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.yolo-booking-summary h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #374151;
+    font-size: 18px;
+}
+
+.yolo-booking-summary-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.yolo-booking-summary-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.yolo-booking-summary-value {
+    color: #111827;
+    font-weight: 600;
+}
+
+.yolo-booking-summary-total {
+    border-top: 1px solid #d1d5db;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.yolo-booking-summary-total .yolo-booking-summary-value {
+    color: #059669;
+    font-size: 1.1em;
+}
+
+/* Form Section */
+.yolo-booking-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #374151;
+    font-size: 18px;
+}
+
+/* Form Fields - Using Bootstrap grid */
+.yolo-booking-form .row {
+    margin-bottom: 15px;
+}
+
+.yolo-booking-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.yolo-booking-form input[type="text"],
+.yolo-booking-form input[type="email"],
+.yolo-booking-form input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.yolo-booking-form input:focus {
+    outline: none;
+    border-color: #1e40af;
+}
+
+/* Form Buttons */
+.yolo-booking-form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.yolo-booking-btn-cancel {
+    flex: 1 1 100%;
+    min-width: 0;
+    background: #e5e7eb;
+    color: #374151;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: background 0.3s;
+    order: 2;
+}
+
+.yolo-booking-btn-cancel:hover {
+    background: #d1d5db;
+}
+
+.yolo-booking-btn-submit {
+    flex: 1 1 100%;
+    min-width: 0;
+    background: #1e40af;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    transition: background 0.3s;
+    order: 1;
+}
+
+.yolo-booking-btn-submit:hover {
+    background: #1e3a8a;
+}
+
+/* Desktop: Side by side buttons */
+@media (min-width: 576px) {
+    .yolo-booking-form-buttons {
+        flex-wrap: nowrap;
+    }
+    
+    .yolo-booking-btn-cancel,
+    .yolo-booking-btn-submit {
+        flex: 1 1 auto;
+    }
+    
+    .yolo-booking-btn-cancel {
+        order: 1;
+    }
+    
+    .yolo-booking-btn-submit {
+        order: 2;
+    }
+}
+
+/* Quote Modal */
+.yolo-quote-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.yolo-quote-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.yolo-quote-modal h2 {
+    margin-top: 0;
+    color: #1e3a8a;
+}
+
+.yolo-quote-modal input,
+.yolo-quote-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.yolo-quote-modal textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.yolo-quote-modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.yolo-quote-modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.yolo-quote-btn-cancel {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.yolo-quote-btn-submit {
+    background: #1e40af;
+    color: white;
+}
+
+.yolo-quote-btn-submit:hover {
+    background: #1e3a8a;
+}
+

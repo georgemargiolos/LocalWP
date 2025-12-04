@@ -1,0 +1,208 @@
+/* Balance Payment Page Styles */
+
+.yolo-balance-payment {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.payment-header h1 {
+    font-size: 32px;
+    color: #1f2937;
+    margin: 0 0 10px 0;
+}
+
+.payment-subtitle {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.payment-content > div {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.payment-content h2 {
+    font-size: 20px;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.summary-row,
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.summary-row:last-child,
+.payment-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label,
+.payment-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.summary-value,
+.payment-value {
+    color: #1f2937;
+    font-weight: 600;
+    text-align: right;
+}
+
+.payment-row.paid .payment-value {
+    color: #10b981;
+}
+
+.payment-row.total {
+    background: #fef3c7;
+    margin: 12px -12px 0 -12px;
+    padding: 16px 12px;
+    border-radius: 6px;
+    border-bottom: none;
+}
+
+.payment-row.total .payment-label {
+    color: #92400e;
+    font-size: 18px;
+}
+
+.payment-row.total .payment-value {
+    color: #92400e;
+    font-size: 24px;
+}
+
+.payment-actions {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.btn-pay-now {
+    display: inline-block;
+    padding: 16px 48px;
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+}
+
+.btn-pay-now:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-pay-now:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.payment-info {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.payment-info p {
+    margin: 8px 0;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.payment-info a {
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.payment-info a:hover {
+    text-decoration: underline;
+}
+
+.yolo-payment-error,
+.yolo-payment-success {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 40px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.yolo-payment-error {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+}
+
+.yolo-payment-error h2 {
+    color: #dc2626;
+    margin-bottom: 16px;
+}
+
+.yolo-payment-error p {
+    color: #991b1b;
+}
+
+.yolo-payment-success {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+}
+
+.yolo-payment-success h2 {
+    color: #10b981;
+    margin-bottom: 16px;
+}
+
+.yolo-payment-success p {
+    color: #065f46;
+}
+
+@media (max-width: 768px) {
+    .yolo-balance-payment {
+        padding: 10px;
+    }
+    
+    .payment-header h1 {
+        font-size: 24px;
+    }
+    
+    .summary-row,
+    .payment-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .summary-value,
+    .payment-value {
+        text-align: left;
+    }
+    
+    .btn-pay-now {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+}

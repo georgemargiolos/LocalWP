@@ -1,0 +1,1129 @@
+<style>
+.yolo-yacht-details-v3 {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto !important;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.yacht-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.yacht-name {
+    font-size: 42px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 10px 0;
+    letter-spacing: 2px;
+}
+
+.yacht-model {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin: 0 0 10px 0;
+}
+
+.yacht-location {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Main Grid: Images + Booking Section */
+.yacht-main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 968px) {
+    .yacht-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Image Carousel */
+.yacht-images-carousel {
+    position: relative;
+    background: #f3f4f6;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 500px;
+}
+
+.carousel-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-prev,
+.carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    font-size: 40px;
+    padding: 10px 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s;
+}
+
+.carousel-prev:hover,
+.carousel-next:hover {
+    background: rgba(0,0,0,0.8);
+}
+
+.carousel-prev {
+    left: 10px;
+}
+
+.carousel-next {
+    right: 10px;
+}
+
+.carousel-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.carousel-dots .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.carousel-dots .dot.active,
+.carousel-dots .dot:hover {
+    background: white;
+}
+
+/* Booking Section */
+.yacht-booking-section {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.yacht-booking-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.yacht-booking-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 20px 0 10px 0;
+    text-align: center;
+}
+
+/* Price Carousel */
+.price-carousel-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.price-carousel-slides {
+    display: flex;
+    gap: 15px;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 0 50px; /* Space for arrows */
+    min-height: 200px;
+}
+
+@media (max-width: 968px) {
+    .price-carousel-slides {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .price-carousel-slides {
+        grid-template-columns: 1fr;
+    }
+}
+
+.price-slide {
+    display: block;
+    text-align: center;
+    padding: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s;
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.price-slide:hover {
+    border-color: #1e3a8a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.price-slide.active {
+    border-color: #1e3a8a;
+}
+
+.price-week {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 5px;
+}
+
+.price-product {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.price-original {
+    margin-bottom: 5px;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.price-discount-badge {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.price-final {
+    font-size: 20px;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 10px;
+}
+
+.price-select-btn {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.price-select-btn:hover {
+    background: #1e40af;
+}
+
+.price-carousel-prev,
+.price-carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    font-size: 24px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.price-carousel-prev:hover,
+.price-carousel-next:hover {
+    background: #1e40af;
+}
+
+.price-carousel-prev {
+    left: -15px;
+}
+
+.price-carousel-next {
+    right: -15px;
+}
+
+/* Date Picker */
+.date-picker-section {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 100; /* Ensure dropdown appears above other elements */
+}
+
+/* Fix Litepicker dropdown overflow */
+.litepicker {
+    z-index: 9999 !important;
+}
+
+#dateRangePicker {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #212529;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+}
+
+#dateRangePicker:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#dateRangePicker:focus {
+    outline: none;
+    border-color: #212529;
+    box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.1);
+}
+
+/* Selected Price Display */
+.selected-price-display {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.selected-price-original {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+
+.selected-price-original .strikethrough {
+    text-decoration: line-through;
+}
+
+.selected-price-discount {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.selected-price-final {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+/* Book Now Button */
+.btn-book-now {
+    width: 100%;
+    padding: 16px;
+    background: #b91c1c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-book-now .btn-main-text {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.btn-book-now .btn-sub-text {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.btn-book-now:hover {
+    background: #991b1b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+}
+
+/* Quote Section */
+.quote-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.quote-label {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 10px 0;
+}
+
+.btn-request-quote {
+    width: 100%;
+    padding: 14px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-request-quote:hover {
+    background: #1e40af;
+    transform: translateY(-2px);
+}
+
+/* Quote Form */
+.quote-form {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.quote-form h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-field {
+    margin-bottom: 10px;
+}
+
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: #1e3a8a;
+}
+
+.form-note {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 10px 0 5px 0;
+}
+
+.form-tagline {
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+.btn-submit-quote {
+    width: 100%;
+    padding: 14px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit-quote:hover {
+    background: #1e40af;
+}
+
+/* Quick Specs */
+.yacht-quick-specs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+    .yacht-quick-specs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.spec-item {
+    text-align: center;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.spec-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.spec-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 5px;
+}
+
+.spec-value .refit {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.spec-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* Description Section */
+.yacht-description-section {
+    margin-bottom: 40px;
+}
+
+.yacht-description-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #1e3a8a;
+}
+
+.yacht-description-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4b5563;
+}
+
+.description-toggle {
+    background: none;
+    border: none;
+    color: #1e3a8a;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 0;
+    margin-top: 10px;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.description-toggle:hover {
+    color: #1e40af;
+}
+
+/* Equipment Section */
+.yacht-equipment-section {
+    margin-bottom: 40px;
+}
+
+.yacht-equipment-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #1e3a8a;
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.equipment-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.equipment-item i {
+    color: #3b82f6;
+    font-size: 18px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.equipment-icon {
+    flex-shrink: 0;
+}
+
+/* Old Description Section */
+.old-yacht-description-section {
+    margin-bottom: 40px;
+}
+
+.yacht-description-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.yacht-description-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #374151;
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #1e3a8a;
+}
+
+/* Map Section */
+.yacht-map-section {
+    margin-bottom: 40px;
+}
+
+.yacht-map-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+/* Technical Characteristics */
+.yacht-technical {
+    margin-bottom: 40px;
+}
+
+.yacht-technical h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .tech-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tech-item {
+    background: #f9fafb;
+    padding: 15px 20px;
+    border-radius: 8px;
+}
+
+.tech-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.tech-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+/* Description */
+.yacht-description {
+    margin-bottom: 40px;
+}
+
+.yacht-description h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.yacht-description p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #4b5563;
+}
+
+/* Equipment */
+.yacht-equipment {
+    margin-bottom: 40px;
+}
+
+.yacht-equipment h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 15px;
+}
+
+.equipment-list {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4b5563;
+}
+
+/* Extras */
+.yacht-extras-combined {
+    margin-bottom: 40px;
+}
+
+.yacht-extras-combined h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.yacht-extras-combined .extras-note {
+    font-size: 14px;
+    font-weight: 400;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.extras-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .extras-two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+.extras-column h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.extras-column:first-child h4 {
+    color: #dc2626;
+}
+
+.extras-column:last-child h4 {
+    color: #1e3a8a;
+}
+
+.extras-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.extra-item {
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.extra-item.obligatory {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.extra-item.optional {
+    background: #f0f9ff;
+    border-color: #bfdbfe;
+}
+
+.extras-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.extras-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.extra-name {
+    font-size: 16px;
+    color: #1f2937;
+}
+
+.extra-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #059669;
+    margin-top: 8px;
+}
+
+.price-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: #6b7280;
+    margin-left: 4px;
+}
+
+.extra-obligatory {
+    font-size: 12px;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Actions */
+.yacht-actions {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.btn-back {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #6b7280;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-back:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.no-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    font-size: 24px;
+    color: #9ca3af;
+}
+
+/* Cancellation Policy */
+.yacht-cancellation-policy {
+    margin-bottom: 40px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.yacht-cancellation-policy h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.policy-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.policy-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.policy-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.policy-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.policy-text strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.policy-note {
+    margin-top: 10px;
+    padding: 15px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+}
+
+.policy-note p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #92400e;
+}
+
+.policy-note strong {
+    color: #78350f;
+}
+
+@media (max-width: 768px) {
+    .yacht-cancellation-policy {
+        padding: 20px;
+    }
+    
+    .policy-item {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .policy-icon {
+        font-size: 20px;
+    }
+}
+
+/* Security Deposit Section */
+.deposit-section {
+    background: #f0fdf4;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.deposit-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.deposit-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deposit-amount {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    border: 2px solid #10b981;
+}
+
+.amount-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.deposit-info {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.deposit-info p {
+    margin: 0 0 15px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.deposit-info p:last-child {
+    margin-bottom: 0;
+}
+
+.deposit-note {
+    padding: 15px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border-left: 4px solid #f59e0b;
+}
+
+/* Check-in/Check-out Section */
+.checkin-section {
+    background: #eff6ff;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.checkin-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.checkin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.checkin-item {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-left: 4px solid #3b82f6;
+}
+
+.checkin-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.checkin-details {
+    flex: 1;
+}
+
+.checkin-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.checkin-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.checkin-info {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.checkin-info p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
+    .deposit-section,
+    .checkin-section {
+        padding: 20px;
+    }
+    
+    .deposit-amount {
+        padding: 20px;
+    }
+    
+    .amount-value {
+        font-size: 28px;
+    }
+    
+    .checkin-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

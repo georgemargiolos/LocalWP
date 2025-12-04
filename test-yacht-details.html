@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Yacht Details Page - Test</title>
+
+    <!-- Bootstrap 5 Grid CSS -->
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap-grid.min.css' />
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Litepicker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>
+
+    <!-- Google Fonts - Manrope -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES - Easy Color Customization
+   ============================================ */
+:root {
+    --yolo-primary: #1e3a8a;
+    --yolo-primary-hover: #1e40af;
+    --yolo-primary-light: #dbeafe;
+    --yolo-secondary: #b91c1c;
+    --yolo-secondary-hover: #991b1b;
+    --yolo-success: #059669;
+    --yolo-warning: #92400e;
+    --yolo-warning-bg: #fef3c7;
+    --yolo-danger: #dc2626;
+    --yolo-danger-bg: #fef2f2;
+    --yolo-text-dark: #1f2937;
+    --yolo-text-medium: #4b5563;
+    --yolo-text-light: #6b7280;
+    --yolo-border: #e5e7eb;
+    --yolo-bg-light: #f9fafb;
+    --yolo-bg-lighter: #f3f4f6;
+    --yolo-white: #ffffff;
+    --yolo-radius-sm: 6px;
+    --yolo-radius-md: 8px;
+    --yolo-radius-lg: 12px;
+    --yolo-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --yolo-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --yolo-shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+    --yolo-transition: 0.3s ease;
+    --yolo-container-padding: clamp(12px, 4vw, 40px);
+    --yolo-sidebar-width: 380px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+/* ============================================
+   BASE CONTAINER
+   ============================================ */
+.yolo-yacht-details-v3 {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: var(--yolo-container-padding);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.yolo-yacht-details-v3 *,
+.yolo-yacht-details-v3 *::before,
+.yolo-yacht-details-v3 *::after {
+    box-sizing: border-box;
+}
+
+/* ============================================
+   YACHT HEADER
+   ============================================ */
+.yacht-header {
+    text-align: center;
+    margin-bottom: clamp(20px, 4vw, 30px);
+    padding: 0 10px;
+}
+
+.yacht-name {
+    font-size: clamp(24px, 6vw, 42px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 8px 0;
+    letter-spacing: clamp(1px, 0.5vw, 2px);
+    line-height: 1.2;
+    word-wrap: break-word;
+}
+
+.yacht-model {
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 600;
+    color: var(--yolo-primary);
+    margin: 0 0 8px 0;
+}
+
+.yacht-location {
+    font-size: clamp(14px, 3vw, 16px);
+    color: var(--yolo-text-light);
+    margin: 0;
+}
+
+/* ============================================
+   MAIN LAYOUT - Bootstrap Grid handles page layout
+   ============================================ */
+.yacht-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(24px, 5vw, 40px);
+}
+
+/* ============================================
+   STICKY SIDEBAR FIX - Critical for sticky to work!
+   ============================================ */
+@media (min-width: 992px) {
+    .sidebar-column {
+        align-self: flex-start !important;
+    }
+}
+
+/* Booking Sidebar - Sticky positioning */
+.yacht-booking-section {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--yolo-primary) var(--yolo-bg-light);
+    background: var(--yolo-white);
+    border: 2px solid var(--yolo-border);
+    border-radius: var(--yolo-radius-lg);
+    padding: clamp(16px, 4vw, 24px);
+    box-shadow: var(--yolo-shadow-md);
+}
+
+.yacht-booking-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.yacht-booking-section::-webkit-scrollbar-track {
+    background: var(--yolo-bg-light);
+    border-radius: 3px;
+}
+
+.yacht-booking-section::-webkit-scrollbar-thumb {
+    background: var(--yolo-primary);
+    border-radius: 3px;
+}
+
+/* ============================================
+   IMAGE CAROUSEL
+   ============================================ */
+.yacht-images-carousel {
+    position: relative;
+    background: var(--yolo-bg-lighter);
+    border-radius: var(--yolo-radius-lg);
+    overflow: hidden;
+    width: 100%;
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: clamp(250px, 50vw, 550px);
+}
+
+@media (min-width: 768px) {
+    .carousel-container {
+        height: clamp(350px, 45vw, 550px);
+    }
+}
+
+.carousel-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    touch-action: pan-y pinch-zoom;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Carousel Navigation */
+.carousel-prev,
+.carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    min-width: 48px;
+    min-height: 48px;
+    width: clamp(48px, 10vw, 64px);
+    height: clamp(48px, 10vw, 64px);
+    font-size: clamp(24px, 5vw, 36px);
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--yolo-transition);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-prev:hover,
+.carousel-next:hover {
+    background: rgba(0, 0, 0, 0.85);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-prev {
+    left: clamp(10px, 3vw, 20px);
+}
+
+.carousel-next {
+    right: clamp(10px, 3vw, 20px);
+}
+
+/* Carousel Dots */
+.carousel-dots {
+    position: absolute;
+    bottom: clamp(12px, 3vw, 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: clamp(8px, 2vw, 12px);
+    z-index: 10;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90%;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 25px;
+}
+
+.carousel-dots .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all var(--yolo-transition);
+    border: none;
+    padding: 0;
+}
+
+.carousel-dots .dot.active,
+.carousel-dots .dot:hover {
+    background: white;
+    transform: scale(1.3);
+}
+
+/* ============================================
+   BOOKING SECTION
+   ============================================ */
+.yacht-booking-section h3 {
+    font-size: clamp(18px, 4vw, 22px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 20px 0;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--yolo-border);
+}
+
+.yacht-booking-section h4 {
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 600;
+    color: var(--yolo-text-dark);
+    margin: 20px 0 12px 0;
+    text-align: center;
+}
+
+/* ============================================
+   PRICE CAROUSEL
+   ============================================ */
+.yacht-price-carousel-section {
+    padding: clamp(16px, 4vw, 24px);
+    background: linear-gradient(135deg, var(--yolo-bg-light) 0%, #eef2ff 100%);
+    border-radius: var(--yolo-radius-lg);
+    border: 1px solid var(--yolo-border);
+}
+
+.yacht-price-carousel-section h3 {
+    font-size: clamp(18px, 4vw, 24px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.price-carousel-container {
+    position: relative;
+    padding: 0 clamp(40px, 10vw, 55px);
+}
+
+.price-carousel-slides {
+    display: flex;
+    gap: clamp(12px, 2vw, 16px);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 5px 15px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.price-carousel-slides::-webkit-scrollbar {
+    display: none;
+}
+
+.price-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(14px, 3vw, 20px);
+    border: 2px solid var(--yolo-border);
+    border-radius: var(--yolo-radius-md);
+    background: var(--yolo-white);
+    transition: all var(--yolo-transition);
+    min-width: clamp(200px, 50vw, 260px);
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+@media (min-width: 768px) {
+    .price-slide {
+        min-width: clamp(220px, 25vw, 260px);
+    }
+}
+
+.price-slide:hover {
+    border-color: var(--yolo-primary);
+    box-shadow: var(--yolo-shadow-md);
+    transform: translateY(-3px);
+}
+
+.price-slide.active {
+    border-color: var(--yolo-primary);
+    background: linear-gradient(to bottom, #eff6ff 0%, var(--yolo-white) 100%);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+.price-week {
+    font-size: clamp(12px, 2.8vw, 14px);
+    font-weight: 600;
+    color: var(--yolo-text-dark);
+    margin-bottom: 8px;
+}
+
+.price-original {
+    margin-bottom: 5px;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-size: clamp(13px, 2.8vw, 15px);
+}
+
+.price-discount-badge {
+    background: var(--yolo-warning-bg);
+    color: var(--yolo-warning);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: clamp(10px, 2.2vw, 11px);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.price-final {
+    font-size: clamp(18px, 4.5vw, 24px);
+    font-weight: 700;
+    color: var(--yolo-success);
+    margin-bottom: 12px;
+}
+
+.price-select-btn {
+    background: var(--yolo-primary);
+    color: white;
+    border: none;
+    padding: clamp(12px, 3vw, 14px);
+    border-radius: var(--yolo-radius-sm);
+    font-size: clamp(12px, 2.8vw, 14px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--yolo-transition);
+    width: 100%;
+    min-height: 48px;
+}
+
+.price-select-btn:hover {
+    background: var(--yolo-primary-hover);
+}
+
+/* Price Carousel Arrows */
+.price-carousel-prev,
+.price-carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--yolo-primary);
+    color: white;
+    border: none;
+    min-width: 44px;
+    min-height: 44px;
+    width: clamp(44px, 9vw, 52px);
+    height: clamp(44px, 9vw, 52px);
+    font-size: clamp(20px, 4vw, 26px);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all var(--yolo-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--yolo-shadow-md);
+}
+
+.price-carousel-prev:hover,
+.price-carousel-next:hover {
+    background: var(--yolo-primary-hover);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.price-carousel-prev {
+    left: 0;
+}
+
+.price-carousel-next {
+    right: 0;
+}
+
+/* ============================================
+   DATE PICKER
+   ============================================ */
+.date-picker-section {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 100;
+}
+
+#dateRangePicker {
+    width: 100%;
+    padding: clamp(14px, 3.5vw, 16px);
+    border: 2px solid #212529;
+    border-radius: var(--yolo-radius-sm);
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    background: var(--yolo-white);
+    transition: all 0.2s;
+    min-height: 52px;
+}
+
+#dateRangePicker:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+#dateRangePicker:focus {
+    outline: none;
+    border-color: var(--yolo-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+/* ============================================
+   SELECTED PRICE DISPLAY
+   ============================================ */
+.selected-price-display {
+    background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%);
+    border: 2px solid var(--yolo-primary-light);
+    border-radius: var(--yolo-radius-md);
+    padding: clamp(14px, 3.5vw, 20px);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.selected-price-original {
+    font-size: clamp(13px, 3vw, 14px);
+    color: var(--yolo-text-light);
+    margin-bottom: 6px;
+}
+
+.selected-price-discount {
+    background: var(--yolo-warning-bg);
+    color: var(--yolo-warning);
+    font-size: clamp(11px, 2.5vw, 12px);
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.selected-price-final {
+    font-size: clamp(26px, 7vw, 32px);
+    font-weight: 700;
+    color: var(--yolo-primary);
+}
+
+/* ============================================
+   BOOK NOW BUTTON
+   ============================================ */
+.btn-book-now {
+    width: 100%;
+    padding: clamp(16px, 4vw, 20px);
+    background: linear-gradient(135deg, var(--yolo-secondary) 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: var(--yolo-radius-md);
+    font-size: clamp(16px, 4vw, 18px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--yolo-transition);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-height: 70px;
+    box-shadow: 0 4px 14px rgba(185, 28, 28, 0.25);
+}
+
+.btn-book-now .btn-main-text {
+    font-size: clamp(16px, 4vw, 18px);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.btn-book-now .btn-sub-text {
+    font-size: clamp(12px, 2.8vw, 14px);
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.btn-book-now:hover {
+    background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(185, 28, 28, 0.35);
+}
+
+/* ============================================
+   QUOTE SECTION & FORM
+   ============================================ */
+.quote-section {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--yolo-border);
+}
+
+.quote-label {
+    font-size: clamp(13px, 3vw, 14px);
+    color: var(--yolo-text-light);
+    margin: 0 0 12px 0;
+}
+
+.btn-request-quote {
+    width: 100%;
+    padding: clamp(14px, 3.5vw, 16px);
+    background: var(--yolo-primary);
+    color: white;
+    border: none;
+    border-radius: var(--yolo-radius-sm);
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--yolo-transition);
+    min-height: 52px;
+}
+
+.btn-request-quote:hover {
+    background: var(--yolo-primary-hover);
+    transform: translateY(-2px);
+}
+
+.quote-form {
+    margin-top: 20px;
+    padding: clamp(16px, 4vw, 20px);
+    background: var(--yolo-bg-light);
+    border-radius: var(--yolo-radius-md);
+}
+
+.quote-form h4 {
+    font-size: clamp(16px, 4vw, 18px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 16px 0;
+    text-align: center;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.form-field {
+    margin-bottom: 10px;
+}
+
+.form-field input,
+.form-field textarea {
+    width: 100%;
+    padding: clamp(12px, 3vw, 14px);
+    border: 1px solid #d1d5db;
+    border-radius: var(--yolo-radius-sm);
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-family: inherit;
+    min-height: 48px;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: var(--yolo-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.form-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-note {
+    font-size: 12px;
+    color: var(--yolo-text-light);
+    margin: 10px 0 5px 0;
+}
+
+.form-tagline {
+    font-size: 13px;
+    color: var(--yolo-text-medium);
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+.btn-submit-quote {
+    width: 100%;
+    padding: clamp(14px, 3.5vw, 16px);
+    background: var(--yolo-primary);
+    color: white;
+    border: none;
+    border-radius: var(--yolo-radius-sm);
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--yolo-transition);
+    min-height: 50px;
+}
+
+.btn-submit-quote:hover {
+    background: var(--yolo-primary-hover);
+}
+
+/* ============================================
+   QUICK SPECS
+   ============================================ */
+.yacht-quick-specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(12px, 3vw, 20px);
+}
+
+@media (min-width: 600px) {
+    .yacht-quick-specs {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.spec-item {
+    text-align: center;
+    padding: clamp(16px, 4vw, 24px);
+    background: var(--yolo-white);
+    border: 1px solid var(--yolo-border);
+    border-radius: var(--yolo-radius-lg);
+    transition: all var(--yolo-transition);
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+.spec-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--yolo-shadow-md);
+    border-color: var(--yolo-primary-light);
+}
+
+.spec-icon {
+    margin-bottom: clamp(10px, 2.5vw, 14px);
+}
+
+.spec-icon i {
+    font-size: clamp(28px, 6vw, 36px);
+    color: var(--yolo-primary);
+}
+
+.spec-value {
+    font-size: clamp(18px, 4.5vw, 24px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin-bottom: 5px;
+}
+
+.spec-label {
+    font-size: clamp(12px, 3vw, 14px);
+    color: var(--yolo-text-light);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   DESCRIPTION SECTION
+   ============================================ */
+.yacht-description-section h3,
+.yacht-equipment-section h3,
+.yacht-map-section h3,
+.yacht-technical h3,
+.yacht-extras-combined h3 {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--yolo-primary);
+}
+
+.yacht-description-content {
+    font-size: clamp(14px, 3.5vw, 16px);
+    line-height: 1.8;
+    color: var(--yolo-text-medium);
+    background: var(--yolo-white);
+    padding: clamp(16px, 4vw, 24px);
+    border-radius: var(--yolo-radius-md);
+    border-left: 4px solid var(--yolo-primary);
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+.description-toggle {
+    background: none;
+    border: none;
+    color: var(--yolo-primary);
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 12px 0;
+    margin-top: 10px;
+    text-decoration: underline;
+    transition: color 0.2s;
+    min-height: 44px;
+    display: inline-block;
+}
+
+.description-toggle:hover {
+    color: var(--yolo-primary-hover);
+}
+
+/* ============================================
+   EQUIPMENT SECTION
+   ============================================ */
+.equipment-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(10px, 2.5vw, 14px);
+}
+
+@media (min-width: 480px) {
+    .equipment-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    .equipment-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.equipment-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 3vw, 16px);
+    padding: clamp(14px, 3.5vw, 18px);
+    background: var(--yolo-white);
+    border-radius: var(--yolo-radius-md);
+    font-size: clamp(14px, 3.5vw, 15px);
+    color: var(--yolo-text-dark);
+    border: 1px solid var(--yolo-border);
+    transition: all 0.2s ease;
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+.equipment-item:hover {
+    background: var(--yolo-bg-light);
+    border-color: var(--yolo-primary-light);
+    transform: translateX(5px);
+}
+
+.equipment-item i {
+    font-size: clamp(20px, 4.5vw, 24px);
+    min-width: clamp(44px, 10vw, 52px);
+    height: clamp(44px, 10vw, 52px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--yolo-primary);
+    background: var(--yolo-primary-light);
+    border-radius: var(--yolo-radius-md);
+    flex-shrink: 0;
+}
+
+.equipment-item span {
+    font-weight: 500;
+}
+
+/* ============================================
+   MAP SECTION
+   ============================================ */
+.map-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 50%;
+    height: 0;
+    overflow: hidden;
+    border-radius: var(--yolo-radius-lg);
+    box-shadow: var(--yolo-shadow-md);
+}
+
+.map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* ============================================
+   TECHNICAL CHARACTERISTICS
+   ============================================ */
+.tech-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(12px, 3vw, 16px);
+}
+
+@media (min-width: 550px) {
+    .tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    .tech-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.tech-item {
+    background: var(--yolo-white);
+    padding: clamp(16px, 4vw, 20px);
+    border-radius: var(--yolo-radius-md);
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 3.5vw, 18px);
+    border: 1px solid var(--yolo-border);
+    box-shadow: var(--yolo-shadow-sm);
+    transition: all var(--yolo-transition);
+}
+
+.tech-item:hover {
+    border-color: var(--yolo-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--yolo-shadow-md);
+}
+
+.tech-icon {
+    width: clamp(50px, 12vw, 60px);
+    height: clamp(50px, 12vw, 60px);
+    background: linear-gradient(135deg, var(--yolo-primary) 0%, #2563eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+}
+
+.tech-icon i {
+    font-size: clamp(20px, 5vw, 26px);
+    color: var(--yolo-white);
+}
+
+.tech-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tech-label {
+    font-size: clamp(11px, 2.5vw, 12px);
+    font-weight: 700;
+    color: var(--yolo-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+}
+
+.tech-value {
+    font-size: clamp(16px, 4vw, 20px);
+    font-weight: 600;
+    color: var(--yolo-primary);
+}
+
+/* ============================================
+   EXTRAS SECTION
+   ============================================ */
+.yacht-extras-combined .extras-note {
+    font-size: clamp(13px, 3vw, 14px);
+    font-weight: 400;
+    color: var(--yolo-text-light);
+    font-style: italic;
+}
+
+.extras-two-column {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(20px, 5vw, 30px);
+}
+
+@media (min-width: 768px) {
+    .extras-two-column {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.extras-column h4 {
+    font-size: clamp(16px, 4vw, 18px);
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.extras-column:first-child h4 {
+    color: var(--yolo-danger);
+}
+
+.extras-column:last-child h4 {
+    color: var(--yolo-primary);
+}
+
+.extras-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(10px, 2.5vw, 12px);
+}
+
+.extra-item {
+    padding: clamp(14px, 3.5vw, 18px);
+    background: var(--yolo-white);
+    border-radius: var(--yolo-radius-md);
+    border: 1px solid var(--yolo-border);
+    box-shadow: var(--yolo-shadow-sm);
+}
+
+.extra-item.obligatory {
+    background: var(--yolo-danger-bg);
+    border-color: #fecaca;
+    border-left: 4px solid var(--yolo-danger);
+}
+
+.extra-item.optional {
+    background: #f0f9ff;
+    border-color: #bfdbfe;
+    border-left: 4px solid var(--yolo-primary);
+}
+
+.extra-name {
+    font-size: clamp(14px, 3.5vw, 16px);
+    color: var(--yolo-text-dark);
+    font-weight: 600;
+}
+
+.extra-price {
+    font-size: clamp(15px, 3.5vw, 17px);
+    font-weight: 700;
+    color: var(--yolo-success);
+    margin-top: 8px;
+}
+
+.price-unit {
+    font-size: clamp(11px, 2.5vw, 12px);
+    font-weight: 400;
+    color: var(--yolo-text-light);
+    margin-left: 4px;
+}
+
+/* ============================================
+   DEPOSIT & CHECK-IN SECTIONS
+   ============================================ */
+.yacht-section h3 {
+    font-size: clamp(20px, 5vw, 26px);
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--yolo-primary);
+}
+
+.deposit-content {
+    background: var(--yolo-bg-light);
+    padding: clamp(16px, 4vw, 24px);
+    border-radius: var(--yolo-radius-md);
+}
+
+.deposit-amount {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.amount-value {
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 700;
+    color: var(--yolo-primary);
+}
+
+.deposit-info p {
+    margin: 0 0 12px 0;
+    line-height: 1.6;
+    color: var(--yolo-text-medium);
+}
+
+.deposit-note {
+    background: var(--yolo-warning-bg);
+    padding: 12px;
+    border-radius: var(--yolo-radius-sm);
+    border-left: 4px solid var(--yolo-warning);
+}
+
+.checkin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.checkin-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--yolo-bg-light);
+    border-radius: var(--yolo-radius-md);
+}
+
+.checkin-icon {
+    font-size: 28px;
+}
+
+.checkin-label {
+    font-size: 12px;
+    color: var(--yolo-text-light);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.checkin-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--yolo-text-dark);
+}
+
+/* ============================================
+   MOBILE SWIPE HINT
+   ============================================ */
+@media (max-width: 767px) {
+    .price-carousel-container::after {
+        content: '← Swipe to see more →';
+        display: block;
+        text-align: center;
+        font-size: 12px;
+        color: var(--yolo-text-light);
+        margin-top: 12px;
+        opacity: 0.8;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="yolo-yacht-details-v3">
+
+    <!-- Yacht Name Header (Full Width) -->
+    <div class="yacht-header">
+        <h1 class="yacht-name">AQUILO</h1>
+        <h2 class="yacht-model">Bavaria Cruiser 46</h2>
+        <p class="yacht-location"><i class="fa-solid fa-location-dot"></i> Preveza Main Port</p>
+    </div>
+
+    <!-- MAIN CONTENT WRAPPER: Bootstrap Grid Layout -->
+    <div class="container-fluid px-0">
+        <div class="row g-4">
+
+            <!-- ============================================ -->
+            <!-- MAIN CONTENT (LEFT COLUMN - 8 cols desktop) -->
+            <!-- ============================================ -->
+            <div class="col-12 col-lg-8">
+                <div class="yacht-main-content">
+
+            <!-- Image Carousel -->
+            <div class="yacht-images-carousel">
+                <div class="carousel-container">
+                    <div class="carousel-slides">
+                        <div class="carousel-slide active">
+                            <img src="https://www.booking-manager.com/cbm/documents/7216949650000107850_Aquilo_int2.jpg" alt="Aquilo">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://www.booking-manager.com/cbm/documents/7216949590000107850_Aquilo_ext3.jpg" alt="Aquilo">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://www.booking-manager.com/cbm/documents/7216949740000107850_Aquilo_int5.jpg" alt="Aquilo">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://www.booking-manager.com/cbm/documents/7216949470000107850_Aq_layout.jpg" alt="Aquilo">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://www.booking-manager.com/cbm/documents/7216949560000107850_Aquilo_ext2.jpg" alt="Aquilo">
+                        </div>
+                    </div>
+
+                    <button class="carousel-prev" onclick="yachtCarousel.prev()">‹</button>
+                    <button class="carousel-next" onclick="yachtCarousel.next()">›</button>
+
+                    <div class="carousel-dots">
+                        <span class="dot active" onclick="yachtCarousel.goTo(0)"></span>
+                        <span class="dot" onclick="yachtCarousel.goTo(1)"></span>
+                        <span class="dot" onclick="yachtCarousel.goTo(2)"></span>
+                        <span class="dot" onclick="yachtCarousel.goTo(3)"></span>
+                        <span class="dot" onclick="yachtCarousel.goTo(4)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Price Carousel -->
+            <div class="yacht-price-carousel-section">
+                <h3><i class="fa-solid fa-calendar-week"></i> Peak Season Pricing (May – September)</h3>
+                <div class="price-carousel-container">
+                    <div class="price-carousel-slides">
+                        <div class="price-slide active" data-date-from="2026-04-18" data-date-to="2026-04-25" data-price="2925.00" data-currency="EUR">
+                            <div class="price-week">Apr 18 – Apr 25, 2026</div>
+                            <div class="price-original"><span class="strikethrough">3,250.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">2,925.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                        <div class="price-slide" data-date-from="2026-04-25" data-date-to="2026-05-02" data-price="2925.00" data-currency="EUR">
+                            <div class="price-week">Apr 25 – May 2, 2026</div>
+                            <div class="price-original"><span class="strikethrough">3,250.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">2,925.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                        <div class="price-slide" data-date-from="2026-05-16" data-date-to="2026-05-23" data-price="3870.00" data-currency="EUR">
+                            <div class="price-week">May 16 – May 23, 2026</div>
+                            <div class="price-original"><span class="strikethrough">4,300.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">3,870.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                        <div class="price-slide" data-date-from="2026-07-04" data-date-to="2026-07-11" data-price="4050.00" data-currency="EUR">
+                            <div class="price-week">Jul 4 – Jul 11, 2026</div>
+                            <div class="price-original"><span class="strikethrough">4,500.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">4,050.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                        <div class="price-slide" data-date-from="2026-08-01" data-date-to="2026-08-08" data-price="4320.00" data-currency="EUR">
+                            <div class="price-week">Aug 1 – Aug 8, 2026</div>
+                            <div class="price-original"><span class="strikethrough">4,800.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">4,320.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                        <div class="price-slide" data-date-from="2026-08-15" data-date-to="2026-08-22" data-price="4320.00" data-currency="EUR">
+                            <div class="price-week">Aug 15 – Aug 22, 2026</div>
+                            <div class="price-original"><span class="strikethrough">4,800.00 EUR</span></div>
+                            <div class="price-discount-badge">10.00% OFF</div>
+                            <div class="price-final">4,320.00 EUR</div>
+                            <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                        </div>
+                    </div>
+
+                    <button class="price-carousel-prev" onclick="priceCarousel.scrollPrev()">‹</button>
+                    <button class="price-carousel-next" onclick="priceCarousel.scrollNext()">›</button>
+                </div>
+            </div>
+
+            <!-- Quick Specs -->
+            <div class="yacht-quick-specs">
+                <div class="spec-item">
+                    <div class="spec-icon"><i class="fa-solid fa-ruler-horizontal"></i></div>
+                    <div class="spec-value">48 ft</div>
+                    <div class="spec-label">Length</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon"><i class="fa-solid fa-bed"></i></div>
+                    <div class="spec-value">4</div>
+                    <div class="spec-label">Cabins</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="spec-value">2014</div>
+                    <div class="spec-label">Year</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon"><i class="fa-solid fa-toilet"></i></div>
+                    <div class="spec-value">3</div>
+                    <div class="spec-label">Head</div>
+                </div>
+            </div>
+
+            <!-- Description Section -->
+            <div class="yacht-description-section">
+                <h3><i class="fa-solid fa-info-circle"></i> Description</h3>
+                <div class="yacht-description-content">
+                    <div class="description-preview">
+                        AQUILO – BAVARIA CRUISER 46 (2014) | YOUR PERFECT IONIAN SAILING GETAWAY<br>
+                        Set sail aboard Aquilo, a Bavaria Cruiser 46 built for those who seek both authentic sailing performance and the comfort of home at sea. With four spacious cabins and room for up to 10 guests (8 + 2), she's the perfect choice whether you're a passionate sailor or simply looking to unwind under the Ionian sun with family and friends.
+                    </div>
+                    <div class="description-full" style="display: none;">
+                        <br><br>SMOOTH PERFORMANCE & EASY HANDLING<br>
+                        Powered by a 55 hp engine and featuring bow thruster, autopilot, and rolling mainsail, Aquilo offers effortless control and smooth manoeuvring even in narrow harbours.<br><br>
+                        Her beam of 14.2 ft and draft of just 6.9 ft provide ideal stability and freedom to explore the Ionian's most secluded coves – confidently and comfortably.<br><br>
+                        BRIGHT, WELCOMING INTERIORS<br>
+                        Step below deck and discover a bright, open space designed for relaxed living. Panoramic windows flood the salon with natural light, while the well-equipped galley with oven, refrigerator, coffee machine, and kitchen utensils invites you to prepare meals to share with your crew.
+                    </div>
+                    <button class="description-toggle" onclick="toggleDescription(this)">
+                        <span class="toggle-more">More...</span>
+                        <span class="toggle-less" style="display: none;">Less</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Equipment Section -->
+            <div class="yacht-equipment-section">
+                <h3><i class="fa-solid fa-ship"></i> Equipment</h3>
+                <div class="equipment-grid">
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-plug"></i>
+                        <span>Inverter</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-kitchen-set"></i>
+                        <span>Refrigerator</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-person-swimming"></i>
+                        <span>Swimming platform</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-mug-hot"></i>
+                        <span>Coffee maker</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-umbrella"></i>
+                        <span>Bimini</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>Chart plotter</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>Autopilot</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-jet-fighter-up"></i>
+                        <span>Bow thruster</span>
+                    </div>
+                    <div class="equipment-item">
+                        <i class="fa-solid fa-ship"></i>
+                        <span>Dinghy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Map -->
+            <div class="yacht-map-section">
+                <h3><i class="fa-solid fa-map-location-dot"></i> Location</h3>
+                <div class="map-container">
+                    <iframe
+                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4&q=Preveza+Main+Port%2C+Greece&zoom=12"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Technical Characteristics -->
+            <div class="yacht-technical">
+                <h3><i class="fa-solid fa-cogs"></i> Technical Characteristics</h3>
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <div class="tech-icon"><i class="fa-solid fa-water"></i></div>
+                        <div class="tech-content">
+                            <div class="tech-label">DRAUGHT</div>
+                            <div class="tech-value">7.2 ft (2.18 m)</div>
+                        </div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
+                        <div class="tech-content">
+                            <div class="tech-label">BEAM</div>
+                            <div class="tech-value">14.3 ft (4.35 m)</div>
+                        </div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="tech-content">
+                            <div class="tech-label">BERTHS</div>
+                            <div class="tech-value">8</div>
+                        </div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon"><i class="fa-solid fa-gas-pump"></i></div>
+                        <div class="tech-content">
+                            <div class="tech-label">FUEL CAPACITY</div>
+                            <div class="tech-value">210 L</div>
+                        </div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-icon"><i class="fa-solid fa-faucet-drip"></i></div>
+                        <div class="tech-content">
+                            <div class="tech-label">WATER CAPACITY</div>
+                            <div class="tech-value">350 L</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extras -->
+            <div class="yacht-extras-combined">
+                <h3><i class="fa-solid fa-plus-circle"></i> Extras <span class="extras-note">(Payable at the base)</span></h3>
+                <div class="extras-two-column">
+                    <div class="extras-column">
+                        <h4>Obligatory Extras</h4>
+                        <div class="extras-grid">
+                            <div class="extra-item obligatory">
+                                <div class="extra-name">Deluxe Charter Pack</div>
+                                <div class="extra-price">300.00 EUR <span class="price-unit">(per booking)</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="extras-column">
+                        <h4>Optional Extras</h4>
+                        <div class="extras-grid">
+                            <div class="extra-item optional">
+                                <div class="extra-name">Wifi</div>
+                                <div class="extra-price">100.00 EUR <span class="price-unit">(per booking)</span></div>
+                            </div>
+                            <div class="extra-item optional">
+                                <div class="extra-name">Skipper</div>
+                                <div class="extra-price">200.00 EUR <span class="price-unit">(per night)</span></div>
+                            </div>
+                            <div class="extra-item optional">
+                                <div class="extra-name">Extra Bed Linen</div>
+                                <div class="extra-price">80.00 EUR <span class="price-unit">(per booking)</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Deposit Section -->
+            <div class="yacht-section deposit-section">
+                <h3><i class="fa-solid fa-shield-halved"></i> Security Deposit</h3>
+                <div class="deposit-content">
+                    <div class="deposit-amount">
+                        <span class="amount-value">2,500 €</span>
+                    </div>
+                    <div class="deposit-info">
+                        <p>A security deposit of <strong>2,500 €</strong> is required at check-in. This deposit is held as a guarantee against any damage to the yacht or its equipment during your charter period.</p>
+                        <p>The deposit will be fully refunded after check-out, provided the yacht is returned in the same condition as received.</p>
+                        <p class="deposit-note"><strong>Payment method:</strong> Credit card authorization or bank transfer.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Check-in / Check-out Section -->
+            <div class="yacht-section checkin-section">
+                <h3><i class="fa-solid fa-clock"></i> Check-in & Check-out</h3>
+                <div class="checkin-content">
+                    <div class="checkin-grid">
+                        <div class="checkin-item">
+                            <div class="checkin-icon">✅</div>
+                            <div class="checkin-details">
+                                <div class="checkin-label">Check-in Time</div>
+                                <div class="checkin-value">17:00</div>
+                            </div>
+                        </div>
+                        <div class="checkin-item">
+                            <div class="checkin-icon">❌</div>
+                            <div class="checkin-details">
+                                <div class="checkin-label">Check-out Time</div>
+                                <div class="checkin-value">09:00</div>
+                            </div>
+                        </div>
+                        <div class="checkin-item">
+                            <div class="checkin-icon">📅</div>
+                            <div class="checkin-details">
+                                <div class="checkin-label">Check-in Day</div>
+                                <div class="checkin-value">Saturday</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+
+            <!-- ============================================ -->
+            <!-- BOOKING SIDEBAR (RIGHT - STICKY - 4 cols desktop) -->
+            <!-- ============================================ -->
+            <!-- FIX: Added sidebar-column class with align-self: flex-start -->
+            <div class="col-12 col-lg-4 sidebar-column">
+            <div class="yacht-booking-section">
+                <h3><i class="fa-solid fa-calendar-check"></i> Availability & Pricing</h3>
+
+                <!-- Selected Week Price Display -->
+                <div id="selectedPriceDisplay" class="selected-price-display">
+                    <div id="selectedPriceOriginal" class="selected-price-original">3,250.00 EUR</div>
+                    <div id="selectedPriceDiscount" class="selected-price-discount">10.00% OFF - Save 325 EUR</div>
+                    <div id="selectedPriceFinal" class="selected-price-final">2,925.00 EUR</div>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="date-picker-section">
+                    <h4>Or Choose Custom Dates</h4>
+                    <input type="text" id="dateRangePicker" placeholder="Select dates" readonly />
+                </div>
+
+                <!-- Book Now Button -->
+                <button class="btn-book-now" onclick="bookNow()" id="bookNowBtn">
+                    <span class="btn-main-text">BOOK NOW</span>
+                    <span class="btn-sub-text" id="depositText">Pay 1,462.50 EUR (50%) Deposit</span>
+                </button>
+
+                <!-- Request Quote Section -->
+                <div class="quote-section">
+                    <p class="quote-label">Need something special?</p>
+                    <button class="btn-request-quote" onclick="toggleQuoteForm()">REQUEST A QUOTE</button>
+                </div>
+
+                <!-- Quote Form (Hidden by default) -->
+                <div id="quoteForm" class="quote-form" style="display: none;">
+                    <h4>Request a Quote</h4>
+                    <form id="quoteRequestForm">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <input type="text" name="first_name" placeholder="First name *" required />
+                            </div>
+                            <div class="form-field">
+                                <input type="text" name="last_name" placeholder="Last name *" required />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <input type="email" name="email" placeholder="E-mail *" required />
+                            </div>
+                            <div class="form-field">
+                                <input type="tel" name="phone" placeholder="Phone number *" required />
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <textarea name="special_requests" placeholder="Special requests" rows="4"></textarea>
+                        </div>
+
+                        <p class="form-note">* Required field</p>
+                        <p class="form-tagline">Quick and free quotation for your sailing holiday.</p>
+
+                        <button type="submit" class="btn-submit-quote">Request a quote</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+            <!-- END BOOKING SIDEBAR -->
+
+        </div>
+        <!-- END ROW -->
+    </div>
+    <!-- END CONTAINER -->
+
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Litepicker JS -->
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+
+<script>
+// Toggle Description "More..." / "Less"
+function toggleDescription(button) {
+    const section = button.closest('.yacht-description-content');
+    const fullText = section.querySelector('.description-full');
+    const moreSpan = button.querySelector('.toggle-more');
+    const lessSpan = button.querySelector('.toggle-less');
+
+    if (!fullText) return;
+
+    if (fullText.style.display === 'none' || fullText.style.display === '') {
+        fullText.style.display = 'block';
+        if (moreSpan) moreSpan.style.display = 'none';
+        if (lessSpan) lessSpan.style.display = 'inline';
+    } else {
+        fullText.style.display = 'none';
+        if (moreSpan) moreSpan.style.display = 'inline';
+        if (lessSpan) lessSpan.style.display = 'none';
+    }
+}
+
+// Toggle Quote Form visibility
+function toggleQuoteForm() {
+    const form = document.getElementById('quoteForm');
+    if (form) {
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            form.style.display = 'none';
+        }
+    }
+}
+
+// Format price
+function formatPrice(price) {
+    if (!price) return '0.00';
+    const num = Number(price);
+    return num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+// Image Carousel
+const yachtCarousel = {
+    currentSlide: 0,
+    slides: document.querySelectorAll('.carousel-slide'),
+    dots: document.querySelectorAll('.carousel-dots .dot'),
+
+    goTo: function(index) {
+        if (this.slides.length === 0) return;
+
+        this.slides[this.currentSlide].classList.remove('active');
+        if (this.dots.length > 0) {
+            this.dots[this.currentSlide].classList.remove('active');
+        }
+
+        this.currentSlide = index;
+
+        this.slides[this.currentSlide].classList.add('active');
+        if (this.dots.length > 0) {
+            this.dots[this.currentSlide].classList.add('active');
+        }
+    },
+
+    next: function() {
+        if (this.slides.length === 0) return;
+        const nextIndex = (this.currentSlide + 1) % this.slides.length;
+        this.goTo(nextIndex);
+    },
+
+    prev: function() {
+        if (this.slides.length === 0) return;
+        const prevIndex = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+        this.goTo(prevIndex);
+    }
+};
+
+// Price Carousel
+const priceCarousel = {
+    container: document.querySelector('.price-carousel-slides'),
+    slideWidth: 265,
+
+    scrollNext: function() {
+        if (!this.container) return;
+        this.container.scrollBy({
+            left: this.slideWidth,
+            behavior: 'smooth'
+        });
+    },
+
+    scrollPrev: function() {
+        if (!this.container) return;
+        this.container.scrollBy({
+            left: -this.slideWidth,
+            behavior: 'smooth'
+        });
+    }
+};
+
+// Select Week Function
+function selectWeek(button) {
+    const slide = button.closest('.price-slide');
+    const price = slide.dataset.price;
+    const currency = slide.dataset.currency;
+
+    // Update active class
+    document.querySelectorAll('.price-slide').forEach(s => s.classList.remove('active'));
+    slide.classList.add('active');
+
+    // Update price display
+    const priceFinal = document.getElementById('selectedPriceFinal');
+    if (priceFinal) {
+        priceFinal.textContent = formatPrice(price) + ' ' + currency;
+    }
+
+    // Update deposit text
+    const depositText = document.getElementById('depositText');
+    if (depositText) {
+        const deposit = (parseFloat(price) * 0.5).toFixed(2);
+        depositText.textContent = `Pay ${formatPrice(deposit)} ${currency} (50%) Deposit`;
+    }
+
+    // Scroll booking section into view on mobile
+    if (window.innerWidth < 992) {
+        const bookingSection = document.querySelector('.yacht-booking-section');
+        if (bookingSection) {
+            bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
+
+// Book Now function (placeholder for demo)
+function bookNow() {
+    alert('Booking functionality would trigger here!\n\nIn the real implementation, this opens the booking form modal and redirects to Stripe checkout.');
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Init image carousel
+    if (yachtCarousel.slides.length > 0) {
+        yachtCarousel.goTo(0);
+
+        // Auto-advance every 5 seconds
+        setInterval(function() {
+            yachtCarousel.next();
+        }, 5000);
+    }
+
+    // Init date picker
+    const dateInput = document.getElementById('dateRangePicker');
+    if (dateInput && typeof Litepicker !== 'undefined') {
+        new Litepicker({
+            element: dateInput,
+            singleMode: false,
+            numberOfMonths: 2,
+            numberOfColumns: 2,
+            format: 'DD.MM.YYYY',
+            minDate: new Date(),
+            autoApply: true
+        });
+    }
+});
+</script>
+
+</body>
+</html>
+
+
+
+

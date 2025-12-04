@@ -1,0 +1,769 @@
+<?php
+/**
+ * Base Manager - Check-Out Admin Page (Mobile-First)
+ *
+ * @package YOLO_Yacht_Search
+ * @subpackage Base_Manager
+ * @since 17.11.2
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Permission check
+if (!current_user_can('edit_posts')) {
+    wp_die(__('Sorry, you are not allowed to access this page.', 'yolo-yacht-search'));
+}
+?>
+
+<div class="wrap yolo-base-manager-page yolo-bm-checkout-page">
+    <!-- Welcome Header -->
+    <div class="yolo-bm-welcome-card yolo-bm-checkout-header">
+        <div class="yolo-bm-welcome-content">
+            <h1><i class="dashicons dashicons-upload"></i> Check-Out Management</h1>
+            <p>Create check-out documents with equipment verification and signatures</p>
+        </div>
+        <button class="button button-primary button-hero" id="new-checkout-btn">
+            <span class="dashicons dashicons-plus-alt"></span> New Check-Out
+        </button>
+    </div>
+    
+    <!-- Check-Out Form (Hidden by default) -->
+    <div id="checkout-form-container" class="yolo-bm-form-container" style="display: none;">
+        <div class="yolo-bm-form-card">
+            <div class="yolo-bm-form-header yolo-bm-checkout-form-header">
+                <h2><i class="dashicons dashicons-clipboard"></i> New Check-Out Document</h2>
+                <button type="button" class="yolo-bm-close-btn" id="cancel-checkout-btn">
+                    <span class="dashicons dashicons-no-alt"></span>
+                </button>
+            </div>
+            
+            <form id="checkout-form">
+                <!-- Booking & Yacht Selection -->
+                <div class="yolo-bm-form-section">
+                    <h3>Booking Information</h3>
+                    <div class="yolo-bm-form-row">
+                        <div class="yolo-bm-form-group">
+                            <label for="checkout-booking-select">Select Booking *</label>
+                            <select id="checkout-booking-select" class="yolo-bm-select" required>
+                                <option value="">Choose booking...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="yolo-bm-form-row">
+                        <div class="yolo-bm-form-group">
+                            <label for="checkout-yacht-select">Select Yacht *</label>
+                            <select id="checkout-yacht-select" class="yolo-bm-select" required>
+                                <option value="">Choose yacht...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Equipment Checklist (Loaded dynamically) -->
+                <div id="equipment-checklist-section" class="yolo-bm-form-section" style="display: none;">
+                    <h3><i class="dashicons dashicons-admin-tools"></i> Equipment Verification</h3>
+                    <p class="yolo-bm-section-description">Check all equipment items to verify they are returned and in good condition</p>
+                    <div id="equipment-checklist-container" class="yolo-bm-equipment-checklist"></div>
+                </div>
+                
+                <!-- Signature Section -->
+                <div class="yolo-bm-form-section">
+                    <h3><i class="dashicons dashicons-edit"></i> Base Manager Signature</h3>
+                    <p class="yolo-bm-section-description">Sign below to confirm check-out completion</p>
+                    <div class="yolo-bm-signature-container">
+                        <canvas id="checkout-signature-pad" class="yolo-bm-signature-canvas"></canvas>
+                        <button type="button" class="button yolo-bm-clear-signature-btn" id="clear-checkout-signature">
+                            <span class="dashicons dashicons-image-rotate"></span> Clear Signature
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="yolo-bm-form-actions yolo-bm-sticky-actions">
+                    <button type="button" class="button button-primary button-large yolo-bm-btn-success" id="complete-checkout-btn">
+                        <span class="dashicons dashicons-yes"></span> Complete Check-Out
+                    </button>
+                    <button type="button" class="button button-large yolo-bm-btn-secondary" id="save-checkout-pdf-btn">
+                        <span class="dashicons dashicons-pdf"></span> Save PDF
+                    </button>
+                    <button type="button" class="button button-large yolo-bm-btn-secondary" id="send-checkout-guest-btn">
+                        <span class="dashicons dashicons-email"></span> Send to Guest
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Previous Check-Outs List -->
+    <div id="checkout-list-container" class="yolo-bm-list-container">
+        <h2><i class="dashicons dashicons-list-view"></i> Previous Check-Outs</h2>
+        <div id="checkout-list" class="yolo-bm-list">
+            <div class="yolo-bm-loading">
+                <span class="spinner is-active"></span>
+                <p>Loading check-outs...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mobile-First Check-Out Styles - COMPLETE CSS v17.12.1 */
+.yolo-bm-checkout-page {
+    background: #f5f7fa;
+    margin: -20px -20px 0 -22px;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Form Container */
+.yolo-bm-form-container {
+    margin-bottom: 30px;
+}
+
+.yolo-bm-form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.yolo-bm-form-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yolo-bm-form-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.yolo-bm-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yolo-bm-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.yolo-bm-close-btn .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+/* Form Sections */
+.yolo-bm-form-section {
+    padding: 24px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.yolo-bm-form-section:last-child {
+    border-bottom: none;
+}
+
+.yolo-bm-form-section h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yolo-bm-section-description {
+    margin: 0 0 20px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Select Inputs - Mobile Optimized */
+.yolo-bm-select {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 44px;
+}
+
+.yolo-bm-select:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Equipment Checklist */
+.yolo-bm-equipment-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yolo-bm-equipment-category {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.yolo-bm-category-header {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.yolo-bm-category-header .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.yolo-bm-category-items {
+    padding: 12px;
+}
+
+.yolo-bm-equipment-item {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+    min-height: 60px;
+}
+
+.yolo-bm-equipment-item:last-child {
+    margin-bottom: 0;
+}
+
+.yolo-bm-equipment-item.checked {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+.yolo-bm-equipment-checkbox {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border: 3px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: white;
+}
+
+.yolo-bm-equipment-checkbox.checked {
+    background: #f59e0b;
+    border-color: #f59e0b;
+}
+
+.yolo-bm-equipment-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.yolo-bm-equipment-label {
+    flex: 1;
+    font-size: 15px;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Signature Pad - Mobile Optimized - CRITICAL FIX! */
+.yolo-bm-signature-container {
+    background: #f9fafb;
+    border: 3px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.yolo-bm-signature-canvas {
+    width: 100%;
+    height: 250px;
+    background: white;
+    border: 3px solid #d1d5db;
+    border-radius: 12px;
+    cursor: crosshair;
+    touch-action: none;
+    display: block;
+}
+
+.yolo-bm-clear-signature-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Action Buttons - Mobile Optimized */
+.yolo-bm-form-actions {
+    padding: 24px;
+    background: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yolo-bm-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.yolo-bm-form-actions .button {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    transition: all 0.2s ease;
+}
+
+.yolo-bm-btn-success {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+}
+
+.yolo-bm-btn-success:hover {
+    background: #d97706;
+    border-color: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.yolo-bm-btn-secondary {
+    background: white;
+    border: 2px solid #e5e7eb;
+    color: #374151;
+}
+
+.yolo-bm-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* Previous Check-Outs List */
+.yolo-bm-list-container {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.yolo-bm-list-container h2 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.yolo-bm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yolo-bm-list-item {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.yolo-bm-list-item:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+}
+
+.yolo-bm-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+.yolo-bm-empty-state .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+/* Welcome Header */
+.yolo-bm-welcome-card {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 16px;
+    padding: 24px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.yolo-bm-welcome-content h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.yolo-bm-welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Responsive - Desktop */
+@media (min-width: 768px) {
+    .yolo-bm-checkout-page {
+        padding: 30px;
+    }
+    
+    .yolo-bm-form-actions {
+        flex-direction: row;
+    }
+    
+    .yolo-bm-form-actions .button {
+        flex: 1;
+    }
+    
+    .yolo-bm-equipment-checklist {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script>
+jQuery(document).ready(function($) {
+    let checkoutSignaturePad = null;
+    let selectedYachtId = null;
+    
+    // Load initial data
+    loadYachts();
+    loadBookings();
+    loadCheckouts();
+    
+    // New check-out button
+    $('#new-checkout-btn').on('click', function() {
+        $('#checkout-form-container').slideDown(function() {
+            initializeSignaturePad();
+        });
+        $('#checkout-list-container').hide();
+    });
+    
+    // Cancel check-out
+    $('#cancel-checkout-btn').on('click', function() {
+        $('#checkout-form-container').slideUp();
+        $('#checkout-list-container').show();
+        $('#checkout-form')[0].reset();
+        $('#equipment-checklist-section').hide();
+        if (checkoutSignaturePad) {
+            checkoutSignaturePad.clear();
+        }
+    });
+    
+    // Yacht selection - load equipment
+    $('#checkout-yacht-select').on('change', function() {
+        selectedYachtId = $(this).val();
+        if (selectedYachtId) {
+            loadEquipmentChecklist(selectedYachtId);
+        } else {
+            $('#equipment-checklist-section').hide();
+        }
+    });
+    
+    // Clear signature
+    $('#clear-checkout-signature').on('click', function() {
+        if (checkoutSignaturePad) {
+            checkoutSignaturePad.clear();
+        }
+    });
+    
+    // Complete check-out
+    $('#complete-checkout-btn').on('click', function() {
+        const bookingId = $('#checkout-booking-select').val();
+        const yachtId = $('#checkout-yacht-select').val();
+        
+        if (!bookingId || !yachtId) {
+            alert('Please select both booking and yacht');
+            return;
+        }
+        
+        if (!checkoutSignaturePad || checkoutSignaturePad.isEmpty()) {
+            alert('Please provide your signature');
+            return;
+        }
+        
+        // Collect equipment checklist data
+        const equipmentData = [];
+        $('.yolo-bm-equipment-checkbox').each(function() {
+            const categoryName = $(this).closest('.yolo-bm-equipment-category').find('.yolo-bm-category-header').text().trim();
+            const itemName = $(this).siblings('.yolo-bm-equipment-label').text();
+            const isChecked = $(this).hasClass('checked');
+            
+            equipmentData.push({
+                category: categoryName,
+                item: itemName,
+                checked: isChecked
+            });
+        });
+        
+        const formData = {
+            action: 'yolo_bm_save_checkout',
+            nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>',
+            booking_id: bookingId,
+            yacht_id: yachtId,
+            checklist_data: JSON.stringify(equipmentData),
+            signature: checkoutSignaturePad.toDataURL(),
+            status: 'completed'
+        };
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    alert('Check-out completed successfully!');
+                    $('#cancel-checkout-btn').click();
+                    loadCheckouts();
+                } else {
+                    alert('Error: ' + (response.data || 'Failed to complete check-out'));
+                }
+            },
+            error: function() {
+                alert('Failed to complete check-out. Please try again.');
+            }
+        });
+    });
+    
+    // Initialize signature pad
+    function initializeSignaturePad() {
+        const canvas = document.getElementById('checkout-signature-pad');
+        if (canvas) {
+            if (checkoutSignaturePad) {
+                checkoutSignaturePad.clear();
+            }
+            checkoutSignaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)',
+                minWidth: 2,
+                maxWidth: 4
+            });
+            resizeCanvas(canvas);
+        }
+    }
+    
+    function resizeCanvas(canvas) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        if (checkoutSignaturePad) {
+            checkoutSignaturePad.clear();
+        }
+    }
+    
+    // Load yachts
+    function loadYachts() {
+        console.log('Check-Out: Loading yachts...');
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_get_yachts',
+                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+            },
+            success: function(response) {
+                console.log('Check-Out: Yachts response:', response);
+                if (response.success && response.data) {
+                    let options = '<option value="">Choose yacht...</option>';
+                    response.data.forEach(function(yacht) {
+                        options += `<option value="${yacht.id}">${yacht.yacht_name}${yacht.yacht_model ? ' - ' + yacht.yacht_model : ''}</option>`;
+                    });
+                    $('#checkout-yacht-select').html(options);
+                    console.log('Check-Out: Loaded ' + response.data.length + ' yachts');
+                } else {
+                    console.error('Check-Out: Failed to load yachts:', response);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Check-Out: AJAX error loading yachts:', status, error, xhr);
+            }
+        });
+    }
+    
+    // Load bookings
+    function loadBookings() {
+        console.log('Check-Out: Loading bookings...');
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_get_bookings_calendar',
+                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+            },
+            success: function(response) {
+                console.log('Check-Out: Bookings response:', response);
+                if (response.success && response.data) {
+                    let options = '<option value="">Choose booking...</option>';
+                    response.data.forEach(function(booking) {
+                        options += `<option value="${booking.id}">BM-${booking.id} - ${booking.customer_name}${booking.yacht_name ? ' (' + booking.yacht_name + ')' : ''}</option>`;
+                    });
+                    $('#checkout-booking-select').html(options);
+                    console.log('Check-Out: Loaded ' + response.data.length + ' bookings');
+                } else {
+                    console.error('Check-Out: Failed to load bookings:', response);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Check-Out: AJAX error loading bookings:', status, error, xhr);
+            }
+        });
+    }
+    
+    // Load equipment checklist
+    function loadEquipmentChecklist(yachtId) {
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_get_equipment_categories',
+                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>',
+                yacht_id: yachtId
+            },
+            success: function(response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    displayEquipmentChecklist(response.data);
+                    $('#equipment-checklist-section').slideDown();
+                } else {
+                    $('#equipment-checklist-section').hide();
+                }
+            }
+        });
+    }
+    
+    // Display equipment checklist
+    function displayEquipmentChecklist(categories) {
+        let html = '';
+        
+        categories.forEach(function(category) {
+            const items = category.items ? JSON.parse(category.items) : [];
+            
+            if (items.length > 0) {
+                html += `
+                    <div class="yolo-bm-equipment-category">
+                        <div class="yolo-bm-category-header">
+                            <span class="dashicons dashicons-category"></span>
+                            ${category.category_name}
+                        </div>
+                        <div class="yolo-bm-category-items">
+                `;
+                
+                items.forEach(function(item) {
+                    // Support both old format (string) and new format (object with name and quantity)
+                    const itemName = typeof item === 'string' ? item : item.name;
+                    const itemQuantity = typeof item === 'string' ? '' : (item.quantity || '');
+                    const itemLabel = itemQuantity ? `${itemName} (${itemQuantity})` : itemName;
+                    
+                    html += `
+                        <div class="yolo-bm-equipment-item">
+                            <div class="yolo-bm-equipment-checkbox" data-item="${itemName}"></div>
+                            <div class="yolo-bm-equipment-label">${itemLabel}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        
+        $('#equipment-checklist-container').html(html);
+        
+        // Equipment checkbox click
+        $('.yolo-bm-equipment-checkbox').on('click', function() {
+            $(this).toggleClass('checked');
+            $(this).closest('.yolo-bm-equipment-item').toggleClass('checked');
+        });
+    }
+    
+    // Load check-outs
+    function loadCheckouts() {
+        $('#checkout-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-clipboard"></span><p>No check-outs yet. Click "New Check-Out" to create one.</p></div>');
+    }
+});
+</script>

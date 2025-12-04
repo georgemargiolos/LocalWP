@@ -1,0 +1,506 @@
+/* ========================================
+   YOLO Yacht Card - Unified Styles v3.7.2
+   Bootstrap Grid Compatible
+   ======================================== */
+
+/* ========================================
+   THEME OVERRIDES - Force Proper Layout
+   ======================================== */
+
+/* Override WordPress theme constraints on fleet containers */
+body .yolo-ys-our-fleet,
+#content .yolo-ys-our-fleet,
+.entry-content .yolo-ys-our-fleet,
+main .yolo-ys-our-fleet,
+.site-content .yolo-ys-our-fleet,
+.wp-block-post-content .yolo-ys-our-fleet,
+article .yolo-ys-our-fleet {
+    max-width: none !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 40px 20px !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+/* Force Bootstrap container-fluid to work */
+body .yolo-ys-our-fleet .container-fluid,
+#content .yolo-ys-our-fleet .container-fluid,
+.entry-content .yolo-ys-our-fleet .container-fluid,
+main .yolo-ys-our-fleet .container-fluid,
+article .yolo-ys-our-fleet .container-fluid {
+    width: 100% !important;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    max-width: 100% !important;
+}
+
+/* Force Bootstrap row to work */
+body .yolo-ys-our-fleet .row,
+#content .yolo-ys-our-fleet .row,
+.entry-content .yolo-ys-our-fleet .row,
+main .yolo-ys-our-fleet .row,
+article .yolo-ys-our-fleet .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-right: -15px !important;
+    margin-left: -15px !important;
+}
+
+/* Force Bootstrap columns to work */
+body .yolo-ys-our-fleet [class*="col-"],
+#content .yolo-ys-our-fleet [class*="col-"],
+.entry-content .yolo-ys-our-fleet [class*="col-"],
+main .yolo-ys-our-fleet [class*="col-"],
+article .yolo-ys-our-fleet [class*="col-"] {
+    position: relative !important;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+}
+
+/* Bootstrap Grid column widths */
+body .yolo-ys-our-fleet .col-6,
+#content .yolo-ys-our-fleet .col-6,
+.entry-content .yolo-ys-our-fleet .col-6,
+main .yolo-ys-our-fleet .col-6,
+article .yolo-ys-our-fleet .col-6 {
+    width: 50% !important;
+}
+
+body .yolo-ys-our-fleet .col-4,
+#content .yolo-ys-our-fleet .col-4,
+.entry-content .yolo-ys-our-fleet .col-4,
+main .yolo-ys-our-fleet .col-4,
+article .yolo-ys-our-fleet .col-4 {
+    width: 33.333333% !important;
+}
+
+/* Override WordPress theme constraints on search results */
+body .yolo-ys-search-results,
+#content .yolo-ys-search-results,
+.entry-content .yolo-ys-search-results,
+main .yolo-ys-search-results,
+.site-content .yolo-ys-search-results,
+.wp-block-post-content .yolo-ys-search-results,
+article .yolo-ys-search-results {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 40px 20px !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+/* ========================================
+   FLEET SECTION HEADERS
+   ======================================== */
+
+.yolo-ys-fleet-section {
+    margin-bottom: 60px !important;
+}
+
+.yolo-ys-fleet-title {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    margin-bottom: 30px !important;
+    color: #1e3a8a !important;
+    text-align: center !important;
+}
+
+.yolo-ys-fleet-badge {
+    display: inline-block !important;
+    background: #dc2626 !important;
+    color: white !important;
+    padding: 8px 20px !important;
+    border-radius: 25px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-right: 10px !important;
+    vertical-align: middle !important;
+}
+
+/* ========================================
+   YACHT CARD
+   ======================================== */
+
+.yolo-ys-yacht-card {
+    background: white !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+.yolo-ys-yacht-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* YOLO Fleet Badge */
+.yolo-ys-yacht-card.yolo-yacht {
+    /* Red border removed as per user request */
+}
+
+.yolo-ys-yacht-card.yolo-yacht::before {
+    content: 'YOLO FLEET' !important;
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 25px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    z-index: 10 !important;
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* ========================================
+   YACHT IMAGE
+   ======================================== */
+
+.yolo-ys-yacht-image {
+    width: 100% !important;
+    height: 240px !important;
+    overflow: hidden !important;
+    background: #f3f4f6 !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+}
+
+.yolo-ys-yacht-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.3s ease !important;
+    display: block !important;
+}
+
+.yolo-ys-yacht-card:hover .yolo-ys-yacht-image img {
+    transform: scale(1.05) !important;
+}
+
+.yolo-ys-yacht-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 80px !important;
+    color: #9ca3af !important;
+}
+
+/* ========================================
+   YACHT CONTENT
+   ======================================== */
+
+.yolo-ys-yacht-content {
+    padding: 20px !important;
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.yolo-ys-yacht-location {
+    font-size: 14px !important;
+    color: #6b7280 !important;
+    margin-bottom: 12px !important;
+}
+
+.yolo-ys-yacht-header {
+    margin-bottom: 20px !important;
+}
+
+.yolo-ys-yacht-name {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin: 0 0 4px 0 !important;
+    word-wrap: break-word !important;
+}
+
+.yolo-ys-yacht-model {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #1e3a8a !important;
+    margin: 0 !important;
+    word-wrap: break-word !important;
+}
+
+/* ========================================
+   SPECS GRID (Bootstrap Grid Compatible)
+   ======================================== */
+
+.yolo-ys-yacht-specs-grid {
+    margin-bottom: 20px !important;
+}
+
+/* Justify spec items within each row */
+.yolo-ys-yacht-specs-grid .row {
+    justify-content: space-between !important;
+}
+
+.yolo-ys-spec-item {
+    text-align: center !important;
+}
+
+.yolo-ys-spec-value {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 4px !important;
+}
+
+.yolo-ys-spec-label {
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    text-transform: uppercase !important;
+}
+
+.yolo-ys-refit-note {
+    display: block !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    color: #6b7280 !important;
+    margin-top: 2px !important;
+}
+
+/* ========================================
+   PRICE
+   ======================================== */
+
+.yolo-ys-yacht-price {
+    font-size: 16px !important;
+    color: #059669 !important;
+    margin-bottom: 15px !important;
+    padding: 12px !important;
+    background: #f0fdf4 !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+}
+
+.yolo-ys-yacht-price strong {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+/* ========================================
+   DETAILS BUTTON
+   ======================================== */
+
+.yolo-ys-details-btn,
+body .yolo-ys-details-btn,
+a.yolo-ys-details-btn {
+    display: block !important;
+    width: 100% !important;
+    padding: 14px 20px !important;
+    background: #b91c1c !important;
+    color: white !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+    margin-top: auto !important;
+    box-sizing: border-box !important;
+}
+
+.yolo-ys-details-btn:hover,
+a.yolo-ys-details-btn:hover {
+    background: #991b1b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3) !important;
+    color: white !important;
+}
+
+/* ========================================
+   NO YACHTS MESSAGE
+   ======================================== */
+
+.yolo-ys-no-yachts {
+    text-align: center !important;
+    padding: 60px 20px !important;
+    background: #f3f4f6 !important;
+    border-radius: 8px !important;
+}
+
+.yolo-ys-no-yachts p {
+    font-size: 18px !important;
+    color: #6b7280 !important;
+    margin: 0 !important;
+}
+
+/* ========================================
+   RESPONSIVE
+   Note: Global mobile responsive fixes are in global-mobile-responsive.css
+   These are page-specific enhancements for yacht cards
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Tablet/mobile padding - minimal for wider cards */
+    body .yolo-ys-our-fleet,
+    #content .yolo-ys-our-fleet,
+    .entry-content .yolo-ys-our-fleet,
+    main .yolo-ys-our-fleet,
+    article .yolo-ys-our-fleet,
+    body .yolo-ys-search-results,
+    #content .yolo-ys-search-results,
+    .entry-content .yolo-ys-search-results,
+    main .yolo-ys-search-results,
+    article .yolo-ys-search-results {
+        padding: 20px 10px !important;
+    }
+    
+    /* Adjust Bootstrap grid spacing for mobile */
+    body .yolo-ys-our-fleet .row,
+    #content .yolo-ys-our-fleet .row,
+    .entry-content .yolo-ys-our-fleet .row,
+    main .yolo-ys-our-fleet .row,
+    article .yolo-ys-our-fleet .row,
+    body .yolo-ys-search-results .row,
+    #content .yolo-ys-search-results .row,
+    .entry-content .yolo-ys-search-results .row,
+    main .yolo-ys-search-results .row,
+    article .yolo-ys-search-results .row {
+        margin-right: -8px !important;
+        margin-left: -8px !important;
+    }
+    
+    body .yolo-ys-our-fleet [class*="col-"],
+    #content .yolo-ys-our-fleet [class*="col-"],
+    .entry-content .yolo-ys-our-fleet [class*="col-"],
+    main .yolo-ys-our-fleet [class*="col-"],
+    article .yolo-ys-our-fleet [class*="col-"],
+    body .yolo-ys-search-results [class*="col-"],
+    #content .yolo-ys-search-results [class*="col-"],
+    .entry-content .yolo-ys-search-results [class*="col-"],
+    main .yolo-ys-search-results [class*="col-"],
+    article .yolo-ys-search-results [class*="col-"] {
+        padding-right: 8px !important;
+        padding-left: 8px !important;
+    }
+    
+    .yolo-ys-yacht-image {
+        height: 200px !important;
+    }
+    
+    .yolo-ys-fleet-title {
+        font-size: 24px !important;
+    }
+    
+    .yolo-ys-yacht-name {
+        font-size: 18px !important;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 16px !important;
+    }
+    
+    .yolo-ys-yacht-card {
+        margin-bottom: 16px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Bootstrap 5 best practice: Edge-to-edge cards on small phones */
+    body .yolo-ys-our-fleet,
+    #content .yolo-ys-our-fleet,
+    .entry-content .yolo-ys-our-fleet,
+    main .yolo-ys-our-fleet,
+    article .yolo-ys-our-fleet,
+    body .yolo-ys-search-results,
+    #content .yolo-ys-search-results,
+    .entry-content .yolo-ys-search-results,
+    main .yolo-ys-search-results,
+    article .yolo-ys-search-results {
+        padding: 15px 0 !important;  /* No horizontal padding - full width */
+    }
+    
+    body .yolo-ys-our-fleet .container-fluid,
+    #content .yolo-ys-our-fleet .container-fluid,
+    .entry-content .yolo-ys-our-fleet .container-fluid,
+    main .yolo-ys-our-fleet .container-fluid,
+    article .yolo-ys-our-fleet .container-fluid,
+    body .yolo-ys-search-results .container-fluid,
+    #content .yolo-ys-search-results .container-fluid,
+    .entry-content .yolo-ys-search-results .container-fluid,
+    main .yolo-ys-search-results .container-fluid,
+    article .yolo-ys-search-results .container-fluid {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+    
+    body .yolo-ys-our-fleet .row,
+    #content .yolo-ys-our-fleet .row,
+    .entry-content .yolo-ys-our-fleet .row,
+    main .yolo-ys-our-fleet .row,
+    article .yolo-ys-our-fleet .row,
+    body .yolo-ys-search-results .row,
+    #content .yolo-ys-search-results .row,
+    .entry-content .yolo-ys-search-results .row,
+    main .yolo-ys-search-results .row,
+    article .yolo-ys-search-results .row {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+    
+    body .yolo-ys-our-fleet [class*="col-"],
+    #content .yolo-ys-our-fleet [class*="col-"],
+    .entry-content .yolo-ys-our-fleet [class*="col-"],
+    main .yolo-ys-our-fleet [class*="col-"],
+    article .yolo-ys-our-fleet [class*="col-"],
+    body .yolo-ys-search-results [class*="col-"],
+    #content .yolo-ys-search-results [class*="col-"],
+    .entry-content .yolo-ys-search-results [class*="col-"],
+    main .yolo-ys-search-results [class*="col-"],
+    article .yolo-ys-search-results [class*="col-"] {
+        padding-right: 8px !important;
+        padding-left: 8px !important;
+    }
+    
+    /* Full-width card on mobile */
+    .yolo-ys-yacht-card {
+        border-radius: 0 !important;  /* No rounded corners for edge-to-edge */
+        margin-bottom: 15px !important;
+    }
+    
+    .yolo-ys-yacht-image {
+        height: 220px !important;  /* Taller image for better visual on mobile */
+    }
+    
+    .yolo-ys-fleet-title {
+        font-size: 20px !important;
+        padding: 0 15px !important;  /* Add padding to title only */
+    }
+    
+    .yolo-ys-yacht-name {
+        font-size: 17px !important;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 15px !important;
+    }
+    
+    .yolo-ys-spec-label {
+        font-size: 11px !important;
+    }
+}
