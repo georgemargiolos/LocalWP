@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [21.0] - 2025-12-05
+
+### 🎨 WordPress Theme Font Inheritance
+
+**All plugin fonts now inherit from the WordPress theme!**
+
+This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elements match your WordPress theme's typography settings.
+
+### Changed
+- **Global Font Inheritance Rule** - Added CSS rule to make all plugin elements inherit fonts from WordPress theme
+- **Balance Payment Page** - Removed hardcoded system font stack, now uses `font-family: inherit`
+- **Booking Confirmation Page** - Removed hardcoded system font stack, now uses `font-family: inherit`
+- **Guest Dashboard** - Removed hardcoded system font stack, now uses `font-family: inherit`
+- **Yacht Details v1 (deprecated)** - Removed hardcoded system font stack for consistency
+- **Litepicker Date Picker** - Added override to inherit theme fonts
+
+### Technical Details
+- Modified `public/css/yolo-yacht-search-public.css` - Added global font inheritance rules
+- Modified `public/css/balance-payment.css` - Changed font-family to inherit
+- Modified `public/css/booking-confirmation.css` - Changed font-family to inherit
+- Modified `public/css/guest-dashboard.css` - Changed font-family to inherit
+- Modified `public/templates/yacht-details.php` - Changed font-family to inherit
+
+### Impact
+- ✅ All plugin text now matches WordPress theme fonts
+- ✅ H1, H2, body, button fonts all inherited from theme
+- ✅ Seamless visual integration with any WordPress theme
+- ✅ No more font conflicts or mismatches
+
+---
+
 ## [20.9] - 2025-12-04
 
 ### Fixed

@@ -1,10 +1,36 @@
 /* YOLO Yacht Search - Public Styles */
 
+/* ============================================
+   GLOBAL FONT INHERITANCE
+   All plugin elements inherit fonts from WordPress theme
+   This ensures h1, h2, body text etc. match the theme
+   ============================================ */
+[class*="yolo-"],
+[class*="yolo-"] *,
+.yolo-ys-yacht-card,
+.yolo-ys-yacht-card *,
+.yolo-ys-search-widget,
+.yolo-ys-search-widget *,
+.yolo-ys-search-results,
+.yolo-ys-search-results *,
+.yolo-ys-our-fleet,
+.yolo-ys-our-fleet *,
+.yolo-yacht-details-v3,
+.yolo-yacht-details-v3 * {
+    font-family: inherit;
+}
+
 /* Import block styles */
 @import url('../blocks/yacht-search/style.css');
 @import url('../blocks/yacht-results/style.css');
 
 /* Additional custom styles can be added here */
+
+/* Override Litepicker to inherit fonts from WordPress theme */
+.litepicker,
+.litepicker * {
+    font-family: inherit !important;
+}
 
 /* Override Litepicker colors to match theme */
 .litepicker .container__months .month-item-header .button-previous-month,
