@@ -28,6 +28,81 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [20.8] - 2025-12-04
+
+### Attempted Fix (Wrong Approach)
+- Attempted to fix sticky sidebar issue introduced in v20.7
+- **DID NOT WORK** - Used incorrect approach
+- This version was superseded by v20.9 which fixed the issue correctly
+
+### Technical Details
+- Various CSS adjustments attempted
+- Sticky sidebar still not working in this version
+- **Recommendation:** Skip this version, use v20.9
+
+---
+
+## [20.7] - 2025-12-04
+
+### Added
+- **Comprehensive Mobile Responsive CSS** - 960+ lines of mobile-first responsive styles
+- Touch-friendly 44px minimum tap targets
+- iOS zoom prevention (16px font on inputs)
+- Edge-to-edge layouts on mobile
+- All templates optimized for mobile devices
+
+### Bootstrap 5 Features
+- ✅ Bootstrap 5 Grid system (container-fluid, row, col-*)
+- ✅ Responsive breakpoints (xs, sm, md, lg, xl, xxl)
+- ✅ Mobile-first responsive design
+
+### ⚠️ KNOWN ISSUE (Fixed in v20.9)
+- **BROKE STICKY SIDEBAR** by adding `overflow-x: hidden` to `html, body` in `bootstrap-mobile-fixes.css`
+- `overflow: hidden` on ANY ancestor element breaks `position: sticky`
+- This issue was fixed in v20.9
+
+### Technical Details
+- File: `public/css/bootstrap-mobile-fixes.css`
+- Added extensive mobile responsive CSS
+- Inadvertently broke sticky sidebar functionality
+
+---
+
+## [20.3] - 2025-12-03
+
+### 🎯 Major Update: Bootstrap 5 Grid Integration
+
+**MILESTONE:** First version with complete Bootstrap 5 Grid integration.
+
+### Added
+- **Bootstrap 5.3 CDN Integration** - Full Bootstrap Grid system
+- Main layout structure: `container-fluid` → `row` → `col-lg-8` / `col-lg-4`
+- Responsive breakpoints properly implemented
+- **Sticky Sidebar WORKING** in this version
+
+### Layout System
+- ✅ Bootstrap 5 Grid system fully integrated
+- ✅ 2-column layout on yacht details (content + sidebar)
+- ✅ Sticky booking sidebar functional
+- ✅ Responsive design across all pages
+
+### Technical Details
+- Converted from CSS Grid to Bootstrap 5 Grid
+- Main layout: `container-fluid` → `row` → `col-lg-8` (content) / `col-lg-4` (sidebar)
+- Sidebar uses `sticky-lg-top` for desktop sticky behavior
+
+### Files Modified
+- All public templates updated to use Bootstrap Grid
+- CSS files cleaned up to work with Bootstrap
+- Removed conflicting CSS Grid code
+
+### Result
+✅ Last known good version with fully working sticky sidebar  
+✅ All Bootstrap 5 features working correctly  
+✅ Recommended base version for future development
+
+---
+
 ## [4.4] - 2025-12-02
 
 ### Verified
