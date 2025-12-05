@@ -66,27 +66,27 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
 ?>
 
 <div class="yolo-ys-yacht-details">
-    
+
     <!-- Hero Section -->
     <div class="yolo-ys-hero">
         <h1 class="yolo-ys-yacht-title"><?php echo esc_html(strtoupper($yacht->name)); ?></h1>
         <h2 class="yolo-ys-yacht-subtitle"><?php echo esc_html(strtoupper($yacht->model)); ?></h2>
     </div>
-    
+
     <!-- Back Button -->
     <div class="yolo-ys-back-btn-container">
         <a href="<?php echo esc_url($back_url); ?>" class="yolo-ys-back-btn">
             ← Back
         </a>
     </div>
-    
+
     <!-- Image Gallery -->
     <div class="yolo-ys-gallery-container">
         <?php if (!empty($images)): ?>
             <div class="yolo-ys-main-image">
                 <img src="<?php echo esc_url($images[0]->image_url); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
             </div>
-            
+
             <?php if (count($images) > 1): ?>
                 <div class="yolo-ys-thumbnails">
                     <?php for ($i = 1; $i < min(3, count($images)); $i++): ?>
@@ -98,14 +98,14 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
             <?php endif; ?>
         <?php endif; ?>
     </div>
-    
+
     <!-- Location -->
     <?php if ($yacht->home_base): ?>
         <div class="yolo-ys-location">
             📍 <?php echo esc_html($yacht->home_base); ?>
         </div>
     <?php endif; ?>
-    
+
     <!-- Quick Specs Grid -->
     <div class="yolo-ys-quick-specs">
         <div class="yolo-ys-spec-box">
@@ -113,13 +113,13 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
             <div class="yolo-ys-spec-label">Length</div>
             <div class="yolo-ys-spec-value"><?php echo esc_html($length_ft); ?> ft</div>
         </div>
-        
+
         <div class="yolo-ys-spec-box">
             <div class="yolo-ys-spec-icon">🛏️</div>
             <div class="yolo-ys-spec-label">Cabins</div>
             <div class="yolo-ys-spec-value"><?php echo esc_html($yacht->cabins); ?></div>
         </div>
-        
+
         <div class="yolo-ys-spec-box">
             <div class="yolo-ys-spec-icon">⏳</div>
             <div class="yolo-ys-spec-label">Year</div>
@@ -130,58 +130,58 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
                 <?php endif; ?>
             </div>
         </div>
-        
+
         <div class="yolo-ys-spec-box">
             <div class="yolo-ys-spec-icon">🚽</div>
             <div class="yolo-ys-spec-label">Head</div>
             <div class="yolo-ys-spec-value"><?php echo esc_html($yacht->wc); ?></div>
         </div>
     </div>
-    
+
     <!-- Technical Characteristics -->
     <div class="yolo-ys-section">
         <h3 class="yolo-ys-section-title">Technical characteristics</h3>
-        
+
         <div class="yolo-ys-tech-grid">
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">DRAUGHT:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($draft_ft); ?> ft</span>
             </div>
-            
+
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">ENGINE:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($yacht->engine_power); ?> hp</span>
             </div>
-            
+
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">WATER CAPACITY:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($yacht->water_capacity); ?> l</span>
             </div>
-            
+
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">BEAM:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($beam_ft); ?> ft</span>
             </div>
-            
+
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">FUEL CAPACITY:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($yacht->fuel_capacity); ?> l</span>
             </div>
-            
+
             <div class="yolo-ys-tech-item">
                 <span class="yolo-ys-tech-label">BERTHS:</span>
                 <span class="yolo-ys-tech-value"><?php echo esc_html($yacht->berths); ?></span>
             </div>
         </div>
     </div>
-    
+
     <!-- Equipment -->
     <?php if (!empty($equipment)): ?>
         <div class="yolo-ys-section">
             <h3 class="yolo-ys-section-title">Equipment</h3>
             <div class="yolo-ys-equipment-text">
                 <strong>Equipment:</strong>
-                <?php 
+                <?php
                 $equipment_names = array_map(function($item) {
                     return $item->equipment_name;
                 }, $equipment);
@@ -190,7 +190,7 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
             </div>
         </div>
     <?php endif; ?>
-    
+
     <!-- Optional Extras -->
     <?php if (!empty($extras)): ?>
         <div class="yolo-ys-section">
@@ -219,7 +219,7 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
             </div>
         </div>
     <?php endif; ?>
-    
+
     <!-- Description -->
     <?php if ($yacht->description): ?>
         <div class="yolo-ys-section">
@@ -229,7 +229,7 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
             </div>
         </div>
     <?php endif; ?>
-    
+
 </div>
 
 <style>
@@ -513,32 +513,32 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
     .yolo-ys-yacht-title {
         font-size: 32px;
     }
-    
+
     .yolo-ys-yacht-subtitle {
         font-size: 24px;
     }
-    
+
     .yolo-ys-gallery-container {
         flex-direction: column;
     }
-    
+
     .yolo-ys-gallery-container > .yolo-ys-main-image,
     .yolo-ys-gallery-container > .yolo-ys-thumbnails {
         flex: 1 1 100%;
     }
-    
+
     .yolo-ys-thumbnails {
         flex-direction: row;
     }
-    
+
     .yolo-ys-thumbnail {
         height: 120px;
     }
-    
+
     .yolo-ys-quick-specs > .yolo-ys-spec-box {
         flex: 1 1 calc(50% - 20px);
     }
-    
+
     .yolo-ys-tech-grid > .yolo-ys-tech-item {
         flex: 1 1 100%;
     }

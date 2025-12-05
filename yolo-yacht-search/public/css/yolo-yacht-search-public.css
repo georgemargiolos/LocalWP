@@ -79,7 +79,7 @@
     .yolo-ys-search-widget {
         display: none;
     }
-    
+
     .yolo-ys-yacht-card {
         page-break-inside: avoid;
     }
@@ -114,7 +114,7 @@
         padding: 15px;
         margin-bottom: 20px;
     }
-    
+
     .yolo-ys-search-form {
         flex-direction: column;
         gap: 10px;

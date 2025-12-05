@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 21.0
+ * Version: 22C.0
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '21.0');
+define('YOLO_YS_VERSION', '22C.0');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -121,7 +121,7 @@ if (is_admin()) {
     add_action('admin_menu', array($icons_admin, 'register_menu'));
     add_action('wp_ajax_yolo_save_icon', array($icons_admin, 'ajax_save_icon'));
     add_action('wp_ajax_yolo_delete_icon', array($icons_admin, 'ajax_delete_icon'));
-    
+
     // Initialize admin colors
     new YOLO_YS_Admin_Colors();
 }
@@ -135,24 +135,24 @@ new YOLO_YS_Warehouse_Notifications();
 function yolo_ys_check_db_version() {
     $current_db_version = get_option('yolo_ys_db_version', '1.0');
     $required_db_version = '1.8'; // Updated for Admin Documents feature
-    
+
     if (version_compare($current_db_version, $required_db_version, '<')) {
         error_log('YOLO YS: Database version outdated. Running migrations...');
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-activator.php';
-        
+
         // Re-run table creation (dbDelta will update existing tables)
         YOLO_YS_Database::create_tables();
-        
+
         // Also create Base Manager tables (added in v17.13)
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-base-manager-database.php';
         YOLO_YS_Base_Manager_Database::create_tables();
-        
+
         // Run migrations
         $reflection = new ReflectionClass('YOLO_YS_Activator');
         $method = $reflection->getMethod('run_migrations');
         $method->setAccessible(true);
         $method->invoke(null);
-        
+
         error_log('YOLO YS: Database migrations completed');
     }
 }
