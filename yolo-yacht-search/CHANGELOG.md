@@ -1,3 +1,11 @@
+## [23.1C] - 2025-12-05
+
+### Fixed - Font Inheritance Issues
+- **Reverted:** `yolo-yacht-search-public.css` was reverted to the v21.9 version to restore stable font inheritance.
+- **Result:** This resolves the font inheritance issues introduced in v22C.x and restores visual stability.
+
+---
+
 ## [23.0] - 2025-12-05
 
 ### Fixed - Mobile Layout on Yacht Details Page
@@ -352,7 +360,7 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 
 **FIX**: Updated `public/class-yolo-ys-public-search.php`:
 - Added `y.wc` to SQL SELECT query (line 39)
-- Added `'wc' => $row->wc` to response array (line 112)
+- Added `\'wc\' => $row->wc` to response array (line 112)
 
 **RESULT**: Search results now display the correct number of heads (e.g., 3, 4) instead of 0
 
@@ -383,7 +391,7 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 - **RESULT**: CSS now parses correctly, yacht details page displays properly
 
 #### 2. Sticky Sidebar Not Working
-- **PROBLEM**: Booking sidebar should stick on desktop but doesn't because Bootstrap's `.row` class uses `align-items: stretch` by default, preventing `position: sticky` from working
+- **PROBLEM**: Booking sidebar should stick on desktop but doesn\'t because Bootstrap\'s `.row` class uses `align-items: stretch` by default, preventing `position: sticky` from working
 - **FIX**: Added `align-items-start` class to the row in `public/templates/yacht-details-v3.php` (line 135)
 - **RESULT**: Booking sidebar now sticks properly when scrolling on desktop
 
@@ -393,7 +401,7 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 - **RESULT**: Emergency CSS now targets the correct Bootstrap Grid structure
 
 #### 4. Search Results CSS - Remove Gap Property
-- **PROBLEM**: `.yolo-ys-results-grid` had `gap: 30px` which conflicts with Bootstrap Grid's `g-4` spacing
+- **PROBLEM**: `.yolo-ys-results-grid` had `gap: 30px` which conflicts with Bootstrap Grid\'s `g-4` spacing
 - **FIX**: Removed `gap` property from `.yolo-ys-results-grid` in `public/css/search-results.css`
 - **RESULT**: Bootstrap Grid spacing (g-4) now controls all spacing consistently
 
