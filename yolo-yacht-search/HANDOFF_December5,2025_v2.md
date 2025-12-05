@@ -10,7 +10,7 @@ We have now corrected this by changing the inline style to `overflow-x: clip`, e
 
 ## Current Status:
 
-*   **Latest Version:** `v22C.3` (production ready)
+*   **Latest Version:** `v23.0` (production ready)
 *   **Repository:** `https://github.com/georgemargiolos/LocalWP` (up to date)
 *   **Key Fix:** The mobile layout for the yacht details page is now stable, and the sticky sidebar functions as intended.
 
@@ -31,4 +31,4 @@ We have now corrected this by changing the inline style to `overflow-x: clip`, e
 ## For Next Session:
 
 *   **Focus:** Full regression testing and documentation cleanup.
-*   **Goal:** Get v22C.3 to a point where we are 100% confident in its stability.
+*   **Goal:** Get v23.0 to a point where we are 100% confident in its stability.

@@ -1,4 +1,4 @@
-## [22C.3] - 2025-12-05
+## [23.0] - 2025-12-05
 
 ### Fixed - Mobile Layout on Yacht Details Page
 - **Fixed:** Restored `overflow-x: clip` on the `.yolo-yacht-details-v3` container, which was being overridden by an inline style (`overflow: visible`).
