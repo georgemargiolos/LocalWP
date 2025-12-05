@@ -1,3 +1,13 @@
+## [C23.2] - 2025-12-05
+
+### Changed
+- **Removed all `font-family` declarations** from public CSS files and templates.
+- The plugin now lets the CSS cascade naturally from the WordPress theme, ensuring consistent font styling.
+- Form elements (input, textarea) still inherit fonts correctly.
+- Email templates retain their original fonts.
+
+---
+
 ## [23.1C] - 2025-12-05
 
 ### Fixed - Font Inheritance Issues
@@ -360,7 +370,7 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 
 **FIX**: Updated `public/class-yolo-ys-public-search.php`:
 - Added `y.wc` to SQL SELECT query (line 39)
-- Added `\'wc\' => $row->wc` to response array (line 112)
+- Added `\\'wc\\' => $row->wc` to response array (line 112)
 
 **RESULT**: Search results now display the correct number of heads (e.g., 3, 4) instead of 0
 
