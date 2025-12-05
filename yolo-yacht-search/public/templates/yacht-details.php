@@ -237,7 +237,6 @@ $back_url = $fleet_page_id ? get_permalink($fleet_page_id) : home_url('/');
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    font-family: inherit;
 }
 
 /* Hero Section */
