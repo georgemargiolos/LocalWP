@@ -35,7 +35,36 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 
 ---
 
-## [20.9] - 2025-12-04
+## [22C.2] - 2025-12-05
+
+### Fixed - Layout Issues from Font Inheritance
+- **Fixed:** Removed `div` from the global font inheritance CSS rule. Applying `font-family: inherit` to `div` elements was causing layout issues.
+- **Improved:** Added `button` to the font inheritance rule to ensure buttons match theme fonts.
+- **Result:** Layouts are now stable, and text elements correctly inherit WordPress theme fonts.
+
+---
+
+## [22C.1] - 2025-12-05
+
+### Fixed - Font Inheritance & Layout Issues
+- **Fixed:** Aggressive `*` selector in font inheritance CSS was breaking layouts
+- **Fixed:** Search widget and yacht details page now display correctly
+- **Improved:** Font inheritance now targets specific text elements (h1, p, span, etc.)
+- **Result:** Plugin now inherits WordPress theme fonts without breaking layouts
+
+---
+
+## [22C.0] - 2025-12-05
+
+### Added - Global Font Inheritance
+- All plugin elements now inherit fonts from the WordPress theme
+- Added global CSS rule for all `[class*="yolo-"]` elements
+- Updated balance-payment.css, booking-confirmation.css, guest-dashboard.css
+- Added Litepicker date picker font override
+
+---
+
+## [21.9] - 2025-12-04
 
 ### Fixed
 - **CRITICAL: Sticky Sidebar Now Works!** 
