@@ -66,7 +66,7 @@ $colors = array(
     padding: 0 var(--yolo-container-padding) var(--yolo-container-padding) var(--yolo-container-padding);
     /* Remove top padding */
     box-sizing: border-box;
-    overflow: visible; /* Allow sticky positioning to work */
+    overflow-x: clip; /* Prevent horizontal scroll without breaking sticky positioning */
 }
 
 .yolo-yacht-details-v3 *,

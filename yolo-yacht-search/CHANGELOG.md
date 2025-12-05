@@ -1,3 +1,11 @@
+## [22C.3] - 2025-12-05
+
+### Fixed - Mobile Layout on Yacht Details Page
+- **Fixed:** Restored `overflow-x: clip` on the `.yolo-yacht-details-v3` container, which was being overridden by an inline style (`overflow: visible`).
+- **Result:** The sticky sidebar on the yacht details page now works correctly on mobile devices, preventing horizontal overflow without breaking the sticky behavior. This restores the functionality from the stable v21.9 release.
+
+---
+
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
@@ -398,20 +406,13 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 
 ### 🎯 Bootstrap Grid Compliance
 
-**Public-facing files now use ONLY Bootstrap Grid:**
-- `public/templates/our-fleet.php` - ✅ Bootstrap Grid
-- `public/templates/search-results.php` - ✅ Bootstrap Grid (via JavaScript)
-- `public/templates/yacht-details-v3.php` - ✅ Bootstrap Grid
-- `public/templates/partials/yacht-card.php` - ✅ Bootstrap Grid
+**Public-facing files are now 100% Bootstrap Grid compliant.**
 
-**Old files with CSS Grid (NOT USED):**
-- `public/templates/yacht-details.php` (v1 - deprecated)
-- `public/templates/yacht-details-v2.php` (v2 - deprecated)
+---
 
 ## [3.7.10] - 2025-12-02
 
 ### 🔧 CRITICAL FIX - Search Results Bootstrap Grid Layout
-
 - **PROBLEM**: Search results page was displaying yacht cards full-width (1 per row) instead of 3 per row on desktop. The JavaScript `displayResults()` function was not wrapping yacht cards in Bootstrap Grid column classes.
 - **ROOT CAUSE**: The `renderBoatCard()` function returns only the yacht card HTML without Bootstrap Grid wrappers. The grid containers (`.yolo-ys-results-grid`) were missing the Bootstrap `.row` class and individual cards were not wrapped in `.col-*` classes.
 - **FIX**: Updated `displayResults()` function in `public/js/yolo-yacht-search-public.js` (lines 316-343) to:
@@ -420,20 +421,24 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
   - Applied fix to both YOLO boats and friend boats sections
 - **RESULT**: Search results now display 3 yacht cards per row on desktop (≥992px), 2 per row on tablet (≥576px), and 1 per row on mobile (<576px), matching the "Our Yachts" page layout.
 
+---
+
 ## [3.7.9] - 2025-12-02
 
 ### 🔧 CRITICAL FIX - JavaScript Yacht Card Rendering
-
 - **PROBLEM**: The JavaScript that renders yacht cards in search results was using the OLD layout without Bootstrap Grid, while the PHP template (yacht-card.php) was using the NEW Bootstrap Grid layout. This caused a mismatch between "Our Yachts" page (PHP) and "Search Results" page (JavaScript).
 - **FIX**: Updated the JavaScript in `public/js/yolo-yacht-search-public.js` to match the PHP template exactly, including the 2-row specs layout (Cabins+Heads, Built+Refit+Length).
+
+---
 
 ## [3.7.8] - 2025-12-02
 
 ### 🔧 CRITICAL FIX - Yacht Card Specs Layout
-
 - **PROBLEM**: Yacht card specs were displaying vertically (one below the other) instead of in 2 rows.
 - **ROOT CAUSE**: The `.yolo-ys-yacht-specs-grid` wrapper in `search-results.css` had a `gap: 15px` CSS property that was interfering with the Bootstrap Grid `.row` elements inside it.
 - **FIX**: Removed the `gap` property from `.yolo-ys-yacht-specs-grid` in `search-results.css`.
+
+---
 
 ## [3.7.7] - 2025-12-02
 
@@ -445,6 +450,8 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
   - `yacht-card.css`: Changed `max-width` to `none`
   - `our-fleet.css`: Changed `max-width` to `none` and added `width: 100%`
   - `yacht-results/style.css`: Changed `max-width` to `none` and added `width: 100%`
+
+---
 
 ## [3.7.6] - 2025-12-02
 
@@ -460,10 +467,14 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
   - Reorganized layout to 2 rows: Row 1 (Cabins + Heads), Row 2 (Built Year + Refit + Length).
   - Made "Refit" text bold.
 
+---
+
 ## [3.7.5] - 2025-12-02
 
 ### FIXED
 - **Broken Yacht Details Page**: Made emergency CSS override more selective to ONLY target main layout rows (`.yolo-ys-yacht-grid > [class*="col-"]` and `.yolo-yacht-details-v3 > .container-fluid > .row > [class*="col-"]`), which fixed the empty yacht details page.
+
+---
 
 ## [3.7.4] - 2025-12-02
 
@@ -472,30 +483,35 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 - **Full Width Layout**: Forced full width on Our Yachts and Search Results pages.
 - **Sticky Sidebar**: Added `position: sticky !important` to `.yacht-booking-section` for desktop.
 
+---
+
 ## [3.7.3] - 2025-12-02
 
 ### FIXED
 - **CSS Grid Conflict**: Removed all CSS Grid code from `our-fleet.css` and `yacht-card.css` to resolve conflicts with Bootstrap Grid.
 
+---
+
 ## [3.7.2] - 2025-12-02
 
 ### 🔧 CRITICAL FIXES - Duplicate Inline Styles Removed
-
 - **PROBLEM**: Template files had `<style>` blocks that were rendered multiple times.
 - **FIX**: Removed all inline styles from `yacht-card.php`, `our-fleet.php`, and `booking-confirmation.php` and created a unified `yacht-card.css` file.
+
+---
 
 ## [3.7.1] - 2025-12-02
 
 ### 🔧 CRITICAL FIXES
-
 - **Bootstrap Grid Layout Fix**: Wrapped all `.row` elements in `.container-fluid` in `our-fleet.php`.
 - **Sticky Sidebar Fix**: Added `align-self: start` to `.yacht-booking-section`.
 - **Full Width Layout Support**: Removed `max-width` restrictions from containers.
 
+---
+
 ## [3.7.0] - 2025-12-02
 
 ### 🎯 Major Update: Complete Bootstrap Grid Conversion
-
 **BREAKING CHANGE:** Complete conversion from CSS Grid to Bootstrap 5 Grid across ALL templates.
 
 ---
