@@ -20,27 +20,15 @@ class YOLO_YS_Public {
      * Enqueue public styles
      */
     public function enqueue_styles() {
-        // Bootstrap 5 CSS (load conditionally on plugin pages)
-        global $post;
-        if (is_a($post, 'WP_Post')) {
-            if (has_shortcode($post->post_content, 'yolo_yacht_details') || 
-                has_shortcode($post->post_content, 'yolo_search_results') || 
-                has_shortcode($post->post_content, 'yolo_our_fleet') ||
-                has_shortcode($post->post_content, 'yolo_guest_dashboard') ||
-                has_shortcode($post->post_content, 'yolo_guest_login') ||
-                has_shortcode($post->post_content, 'yolo_search_widget') ||
-                has_shortcode($post->post_content, 'yolo_booking_confirmation') ||
-                has_shortcode($post->post_content, 'yolo_balance_payment') ||
-                has_shortcode($post->post_content, 'yolo_balance_confirmation')) {
-                // Bootstrap 5 - Full CSS with utilities for responsive classes
-                wp_enqueue_style(
-                    'bootstrap',
-                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
-                    array(),
-                    '5.3.2'
-                );
-            }
-        }
+        // ALWAYS load Bootstrap 5 CSS on frontend (bundled locally for reliability)
+        // Our plugin CSS depends on Bootstrap, so it must always be available
+        // Local hosting = no CDN dependency, works offline, guaranteed availability
+        wp_enqueue_style(
+            'bootstrap',
+            YOLO_YS_PLUGIN_URL . 'vendor/bootstrap/css/bootstrap.min.css',
+            array(),
+            '5.3.2'
+        );
         
         // Litepicker CSS
         wp_enqueue_style(
@@ -48,6 +36,22 @@ class YOLO_YS_Public {
             YOLO_YS_PLUGIN_URL . 'assets/css/litepicker.css',
             array(),
             $this->version
+        );
+        
+        // Swiper CSS (bundled locally for carousels)
+        wp_enqueue_style(
+            'swiper',
+            YOLO_YS_PLUGIN_URL . 'vendor/swiper/swiper-bundle.min.css',
+            array(),
+            '11.0.0'
+        );
+        
+        // Toastify CSS (bundled locally for notifications)
+        wp_enqueue_style(
+            'toastify',
+            YOLO_YS_PLUGIN_URL . 'vendor/toastify/toastify.min.css',
+            array(),
+            '1.12.0'
         );
         
         // Plugin public CSS
@@ -136,6 +140,17 @@ class YOLO_YS_Public {
                     $this->version
                 );
             }
+            
+            // Yacht details page CSS (v30.5 FIX)
+            // Load when shortcode is present OR when yacht_id URL parameter is present
+            if (has_shortcode($post->post_content, 'yolo_yacht_details') || isset($_GET['yacht_id'])) {
+                wp_enqueue_style(
+                    'yolo-ys-yacht-details-v3',
+                    YOLO_YS_PLUGIN_URL . 'public/css/yacht-details-v3.css',
+                    array('bootstrap'),
+                    $this->version
+                );
+            }
         }
         
         // Yacht details page responsive CSS
@@ -198,27 +213,14 @@ class YOLO_YS_Public {
             );
         }
         
-        // Bootstrap 5 JS (load conditionally on plugin pages)
-        global $post;
-        if (is_a($post, 'WP_Post')) {
-            if (has_shortcode($post->post_content, 'yolo_yacht_details') || 
-                has_shortcode($post->post_content, 'yolo_search_results') || 
-                has_shortcode($post->post_content, 'yolo_our_fleet') ||
-                has_shortcode($post->post_content, 'yolo_guest_dashboard') ||
-                has_shortcode($post->post_content, 'yolo_guest_login') ||
-                has_shortcode($post->post_content, 'yolo_search_widget') ||
-                has_shortcode($post->post_content, 'yolo_booking_confirmation') ||
-                has_shortcode($post->post_content, 'yolo_balance_payment') ||
-                has_shortcode($post->post_content, 'yolo_balance_confirmation')) {
-                wp_enqueue_script(
-                    'bootstrap-5-bundle',
-                    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
-                    array(),
-                    '5.3.2',
-                    true
-                );
-            }
-        }
+        // ALWAYS load Bootstrap 5 JS on frontend (bundled locally for reliability)
+        wp_enqueue_script(
+            'bootstrap-5-bundle',
+            YOLO_YS_PLUGIN_URL . 'vendor/bootstrap/js/bootstrap.bundle.min.js',
+            array(),
+            '5.3.2',
+            true
+        );
         
         // Litepicker JS
         wp_enqueue_script(
@@ -235,6 +237,24 @@ class YOLO_YS_Public {
             YOLO_YS_PLUGIN_URL . 'assets/js/mobilefriendly.js',
             array('litepicker'),
             $this->version,
+            true
+        );
+        
+        // Swiper JS (bundled locally for carousels)
+        wp_enqueue_script(
+            'swiper',
+            YOLO_YS_PLUGIN_URL . 'vendor/swiper/swiper-bundle.min.js',
+            array(),
+            '11.0.0',
+            true
+        );
+        
+        // Toastify JS (bundled locally for notifications)
+        wp_enqueue_script(
+            'toastify',
+            YOLO_YS_PLUGIN_URL . 'vendor/toastify/toastify.min.js',
+            array(),
+            '1.12.0',
             true
         );
         

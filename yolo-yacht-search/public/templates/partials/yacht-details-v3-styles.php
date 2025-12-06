@@ -26,6 +26,30 @@ $colors = array(
 ?>
 <style>
 /* ============================================
+   CRITICAL CSS - Prevent FOUC (Flash of Unstyled Content)
+   ============================================ */
+.yolo-yacht-details-v3 {
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+.yolo-yacht-details-v3.loaded {
+    opacity: 1;
+}
+
+/* Prevent layout shift during load */
+.yacht-image-swiper {
+    min-height: 250px;
+    background: #f3f4f6;
+}
+
+@media (min-width: 768px) {
+    .yacht-image-swiper {
+        min-height: 400px;
+    }
+}
+
+/* ============================================
    CSS CUSTOM PROPERTIES - Easy Color Customization
    ============================================ */
 :root {
@@ -198,7 +222,7 @@ $colors = array(
 }
 
 /* ============================================
-   IMAGE CAROUSEL
+   IMAGE CAROUSEL - SWIPER
    ============================================ */
 .yacht-images-carousel {
     position: relative;
@@ -208,121 +232,73 @@ $colors = array(
     width: 100%;
 }
 
-.carousel-container {
-    position: relative;
+.yacht-image-swiper {
     width: 100%;
     height: clamp(250px, 50vw, 550px);
 }
 
 @media (min-width: 768px) {
-    .carousel-container {
+    .yacht-image-swiper {
         height: clamp(350px, 45vw, 550px);
     }
 }
 
-.carousel-slides {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.yacht-image-swiper .swiper-slide {
+    overflow: hidden;
 }
 
-.carousel-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    touch-action: pan-y pinch-zoom;
-}
-
-.carousel-slide.active {
-    opacity: 1;
-}
-
-.carousel-slide img {
+.yacht-image-swiper .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-/* Carousel Navigation - Touch Friendly (min 48px) */
-.carousel-prev,
-.carousel-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+/* Swiper Navigation - Custom styling */
+.yacht-image-swiper .swiper-button-prev,
+.yacht-image-swiper .swiper-button-next {
     background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    min-width: 48px;
-    min-height: 48px;
-    width: clamp(48px, 10vw, 64px);
-    height: clamp(48px, 10vw, 64px);
-    font-size: clamp(24px, 5vw, 36px);
-    cursor: pointer;
-    z-index: 10;
-    transition: all var(--yolo-transition);
+    width: clamp(44px, 10vw, 56px);
+    height: clamp(44px, 10vw, 56px);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
+    transition: all var(--yolo-transition);
 }
 
-.carousel-prev:hover,
-.carousel-next:hover {
+.yacht-image-swiper .swiper-button-prev:hover,
+.yacht-image-swiper .swiper-button-next:hover {
     background: rgba(0, 0, 0, 0.85);
-    transform: translateY(-50%) scale(1.05);
+    transform: scale(1.05);
 }
 
-.carousel-prev:active,
-.carousel-next:active {
-    transform: translateY(-50%) scale(0.95);
+.yacht-image-swiper .swiper-button-prev::after,
+.yacht-image-swiper .swiper-button-next::after {
+    font-size: clamp(18px, 4vw, 24px);
+    color: white;
+    font-weight: bold;
 }
 
-.carousel-prev {
-    left: clamp(10px, 3vw, 20px);
+/* Swiper Pagination - Custom styling */
+.yacht-image-swiper .swiper-pagination {
+    bottom: clamp(12px, 3vw, 20px) !important;
 }
 
-.carousel-next {
-    right: clamp(10px, 3vw, 20px);
-}
-
-/* Carousel Dots */
-.carousel-dots {
-    position: absolute;
-    bottom: clamp(12px, 3vw, 20px);
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: clamp(8px, 2vw, 12px);
-    z-index: 10;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 90%;
-    padding: 10px 16px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 25px;
-}
-
-.carousel-dots .dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
+.yacht-image-swiper .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
     background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
+    opacity: 1;
     transition: all var(--yolo-transition);
-    border: none;
-    padding: 0;
 }
 
-.carousel-dots .dot.active,
-.carousel-dots .dot:hover {
+.yacht-image-swiper .swiper-pagination-bullet-active {
     background: white;
     transform: scale(1.3);
+}
+
+/* Lazy loading preloader */
+.yacht-image-swiper .swiper-lazy-preloader {
+    border-color: var(--yolo-primary);
+    border-top-color: transparent;
 }
 
 .no-images {
@@ -364,7 +340,7 @@ $colors = array(
 }
 
 /* ============================================
-   PRICE CAROUSEL
+   PRICE CAROUSEL - SWIPER
    ============================================ */
 .yacht-price-carousel-section {
     padding: clamp(16px, 4vw, 24px);
@@ -381,23 +357,18 @@ $colors = array(
     text-align: center;
 }
 
-.price-carousel-container {
+.price-swiper {
     position: relative;
-    padding: 0 clamp(40px, 10vw, 55px);
+    padding: 10px 50px 20px;
 }
 
-.price-carousel-slides {
-    display: flex;
-    gap: clamp(12px, 2vw, 16px);
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 10px 5px 15px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+.price-swiper .swiper-wrapper {
+    padding: 5px 0;
 }
 
-.price-carousel-slides::-webkit-scrollbar {
-    display: none;
+.price-swiper .swiper-slide {
+    width: auto;
+    height: auto;
 }
 
 .price-slide {
@@ -410,15 +381,14 @@ $colors = array(
     border-radius: var(--yolo-radius-md);
     background: var(--yolo-white);
     transition: all var(--yolo-transition);
-    min-width: clamp(200px, 50vw, 260px);
-    flex-shrink: 0;
+    width: clamp(200px, 50vw, 260px);
     cursor: pointer;
     box-shadow: var(--yolo-shadow-sm);
 }
 
 @media (min-width: 768px) {
     .price-slide {
-        min-width: clamp(220px, 25vw, 260px);
+        width: clamp(220px, 22vw, 260px);
     }
 }
 
@@ -493,41 +463,42 @@ $colors = array(
     background: var(--yolo-primary-hover);
 }
 
-/* Price Carousel Arrows */
-.price-carousel-prev,
-.price-carousel-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+/* Price Carousel Arrows - Swiper */
+.price-swiper .swiper-button-prev,
+.price-swiper .swiper-button-next {
     background: var(--yolo-primary);
-    color: white;
-    border: none;
-    min-width: 44px;
-    min-height: 44px;
-    width: clamp(44px, 9vw, 52px);
-    height: clamp(44px, 9vw, 52px);
-    font-size: clamp(20px, 4vw, 26px);
-    cursor: pointer;
+    width: clamp(40px, 9vw, 48px);
+    height: clamp(40px, 9vw, 48px);
     border-radius: 50%;
-    transition: all var(--yolo-transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     box-shadow: var(--yolo-shadow-md);
+    transition: all var(--yolo-transition);
 }
 
-.price-carousel-prev:hover,
-.price-carousel-next:hover {
+.price-swiper .swiper-button-prev::after,
+.price-swiper .swiper-button-next::after {
+    font-size: clamp(16px, 3.5vw, 20px);
+    color: white;
+    font-weight: bold;
+}
+
+.price-swiper .swiper-button-prev:hover,
+.price-swiper .swiper-button-next:hover {
     background: var(--yolo-primary-hover);
-    transform: translateY(-50%) scale(1.1);
+    transform: scale(1.1);
 }
 
-.price-carousel-prev {
-    left: 0;
+.price-swiper .swiper-button-prev {
+    left: 5px;
 }
 
-.price-carousel-next {
-    right: 0;
+.price-swiper .swiper-button-next {
+    right: 5px;
+}
+
+/* Hide navigation when disabled */
+.price-swiper .swiper-button-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 /* ============================================
@@ -1157,20 +1128,7 @@ $colors = array(
     color: white;
 }
 
-/* ============================================
-   MOBILE SWIPE HINT
-   ============================================ */
-@media (max-width: 767px) {
-    .price-carousel-container::after {
-        content: '← Swipe to see more →';
-        display: block;
-        text-align: center;
-        font-size: 12px;
-        color: var(--yolo-text-light);
-        margin-top: 12px;
-        opacity: 0.8;
-    }
-}
+/* Mobile swipe hint removed - Swiper has intuitive touch behavior */
 
 /* ============================================
    INFO CARDS (Security Deposit, Cancellation, Check-in)
@@ -1323,11 +1281,9 @@ $colors = array(
    ============================================ */
 @media print {
     .yacht-booking-sidebar,
-    .carousel-prev,
-    .carousel-next,
-    .carousel-dots,
-    .price-carousel-prev,
-    .price-carousel-next {
+    .swiper-button-prev,
+    .swiper-button-next,
+    .swiper-pagination {
         display: none !important;
     }
     

@@ -267,14 +267,8 @@ class YOLO_YS_Admin {
             'yolo-yacht-search'
         );
         
-        register_setting('yolo-yacht-search', 'yolo_ys_cache_duration');
-        add_settings_field(
-            'yolo_ys_cache_duration',
-            __('Cache Duration (hours)', 'yolo-yacht-search'),
-            array($this, 'cache_duration_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_general_settings'
-        );
+        // REMOVED in v30.0: cache_duration setting was never used
+        // Data freshness now depends on manual sync or auto-sync cron jobs
         
         register_setting('yolo-yacht-search', 'yolo_ys_currency');
         add_settings_field(
@@ -456,11 +450,7 @@ class YOLO_YS_Admin {
         echo '<p class="description">' . __('Select the page where yacht details will be displayed (must contain [yolo_yacht_details] shortcode)', 'yolo-yacht-search') . '</p>';
     }
     
-    public function cache_duration_callback() {
-        $value = get_option('yolo_ys_cache_duration', '24');
-        echo '<input type="number" name="yolo_ys_cache_duration" value="' . esc_attr($value) . '" class="small-text" min="1" max="168" />';
-        echo '<p class="description">' . __('How long to cache API results (1-168 hours)', 'yolo-yacht-search') . '</p>';
-    }
+    // REMOVED in v30.0: cache_duration_callback() - setting was never used
     
     public function currency_callback() {
         $value = get_option('yolo_ys_currency', 'EUR');

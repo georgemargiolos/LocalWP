@@ -1,55 +1,12 @@
 /* YOLO Yacht Search - Public Styles */
-
-/* ============================================
-   GLOBAL FONT INHERITANCE
-   All plugin elements inherit fonts from WordPress theme
-   This ensures h1, h2, body text etc. match the theme
-   ============================================ */
-[class*="yolo-"] h1,
-[class*="yolo-"] h2,
-[class*="yolo-"] h3,
-[class*="yolo-"] h4,
-[class*="yolo-"] h5,
-[class*="yolo-"] h6,
-[class*="yolo-"] p,
-[class*="yolo-"] span,
-[class*="yolo-"] a,
-[class*="yolo-"] li,
-[class*="yolo-"] label,
-[class*="yolo-"] button,
-.yolo-ys-yacht-card h1,
-.yolo-ys-yacht-card h2,
-.yolo-ys-yacht-card h3,
-.yolo-ys-yacht-card p,
-.yolo-ys-yacht-card span,
-.yolo-ys-search-widget h1,
-.yolo-ys-search-widget h2,
-.yolo-ys-search-widget p,
-.yolo-ys-search-widget label,
-.yolo-ys-search-results h1,
-.yolo-ys-search-results h2,
-.yolo-ys-search-results p,
-.yolo-ys-our-fleet h1,
-.yolo-ys-our-fleet h2,
-.yolo-ys-our-fleet p,
-.yolo-yacht-details-v3 h1,
-.yolo-yacht-details-v3 h2,
-.yolo-yacht-details-v3 h3,
-.yolo-yacht-details-v3 p,
-.yolo-yacht-details-v3 span {
-    font-family: inherit;
-}
+/* v30.0 - Removed aggressive font wildcards that broke layouts */
+/* Fonts are inherited from WordPress theme automatically */
 
 /* Import block styles */
 @import url('../blocks/yacht-search/style.css');
 @import url('../blocks/yacht-results/style.css');
 
 /* Additional custom styles can be added here */
-
-/* Override Litepicker to inherit fonts from WordPress theme */
-.litepicker {
-    font-family: inherit !important;
-}
 
 /* Override Litepicker colors to match theme */
 .litepicker .container__months .month-item-header .button-previous-month,
@@ -98,7 +55,7 @@
     .yolo-ys-search-widget {
         display: none;
     }
-
+    
     .yolo-ys-yacht-card {
         page-break-inside: avoid;
     }
@@ -133,7 +90,7 @@
         padding: 15px;
         margin-bottom: 20px;
     }
-
+    
     .yolo-ys-search-form {
         flex-direction: column;
         gap: 10px;

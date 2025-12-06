@@ -457,28 +457,6 @@ class YOLO_YS_Booking_Manager_API {
         );
     }
     
-    /**
-     * Get cached or fresh offers
-     */
-    public function get_offers_cached($params) {
-        $cache_key = 'yolo_ys_offers_' . md5(serialize($params));
-        $cache_duration = (int) get_option('yolo_ys_cache_duration', 24) * HOUR_IN_SECONDS;
-        
-        $cached_data = get_transient($cache_key);
-        
-        if ($cached_data !== false) {
-            return $cached_data;
-        }
-        
-        // CRITICAL FIX (v2.3.7): search_offers now returns data array directly, not result object
-        // It throws exception on failure, so no need to check ['success']
-        try {
-            $data = $this->search_offers($params);
-            set_transient($cache_key, $data, $cache_duration);
-            return $data;
-        } catch (Exception $e) {
-            // Return empty array on error
-            return array();
-        }
-    }
+    // REMOVED in v30.0: get_offers_cached() was never called anywhere
+    // Data freshness now depends on manual sync or auto-sync cron jobs
 }

@@ -93,28 +93,27 @@ $responded_quotes = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name} WHERE sta
     </div>
     
     <!-- Quotes Table -->
-    <table class="wp-list-table widefat fixed striped yolo-quotes-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Contact</th>
-                <th>Yacht Preference</th>
-                <th>Charter Dates</th>
-                <th>Guests</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($quotes)): ?>
+    <?php if (empty($quotes)): ?>
+        <!-- Empty state OUTSIDE table to avoid DataTables column count error (v30.0 fix) -->
+        <div class="notice notice-info" style="text-align: center; padding: 40px; margin: 20px 0;">
+            <p style="font-size: 16px; color: #666; margin: 0;">No quote requests found.</p>
+        </div>
+    <?php else: ?>
+        <table class="wp-list-table widefat fixed striped yolo-quotes-table">
+            <thead>
                 <tr>
-                    <td colspan="9" style="text-align: center; padding: 40px;">
-                        <p style="font-size: 16px; color: #666;">No quote requests found.</p>
-                    </td>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Yacht Preference</th>
+                    <th>Charter Dates</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
-            <?php else: ?>
+            </thead>
+            <tbody>
                 <?php foreach ($quotes as $quote): ?>
                     <tr class="quote-row <?php echo $quote['status']; ?>">
                         <td><strong>#<?php echo $quote['id']; ?></strong></td>
@@ -153,9 +152,9 @@ $responded_quotes = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name} WHERE sta
                         </td>
                     </tr>
                 <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    <?php endif; ?>
 </div>
 
 <style>

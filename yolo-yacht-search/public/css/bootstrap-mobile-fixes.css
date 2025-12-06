@@ -39,14 +39,14 @@
 }
 
 /* Prevent horizontal overflow from breaking layouts */
+/* Note: .yolo-yacht-details-v3 has its own rule at the end using overflow-x: clip */
 .yolo-ys-our-fleet,
 .yolo-ys-search-results,
-.yolo-yacht-details-v3,
 .yolo-booking-confirmation,
 .yolo-balance-payment,
 .yolo-guest-login-container,
 .yolo-guest-dashboard {
-    overflow-x: visible;
+    overflow-x: clip; /* clip prevents scroll but doesn't break position:sticky like hidden does */
     max-width: 100%;
 }
 
@@ -297,7 +297,7 @@
         padding: 0 !important;
     }
     
-    .yolo-yacht-details-v3 .carousel-container {
+    .yolo-yacht-details-v3 .yacht-image-swiper {
         border-radius: 0 !important;
     }
     
@@ -974,8 +974,9 @@ html, body {
     max-width: 100vw;
 }
 
-/* Yacht details needs overflow:visible for sticky sidebar to work */
+/* Yacht details needs overflow-x:clip for sticky sidebar to work */
+/* overflow:hidden breaks position:sticky, but clip works correctly */
 .yolo-yacht-details-v3 {
-    overflow-x: clip; /* clip prevents horizontal scroll but doesn't break sticky like hidden does */
-    max-width: 100vw;
+    overflow-x: clip !important; /* Prevent horizontal scroll without breaking sticky */
+    max-width: 100vw !important;
 }

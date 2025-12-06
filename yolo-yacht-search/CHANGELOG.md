@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [30.6] - 2025-12-06
+
+### Fixed
+- **CRITICAL: White Page on Yacht Details (FOUC)** - Fixed issue where yacht details page was invisible due to `opacity: 0` CSS. Added JavaScript to add `.loaded` class on page load to make content visible.
+
+---
+
+## [30.5] - 2025-12-06
+
+### Fixed
+- **CRITICAL: White Page on Yacht Details** - Fixed issue where Bootstrap CSS was not loading on yacht details pages accessed via URL parameter (`?yacht_id=...`), causing a white page.
+
+---
+
+## [30.4] - 2025-12-06
+
+### Merged
+- **Combined v21.9 and v30.3** - This version includes all modern libraries from v30.3 (Swiper, Bootstrap, Chart.js, etc.) and the stable CSS from v21.9.
+
+---
+
 ## [22C.0] - 2025-12-05
 
 ### 🎨 WordPress Theme Font Inheritance
@@ -35,36 +56,7 @@ This ensures that headings (h1, h2, etc.), body text, buttons, and all UI elemen
 
 ---
 
-## [22C.2] - 2025-12-05
-
-### Fixed - Layout Issues from Font Inheritance
-- **Fixed:** Removed `div` from the global font inheritance CSS rule. Applying `font-family: inherit` to `div` elements was causing layout issues.
-- **Improved:** Added `button` to the font inheritance rule to ensure buttons match theme fonts.
-- **Result:** Layouts are now stable, and text elements correctly inherit WordPress theme fonts.
-
----
-
-## [22C.1] - 2025-12-05
-
-### Fixed - Font Inheritance & Layout Issues
-- **Fixed:** Aggressive `*` selector in font inheritance CSS was breaking layouts
-- **Fixed:** Search widget and yacht details page now display correctly
-- **Improved:** Font inheritance now targets specific text elements (h1, p, span, etc.)
-- **Result:** Plugin now inherits WordPress theme fonts without breaking layouts
-
----
-
-## [22C.0] - 2025-12-05
-
-### Added - Global Font Inheritance
-- All plugin elements now inherit fonts from the WordPress theme
-- Added global CSS rule for all `[class*="yolo-"]` elements
-- Updated balance-payment.css, booking-confirmation.css, guest-dashboard.css
-- Added Litepicker date picker font override
-
----
-
-## [21.9] - 2025-12-04
+## [20.9] - 2025-12-04
 
 ### Fixed
 - **CRITICAL: Sticky Sidebar Now Works!** 

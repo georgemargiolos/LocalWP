@@ -166,27 +166,25 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <div class="col-12 col-lg-8">
                 <div class="yacht-main-content">
             
-            <!-- Image Carousel -->
+            <!-- Image Carousel - Swiper (v30.1) -->
             <div class="yacht-images-carousel">
                 <?php if (!empty($images)): ?>
-                    <div class="carousel-container">
-                        <div class="carousel-slides">
+                    <div class="swiper yacht-image-swiper">
+                        <div class="swiper-wrapper">
                             <?php foreach ($images as $index => $image): ?>
-                                <div class="carousel-slide <?php echo $index === 0 ? 'active' : ''; ?>">
+                                <div class="swiper-slide">
                                     <img src="<?php echo esc_url($image->image_url); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
                                 </div>
                             <?php endforeach; ?>
                         </div>
                         
                         <?php if (count($images) > 1): ?>
-                            <button class="carousel-prev" onclick="yachtCarousel.prev()">‹</button>
-                            <button class="carousel-next" onclick="yachtCarousel.next()">›</button>
+                            <!-- Navigation arrows -->
+                            <div class="swiper-button-prev"></div>
+                            <div class="swiper-button-next"></div>
                             
-                            <div class="carousel-dots">
-                                <?php foreach ($images as $index => $image): ?>
-                                    <span class="dot <?php echo $index === 0 ? 'active' : ''; ?>" onclick="yachtCarousel.goTo(<?php echo $index; ?>)"></span>
-                                <?php endforeach; ?>
-                            </div>
+                            <!-- Pagination dots -->
+                            <div class="swiper-pagination"></div>
                         <?php endif; ?>
                     </div>
                 <?php else: ?>
@@ -194,21 +192,20 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 <?php endif; ?>
             </div>
             
-            <!-- Weekly Price Carousel -->
+            <!-- Weekly Price Carousel - Swiper -->
             <?php if (!empty($prices)): ?>
             <div class="yacht-price-carousel-section">
                 <h3><i class="fa-solid fa-calendar-week"></i> Peak Season Pricing (May - September)</h3>
-                <div class="price-carousel-container" 
+                <div class="swiper price-swiper" 
                      data-init-date-from="<?php echo esc_attr($requested_date_from); ?>"
-                     data-init-date-to="<?php echo esc_attr($requested_date_to); ?>"
-                     data-visible-slides="4">
-                    <div class="price-carousel-slides">
+                     data-init-date-to="<?php echo esc_attr($requested_date_to); ?>">
+                    <div class="swiper-wrapper">
                         <?php foreach ($prices as $index => $price): 
                             $discount_amount = $price->start_price - $price->price;
                             $week_start = date('M j', strtotime($price->date_from));
                             $week_end = date('M j, Y', strtotime($price->date_to));
                         ?>
-                            <div class="price-slide <?php echo $index === 0 ? 'active' : ''; ?>" 
+                            <div class="swiper-slide price-slide" 
                                  data-date-from="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_from))); ?>"
                                  data-date-to="<?php echo esc_attr(date('Y-m-d', strtotime($price->date_to))); ?>"
                                  data-price="<?php echo esc_attr($price->price); ?>"
@@ -237,8 +234,8 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     </div>
                     
                     <?php if (count($prices) > 1): ?>
-                        <button class="price-carousel-prev" onclick="priceCarousel.scrollPrev()">‹</button>
-                        <button class="price-carousel-next" onclick="priceCarousel.scrollNext()">›</button>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
                     <?php endif; ?>
                 </div>
             </div>

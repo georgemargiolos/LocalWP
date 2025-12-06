@@ -326,99 +326,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Image Carousel
-const yachtCarousel = {
-    currentSlide: 0,
-    slides: document.querySelectorAll('.carousel-slide'),
-    dots: document.querySelectorAll('.carousel-dots .dot'),
-    
-    goTo: function(index) {
-        if (this.slides.length === 0) return;
-        
-        this.slides[this.currentSlide].classList.remove('active');
-        if (this.dots.length > 0) {
-            this.dots[this.currentSlide].classList.remove('active');
-        }
-        
-        this.currentSlide = index;
-        
-        this.slides[this.currentSlide].classList.add('active');
-        if (this.dots.length > 0) {
-            this.dots[this.currentSlide].classList.add('active');
-        }
-    },
-    
-    next: function() {
-        if (this.slides.length === 0) return;
-        const nextIndex = (this.currentSlide + 1) % this.slides.length;
-        this.goTo(nextIndex);
-    },
-    
-    prev: function() {
-        if (this.slides.length === 0) return;
-        const prevIndex = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
-        this.goTo(prevIndex);
-    }
-};
+// Swiper instances
+let yachtImageSwiper = null;
+let priceSwiper = null;
 
-// Price Carousel - Horizontal scroll showing 4 weeks at a time
-const priceCarousel = {
-    container: document.querySelector('.price-carousel-slides'),
-    slideWidth: 265, // 250px width + 15px gap
-    visibleSlides: 4,
-    
-    init: function() {
-        if (!this.container) return;
-        // All slides are visible, just scrolled
-        this.updateArrows();
-    },
-    
-    updateArrows: function() {
-        if (!this.container) return;
-        const prevBtn = document.querySelector('.price-carousel-prev');
-        const nextBtn = document.querySelector('.price-carousel-next');
-        
-        if (!prevBtn || !nextBtn) return;
-        
-        const scrollLeft = this.container.scrollLeft;
-        const maxScroll = this.container.scrollWidth - this.container.clientWidth;
-        
-        prevBtn.style.display = scrollLeft > 0 ? 'flex' : 'none';
-        nextBtn.style.display = scrollLeft < maxScroll - 1 ? 'flex' : 'none';
-    },
-    
-    scrollNext: function() {
-        if (!this.container) return;
-        this.container.scrollBy({
-            left: this.slideWidth,
-            behavior: 'smooth'
-        });
-        setTimeout(() => this.updateArrows(), 300);
-    },
-    
-    scrollPrev: function() {
-        if (!this.container) return;
-        this.container.scrollBy({
-            left: -this.slideWidth,
-            behavior: 'smooth'
-        });
-        setTimeout(() => this.updateArrows(), 300);
-    }
-};
-
-// Initialize carousels
+// Initialize Swipers
 document.addEventListener('DOMContentLoaded', function() {
-    if (yachtCarousel.slides.length > 0) {
-        yachtCarousel.goTo(0);
-        
-        // Auto-advance every 5 seconds
-        setInterval(function() {
-            yachtCarousel.next();
-        }, 5000);
+    // Image Carousel - Swiper
+    const imageContainer = document.querySelector('.yacht-image-swiper');
+    if (imageContainer) {
+        yachtImageSwiper = new Swiper('.yacht-image-swiper', {
+            loop: true,
+            effect: 'fade',
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+            },
+            lazy: {
+                loadPrevNext: true,
+                loadPrevNextAmount: 2
+            },
+            navigation: {
+                nextEl: '.yacht-image-swiper .swiper-button-next',
+                prevEl: '.yacht-image-swiper .swiper-button-prev',
+            },
+            pagination: {
+                el: '.yacht-image-swiper .swiper-pagination',
+                clickable: true,
+            },
+            keyboard: {
+                enabled: true,
+            },
+            grabCursor: true,
+        });
     }
     
-    if (priceCarousel.container) {
-        priceCarousel.init();
+    // Price Carousel - Swiper
+    const priceContainer = document.querySelector('.price-swiper');
+    if (priceContainer) {
+        priceSwiper = new Swiper('.price-swiper', {
+            slidesPerView: 'auto',
+            spaceBetween: 16,
+            freeMode: true,
+            navigation: {
+                nextEl: '.price-swiper .swiper-button-next',
+                prevEl: '.price-swiper .swiper-button-prev',
+            },
+            breakpoints: {
+                320: {
+                    spaceBetween: 12,
+                },
+                768: {
+                    spaceBetween: 16,
+                },
+            },
+            grabCursor: true,
+        });
     }
     
     // Auto-select week based on init dates or default to July
@@ -430,9 +397,9 @@ function autoSelectWeek() {
     const priceSlides = document.querySelectorAll('.price-slide');
     if (priceSlides.length === 0) return;
     
-    const carouselContainer = document.querySelector('.price-carousel-container');
-    const initDateFrom = carouselContainer ? carouselContainer.dataset.initDateFrom : '';
-    const initDateTo = carouselContainer ? carouselContainer.dataset.initDateTo : '';
+    const swiperContainer = document.querySelector('.price-swiper');
+    const initDateFrom = swiperContainer ? swiperContainer.dataset.initDateFrom : '';
+    const initDateTo = swiperContainer ? swiperContainer.dataset.initDateTo : '';
     
     let selectedSlide = null;
     
@@ -937,6 +904,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Date picker event handler is now attached immediately after Litepicker creation (see line 237+)
 // This ensures the handler is always attached when the picker exists, avoiding race conditions
+
+// ============================================
+// v30.6 FIX: Add .loaded class to prevent FOUC
+// The CSS sets opacity: 0 by default, this makes it visible
+// ============================================
+window.addEventListener('load', function() {
+    const yachtDetails = document.querySelector('.yolo-yacht-details-v3');
+    if (yachtDetails) {
+        yachtDetails.classList.add('loaded');
+    }
+});
+
+// Fallback: If load event doesn't fire, show content after 500ms
+setTimeout(function() {
+    const yachtDetails = document.querySelector('.yolo-yacht-details-v3');
+    if (yachtDetails && !yachtDetails.classList.contains('loaded')) {
+        yachtDetails.classList.add('loaded');
+    }
+}, 500);
 </script>
 
 <!-- Load Stripe.js -->

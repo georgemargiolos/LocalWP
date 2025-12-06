@@ -67,6 +67,38 @@ $sync_status = $sync->get_sync_status();
         
         <div id="yolo-ys-sync-message" style="margin-top: 15px;"></div>
         
+        <!-- Auto-Sync Yachts -->
+        <div style="margin-top: 20px; padding: 15px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                <label for="yolo-ys-auto-sync-yachts" style="font-weight: 600; color: #dc2626;">🔄 Auto-Sync:</label>
+                <select id="yolo-ys-auto-sync-yachts" style="padding: 8px 12px; font-size: 14px; border: 2px solid #dc2626; border-radius: 6px;">
+                    <option value="disabled" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'disabled'); ?>>Disabled</option>
+                    <option value="twice_daily" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'twice_daily'); ?>>Twice Daily</option>
+                    <option value="daily" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'daily'); ?>>Daily</option>
+                    <option value="weekly" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'weekly'); ?>>Weekly</option>
+                </select>
+                <label style="font-weight: 600;">at</label>
+                <select id="yolo-ys-auto-sync-yachts-time" style="padding: 8px 12px; font-size: 14px; border: 2px solid #dc2626; border-radius: 6px;">
+                    <?php
+                    $selected_time = get_option('yolo_ys_auto_sync_yachts_time', '03:00');
+                    for ($i = 0; $i < 24; $i++) {
+                        $time = sprintf('%02d:00', $i);
+                        $display = date('g:00 A', strtotime($time));
+                        echo '<option value="' . esc_attr($time) . '" ' . selected($selected_time, $time, false) . '>' . esc_html($display) . '</option>';
+                    }
+                    ?>
+                </select>
+                <span id="yolo-ys-auto-sync-yachts-status" style="color: #6b7280; font-size: 13px;">
+                    <?php
+                    $next_yacht_sync = wp_next_scheduled('yolo_ys_auto_sync_yachts');
+                    if ($next_yacht_sync) {
+                        echo 'Next: ' . date('M d, g:i A', $next_yacht_sync);
+                    }
+                    ?>
+                </span>
+            </div>
+        </div>
+        
         <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
             <strong>What happens when you sync yachts:</strong><br>
             • Fetches all yachts from YOLO (7850) and partner companies (4366, 3604, 6711)<br>
@@ -105,6 +137,38 @@ $sync_status = $sync->get_sync_status();
         </button>
         
         <div id="yolo-ys-price-sync-message" style="margin-top: 15px;"></div>
+        
+        <!-- Auto-Sync Offers -->
+        <div style="margin-top: 20px; padding: 15px; background: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                <label for="yolo-ys-auto-sync-offers" style="font-weight: 600; color: #2563eb;">🔄 Auto-Sync:</label>
+                <select id="yolo-ys-auto-sync-offers" style="padding: 8px 12px; font-size: 14px; border: 2px solid #2563eb; border-radius: 6px;">
+                    <option value="disabled" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'disabled'); ?>>Disabled</option>
+                    <option value="twice_daily" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'twice_daily'); ?>>Twice Daily</option>
+                    <option value="daily" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'daily'); ?>>Daily</option>
+                    <option value="weekly" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'weekly'); ?>>Weekly</option>
+                </select>
+                <label style="font-weight: 600;">at</label>
+                <select id="yolo-ys-auto-sync-offers-time" style="padding: 8px 12px; font-size: 14px; border: 2px solid #2563eb; border-radius: 6px;">
+                    <?php
+                    $selected_time = get_option('yolo_ys_auto_sync_offers_time', '03:00');
+                    for ($i = 0; $i < 24; $i++) {
+                        $time = sprintf('%02d:00', $i);
+                        $display = date('g:00 A', strtotime($time));
+                        echo '<option value="' . esc_attr($time) . '" ' . selected($selected_time, $time, false) . '>' . esc_html($display) . '</option>';
+                    }
+                    ?>
+                </select>
+                <span id="yolo-ys-auto-sync-offers-status" style="color: #6b7280; font-size: 13px;">
+                    <?php
+                    $next_offers_sync = wp_next_scheduled('yolo_ys_auto_sync_offers');
+                    if ($next_offers_sync) {
+                        echo 'Next: ' . date('M d, g:i A', $next_offers_sync);
+                    }
+                    ?>
+                </span>
+            </div>
+        </div>
         
         <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
             <strong>What happens when you sync offers:</strong><br>
@@ -310,6 +374,49 @@ jQuery(document).ready(function($) {
             }
         });
     });
+    
+    // Auto-Sync Settings Handlers
+    $('#yolo-ys-auto-sync-yachts, #yolo-ys-auto-sync-yachts-time').on('change', function() {
+        saveAutoSyncSetting('yolo-ys-auto-sync-yachts');
+    });
+    
+    $('#yolo-ys-auto-sync-offers, #yolo-ys-auto-sync-offers-time').on('change', function() {
+        saveAutoSyncSetting('yolo-ys-auto-sync-offers');
+    });
+    
+    function saveAutoSyncSetting(settingName) {
+        var frequency = $('#' + settingName).val();
+        var time = $('#' + settingName + '-time').val();
+        var $status = $('#' + settingName + '-status');
+        
+        $status.text('Saving...');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_ys_save_auto_sync_settings',
+                nonce: yoloYsAdmin.nonce,
+                setting: settingName,
+                frequency: frequency,
+                time: time
+            },
+            success: function(response) {
+                if (response.success) {
+                    if (frequency === 'disabled') {
+                        $status.text('Disabled').css('color', '#6b7280');
+                    } else {
+                        $status.text('Next: ' + response.data.next_run).css('color', '#16a34a');
+                    }
+                } else {
+                    $status.text('Error: ' + response.data).css('color', '#dc2626');
+                }
+            },
+            error: function() {
+                $status.text('Save failed').css('color', '#dc2626');
+            }
+        });
+    }
 });
 </script>
 
