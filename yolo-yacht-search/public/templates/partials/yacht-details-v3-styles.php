@@ -905,6 +905,10 @@ $colors = array(
 
 .equipment-item span {
     font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* ============================================
