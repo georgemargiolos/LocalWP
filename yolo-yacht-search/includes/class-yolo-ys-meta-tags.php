@@ -28,7 +28,8 @@ class YOLO_YS_Meta_Tags {
     private function get_current_yacht() {
         if ($this->current_yacht !== null) return $this->current_yacht;
         
-        $yacht_id = intval($_GET['yacht_id'] ?? $_GET['yacht'] ?? 0);
+        $yacht_id = isset($_GET['yacht_id']) ? intval($_GET['yacht_id']) : 
+                    (isset($_GET['yacht']) ? intval($_GET['yacht']) : 0);
         if (!$yacht_id) return null;
         
         // Try API cache

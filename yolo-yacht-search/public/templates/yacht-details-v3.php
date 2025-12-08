@@ -327,12 +327,22 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <div class="yacht-map-section">
                 <h3><i class="fa-solid fa-map-location-dot"></i> <?php yolo_ys_text_e('location', 'Location'); ?></h3>
                 <div class="map-container">
+                    <?php 
+                    $maps_key = get_option('yolo_ys_google_maps_api_key', '');
+                    if (!empty($maps_key)): 
+                    ?>
                     <iframe 
-                        src="https://www.google.com/maps/embed/v1/place?key=<?php echo esc_attr(get_option('yolo_ys_google_maps_api_key', 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8')); ?>&q=<?php echo urlencode($yacht->home_base . ', Greece'); ?>&zoom=12"
+                        src="https://www.google.com/maps/embed/v1/place?key=<?php echo esc_attr($maps_key); ?>&q=<?php echo urlencode($yacht->home_base . ', Greece'); ?>&zoom=12"
                         allowfullscreen="" 
                         loading="lazy" 
                         referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
+                    <?php else: ?>
+                    <div class="map-unavailable" style="padding: 40px; text-align: center; background: #f3f4f6; border-radius: 8px; color: #6b7280;">
+                        <i class="fa-solid fa-map-location-dot" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p style="margin: 0; font-size: 16px;"><?php yolo_ys_text_e('map_unavailable', 'Map unavailable. Please configure Google Maps API key in plugin settings.'); ?></p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>

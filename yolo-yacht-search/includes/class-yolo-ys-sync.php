@@ -12,8 +12,17 @@ class YOLO_YS_Sync {
     private $db;
     
     public function __construct() {
-        $this->api = new YOLO_YS_Booking_Manager_API();
-        $this->db = new YOLO_YS_Database();
+        if (class_exists('YOLO_YS_Booking_Manager_API')) {
+            $this->api = new YOLO_YS_Booking_Manager_API();
+        } else {
+            error_log('YOLO YS: YOLO_YS_Booking_Manager_API class not found');
+        }
+        
+        if (class_exists('YOLO_YS_Database')) {
+            $this->db = new YOLO_YS_Database();
+        } else {
+            error_log('YOLO YS: YOLO_YS_Database class not found');
+        }
     }
     
     /**
