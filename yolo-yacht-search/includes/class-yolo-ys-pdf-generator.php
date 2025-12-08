@@ -13,10 +13,6 @@ if (!defined('ABSPATH')) {
  * @since 17.0
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
 // Include FPDF library
 require_once YOLO_YS_PLUGIN_DIR . 'vendor/fpdf/fpdf.php';
 

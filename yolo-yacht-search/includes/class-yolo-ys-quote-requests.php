@@ -13,10 +13,6 @@ if (!defined('ABSPATH')) {
  * @since 17.4
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
 class YOLO_YS_Quote_Requests {
 
     /**

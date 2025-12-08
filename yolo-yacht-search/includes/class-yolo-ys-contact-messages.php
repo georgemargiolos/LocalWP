@@ -13,10 +13,6 @@ if (!defined('ABSPATH')) {
  * @since 17.5
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
 class YOLO_YS_Contact_Messages {
     
     /**

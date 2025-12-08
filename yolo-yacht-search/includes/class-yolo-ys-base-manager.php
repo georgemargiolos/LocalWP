@@ -14,10 +14,6 @@ if (!defined('ABSPATH')) {
  * @since 17.0
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
 class YOLO_YS_Base_Manager {
 
     /**
