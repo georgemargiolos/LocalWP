@@ -517,6 +517,20 @@ function selectWeek(button) {
     // Update deposit info
     updatePriceDisplayWithDeposit();
     
+    // FIX: Re-enable Book Now button when selecting from carousel (was disabled if unavailable dates were selected before)
+    const bookNowBtn = document.getElementById('bookNowBtn');
+    if (bookNowBtn) {
+        bookNowBtn.disabled = false;
+        bookNowBtn.style.opacity = '1';
+        bookNowBtn.style.cursor = 'pointer';
+    }
+    
+    // Also reset the price color in case it was red from "Not Available"
+    const priceFinal = document.getElementById('selectedPriceFinal');
+    if (priceFinal) {
+        priceFinal.style.color = ''; // Reset to default
+    }
+    
     // Scroll booking section into view on mobile
     if (window.innerWidth < 1024) {
         const bookingSection = document.querySelector('.yacht-booking-section');
