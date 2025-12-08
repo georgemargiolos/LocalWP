@@ -376,6 +376,86 @@ class YOLO_YS_Admin {
             'yolo-yacht-search',
             'yolo_ys_styling_settings'
         );
+        
+        // Analytics & SEO Settings Section
+        add_settings_section(
+            'yolo_ys_analytics_settings',
+            __('Analytics & SEO Settings', 'yolo-yacht-search'),
+            array($this, 'analytics_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ga4_measurement_id');
+        add_settings_field(
+            'yolo_ga4_measurement_id',
+            __('Google Analytics 4 Measurement ID', 'yolo-yacht-search'),
+            array($this, 'ga4_measurement_id_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ga4_api_secret');
+        add_settings_field(
+            'yolo_ga4_api_secret',
+            __('GA4 API Secret (for server-side tracking)', 'yolo-yacht-search'),
+            array($this, 'ga4_api_secret_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_fb_pixel_id');
+        add_settings_field(
+            'yolo_fb_pixel_id',
+            __('Facebook Pixel ID', 'yolo-yacht-search'),
+            array($this, 'fb_pixel_id_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_fb_access_token');
+        add_settings_field(
+            'yolo_fb_access_token',
+            __('Facebook Access Token (for Conversions API)', 'yolo-yacht-search'),
+            array($this, 'fb_access_token_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_default_og_image');
+        add_settings_field(
+            'yolo_default_og_image',
+            __('Default Open Graph Image URL', 'yolo-yacht-search'),
+            array($this, 'default_og_image_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_twitter_handle');
+        add_settings_field(
+            'yolo_twitter_handle',
+            __('Twitter Handle', 'yolo-yacht-search'),
+            array($this, 'twitter_handle_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_enable_schema');
+        add_settings_field(
+            'yolo_enable_schema',
+            __('Enable Schema.org Structured Data', 'yolo-yacht-search'),
+            array($this, 'enable_schema_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_enable_debug_mode');
+        add_settings_field(
+            'yolo_enable_debug_mode',
+            __('Enable Analytics Debug Mode', 'yolo-yacht-search'),
+            array($this, 'enable_debug_mode_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
     }
     
     // Section Callbacks
@@ -515,6 +595,59 @@ class YOLO_YS_Admin {
         $value = get_option('yolo_ys_deposit_percentage', '50');
         echo '<input type="number" name="yolo_ys_deposit_percentage" value="' . esc_attr($value) . '" class="small-text" min="1" max="100" step="1" /> %';
         echo '<p class="description">' . __('Percentage of charter price to charge as deposit (1-100%). Customer pays remaining balance later. Example: 50% means customer pays half now, half later.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    // Analytics & SEO Callbacks
+    public function analytics_settings_callback() {
+        echo '<p>' . __('Configure Google Analytics 4, Facebook Pixel, and SEO settings for tracking and social sharing.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function ga4_measurement_id_callback() {
+        $value = get_option('yolo_ga4_measurement_id', '');
+        echo '<input type="text" name="yolo_ga4_measurement_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="G-XXXXXXXXXX" />';
+        echo '<p class="description">' . __('Your Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX). Find it in GA4 Admin > Data Streams.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function ga4_api_secret_callback() {
+        $value = get_option('yolo_ga4_api_secret', '');
+        echo '<input type="text" name="yolo_ga4_api_secret" value="' . esc_attr($value) . '" class="regular-text" placeholder="xxxxxxxxxxxxxxxx" />';
+        echo '<p class="description">' . __('GA4 API Secret for server-side purchase tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function fb_pixel_id_callback() {
+        $value = get_option('yolo_fb_pixel_id', '');
+        echo '<input type="text" name="yolo_fb_pixel_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="1234567890123456" />';
+        echo '<p class="description">' . __('Your Facebook Pixel ID (15-16 digits). Find it in Facebook Events Manager.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function fb_access_token_callback() {
+        $value = get_option('yolo_fb_access_token', '');
+        echo '<input type="text" name="yolo_fb_access_token" value="' . esc_attr($value) . '" class="regular-text" placeholder="EAAxxxx" />';
+        echo '<p class="description">' . __('Facebook Access Token for Conversions API (server-side purchase tracking). Generate in Events Manager > Settings > Conversions API.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function default_og_image_callback() {
+        $value = get_option('yolo_default_og_image', '');
+        echo '<input type="url" name="yolo_default_og_image" value="' . esc_attr($value) . '" class="regular-text" placeholder="https://example.com/image.jpg" />';
+        echo '<p class="description">' . __('Default image URL for social media sharing (Open Graph). Recommended size: 1200x630px.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function twitter_handle_callback() {
+        $value = get_option('yolo_twitter_handle', '');
+        echo '<input type="text" name="yolo_twitter_handle" value="' . esc_attr($value) . '" class="regular-text" placeholder="@YOLOCharters" />';
+        echo '<p class="description">' . __('Your Twitter/X handle (e.g., @YOLOCharters) for Twitter Card attribution.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function enable_schema_callback() {
+        $value = get_option('yolo_enable_schema', '1');
+        echo '<input type="checkbox" name="yolo_enable_schema" value="1" ' . checked('1', $value, false) . ' />';
+        echo '<label>' . __('Enable Schema.org structured data for better SEO and rich Google results', 'yolo-yacht-search') . '</label>';
+    }
+    
+    public function enable_debug_mode_callback() {
+        $value = get_option('yolo_enable_debug_mode', '0');
+        echo '<input type="checkbox" name="yolo_enable_debug_mode" value="1" ' . checked('1', $value, false) . ' />';
+        echo '<label>' . __('Enable debug mode (shows analytics events in browser console and logs server-side events)', 'yolo-yacht-search') . '</label>';
     }
     
     /**

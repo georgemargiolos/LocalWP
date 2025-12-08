@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 41.18
+ * Version: 41.19
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '41.18');
+define('YOLO_YS_VERSION', '41.19');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -64,8 +64,12 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
 // Load quote handler
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-quote-handler.php';
 
-// Load icons helper
-require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-icons-helper.php';
+// Load text helpers
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-text-helpers.php';
+
+// Load analytics and SEO (v41.19)
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-analytics.php';
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-meta-tags.php';
 
 // Load text helpers
 require_once YOLO_YS_PLUGIN_DIR . 'includes/text-helpers.php';
@@ -117,6 +121,10 @@ function run_yolo_yacht_search() {
 }
 
 run_yolo_yacht_search();
+
+// Initialize analytics and SEO (v41.19)
+yolo_analytics();
+yolo_meta_tags();
 
 // Initialize icons admin
 if (is_admin()) {
