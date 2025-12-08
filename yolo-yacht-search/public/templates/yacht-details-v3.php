@@ -194,7 +194,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- Weekly Price Carousel - Swiper -->
             <?php if (!empty($prices)): ?>
             <div class="yacht-price-carousel-section">
-                <h3><i class="fa-solid fa-calendar-week"></i> Peak Season Pricing (May - September)</h3>
+                <h3><i class="fa-solid fa-calendar-week"></i> <?php yolo_ys_text_e('weekly_prices_title', 'Peak Season Pricing (May - September)'); ?></h3>
                 <div class="swiper price-swiper" 
                      data-init-date-from="<?php echo esc_attr($requested_date_from); ?>"
                      data-init-date-to="<?php echo esc_attr($requested_date_to); ?>">
@@ -219,7 +219,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <span class="strikethrough"><?php echo number_format($price->start_price, 2, '.', ','); ?> <?php echo esc_html($price->currency); ?></span>
                                     </div>
                                     <div class="price-discount-badge">
-                                        <?php echo number_format($price->discount_percentage, 2, '.', ','); ?>% OFF
+                                        <?php echo number_format($price->discount_percentage, 2, '.', ','); ?>% <?php yolo_ys_text_e('discount_off', 'OFF'); ?>
                                     </div>
                                 <?php endif; ?>
                                 
@@ -227,7 +227,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                     <?php echo number_format($price->price, 2, '.', ','); ?> <?php echo esc_html($price->currency); ?>
                                 </div>
                                 
-                                <button class="price-select-btn" onclick="selectWeek(this)">Select This Week</button>
+                                <button class="price-select-btn" onclick="selectWeek(this)"><?php yolo_ys_text_e('select_week', 'Select This Week'); ?></button>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -296,8 +296,8 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                             <?php echo nl2br(esc_html(implode("\n", $remaining_paragraphs))); ?>
                         </div>
                         <button class="description-toggle" onclick="toggleDescription(this)">
-                            <span class="toggle-more">More...</span>
-                            <span class="toggle-less" style="display: none;">Less</span>
+                            <span class="toggle-more"><?php yolo_ys_text_e('read_more', 'More...'); ?></span>
+                            <span class="toggle-less" style="display: none;"><?php yolo_ys_text_e('read_less', 'Less'); ?></span>
                         </button>
                     <?php endif; ?>
                 </div>
@@ -325,7 +325,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- Location Map -->
             <?php if ($yacht->home_base): ?>
             <div class="yacht-map-section">
-                <h3><i class="fa-solid fa-map-location-dot"></i> Location</h3>
+                <h3><i class="fa-solid fa-map-location-dot"></i> <?php yolo_ys_text_e('location', 'Location'); ?></h3>
                 <div class="map-container">
                     <iframe 
                         src="https://www.google.com/maps/embed/v1/place?key=<?php echo esc_attr(get_option('yolo_ys_google_maps_api_key', 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8')); ?>&q=<?php echo urlencode($yacht->home_base . ', Greece'); ?>&zoom=12"
@@ -346,7 +346,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-water"></i></div>
                             <div class="tech-content">
-                                <div class="tech-label">DRAUGHT</div>
+                                <div class="spec-label"><?php yolo_ys_text_e('draught', 'DRAUGHT'); ?></div>
                                 <div class="tech-value"><?php echo $draft_ft; ?> ft (<?php echo number_format($yacht->draft, 2); ?> m)</div>
                             </div>
                         </div>
@@ -382,7 +382,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-gauge-high"></i></div>
                             <div class="tech-content">
-                                <div class="tech-label">ENGINE</div>
+                                <div class="spec-label"><?php yolo_ys_text_e('engine', 'ENGINE'); ?></div>
                                 <div class="tech-value"><?php echo esc_html($yacht->engine_power); ?> HP</div>
                             </div>
                         </div>
@@ -423,7 +423,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 ?>
                 
                 <div class="yacht-extras-combined">
-                    <h3><i class="fa-solid fa-plus-circle"></i> Extras <span class="extras-note">(Payable at the base)</span></h3>
+                    <h3><i class="fa-solid fa-plus-circle"></i> <?php yolo_ys_text_e('extras', 'Extras'); ?> <span class="extras-note"><?php yolo_ys_text_e('payable_at_base', '(Payable at the base)'); ?></span></h3>
                     <div class="row g-4 extras-two-column">
                         <?php if (!empty($obligatory_extras)): ?>
                         <div class="col-12 col-md-6 extras-column">
@@ -587,10 +587,10 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- ============================================ -->
             <div class="col-12 col-lg-4">
             <div class="yacht-booking-section">
-                <h3><i class="fa-solid fa-calendar-check"></i> Availability & Pricing</h3>
+                <h3><i class="fa-solid fa-calendar-check"></i> <?php yolo_ys_text_e('availability_pricing', 'Availability & Pricing'); ?></h3>
                 
                 <?php if (empty($prices)): ?>
-                    <p style="text-align: center; color: #6b7280;">No pricing available. Please contact us for a quote.</p>
+                    <p style="text-align: center; color: #6b7280;"><?php yolo_ys_text_e('no_pricing', 'No pricing available. Please contact us for a quote.'); ?></p>
                 <?php endif; ?>
                 
                 <!-- Selected Week Price Display -->
@@ -602,7 +602,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 
                 <!-- Date Picker -->
                 <div class="date-picker-section">
-                    <h4>Or Choose Custom Dates</h4>
+                    <h4><?php yolo_ys_text_e('choose_custom_dates', 'Or Choose Custom Dates'); ?></h4>
                     <input type="text" id="dateRangePicker" placeholder="Select dates" readonly 
                         data-init-date-from="<?php echo esc_attr($requested_date_from); ?>" 
                         data-init-date-to="<?php echo esc_attr($requested_date_to); ?>" />
@@ -616,7 +616,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 
                 <!-- Request Quote Section -->
                 <div class="quote-section">
-                    <p class="quote-label">Need something special?</p>
+                    <p class="quote-label"><?php yolo_ys_text_e('quote_tagline', 'Need something special?'); ?></p>
                     <button class="btn-request-quote" onclick="toggleQuoteForm()">REQUEST A QUOTE</button>
                 </div>
                 

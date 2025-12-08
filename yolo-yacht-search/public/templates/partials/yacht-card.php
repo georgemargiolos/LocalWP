@@ -114,7 +114,7 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
         
         <!-- Details Button -->
         <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-details-btn">
-            DETAILS
+            <?php yolo_ys_text_e('details_button', 'DETAILS'); ?>
         </a>
     </div>
 </div>

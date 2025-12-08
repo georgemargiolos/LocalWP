@@ -114,6 +114,36 @@ class YOLO_YS_Admin_Colors {
                 'default' => '#f9fafb',
                 'group' => 'UI Colors'
             ),
+            'yolo_ys_color_bg_lighter' => array(
+                'label' => 'Lighter Background',
+                'description' => 'Image placeholders, loading states',
+                'default' => '#f3f4f6',
+                'group' => 'UI Colors'
+            ),
+            'yolo_ys_color_separator' => array(
+                'label' => 'Separator Color',
+                'description' => 'Yacht name separators, dividers',
+                'default' => '#cccccc',
+                'group' => 'UI Colors'
+            ),
+            'yolo_ys_color_header_bg' => array(
+                'label' => 'Header Background',
+                'description' => 'Yacht header section background',
+                'default' => '#f8f9fa',
+                'group' => 'UI Colors'
+            ),
+            'yolo_ys_color_disabled' => array(
+                'label' => 'Disabled State Color',
+                'description' => 'Disabled buttons and inactive elements',
+                'default' => '#9ca3af',
+                'group' => 'UI Colors'
+            ),
+            'yolo_ys_color_loading' => array(
+                'label' => 'Loading Spinner Color',
+                'description' => 'Loading animations',
+                'default' => '#dc2626',
+                'group' => 'UI Colors'
+            ),
         );
     }
     

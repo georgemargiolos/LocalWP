@@ -365,6 +365,151 @@ $texts = array(
                 <th scope="row"><label for="yolo_ys_text_confirmation_email"><?php _e('Confirmation Email Message', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_confirmation_email" name="yolo_ys_text_confirmation_email" value="<?php echo esc_attr($texts['confirmation_email']); ?>" class="regular-text"></td>
             </tr>
+            
+            <!-- Yacht Details Additional -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Yacht Details Page', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_weekly_prices_title"><?php _e('Weekly Prices Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_weekly_prices_title" name="yolo_ys_text_weekly_prices_title" value="<?php echo esc_attr(get_option('yolo_ys_text_weekly_prices_title', 'Peak Season Pricing (May - September)')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_discount_off"><?php _e('Discount OFF Text', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_discount_off" name="yolo_ys_text_discount_off" value="<?php echo esc_attr(get_option('yolo_ys_text_discount_off', 'OFF')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_select_week"><?php _e('Select Week Button', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_select_week" name="yolo_ys_text_select_week" value="<?php echo esc_attr(get_option('yolo_ys_text_select_week', 'Select This Week')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_read_more"><?php _e('Read More', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_read_more" name="yolo_ys_text_read_more" value="<?php echo esc_attr(get_option('yolo_ys_text_read_more', 'More...')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_read_less"><?php _e('Read Less', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_read_less" name="yolo_ys_text_read_less" value="<?php echo esc_attr(get_option('yolo_ys_text_read_less', 'Less')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_location"><?php _e('Location', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_location" name="yolo_ys_text_location" value="<?php echo esc_attr(get_option('yolo_ys_text_location', 'Location')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_availability_pricing"><?php _e('Availability Section Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_availability_pricing" name="yolo_ys_text_availability_pricing" value="<?php echo esc_attr(get_option('yolo_ys_text_availability_pricing', 'Availability & Pricing')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_no_pricing"><?php _e('No Pricing Message', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_no_pricing" name="yolo_ys_text_no_pricing" value="<?php echo esc_attr(get_option('yolo_ys_text_no_pricing', 'No pricing available. Please contact us for a quote.')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_choose_custom_dates"><?php _e('Custom Dates Label', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_choose_custom_dates" name="yolo_ys_text_choose_custom_dates" value="<?php echo esc_attr(get_option('yolo_ys_text_choose_custom_dates', 'Or Choose Custom Dates')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_loading"><?php _e('Loading Text', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_loading" name="yolo_ys_text_loading" value="<?php echo esc_attr(get_option('yolo_ys_text_loading', 'Loading...')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Extras Section -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Extras Section', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_extras"><?php _e('Extras Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_extras" name="yolo_ys_text_extras" value="<?php echo esc_attr(get_option('yolo_ys_text_extras', 'Extras')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_payable_at_base"><?php _e('Payable at Base Note', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_payable_at_base" name="yolo_ys_text_payable_at_base" value="<?php echo esc_attr(get_option('yolo_ys_text_payable_at_base', '(Payable at the base)')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_per_booking"><?php _e('Per Booking', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_per_booking" name="yolo_ys_text_per_booking" value="<?php echo esc_attr(get_option('yolo_ys_text_per_booking', 'Per Booking')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_per_night"><?php _e('Per Night', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_per_night" name="yolo_ys_text_per_night" value="<?php echo esc_attr(get_option('yolo_ys_text_per_night', 'Per Night')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_per_day"><?php _e('Per Day', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_per_day" name="yolo_ys_text_per_day" value="<?php echo esc_attr(get_option('yolo_ys_text_per_day', 'Per Day')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_per_hour"><?php _e('Per Hour', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_per_hour" name="yolo_ys_text_per_hour" value="<?php echo esc_attr(get_option('yolo_ys_text_per_hour', 'Per Hour')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_per_person"><?php _e('Per Person', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_per_person" name="yolo_ys_text_per_person" value="<?php echo esc_attr(get_option('yolo_ys_text_per_person', 'Per Person')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Additional Technical Specs -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Additional Technical Specs', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_draught"><?php _e('Draught', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_draught" name="yolo_ys_text_draught" value="<?php echo esc_attr(get_option('yolo_ys_text_draught', 'DRAUGHT')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_engine"><?php _e('Engine', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_engine" name="yolo_ys_text_engine" value="<?php echo esc_attr(get_option('yolo_ys_text_engine', 'ENGINE')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_refit"><?php _e('Refit', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_refit" name="yolo_ys_text_refit" value="<?php echo esc_attr(get_option('yolo_ys_text_refit', 'Refit')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Fleet Page -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Fleet Page', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_our_fleet_title"><?php _e('Our Fleet Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_our_fleet_title" name="yolo_ys_text_our_fleet_title" value="<?php echo esc_attr(get_option('yolo_ys_text_our_fleet_title', 'Our Fleet')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_partner_title"><?php _e('Partner Section Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_partner_title" name="yolo_ys_text_partner_title" value="<?php echo esc_attr(get_option('yolo_ys_text_partner_title', 'Partner Companies')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_no_yachts"><?php _e('No Yachts Message', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_no_yachts" name="yolo_ys_text_no_yachts" value="<?php echo esc_attr(get_option('yolo_ys_text_no_yachts', 'No yachts available. Please sync yacht data from the admin panel.')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_details_button"><?php _e('Details Button', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_details_button" name="yolo_ys_text_details_button" value="<?php echo esc_attr(get_option('yolo_ys_text_details_button', 'DETAILS')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Quote Form Additional -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Quote Form Additional', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_quote_tagline"><?php _e('Quote Tagline', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_quote_tagline" name="yolo_ys_text_quote_tagline" value="<?php echo esc_attr(get_option('yolo_ys_text_quote_tagline', 'Need something special?')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_first_name"><?php _e('First Name Placeholder', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_first_name" name="yolo_ys_text_first_name" value="<?php echo esc_attr(get_option('yolo_ys_text_first_name', 'First name *')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_last_name"><?php _e('Last Name Placeholder', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_last_name" name="yolo_ys_text_last_name" value="<?php echo esc_attr(get_option('yolo_ys_text_last_name', 'Last name *')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_special_requests"><?php _e('Special Requests Placeholder', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_special_requests" name="yolo_ys_text_special_requests" value="<?php echo esc_attr(get_option('yolo_ys_text_special_requests', 'Special requests')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_required_field"><?php _e('Required Field Note', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_required_field" name="yolo_ys_text_required_field" value="<?php echo esc_attr(get_option('yolo_ys_text_required_field', '* Required field')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_quote_description"><?php _e('Quote Form Description', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_quote_description" name="yolo_ys_text_quote_description" value="<?php echo esc_attr(get_option('yolo_ys_text_quote_description', 'Quick and free quotation for your sailing holiday.')); ?>" class="regular-text"></td>
+            </tr>
         </table>
         
         <?php submit_button(__('Save Text Settings', 'yolo-yacht-search'), 'primary', 'yolo_ys_save_texts'); ?>

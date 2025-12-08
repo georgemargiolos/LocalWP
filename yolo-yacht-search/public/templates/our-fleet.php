@@ -32,7 +32,7 @@ $partner_yachts = array_filter($partner_yachts, function($yacht) use ($yolo_comp
             <div class="yolo-ys-fleet-section yolo-ys-yolo-fleet">
                 <h2 class="yolo-ys-fleet-title">
                     <span class="yolo-ys-fleet-badge">YOLO Charters</span>
-                    Our Fleet
+                    <?php yolo_ys_text_e('our_fleet_title', 'Our Fleet'); ?>
                 </h2>
                 
                 <div class="container-fluid">
@@ -50,7 +50,7 @@ $partner_yachts = array_filter($partner_yachts, function($yacht) use ($yolo_comp
         <!-- Partner Fleet Section -->
         <?php if (!empty($partner_yachts)): ?>
             <div class="yolo-ys-fleet-section yolo-ys-partner-fleet">
-                <h2 class="yolo-ys-fleet-title">Partner Companies</h2>
+                <h2 class="yolo-ys-fleet-title"><?php yolo_ys_text_e('partner_title', 'Partner Companies'); ?></h2>
                 
                 <div class="container-fluid">
                     <div class="row g-4 yolo-ys-yacht-grid">
