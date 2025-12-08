@@ -71,7 +71,7 @@ fbq('track', 'PageView');
         if (is_admin()) return;
         
         wp_enqueue_script('yolo-analytics', 
-            YOLO_YS_PLUGIN_URL . 'public/js/yolo-analytics.js',
+            plugin_dir_url(dirname(__FILE__)) . 'public/js/yolo-analytics.js',
             array('jquery'), YOLO_YS_VERSION, true);
         
         wp_localize_script('yolo-analytics', 'yoloAnalyticsConfig', array(
