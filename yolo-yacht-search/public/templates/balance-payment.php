@@ -162,13 +162,27 @@ jQuery(document).ready(function($) {
                     // Redirect to Stripe Checkout
                     window.location.href = response.data.url;
                 } else {
-                    alert('Error: ' + (response.data.message || 'Failed to create payment session'));
+                    Toastify({
+                        text: response.data.message || 'Failed to create payment session',
+                        duration: 5000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#dc2626',
+                        stopOnFocus: true
+                    }).showToast();
                     button.prop('disabled', false);
                     button.html('Pay Now - <?php echo YOLO_YS_Price_Formatter::format_price($booking->remaining_balance, $booking->currency); ?>');
                 }
             },
             error: function() {
-                alert('An error occurred. Please try again.');
+                Toastify({
+                    text: 'An error occurred. Please try again.',
+                    duration: 5000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#dc2626',
+                    stopOnFocus: true
+                }).showToast();
                 button.prop('disabled', false);
                 button.html('Pay Now - <?php echo YOLO_YS_Price_Formatter::format_price($booking->remaining_balance, $booking->currency); ?>');
             }

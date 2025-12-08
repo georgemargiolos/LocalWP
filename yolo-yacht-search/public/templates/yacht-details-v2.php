@@ -809,7 +809,14 @@ function selectWeek(button) {
     const price = slide.dataset.price;
     
     // TODO: Implement date picker population and booking flow
-    alert('Selected week: ' + dateFrom + ' to ' + dateTo + '\nPrice: €' + price);
+    Toastify({
+        text: 'Selected week: ' + dateFrom + ' to ' + dateTo + ' - Price: €' + price,
+        duration: 4000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#1e3a8a',
+        stopOnFocus: true
+    }).showToast();
 }
 
 // Auto-advance image carousel every 5 seconds

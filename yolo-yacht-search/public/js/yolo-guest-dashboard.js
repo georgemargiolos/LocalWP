@@ -242,12 +242,26 @@ jQuery(document).ready(function($) {
      */
     function submitGuestSignature() {
         if (!guestSignaturePad || guestSignaturePad.isEmpty()) {
-            alert('Please provide your signature before submitting.');
+            Toastify({
+                text: 'Please provide your signature before submitting.',
+                duration: 4000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#f59e0b',
+                stopOnFocus: true
+            }).showToast();
             return;
         }
         
         if (!currentDocumentId || !currentDocumentType) {
-            alert('Invalid document. Please try again.');
+            Toastify({
+                text: 'Invalid document. Please try again.',
+                duration: 4000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#dc2626',
+                stopOnFocus: true
+            }).showToast();
             return;
         }
         
@@ -268,15 +282,36 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Document signed successfully!');
+                    Toastify({
+                        text: 'Document signed successfully!',
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#10b981',
+                        stopOnFocus: true
+                    }).showToast();
                     hideSignatureModal();
                     location.reload(); // Reload to show updated status
                 } else {
-                    alert('Error: ' + (response.data.message || 'Failed to sign document'));
+                    Toastify({
+                        text: response.data.message || 'Failed to sign document',
+                        duration: 5000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#dc2626',
+                        stopOnFocus: true
+                    }).showToast();
                 }
             },
             error: function() {
-                alert('Network error. Please try again.');
+                Toastify({
+                    text: 'Network error. Please try again.',
+                    duration: 5000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#dc2626',
+                    stopOnFocus: true
+                }).showToast();
             },
             complete: function() {
                 $('.yolo-submit-signature-btn').prop('disabled', false).text('Submit Signature');
