@@ -760,12 +760,20 @@ $colors = array(
 }
 
 .spec-icon {
-    margin-bottom: clamp(10px, 2.5vw, 14px);
+    width: clamp(50px, 12vw, 60px);
+    height: clamp(50px, 12vw, 60px);
+    background: linear-gradient(135deg, var(--yolo-primary) 0%, #2563eb 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto clamp(10px, 2.5vw, 14px) auto;
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
 }
 
 .spec-icon i {
-    font-size: clamp(28px, 6vw, 36px);
-    color: var(--yolo-primary);
+    font-size: clamp(20px, 5vw, 26px);
+    color: var(--yolo-white);
 }
 
 .spec-value {
