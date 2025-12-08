@@ -6,6 +6,14 @@
     transition: opacity 0.3s ease-in;
 }
 
+/* Desktop padding - prevents content from being glued to left edge */
+@media (min-width: 576px) {
+    .yolo-yacht-details-v3 {
+        padding-left: clamp(16px, 4vw, 48px) !important;
+        padding-right: clamp(16px, 4vw, 48px) !important;
+    }
+}
+
 .yolo-yacht-details-v3.loaded {
     opacity: 1;
 }
