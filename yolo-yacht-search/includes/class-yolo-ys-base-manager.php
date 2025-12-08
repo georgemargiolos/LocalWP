@@ -346,7 +346,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_save_yacht() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -427,7 +427,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_get_yachts() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -446,7 +446,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_delete_yacht() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -465,7 +465,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_save_equipment_category() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -502,7 +502,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_get_equipment_categories() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -525,7 +525,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_delete_equipment_category() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -549,7 +549,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_save_checkin() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -597,7 +597,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_save_checkout() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -645,7 +645,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_generate_pdf() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -684,7 +684,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_send_to_guest() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -781,7 +781,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_save_warehouse_item() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -847,7 +847,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_get_warehouse_items() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -876,7 +876,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_delete_warehouse_item() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
@@ -903,7 +903,7 @@ class YOLO_YS_Base_Manager {
     public function ajax_get_bookings_calendar() {
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
-        if (!current_user_can('manage_base_operations') && !current_user_can('manage_options')) {
+        if (!current_user_can('edit_posts')) {
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
