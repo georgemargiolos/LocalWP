@@ -28,7 +28,8 @@
 /* Select Field Styling */
 .yolo-ys-field-select {
     flex: 0 0 auto;
-    width: 320px;
+    width: 280px;
+    min-width: 200px;
 }
 
 .yolo-ys-field-select select {
@@ -60,6 +61,7 @@
 /* Date Field Styling */
 .yolo-ys-field-date {
     flex: 1;
+    min-width: 200px;
 }
 
 .yolo-ys-field-date input {
@@ -95,7 +97,8 @@
 /* Button Field Styling */
 .yolo-ys-field-button {
     flex: 0 0 auto;
-    width: 320px;
+    width: 280px;
+    min-width: 200px;
 }
 
 .yolo-ys-search-button {
@@ -130,6 +133,21 @@
 
 .yolo-ys-search-button span {
     display: inline-block;
+}
+
+/* Tablet Responsive - Stack earlier to prevent date field from being squeezed */
+@media (max-width: 1024px) {
+    .yolo-ys-search-form {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yolo-ys-field-select,
+    .yolo-ys-field-date,
+    .yolo-ys-field-button {
+        width: 100%;
+        flex: 1 1 auto;
+    }
 }
 
 /* Mobile Responsive */
