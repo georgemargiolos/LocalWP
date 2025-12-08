@@ -475,6 +475,7 @@ jQuery(document).ready(function($) {
     
     let checkinSignaturePad = null;
     let selectedYachtId = null;
+    let currentCheckinId = null; // Store the check-in ID after completion
     
     // Load initial data
     console.log('Check-In: Starting initial data load...');
@@ -496,6 +497,7 @@ jQuery(document).ready(function($) {
         $('#checkin-list-container').show();
         $('#checkin-form')[0].reset();
         $('#equipment-checklist-section').hide();
+        currentCheckinId = null; // Reset the check-in ID
         if (checkinSignaturePad) {
             checkinSignaturePad.clear();
         }
@@ -563,8 +565,10 @@ jQuery(document).ready(function($) {
             data: formData,
             success: function(response) {
                 if (response.success) {
-                    alert('Check-in completed successfully!');
-                    $('#cancel-checkin-btn').click();
+                    currentCheckinId = response.data.checkin_id;
+                    alert('Check-in completed successfully! You can now Save PDF or Send to Guest.');
+                    // Don't close form - user may want to save PDF or send to guest
+                    $('#save-checkin-pdf-btn, #send-checkin-guest-btn').css('opacity', '1').prop('disabled', false);
                     loadCheckins();
                 } else {
                     alert('Error: ' + (response.data || 'Failed to complete check-in'));
@@ -572,6 +576,79 @@ jQuery(document).ready(function($) {
             },
             error: function() {
                 alert('Failed to complete check-in. Please try again.');
+            }
+        });
+    });
+    
+    // Save PDF button
+    $('#save-checkin-pdf-btn').on('click', function() {
+        if (!currentCheckinId) {
+            alert('Please complete the check-in first before saving PDF.');
+            return;
+        }
+        
+        $(this).prop('disabled', true).text('Generating PDF...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_generate_pdf',
+                nonce: yoloBaseManager.nonce,
+                type: 'checkin',
+                record_id: currentCheckinId
+            },
+            success: function(response) {
+                $('#save-checkin-pdf-btn').prop('disabled', false).html('<span class="dashicons dashicons-pdf"></span> Save PDF');
+                if (response.success && response.data.pdf_url) {
+                    window.open(response.data.pdf_url, '_blank');
+                } else {
+                    alert('Error: ' + (response.data?.message || 'Failed to generate PDF'));
+                }
+            },
+            error: function() {
+                $('#save-checkin-pdf-btn').prop('disabled', false).html('<span class="dashicons dashicons-pdf"></span> Save PDF');
+                alert('Failed to generate PDF. Please try again.');
+            }
+        });
+    });
+    
+    // Send to Guest button
+    $('#send-checkin-guest-btn').on('click', function() {
+        if (!currentCheckinId) {
+            alert('Please complete the check-in first before sending to guest.');
+            return;
+        }
+        
+        const bookingId = $('#checkin-booking-select').val();
+        if (!bookingId) {
+            alert('No booking selected.');
+            return;
+        }
+        
+        $(this).prop('disabled', true).text('Sending...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_send_to_guest',
+                nonce: yoloBaseManager.nonce,
+                type: 'checkin',
+                record_id: currentCheckinId,
+                booking_id: bookingId
+            },
+            success: function(response) {
+                $('#send-checkin-guest-btn').prop('disabled', false).html('<span class="dashicons dashicons-email"></span> Send to Guest');
+                if (response.success) {
+                    alert('Document sent to guest successfully!');
+                } else {
+                    alert('Error: ' + (response.data?.message || 'Failed to send to guest'));
+                }
+            },
+            error: function() {
+                $('#send-checkin-guest-btn').prop('disabled', false).html('<span class="dashicons dashicons-email"></span> Send to Guest');
+                alert('Failed to send to guest. Please try again.');
             }
         });
     });
@@ -614,7 +691,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_bm_get_yachts',
-                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+                nonce: yoloBaseManager.nonce
             },
             success: function(response) {
                 console.log('Check-In: Yachts AJAX SUCCESS');
@@ -668,7 +745,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_bm_get_bookings_calendar',
-                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+                nonce: yoloBaseManager.nonce
             },
             success: function(response) {
                 console.log('Check-In: Bookings AJAX SUCCESS');
@@ -781,7 +858,55 @@ jQuery(document).ready(function($) {
     
     // Load check-ins
     function loadCheckins() {
-        $('#checkin-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-clipboard"></span><p>No check-ins yet. Click "New Check-In" to create one.</p></div>');
+        console.log('Check-In: Loading check-ins list...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_get_checkins',
+                nonce: yoloBaseManager.nonce
+            },
+            success: function(response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    console.log('Check-In: Loaded ' + response.data.length + ' check-ins');
+                    let html = '<table class="yolo-bm-table"><thead><tr>';
+                    html += '<th>ID</th><th>Booking</th><th>Yacht</th><th>Date</th><th>Status</th><th>Actions</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    response.data.forEach(function(checkin) {
+                        const yachtName = checkin.managed_yacht_name || checkin.booking_yacht_name || 'N/A';
+                        const customerName = checkin.customer_name || 'N/A';
+                        const status = checkin.guest_signature ? 'Signed' : 'Pending';
+                        const statusClass = checkin.guest_signature ? 'status-signed' : 'status-pending';
+                        const createdDate = new Date(checkin.created_at).toLocaleDateString();
+                        
+                        html += '<tr>';
+                        html += '<td>#' + checkin.id + '</td>';
+                        html += '<td>' + customerName + '</td>';
+                        html += '<td>' + yachtName + '</td>';
+                        html += '<td>' + createdDate + '</td>';
+                        html += '<td><span class="yolo-bm-status ' + statusClass + '">' + status + '</span></td>';
+                        html += '<td>';
+                        if (checkin.pdf_url) {
+                            html += '<a href="' + checkin.pdf_url + '" target="_blank" class="yolo-bm-btn-icon" title="View PDF"><span class="dashicons dashicons-pdf"></span></a> ';
+                        }
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                    $('#checkin-list').html(html);
+                } else {
+                    console.log('Check-In: No check-ins found');
+                    $('#checkin-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-clipboard"></span><p>No check-ins yet. Click "New Check-In" to create one.</p></div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Check-In: Failed to load check-ins:', error);
+                $('#checkin-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-warning"></span><p>Failed to load check-ins. Please refresh the page.</p></div>');
+            }
+        });
     }
 });
 </script>

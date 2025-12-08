@@ -518,6 +518,7 @@ jQuery(document).ready(function($) {
     
     let checkoutSignaturePad = null;
     let selectedYachtId = null;
+    let currentCheckoutId = null; // Store the check-out ID after completion
     
     // Load initial data
     console.log('Check-Out: Starting initial data load...');
@@ -539,6 +540,7 @@ jQuery(document).ready(function($) {
         $('#checkout-list-container').show();
         $('#checkout-form')[0].reset();
         $('#equipment-checklist-section').hide();
+        currentCheckoutId = null; // Reset the check-out ID
         if (checkoutSignaturePad) {
             checkoutSignaturePad.clear();
         }
@@ -592,7 +594,7 @@ jQuery(document).ready(function($) {
         
         const formData = {
             action: 'yolo_bm_save_checkout',
-            nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>',
+            nonce: yoloBaseManager.nonce,
             booking_id: bookingId,
             yacht_id: yachtId,
             checklist_data: JSON.stringify(equipmentData),
@@ -606,8 +608,10 @@ jQuery(document).ready(function($) {
             data: formData,
             success: function(response) {
                 if (response.success) {
-                    alert('Check-out completed successfully!');
-                    $('#cancel-checkout-btn').click();
+                    currentCheckoutId = response.data.checkout_id;
+                    alert('Check-out completed successfully! You can now Save PDF or Send to Guest.');
+                    // Don't close form - user may want to save PDF or send to guest
+                    $('#save-checkout-pdf-btn, #send-checkout-guest-btn').css('opacity', '1').prop('disabled', false);
                     loadCheckouts();
                 } else {
                     alert('Error: ' + (response.data || 'Failed to complete check-out'));
@@ -615,6 +619,79 @@ jQuery(document).ready(function($) {
             },
             error: function() {
                 alert('Failed to complete check-out. Please try again.');
+            }
+        });
+    });
+    
+    // Save PDF button
+    $('#save-checkout-pdf-btn').on('click', function() {
+        if (!currentCheckoutId) {
+            alert('Please complete the check-out first before saving PDF.');
+            return;
+        }
+        
+        $(this).prop('disabled', true).text('Generating PDF...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_generate_pdf',
+                nonce: yoloBaseManager.nonce,
+                type: 'checkout',
+                record_id: currentCheckoutId
+            },
+            success: function(response) {
+                $('#save-checkout-pdf-btn').prop('disabled', false).html('<span class="dashicons dashicons-pdf"></span> Save PDF');
+                if (response.success && response.data.pdf_url) {
+                    window.open(response.data.pdf_url, '_blank');
+                } else {
+                    alert('Error: ' + (response.data?.message || 'Failed to generate PDF'));
+                }
+            },
+            error: function() {
+                $('#save-checkout-pdf-btn').prop('disabled', false).html('<span class="dashicons dashicons-pdf"></span> Save PDF');
+                alert('Failed to generate PDF. Please try again.');
+            }
+        });
+    });
+    
+    // Send to Guest button
+    $('#send-checkout-guest-btn').on('click', function() {
+        if (!currentCheckoutId) {
+            alert('Please complete the check-out first before sending to guest.');
+            return;
+        }
+        
+        const bookingId = $('#checkout-booking-select').val();
+        if (!bookingId) {
+            alert('No booking selected.');
+            return;
+        }
+        
+        $(this).prop('disabled', true).text('Sending...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_send_to_guest',
+                nonce: yoloBaseManager.nonce,
+                type: 'checkout',
+                record_id: currentCheckoutId,
+                booking_id: bookingId
+            },
+            success: function(response) {
+                $('#send-checkout-guest-btn').prop('disabled', false).html('<span class="dashicons dashicons-email"></span> Send to Guest');
+                if (response.success) {
+                    alert('Document sent to guest successfully!');
+                } else {
+                    alert('Error: ' + (response.data?.message || 'Failed to send to guest'));
+                }
+            },
+            error: function() {
+                $('#send-checkout-guest-btn').prop('disabled', false).html('<span class="dashicons dashicons-email"></span> Send to Guest');
+                alert('Failed to send to guest. Please try again.');
             }
         });
     });
@@ -657,7 +734,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_bm_get_yachts',
-                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+                nonce: yoloBaseManager.nonce
             },
             success: function(response) {
                 console.log('Check-Out: Yachts AJAX SUCCESS');
@@ -711,7 +788,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_bm_get_bookings_calendar',
-                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
+                nonce: yoloBaseManager.nonce
             },
             success: function(response) {
                 console.log('Check-Out: Bookings AJAX SUCCESS');
@@ -761,7 +838,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_bm_get_equipment_categories',
-                nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>',
+                nonce: yoloBaseManager.nonce,
                 yacht_id: yachtId
             },
             success: function(response) {
@@ -824,7 +901,55 @@ jQuery(document).ready(function($) {
     
     // Load check-outs
     function loadCheckouts() {
-        $('#checkout-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-clipboard"></span><p>No check-outs yet. Click "New Check-Out" to create one.</p></div>');
+        console.log('Check-Out: Loading check-outs list...');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_get_checkouts',
+                nonce: yoloBaseManager.nonce
+            },
+            success: function(response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    console.log('Check-Out: Loaded ' + response.data.length + ' check-outs');
+                    let html = '<table class="yolo-bm-table"><thead><tr>';
+                    html += '<th>ID</th><th>Booking</th><th>Yacht</th><th>Date</th><th>Status</th><th>Actions</th>';
+                    html += '</tr></thead><tbody>';
+                    
+                    response.data.forEach(function(checkout) {
+                        const yachtName = checkout.managed_yacht_name || checkout.booking_yacht_name || 'N/A';
+                        const customerName = checkout.customer_name || 'N/A';
+                        const status = checkout.guest_signature ? 'Signed' : 'Pending';
+                        const statusClass = checkout.guest_signature ? 'status-signed' : 'status-pending';
+                        const createdDate = new Date(checkout.created_at).toLocaleDateString();
+                        
+                        html += '<tr>';
+                        html += '<td>#' + checkout.id + '</td>';
+                        html += '<td>' + customerName + '</td>';
+                        html += '<td>' + yachtName + '</td>';
+                        html += '<td>' + createdDate + '</td>';
+                        html += '<td><span class="yolo-bm-status ' + statusClass + '">' + status + '</span></td>';
+                        html += '<td>';
+                        if (checkout.pdf_url) {
+                            html += '<a href="' + checkout.pdf_url + '" target="_blank" class="yolo-bm-btn-icon" title="View PDF"><span class="dashicons dashicons-pdf"></span></a> ';
+                        }
+                        html += '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                    $('#checkout-list').html(html);
+                } else {
+                    console.log('Check-Out: No check-outs found');
+                    $('#checkout-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-clipboard"></span><p>No check-outs yet. Click "New Check-Out" to create one.</p></div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Check-Out: Failed to load check-outs:', error);
+                $('#checkout-list').html('<div class="yolo-bm-empty-state"><span class="dashicons dashicons-warning"></span><p>Failed to load check-outs. Please refresh the page.</p></div>');
+            }
+        });
     }
 });
 </script>

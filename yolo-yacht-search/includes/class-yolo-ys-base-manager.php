@@ -39,10 +39,13 @@ class YOLO_YS_Base_Manager {
         add_action('wp_ajax_yolo_bm_save_equipment_category', array($this, 'ajax_save_equipment_category'));
         add_action('wp_ajax_yolo_bm_get_equipment_categories', array($this, 'ajax_get_equipment_categories'));
         add_action('wp_ajax_yolo_bm_delete_equipment_category', array($this, 'ajax_delete_equipment_category'));
+        add_action('wp_ajax_yolo_bm_get_checkins', array($this, 'ajax_get_checkins'));
         add_action('wp_ajax_yolo_bm_save_checkin', array($this, 'ajax_save_checkin'));
+        add_action('wp_ajax_yolo_bm_get_checkouts', array($this, 'ajax_get_checkouts'));
         add_action('wp_ajax_yolo_bm_save_checkout', array($this, 'ajax_save_checkout'));
         add_action('wp_ajax_yolo_bm_generate_pdf', array($this, 'ajax_generate_pdf'));
         add_action('wp_ajax_yolo_bm_send_to_guest', array($this, 'ajax_send_to_guest'));
+        add_action('wp_ajax_yolo_bm_upload_document', array($this, 'ajax_upload_document'));
         add_action('wp_ajax_yolo_bm_save_warehouse_item', array($this, 'ajax_save_warehouse_item'));
         add_action('wp_ajax_yolo_bm_get_warehouse_items', array($this, 'ajax_get_warehouse_items'));
         add_action('wp_ajax_yolo_bm_delete_warehouse_item', array($this, 'ajax_delete_warehouse_item'));
@@ -195,16 +198,11 @@ class YOLO_YS_Base_Manager {
             YOLO_YS_VERSION
         );
         
-        // Base manager JS (reuse existing)
-        wp_enqueue_script(
-            'yolo-base-manager',
-            YOLO_YS_PLUGIN_URL . 'public/js/base-manager.js',
-            array('jquery'),
-            YOLO_YS_VERSION,
-            true
-        );
+        // NOTE: Do NOT load base-manager.js on admin pages!
+        // It's meant for the frontend shortcode and has a different data format expectation.
+        // The admin Check-In/Check-Out pages have their own inline JavaScript.
         
-        // Signature Pad library
+        // Signature Pad library (still needed for admin pages)
         wp_enqueue_script(
             'signature-pad',
             'https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js',
@@ -213,11 +211,15 @@ class YOLO_YS_Base_Manager {
             true
         );
         
-        // Localize script
-        wp_localize_script('yolo-base-manager', 'yoloBaseManager', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('yolo_base_manager_nonce')
-        ));
+        // Add inline script to provide nonce for admin pages
+        wp_add_inline_script(
+            'signature-pad',
+            'var yoloBaseManager = {' .
+            '    ajaxurl: "' . admin_url('admin-ajax.php') . '",' .
+            '    nonce: "' . wp_create_nonce('yolo_base_manager_nonce') . '"' .
+            '};',
+            'before'
+        );
     }
     
     /**
@@ -276,13 +278,15 @@ class YOLO_YS_Base_Manager {
                 true
             );
             
-            // Font Awesome
-            wp_enqueue_style(
-                'font-awesome-6',
-                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                array(),
-                '6.4.0'
-            );
+            // Font Awesome (conditional based on setting)
+            if (get_option('yolo_ys_load_fontawesome', '0') === '1') {
+                wp_enqueue_style(
+                    'font-awesome-6',
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                    array(),
+                    '6.4.0'
+                );
+            }
             
             // Signature Pad library
             wp_enqueue_script(
@@ -573,6 +577,41 @@ class YOLO_YS_Base_Manager {
     }
 
     /**
+     * AJAX: Get check-ins list
+     */
+    public function ajax_get_checkins() {
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+            return;
+        }
+        
+        global $wpdb;
+        $table_checkins = $wpdb->prefix . 'yolo_bm_checkins';
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        $table_yachts = $wpdb->prefix . 'yolo_bm_yachts';
+        
+        $checkins = $wpdb->get_results("
+            SELECT 
+                c.*,
+                b.customer_name,
+                b.customer_email,
+                b.yacht_name as booking_yacht_name,
+                b.date_from,
+                b.date_to,
+                y.yacht_name as managed_yacht_name
+            FROM {$table_checkins} c
+            LEFT JOIN {$table_bookings} b ON c.booking_id = b.id
+            LEFT JOIN {$table_yachts} y ON c.yacht_id = y.id
+            ORDER BY c.created_at DESC
+            LIMIT 50
+        ");
+        
+        wp_send_json_success($checkins);
+    }
+
+    /**
      * AJAX: Save check-in
      */
     public function ajax_save_checkin() {
@@ -618,6 +657,41 @@ class YOLO_YS_Base_Manager {
         }
         
         wp_send_json_success(array('message' => 'Check-in saved successfully', 'checkin_id' => $checkin_id));
+    }
+
+    /**
+     * AJAX: Get check-outs list
+     */
+    public function ajax_get_checkouts() {
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+            return;
+        }
+        
+        global $wpdb;
+        $table_checkouts = $wpdb->prefix . 'yolo_bm_checkouts';
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        $table_yachts = $wpdb->prefix . 'yolo_bm_yachts';
+        
+        $checkouts = $wpdb->get_results("
+            SELECT 
+                c.*,
+                b.customer_name,
+                b.customer_email,
+                b.yacht_name as booking_yacht_name,
+                b.date_from,
+                b.date_to,
+                y.yacht_name as managed_yacht_name
+            FROM {$table_checkouts} c
+            LEFT JOIN {$table_bookings} b ON c.booking_id = b.id
+            LEFT JOIN {$table_yachts} y ON c.yacht_id = y.id
+            ORDER BY c.created_at DESC
+            LIMIT 50
+        ");
+        
+        wp_send_json_success($checkouts);
     }
 
     /**
@@ -802,6 +876,63 @@ class YOLO_YS_Base_Manager {
         );
         
         return wp_mail($to, $subject, $message, $headers);
+    }
+
+    /**
+     * AJAX: Upload document (for Base Manager to send arbitrary documents to guests)
+     */
+    public function ajax_upload_document() {
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+            return;
+        }
+        
+        if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+            wp_send_json_error(array('message' => 'No file uploaded or upload error'));
+            return;
+        }
+        
+        $booking_id = intval($_POST['booking_id']);
+        $document_type = sanitize_text_field($_POST['document_type']); // 'checkin', 'checkout', or 'other'
+        $document_title = sanitize_text_field($_POST['document_title']);
+        
+        // Validate booking exists
+        global $wpdb;
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking) {
+            wp_send_json_error(array('message' => 'Booking not found'));
+            return;
+        }
+        
+        // Handle file upload
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        
+        $file = $_FILES['document'];
+        $upload_overrides = array('test_form' => false);
+        $movefile = wp_handle_upload($file, $upload_overrides);
+        
+        if ($movefile && !isset($movefile['error'])) {
+            $file_url = $movefile['url'];
+            
+            // Store document reference (could be in a custom table or as post meta)
+            // For now, just return the URL and let the frontend handle it
+            
+            wp_send_json_success(array(
+                'message' => 'Document uploaded successfully',
+                'file_url' => $file_url,
+                'file_name' => basename($movefile['file'])
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Upload failed: ' . $movefile['error']));
+        }
     }
 
     /**
@@ -1015,16 +1146,18 @@ class YOLO_YS_Base_Manager {
             return;
         }
         
-        // Verify user owns the booking
-        $user_id = get_current_user_id();
+        // Verify user owns the booking (check both user_id AND email for consistency)
+        $user = wp_get_current_user();
         $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d AND user_id = %d",
+            "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d AND (user_id = %d OR customer_email = %s)",
             $document->booking_id,
-            $user_id
+            $user->ID,
+            $user->user_email
         ));
         
         if (!$booking) {
-            wp_send_json_error(array('message' => 'Permission denied'));
+            error_log('YOLO YS Sign Doc: Permission denied for user ' . $user->ID . ' (email: ' . $user->user_email . ') on booking ' . $document->booking_id);
+            wp_send_json_error(array('message' => 'Permission denied - booking not found for your account'));
             return;
         }
         

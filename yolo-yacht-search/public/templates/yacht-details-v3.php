@@ -133,8 +133,7 @@ $draft_ft = $yacht->draft ? round($yacht->draft * 3.28084, 1) : 0;
 $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
 ?>
 
-<!-- Load FontAwesome 6 Free (CDN) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- FontAwesome loaded conditionally via plugin settings (public/class-yolo-ys-public.php) -->
 
 <!-- Load Litepicker CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css"/>

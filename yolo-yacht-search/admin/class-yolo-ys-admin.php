@@ -323,15 +323,7 @@ class YOLO_YS_Admin {
             'yolo_ys_stripe_settings'
         );
         
-        register_setting('yolo-yacht-search', 'yolo_ys_stripe_test_mode');
-        add_settings_field(
-            'yolo_ys_stripe_test_mode',
-            __('Test Mode', 'yolo-yacht-search'),
-            array($this, 'stripe_test_mode_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_stripe_settings'
-        );
-        
+
         register_setting('yolo-yacht-search', 'yolo_ys_deposit_percentage');
         add_settings_field(
             'yolo_ys_deposit_percentage',
@@ -499,13 +491,13 @@ class YOLO_YS_Admin {
     public function stripe_publishable_key_callback() {
         $value = get_option('yolo_ys_stripe_publishable_key', 'pk_test_51ST5sKEqtLDG25BLYenhP94HzLvKGFhAjOFNTZVZpUZLUNJVUkXoGEYoypHzmqVltBELrX2QpsVhhqzcRgvPyedG00Wpt5SF3d');
         echo '<input type="text" name="yolo_ys_stripe_publishable_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="pk_test_... or pk_live_..." />';
-        echo '<p class="description">' . __('Your Stripe publishable key (starts with pk_test_ for test mode or pk_live_ for live mode)', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description">' . __('Your Stripe publishable key. Use pk_test_ for testing or pk_live_ for live payments.', 'yolo-yacht-search') . '</p>';
     }
     
     public function stripe_secret_key_callback() {
         $value = get_option('yolo_ys_stripe_secret_key', 'sk_test_51ST5sKEqtLDG25BLFqTjNKXepps0axIoIafVyOQ1eVn3lRXoTQ3z0oB4TlqLQ8mhM19F5QBrO5MxCMZ1NN7kmITT00IK1vaUhE');
         echo '<input type="password" name="yolo_ys_stripe_secret_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="sk_test_... or sk_live_..." />';
-        echo '<p class="description">' . __('Your Stripe secret key (starts with sk_test_ for test mode or sk_live_ for live mode) - Keep this secure!', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description">' . __('Your Stripe secret key. Use sk_test_ for testing or sk_live_ for live payments. Keep this secure!', 'yolo-yacht-search') . '</p>';
     }
     
     public function stripe_webhook_secret_callback() {
@@ -517,11 +509,7 @@ class YOLO_YS_Admin {
         echo '<p class="description">' . __('Add this URL to your <a href="https://dashboard.stripe.com/webhooks" target="_blank">Stripe Webhooks</a> and listen for <code>checkout.session.completed</code> event.', 'yolo-yacht-search') . '</p>';
     }
     
-    public function stripe_test_mode_callback() {
-        $value = get_option('yolo_ys_stripe_test_mode', '1');
-        echo '<label><input type="checkbox" name="yolo_ys_stripe_test_mode" value="1" ' . checked($value, '1', false) . ' /> ' . __('Enable test mode (use test API keys)', 'yolo-yacht-search') . '</label>';
-        echo '<p class="description">' . __('When enabled, use test API keys (pk_test_ and sk_test_). Disable for live payments.', 'yolo-yacht-search') . '</p>';
-    }
+
     
     public function deposit_percentage_callback() {
         $value = get_option('yolo_ys_deposit_percentage', '50');
