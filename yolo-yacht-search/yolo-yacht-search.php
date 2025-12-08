@@ -65,14 +65,11 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-quote-handler.php';
 
 // Load text helpers
-require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-text-helpers.php';
+require_once YOLO_YS_PLUGIN_DIR . 'includes/text-helpers.php';
 
 // Load analytics and SEO (v41.19)
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-analytics.php';
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-meta-tags.php';
-
-// Load text helpers
-require_once YOLO_YS_PLUGIN_DIR . 'includes/text-helpers.php';
 
 // Load icons admin
 if (is_admin()) {
