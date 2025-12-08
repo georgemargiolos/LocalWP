@@ -526,7 +526,7 @@ function selectWeek(button) {
     }
     
     // Also reset the price color in case it was red from "Not Available"
-    const priceFinal = document.getElementById('selectedPriceFinal');
+    // Note: priceFinal already declared above on line 485
     if (priceFinal) {
         priceFinal.style.color = ''; // Reset to default
     }
