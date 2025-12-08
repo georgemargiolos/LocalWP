@@ -425,17 +425,25 @@ class YOLO_YS_Base_Manager {
      * AJAX: Get yachts
      */
     public function ajax_get_yachts() {
+        error_log('YOLO BM: ajax_get_yachts called');
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
+            error_log('YOLO BM: Permission denied for ajax_get_yachts');
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_bm_yachts';
+        error_log('YOLO BM: Querying table: ' . $table_name);
         
         $yachts = $wpdb->get_results("SELECT * FROM $table_name ORDER BY yacht_name ASC");
+        error_log('YOLO BM: Found ' . count($yachts) . ' yachts');
+        
+        if ($wpdb->last_error) {
+            error_log('YOLO BM: Database error: ' . $wpdb->last_error);
+        }
         
         wp_send_json_success($yachts);
     }
@@ -901,17 +909,25 @@ class YOLO_YS_Base_Manager {
      * AJAX: Get bookings calendar
      */
     public function ajax_get_bookings_calendar() {
+        error_log('YOLO BM: ajax_get_bookings_calendar called');
         check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
+            error_log('YOLO BM: Permission denied for ajax_get_bookings_calendar');
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_bookings';
+        error_log('YOLO BM: Querying bookings table: ' . $table_name);
         
         $bookings = $wpdb->get_results("SELECT * FROM $table_name ORDER BY date_from ASC");
+        error_log('YOLO BM: Found ' . count($bookings) . ' bookings');
+        
+        if ($wpdb->last_error) {
+            error_log('YOLO BM: Database error: ' . $wpdb->last_error);
+        }
         
         wp_send_json_success($bookings);
     }
