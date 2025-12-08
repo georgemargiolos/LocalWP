@@ -88,7 +88,7 @@
 }
 
 @media (max-width: 991.98px) {
-    .yacht-booking-section {
+    .yolo-yacht-details-v3 .yacht-booking-section {
         position: relative;
         top: auto;
         max-height: none;
@@ -570,23 +570,23 @@
    RESPONSIVE ADJUSTMENTS
    ============================================ */
 @media (max-width: 767.98px) {
-    .yacht-header {
+    .yolo-yacht-details-v3 .yacht-header {
         padding: 12px 15px;
     }
     
-    .spec-item {
+    .yolo-yacht-details-v3 .spec-item {
         padding: 12px;
     }
     
-    .equipment-item {
+    .yolo-yacht-details-v3 .equipment-item {
         padding: 8px 10px;
     }
     
-    .tech-item {
+    .yolo-yacht-details-v3 .tech-item {
         padding: 12px 15px;
     }
     
-    .extra-item {
+    .yolo-yacht-details-v3 .extra-item {
         padding: 10px 12px;
     }
 }
