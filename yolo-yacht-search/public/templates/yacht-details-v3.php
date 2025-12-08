@@ -309,14 +309,12 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php if (!empty($equipment)): ?>
             <div class="yacht-equipment-section">
                 <h3><?php echo yolo_ys_get_icon('section', 'Equipment', 'fa-solid fa-ship'); ?> <?php yolo_ys_text_e('equipment', 'Equipment'); ?></h3>
-                <div class="row g-3 equipment-grid">
+                <div class="equipment-grid">
                     <?php foreach ($equipment as $item): ?>
                         <?php $icon_class = yolo_get_equipment_icon($item->equipment_id, $item->equipment_name); ?>
-                        <div class="col-12 col-sm-6">
                         <div class="equipment-item">
                             <i class="<?php echo esc_attr($icon_class); ?>"></i>
                             <span><?php echo esc_html($item->equipment_name); ?></span>
-                        </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -341,9 +339,8 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- Technical Characteristics -->
             <div class="yacht-technical">
                 <h3><?php echo yolo_ys_get_icon('section', 'Technical Characteristics', 'fa-solid fa-cogs'); ?> <?php yolo_ys_text_e('technical_specs', 'Technical Characteristics'); ?></h3>
-                <div class="row g-3 tech-grid">
+                <div class="tech-grid">
                     <?php if ($yacht->draft): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-water"></i></div>
                             <div class="tech-content">
@@ -351,11 +348,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 <div class="tech-value"><?php echo $draft_ft; ?> ft (<?php echo number_format($yacht->draft, 2); ?> m)</div>
                             </div>
                         </div>
-                        </div>
                     <?php endif; ?>
                     
                     <?php if ($yacht->beam): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
                             <div class="tech-content">
@@ -363,11 +358,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 <div class="tech-value"><?php echo $beam_ft; ?> ft (<?php echo number_format($yacht->beam, 2); ?> m)</div>
                             </div>
                         </div>
-                        </div>
                     <?php endif; ?>
                     
                     <?php if ($yacht->berths): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-users"></i></div>
                             <div class="tech-content">
@@ -375,11 +368,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 <div class="tech-value"><?php echo esc_html($yacht->berths); ?></div>
                             </div>
                         </div>
-                        </div>
                     <?php endif; ?>
                     
                     <?php if ($yacht->engine_power): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-gauge-high"></i></div>
                             <div class="tech-content">
@@ -387,11 +378,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 <div class="tech-value"><?php echo esc_html($yacht->engine_power); ?> HP</div>
                             </div>
                         </div>
-                        </div>
                     <?php endif; ?>
                     
                     <?php if ($yacht->fuel_capacity): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-gas-pump"></i></div>
                             <div class="tech-content">
@@ -399,18 +388,15 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 <div class="tech-value"><?php echo esc_html($yacht->fuel_capacity); ?> L</div>
                             </div>
                         </div>
-                        </div>
                     <?php endif; ?>
                     
                     <?php if ($yacht->water_capacity): ?>
-                        <div class="col-12 col-sm-6">
                         <div class="tech-item">
                             <div class="tech-icon"><i class="fa-solid fa-faucet-drip"></i></div>
                             <div class="tech-content">
                                 <div class="tech-label">WATER CAPACITY</div>
                                 <div class="tech-value"><?php echo esc_html($yacht->water_capacity); ?> L</div>
                             </div>
-                        </div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -425,9 +411,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 
                 <div class="yacht-extras-combined">
                     <h3><i class="fa-solid fa-plus-circle"></i> Extras <span class="extras-note">(Payable at the base)</span></h3>
-                    <div class="row g-4 extras-two-column">
+                    <div class="extras-two-column">
                         <?php if (!empty($obligatory_extras)): ?>
-                        <div class="col-12 col-md-6 extras-column">
+                        <div class="extras-column">
                             <h4><?php yolo_ys_text_e('obligatory_extras', 'Obligatory Extras'); ?></h4>
                             <div class="extras-grid">
                                 <?php foreach ($obligatory_extras as $extra): ?>
@@ -457,7 +443,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         <?php endif; ?>
                         
                         <?php if (!empty($optional_extras)): ?>
-                        <div class="col-12 col-md-6 extras-column">
+                        <div class="extras-column">
                             <h4><?php yolo_ys_text_e('optional_extras', 'Optional Extras'); ?></h4>
                             <div class="extras-grid">
                                 <?php foreach ($optional_extras as $extra): ?>

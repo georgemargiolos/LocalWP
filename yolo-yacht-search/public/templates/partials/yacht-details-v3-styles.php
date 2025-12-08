@@ -760,20 +760,12 @@ $colors = array(
 }
 
 .spec-icon {
-    width: clamp(50px, 12vw, 60px);
-    height: clamp(50px, 12vw, 60px);
-    background: linear-gradient(135deg, var(--yolo-primary) 0%, #2563eb 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto clamp(10px, 2.5vw, 14px) auto;
-    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+    font-size: 32px;
+    margin-bottom: 10px;
 }
 
 .spec-icon i {
-    font-size: clamp(20px, 5vw, 26px);
-    color: var(--yolo-white);
+    color: var(--yolo-primary);
 }
 
 .spec-value {
@@ -862,51 +854,32 @@ $colors = array(
     border-bottom: 3px solid var(--yolo-primary);
 }
 
-/* equipment-grid now uses Bootstrap Grid (row g-3 with col-12 col-sm-6) */
 .equipment-grid {
-    /* No grid styles needed - Bootstrap handles layout */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
 }
-
-/* equipment-grid responsive behavior handled by Bootstrap Grid */
 
 .equipment-item {
     display: flex;
     align-items: center;
-    gap: clamp(12px, 3vw, 16px);
-    padding: clamp(14px, 3.5vw, 18px);
-    background: var(--yolo-white);
-    border-radius: var(--yolo-radius-md);
-    font-size: clamp(14px, 3.5vw, 15px);
-    color: var(--yolo-text-dark);
-    border: 1px solid var(--yolo-border);
-    transition: all 0.2s ease;
-    box-shadow: var(--yolo-shadow-sm);
+    gap: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
 }
 
-.equipment-item:hover {
-    background: var(--yolo-bg-light);
-    border-color: var(--yolo-primary-light);
-    transform: translateX(5px);
-}
-
-/* Equipment Icon Box */
 .equipment-item i {
-    font-size: clamp(20px, 4.5vw, 24px);
-    min-width: clamp(44px, 10vw, 52px);
-    height: clamp(44px, 10vw, 52px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 20px;
+    min-width: 24px;
+    text-align: center;
     color: var(--yolo-primary);
-    background: var(--yolo-primary-light);
-    border-radius: var(--yolo-radius-md);
-    flex-shrink: 0;
 }
 
 .equipment-item span {
     font-weight: 500;
-    flex: 1;
-    min-width: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -954,66 +927,45 @@ $colors = array(
     border-bottom: 3px solid var(--yolo-primary);
 }
 
-/* tech-grid now uses Bootstrap Grid (row g-3 with col-12 col-sm-6) */
 .tech-grid {
-    /* No grid styles needed - Bootstrap handles layout */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
-/* tech-grid responsive behavior handled by Bootstrap Grid */
+@media (max-width: 768px) {
+    .tech-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
 .tech-item {
-    background: var(--yolo-white);
-    padding: clamp(16px, 4vw, 20px);
-    border-radius: var(--yolo-radius-md);
-    display: flex;
-    align-items: center;
-    gap: clamp(14px, 3.5vw, 18px);
-    border: 1px solid var(--yolo-border);
-    box-shadow: var(--yolo-shadow-sm);
-    transition: all var(--yolo-transition);
-}
-
-.tech-item:hover {
-    border-color: var(--yolo-primary-light);
-    transform: translateY(-2px);
-    box-shadow: var(--yolo-shadow-md);
+    background: #f9fafb;
+    padding: 15px 20px;
+    border-radius: 8px;
 }
 
 .tech-icon {
-    width: clamp(50px, 12vw, 60px);
-    height: clamp(50px, 12vw, 60px);
-    background: linear-gradient(135deg, var(--yolo-primary) 0%, #2563eb 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
-}
-
-.tech-icon i {
-    font-size: clamp(20px, 5vw, 26px);
-    color: var(--yolo-white);
+    display: none;  /* v21.9 doesn't show icons in tech specs */
 }
 
 .tech-content {
     flex: 1;
-    min-width: 0;
 }
 
 .tech-label {
-    font-size: clamp(11px, 2.5vw, 12px);
+    font-size: 12px;
     font-weight: 700;
-    color: var(--yolo-text-light);
+    color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
 }
 
 .tech-value {
-    font-size: clamp(16px, 4vw, 20px);
+    font-size: 18px;
     font-weight: 600;
-    color: var(--yolo-primary);
+    color: #1e3a8a;
 }
 
 /* ============================================
@@ -1035,18 +987,22 @@ $colors = array(
     font-style: italic;
 }
 
-/* extras-two-column now uses Bootstrap Grid (row g-4 with col-12 col-md-6) */
 .extras-two-column {
-    /* No grid styles needed - Bootstrap handles layout */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .extras-two-column {
+        grid-template-columns: 1fr;
+    }
 }
 
 .extras-column h4 {
-    font-size: clamp(16px, 4vw, 18px);
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .extras-column:first-child h4 {
@@ -1057,11 +1013,10 @@ $colors = array(
     color: var(--yolo-primary);
 }
 
-/* extras-grid is a simple vertical list - no grid needed */
 .extras-grid {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(10px, 2.5vw, 12px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }
 
 .extra-item {
