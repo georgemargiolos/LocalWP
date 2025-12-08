@@ -1,6 +1,61 @@
+<?php
+/**
+ * Yacht Details v3 Styles - COMPLETE RESPONSIVE UPDATE
+ * Version: 2.6.0
+ * 
+ * FEATURES:
+ * ✓ Sticky booking sidebar on desktop
+ * ✓ All content flows on LEFT, booking on RIGHT
+ * ✓ Fully responsive (mobile-first)
+ * ✓ Touch-friendly (44px minimum tap targets)
+ * ✓ Equipment icons properly styled
+ * ✓ Technical characteristics with icons
+ * ✓ CSS variables for easy color customization
+ */
+
+// Get custom colors from admin settings
+$colors = array(
+    'primary' => get_option('yolo_ys_color_primary', '#1e3a8a'),
+    'primary_hover' => get_option('yolo_ys_color_primary_hover', '#1e40af'),
+    'secondary' => get_option('yolo_ys_color_secondary', '#b91c1c'),
+    'secondary_hover' => get_option('yolo_ys_color_secondary_hover', '#991b1b'),
+    'success' => get_option('yolo_ys_color_success', '#059669'),
+    'text_dark' => get_option('yolo_ys_color_text_dark', '#1f2937'),
+    'text_light' => get_option('yolo_ys_color_text_light', '#6b7280'),
+);
+?>
+<style>
 /* ============================================
    CSS CUSTOM PROPERTIES - Easy Color Customization
    ============================================ */
+:root {
+    --yolo-primary: <?php echo esc_attr($colors['primary']); ?>;
+    --yolo-primary-hover: <?php echo esc_attr($colors['primary_hover']); ?>;
+    --yolo-primary-light: #dbeafe;
+    --yolo-secondary: <?php echo esc_attr($colors['secondary']); ?>;
+    --yolo-secondary-hover: <?php echo esc_attr($colors['secondary_hover']); ?>;
+    --yolo-success: <?php echo esc_attr($colors['success']); ?>;
+    --yolo-warning: #92400e;
+    --yolo-warning-bg: #fef3c7;
+    --yolo-danger: #dc2626;
+    --yolo-danger-bg: #fef2f2;
+    --yolo-text-dark: <?php echo esc_attr($colors['text_dark']); ?>;
+    --yolo-text-medium: #4b5563;
+    --yolo-text-light: <?php echo esc_attr($colors['text_light']); ?>;
+    --yolo-border: #e5e7eb;
+    --yolo-bg-light: #f9fafb;
+    --yolo-bg-lighter: #f3f4f6;
+    --yolo-white: #ffffff;
+    --yolo-radius-sm: 6px;
+    --yolo-radius-md: 8px;
+    --yolo-radius-lg: 12px;
+    --yolo-shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --yolo-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --yolo-shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+    --yolo-transition: 0.3s ease;
+    --yolo-container-padding: clamp(12px, 4vw, 40px);
+    --yolo-sidebar-width: 380px;
+}
 
 /* ============================================
    BASE CONTAINER
@@ -23,7 +78,7 @@
 /* ============================================
    YACHT HEADER - Plugin 3 Version
    ============================================ */
-.yolo-yacht-details-v3 .yacht-header {
+.yacht-header {
     text-align: center;
     margin-bottom: clamp(20px, 4vw, 30px);
     margin-top: 0;
@@ -33,7 +88,7 @@
     padding: 15px 20px;
 }
 
-.yolo-yacht-details-v3 .yacht-name {
+.yacht-name {
     font-size: clamp(22px, 5vw, 32px);
     font-weight: 400;
     color: #666;
@@ -48,21 +103,21 @@
     gap: 0;
 }
 
-.yolo-yacht-details-v3 .yacht-name .separator {
+.yacht-name .separator {
     color: #ccc;
     font-weight: 300;
     margin: 0 15px;
 }
 
-.yolo-yacht-details-v3 .yacht-name .model {
+.yacht-name .model {
     font-weight: 400;
 }
 
-.yolo-yacht-details-v3 .yacht-title {
+.yacht-title {
     font-weight: 700;
 }
 
-.yolo-yacht-details-v3 .yacht-name .location {
+.yacht-name .location {
     font-size: clamp(20px, 4.5vw, 28px);
     font-weight: 400;
     color: #666;
@@ -70,11 +125,11 @@
     transition: color 0.3s;
 }
 
-.yolo-yacht-details-v3 .yacht-name .location:hover {
+.yacht-name .location:hover {
     color: #2563eb;
 }
 
-.yolo-yacht-details-v3 .yacht-name .location i {
+.yacht-name .location i {
     margin-right: 10px;
 }
 
@@ -84,7 +139,7 @@
 /* Page layout removed - Bootstrap Grid handles container/row/col */
 
 /* Main Content Area - Just spacing */
-.yolo-yacht-details-v3 .yacht-main-content {
+.yacht-main-content {
     display: flex;
     flex-direction: column;
     gap: clamp(24px, 5vw, 40px);
@@ -109,7 +164,7 @@
 }
 
 /* Booking Sidebar - Sticky positioning */
-.yolo-yacht-details-v3 .yacht-booking-section {
+.yacht-booking-section {
     position: sticky;
     top: 100px;                          /* Stick 100px from top of viewport */
     max-height: calc(100vh - 120px);     /* Constrain height to viewport */
@@ -120,7 +175,7 @@
 
 /* Disable sticky on mobile/tablet (not needed when columns stack) */
 @media (max-width: 991px) {
-    .yolo-yacht-details-v3 .yacht-booking-section {
+    .yacht-booking-section {
         position: static !important;
         align-self: auto;
         max-height: none;
@@ -128,16 +183,16 @@
     }
 }
 
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar {
+.yacht-booking-section::-webkit-scrollbar {
     width: 6px;
 }
 
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar-track {
+.yacht-booking-section::-webkit-scrollbar-track {
     background: var(--yolo-bg-light);
     border-radius: 3px;
 }
 
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar-thumb {
+.yacht-booking-section::-webkit-scrollbar-thumb {
     background: var(--yolo-primary);
     border-radius: 3px;
 }
@@ -145,7 +200,7 @@
 /* ============================================
    IMAGE CAROUSEL
    ============================================ */
-.yolo-yacht-details-v3 .yacht-images-carousel {
+.yacht-images-carousel {
     position: relative;
     background: var(--yolo-bg-lighter);
     border-radius: var(--yolo-radius-lg);
@@ -153,25 +208,25 @@
     width: 100%;
 }
 
-.yolo-yacht-details-v3 .carousel-container {
+.carousel-container {
     position: relative;
     width: 100%;
     height: clamp(250px, 50vw, 550px);
 }
 
 @media (min-width: 768px) {
-    .yolo-yacht-details-v3 .carousel-container {
+    .carousel-container {
         height: clamp(350px, 45vw, 550px);
     }
 }
 
-.yolo-yacht-details-v3 .carousel-slides {
+.carousel-slides {
     position: relative;
     width: 100%;
     height: 100%;
 }
 
-.yolo-yacht-details-v3 .carousel-slide {
+.carousel-slide {
     position: absolute;
     top: 0;
     left: 0;
@@ -182,11 +237,11 @@
     touch-action: pan-y pinch-zoom;
 }
 
-.yolo-yacht-details-v3 .carousel-slide.active {
+.carousel-slide.active {
     opacity: 1;
 }
 
-.yolo-yacht-details-v3 .carousel-slide img {
+.carousel-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -194,8 +249,8 @@
 }
 
 /* Carousel Navigation - Touch Friendly (min 48px) */
-.yolo-yacht-details-v3 .carousel-prev,
-.yolo-yacht-details-v3 .carousel-next {
+.carousel-prev,
+.carousel-next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -217,27 +272,27 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.yolo-yacht-details-v3 .carousel-prev:hover,
-.yolo-yacht-details-v3 .carousel-next:hover {
+.carousel-prev:hover,
+.carousel-next:hover {
     background: rgba(0, 0, 0, 0.85);
     transform: translateY(-50%) scale(1.05);
 }
 
-.yolo-yacht-details-v3 .carousel-prev:active,
-.yolo-yacht-details-v3 .carousel-next:active {
+.carousel-prev:active,
+.carousel-next:active {
     transform: translateY(-50%) scale(0.95);
 }
 
-.yolo-yacht-details-v3 .carousel-prev {
+.carousel-prev {
     left: clamp(10px, 3vw, 20px);
 }
 
-.yolo-yacht-details-v3 .carousel-next {
+.carousel-next {
     right: clamp(10px, 3vw, 20px);
 }
 
 /* Carousel Dots */
-.yolo-yacht-details-v3 .carousel-dots {
+.carousel-dots {
     position: absolute;
     bottom: clamp(12px, 3vw, 20px);
     left: 50%;
@@ -253,7 +308,7 @@
     border-radius: 25px;
 }
 
-.yolo-yacht-details-v3 .carousel-dots .dot {
+.carousel-dots .dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
@@ -264,13 +319,13 @@
     padding: 0;
 }
 
-.yolo-yacht-details-v3 .carousel-dots .dot.active,
-.yolo-yacht-details-v3 .carousel-dots .dot:hover {
+.carousel-dots .dot.active,
+.carousel-dots .dot:hover {
     background: white;
     transform: scale(1.3);
 }
 
-.yolo-yacht-details-v3 .no-images {
+.no-images {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -282,7 +337,7 @@
 /* ============================================
    BOOKING SECTION (Sticky Sidebar)
    ============================================ */
-.yolo-yacht-details-v3 .yacht-booking-section {
+.yacht-booking-section {
     background: var(--yolo-white);
     border: 2px solid var(--yolo-border);
     border-radius: var(--yolo-radius-lg);
@@ -290,7 +345,7 @@
     box-shadow: var(--yolo-shadow-md);
 }
 
-.yolo-yacht-details-v3 .yacht-booking-section h3 {
+.yacht-booking-section h3 {
     font-size: clamp(18px, 4vw, 22px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -300,7 +355,7 @@
     border-bottom: 2px solid var(--yolo-border);
 }
 
-.yolo-yacht-details-v3 .yacht-booking-section h4 {
+.yacht-booking-section h4 {
     font-size: clamp(14px, 3.5vw, 16px);
     font-weight: 600;
     color: var(--yolo-text-dark);
@@ -311,14 +366,14 @@
 /* ============================================
    PRICE CAROUSEL
    ============================================ */
-.yolo-yacht-details-v3 .yacht-price-carousel-section {
+.yacht-price-carousel-section {
     padding: clamp(16px, 4vw, 24px);
     background: linear-gradient(135deg, var(--yolo-bg-light) 0%, #eef2ff 100%);
     border-radius: var(--yolo-radius-lg);
     border: 1px solid var(--yolo-border);
 }
 
-.yolo-yacht-details-v3 .yacht-price-carousel-section h3 {
+.yacht-price-carousel-section h3 {
     font-size: clamp(18px, 4vw, 24px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -326,12 +381,12 @@
     text-align: center;
 }
 
-.yolo-yacht-details-v3 .price-carousel-container {
+.price-carousel-container {
     position: relative;
     padding: 0 clamp(40px, 10vw, 55px);
 }
 
-.yolo-yacht-details-v3 .price-carousel-slides {
+.price-carousel-slides {
     display: flex;
     gap: clamp(12px, 2vw, 16px);
     overflow-x: auto;
@@ -341,11 +396,11 @@
     scrollbar-width: none;
 }
 
-.yolo-yacht-details-v3 .price-carousel-slides::-webkit-scrollbar {
+.price-carousel-slides::-webkit-scrollbar {
     display: none;
 }
 
-.yolo-yacht-details-v3 .price-slide {
+.price-slide {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -362,47 +417,47 @@
 }
 
 @media (min-width: 768px) {
-    .yolo-yacht-details-v3 .price-slide {
+    .price-slide {
         min-width: clamp(220px, 25vw, 260px);
     }
 }
 
-.yolo-yacht-details-v3 .price-slide:hover {
+.price-slide:hover {
     border-color: var(--yolo-primary);
     box-shadow: var(--yolo-shadow-md);
     transform: translateY(-3px);
 }
 
-.yolo-yacht-details-v3 .price-slide.active {
+.price-slide.active {
     border-color: var(--yolo-primary);
     background: linear-gradient(to bottom, #eff6ff 0%, var(--yolo-white) 100%);
     box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
 }
 
-.yolo-yacht-details-v3 .price-week {
+.price-week {
     font-size: clamp(12px, 2.8vw, 14px);
     font-weight: 600;
     color: var(--yolo-text-dark);
     margin-bottom: 8px;
 }
 
-.yolo-yacht-details-v3 .price-product {
+.price-product {
     font-size: clamp(10px, 2.2vw, 11px);
     color: var(--yolo-text-light);
     margin-bottom: 8px;
 }
 
-.yolo-yacht-details-v3 .price-original {
+.price-original {
     margin-bottom: 5px;
 }
 
-.yolo-yacht-details-v3 .strikethrough {
+.strikethrough {
     text-decoration: line-through;
     color: #9ca3af;
     font-size: clamp(13px, 2.8vw, 15px);
 }
 
-.yolo-yacht-details-v3 .price-discount-badge {
+.price-discount-badge {
     background: var(--yolo-warning-bg);
     color: var(--yolo-warning);
     padding: 5px 10px;
@@ -413,14 +468,14 @@
     display: inline-block;
 }
 
-.yolo-yacht-details-v3 .price-final {
+.price-final {
     font-size: clamp(18px, 4.5vw, 24px);
     font-weight: 700;
     color: var(--yolo-success);
     margin-bottom: 12px;
 }
 
-.yolo-yacht-details-v3 .price-select-btn {
+.price-select-btn {
     background: var(--yolo-primary);
     color: white;
     border: none;
@@ -434,13 +489,13 @@
     min-height: 48px;
 }
 
-.yolo-yacht-details-v3 .price-select-btn:hover {
+.price-select-btn:hover {
     background: var(--yolo-primary-hover);
 }
 
 /* Price Carousel Arrows */
-.yolo-yacht-details-v3 .price-carousel-prev,
-.yolo-yacht-details-v3 .price-carousel-next {
+.price-carousel-prev,
+.price-carousel-next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -461,30 +516,30 @@
     box-shadow: var(--yolo-shadow-md);
 }
 
-.yolo-yacht-details-v3 .price-carousel-prev:hover,
-.yolo-yacht-details-v3 .price-carousel-next:hover {
+.price-carousel-prev:hover,
+.price-carousel-next:hover {
     background: var(--yolo-primary-hover);
     transform: translateY(-50%) scale(1.1);
 }
 
-.yolo-yacht-details-v3 .price-carousel-prev {
+.price-carousel-prev {
     left: 0;
 }
 
-.yolo-yacht-details-v3 .price-carousel-next {
+.price-carousel-next {
     right: 0;
 }
 
 /* ============================================
    DATE PICKER
    ============================================ */
-.yolo-yacht-details-v3 .date-picker-section {
+.date-picker-section {
     margin-bottom: 20px;
     position: relative;
     z-index: 100;
 }
 
-.yolo-yacht-details-v3 .litepicker {
+.litepicker {
     z-index: 9999 !important;
 }
 
@@ -516,7 +571,7 @@
 /* ============================================
    SELECTED PRICE DISPLAY
    ============================================ */
-.yolo-yacht-details-v3 .selected-price-display {
+.selected-price-display {
     background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%);
     border: 2px solid var(--yolo-primary-light);
     border-radius: var(--yolo-radius-md);
@@ -525,13 +580,13 @@
     text-align: center;
 }
 
-.yolo-yacht-details-v3 .selected-price-original {
+.selected-price-original {
     font-size: clamp(13px, 3vw, 14px);
     color: var(--yolo-text-light);
     margin-bottom: 6px;
 }
 
-.yolo-yacht-details-v3 .selected-price-discount {
+.selected-price-discount {
     background: var(--yolo-warning-bg);
     color: var(--yolo-warning);
     font-size: clamp(11px, 2.5vw, 12px);
@@ -542,7 +597,7 @@
     margin-bottom: 10px;
 }
 
-.yolo-yacht-details-v3 .selected-price-final {
+.selected-price-final {
     font-size: clamp(26px, 7vw, 32px);
     font-weight: 700;
     color: var(--yolo-primary);
@@ -551,7 +606,7 @@
 /* ============================================
    BOOK NOW BUTTON
    ============================================ */
-.yolo-yacht-details-v3 .btn-book-now {
+.btn-book-now {
     width: 100%;
     padding: clamp(16px, 4vw, 20px);
     background: linear-gradient(135deg, var(--yolo-secondary) 0%, #dc2626 100%);
@@ -571,19 +626,19 @@
     box-shadow: 0 4px 14px rgba(185, 28, 28, 0.25);
 }
 
-.yolo-yacht-details-v3 .btn-book-now .btn-main-text {
+.btn-book-now .btn-main-text {
     font-size: clamp(16px, 4vw, 18px);
     font-weight: 700;
     letter-spacing: 1.5px;
 }
 
-.yolo-yacht-details-v3 .btn-book-now .btn-sub-text {
+.btn-book-now .btn-sub-text {
     font-size: clamp(12px, 2.8vw, 14px);
     font-weight: 500;
     opacity: 0.95;
 }
 
-.yolo-yacht-details-v3 .btn-book-now:hover {
+.btn-book-now:hover {
     background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%);
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(185, 28, 28, 0.35);
@@ -592,20 +647,20 @@
 /* ============================================
    QUOTE SECTION & FORM
    ============================================ */
-.yolo-yacht-details-v3 .quote-section {
+.quote-section {
     text-align: center;
     margin-bottom: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--yolo-border);
 }
 
-.yolo-yacht-details-v3 .quote-label {
+.quote-label {
     font-size: clamp(13px, 3vw, 14px);
     color: var(--yolo-text-light);
     margin: 0 0 12px 0;
 }
 
-.yolo-yacht-details-v3 .btn-request-quote {
+.btn-request-quote {
     width: 100%;
     padding: clamp(14px, 3.5vw, 16px);
     background: var(--yolo-primary);
@@ -619,19 +674,19 @@
     min-height: 52px;
 }
 
-.yolo-yacht-details-v3 .btn-request-quote:hover {
+.btn-request-quote:hover {
     background: var(--yolo-primary-hover);
     transform: translateY(-2px);
 }
 
-.yolo-yacht-details-v3 .quote-form {
+.quote-form {
     margin-top: 20px;
     padding: clamp(16px, 4vw, 20px);
     background: var(--yolo-bg-light);
     border-radius: var(--yolo-radius-md);
 }
 
-.yolo-yacht-details-v3 .quote-form h4 {
+.quote-form h4 {
     font-size: clamp(16px, 4vw, 18px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -640,18 +695,18 @@
 }
 
 /* form-row now uses Bootstrap Grid (row g-2 with col-12 col-sm-6) */
-.yolo-yacht-details-v3 .form-row {
+.form-row {
     margin-bottom: 10px;
 }
 
 /* form-row responsive behavior handled by Bootstrap Grid */
 
-.yolo-yacht-details-v3 .form-field {
+.form-field {
     margin-bottom: 10px;
 }
 
-.yolo-yacht-details-v3 .form-field input,
-.yolo-yacht-details-v3 .form-field textarea {
+.form-field input,
+.form-field textarea {
     width: 100%;
     padding: clamp(12px, 3vw, 14px);
     border: 1px solid #d1d5db;
@@ -662,32 +717,32 @@
     -webkit-appearance: none;
 }
 
-.yolo-yacht-details-v3 .form-field input:focus,
-.yolo-yacht-details-v3 .form-field textarea:focus {
+.form-field input:focus,
+.form-field textarea:focus {
     outline: none;
     border-color: var(--yolo-primary);
     box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
 }
 
-.yolo-yacht-details-v3 .form-field textarea {
+.form-field textarea {
     min-height: 100px;
     resize: vertical;
 }
 
-.yolo-yacht-details-v3 .form-note {
+.form-note {
     font-size: 12px;
     color: var(--yolo-text-light);
     margin: 10px 0 5px 0;
 }
 
-.yolo-yacht-details-v3 .form-tagline {
+.form-tagline {
     font-size: 13px;
     color: var(--yolo-text-medium);
     margin: 0 0 15px 0;
     text-align: center;
 }
 
-.yolo-yacht-details-v3 .btn-submit-quote {
+.btn-submit-quote {
     width: 100%;
     padding: clamp(14px, 3.5vw, 16px);
     background: var(--yolo-primary);
@@ -701,7 +756,7 @@
     min-height: 50px;
 }
 
-.yolo-yacht-details-v3 .btn-submit-quote:hover {
+.btn-submit-quote:hover {
     background: var(--yolo-primary-hover);
 }
 
@@ -709,11 +764,11 @@
    QUICK SPECS
    ============================================ */
 /* yacht-quick-specs now uses Bootstrap Grid (row g-3 with col-6 col-sm-6 col-md-3) */
-.yolo-yacht-details-v3 .yacht-quick-specs {
+.yacht-quick-specs {
     /* No grid styles needed - Bootstrap handles layout */
 }
 
-.yolo-yacht-details-v3 .spec-item {
+.spec-item {
     text-align: center;
     padding: clamp(16px, 4vw, 24px);
     background: var(--yolo-white);
@@ -727,29 +782,29 @@
     justify-content: center;
 }
 
-.yolo-yacht-details-v3 .spec-item:hover {
+.spec-item:hover {
     transform: translateY(-3px);
     box-shadow: var(--yolo-shadow-md);
     border-color: var(--yolo-primary-light);
 }
 
-.yolo-yacht-details-v3 .spec-icon {
+.spec-icon {
     margin-bottom: clamp(10px, 2.5vw, 14px);
 }
 
-.yolo-yacht-details-v3 .spec-icon i {
+.spec-icon i {
     font-size: clamp(28px, 6vw, 36px);
     color: var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .spec-value {
+.spec-value {
     font-size: clamp(18px, 4.5vw, 24px);
     font-weight: 700;
     color: var(--yolo-text-dark);
     margin-bottom: 5px;
 }
 
-.yolo-yacht-details-v3 .spec-value .refit {
+.spec-value .refit {
     display: block;
     font-size: clamp(11px, 2.5vw, 12px);
     font-weight: 400;
@@ -757,7 +812,7 @@
     margin-top: 4px;
 }
 
-.yolo-yacht-details-v3 .spec-label {
+.spec-label {
     font-size: clamp(12px, 3vw, 14px);
     color: var(--yolo-text-light);
     font-weight: 500;
@@ -768,11 +823,11 @@
 /* ============================================
    DESCRIPTION SECTION
    ============================================ */
-.yolo-yacht-details-v3 .yacht-description-section {
+.yacht-description-section {
     margin-bottom: 0;
 }
 
-.yolo-yacht-details-v3 .yacht-description-section h3 {
+.yacht-description-section h3 {
     font-size: clamp(20px, 5vw, 26px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -781,7 +836,7 @@
     border-bottom: 3px solid var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .yacht-description-content {
+.yacht-description-content {
     font-size: clamp(14px, 3.5vw, 16px);
     line-height: 1.8;
     color: var(--yolo-text-medium);
@@ -792,12 +847,12 @@
     box-shadow: var(--yolo-shadow-sm);
 }
 
-.yolo-yacht-details-v3 .description-preview,
-.yolo-yacht-details-v3 .description-full {
+.description-preview,
+.description-full {
     margin-bottom: 0;
 }
 
-.yolo-yacht-details-v3 .description-toggle {
+.description-toggle {
     background: none;
     border: none;
     color: var(--yolo-primary);
@@ -812,14 +867,14 @@
     display: inline-block;
 }
 
-.yolo-yacht-details-v3 .description-toggle:hover {
+.description-toggle:hover {
     color: var(--yolo-primary-hover);
 }
 
 /* ============================================
    EQUIPMENT SECTION
    ============================================ */
-.yolo-yacht-details-v3 .yacht-equipment-section h3 {
+.yacht-equipment-section h3 {
     font-size: clamp(20px, 5vw, 26px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -829,13 +884,13 @@
 }
 
 /* equipment-grid now uses Bootstrap Grid (row g-3 with col-12 col-sm-6) */
-.yolo-yacht-details-v3 .equipment-grid {
+.equipment-grid {
     /* No grid styles needed - Bootstrap handles layout */
 }
 
 /* equipment-grid responsive behavior handled by Bootstrap Grid */
 
-.yolo-yacht-details-v3 .equipment-item {
+.equipment-item {
     display: flex;
     align-items: center;
     gap: clamp(12px, 3vw, 16px);
@@ -849,14 +904,14 @@
     box-shadow: var(--yolo-shadow-sm);
 }
 
-.yolo-yacht-details-v3 .equipment-item:hover {
+.equipment-item:hover {
     background: var(--yolo-bg-light);
     border-color: var(--yolo-primary-light);
     transform: translateX(5px);
 }
 
 /* Equipment Icon Box */
-.yolo-yacht-details-v3 .equipment-item i {
+.equipment-item i {
     font-size: clamp(20px, 4.5vw, 24px);
     min-width: clamp(44px, 10vw, 52px);
     height: clamp(44px, 10vw, 52px);
@@ -869,14 +924,14 @@
     flex-shrink: 0;
 }
 
-.yolo-yacht-details-v3 .equipment-item span {
+.equipment-item span {
     font-weight: 500;
 }
 
 /* ============================================
    MAP SECTION
    ============================================ */
-.yolo-yacht-details-v3 .yacht-map-section h3 {
+.yacht-map-section h3 {
     font-size: clamp(20px, 5vw, 26px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -885,7 +940,7 @@
     border-bottom: 3px solid var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .map-container {
+.map-container {
     position: relative;
     width: 100%;
     padding-bottom: 50%;
@@ -895,7 +950,7 @@
     box-shadow: var(--yolo-shadow-md);
 }
 
-.yolo-yacht-details-v3 .map-container iframe {
+.map-container iframe {
     position: absolute;
     top: 0;
     left: 0;
@@ -907,7 +962,7 @@
 /* ============================================
    TECHNICAL CHARACTERISTICS
    ============================================ */
-.yolo-yacht-details-v3 .yacht-technical h3 {
+.yacht-technical h3 {
     font-size: clamp(20px, 5vw, 26px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -917,13 +972,13 @@
 }
 
 /* tech-grid now uses Bootstrap Grid (row g-3 with col-12 col-sm-6) */
-.yolo-yacht-details-v3 .tech-grid {
+.tech-grid {
     /* No grid styles needed - Bootstrap handles layout */
 }
 
 /* tech-grid responsive behavior handled by Bootstrap Grid */
 
-.yolo-yacht-details-v3 .tech-item {
+.tech-item {
     background: var(--yolo-white);
     padding: clamp(16px, 4vw, 20px);
     border-radius: var(--yolo-radius-md);
@@ -935,13 +990,13 @@
     transition: all var(--yolo-transition);
 }
 
-.yolo-yacht-details-v3 .tech-item:hover {
+.tech-item:hover {
     border-color: var(--yolo-primary-light);
     transform: translateY(-2px);
     box-shadow: var(--yolo-shadow-md);
 }
 
-.yolo-yacht-details-v3 .tech-icon {
+.tech-icon {
     width: clamp(50px, 12vw, 60px);
     height: clamp(50px, 12vw, 60px);
     background: linear-gradient(135deg, var(--yolo-primary) 0%, #2563eb 100%);
@@ -953,17 +1008,17 @@
     box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
 }
 
-.yolo-yacht-details-v3 .tech-icon i {
+.tech-icon i {
     font-size: clamp(20px, 5vw, 26px);
     color: var(--yolo-white);
 }
 
-.yolo-yacht-details-v3 .tech-content {
+.tech-content {
     flex: 1;
     min-width: 0;
 }
 
-.yolo-yacht-details-v3 .tech-label {
+.tech-label {
     font-size: clamp(11px, 2.5vw, 12px);
     font-weight: 700;
     color: var(--yolo-text-light);
@@ -972,7 +1027,7 @@
     margin-bottom: 4px;
 }
 
-.yolo-yacht-details-v3 .tech-value {
+.tech-value {
     font-size: clamp(16px, 4vw, 20px);
     font-weight: 600;
     color: var(--yolo-primary);
@@ -981,7 +1036,7 @@
 /* ============================================
    EXTRAS SECTION
    ============================================ */
-.yolo-yacht-details-v3 .yacht-extras-combined h3 {
+.yacht-extras-combined h3 {
     font-size: clamp(20px, 5vw, 26px);
     font-weight: 700;
     color: var(--yolo-text-dark);
@@ -990,7 +1045,7 @@
     border-bottom: 3px solid var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .yacht-extras-combined .extras-note {
+.yacht-extras-combined .extras-note {
     font-size: clamp(13px, 3vw, 14px);
     font-weight: 400;
     color: var(--yolo-text-light);
@@ -998,11 +1053,11 @@
 }
 
 /* extras-two-column now uses Bootstrap Grid (row g-4 with col-12 col-md-6) */
-.yolo-yacht-details-v3 .extras-two-column {
+.extras-two-column {
     /* No grid styles needed - Bootstrap handles layout */
 }
 
-.yolo-yacht-details-v3 .extras-column h4 {
+.extras-column h4 {
     font-size: clamp(16px, 4vw, 18px);
     font-weight: 600;
     margin-bottom: 14px;
@@ -1011,22 +1066,22 @@
     gap: 10px;
 }
 
-.yolo-yacht-details-v3 .extras-column:first-child h4 {
+.extras-column:first-child h4 {
     color: var(--yolo-danger);
 }
 
-.yolo-yacht-details-v3 .extras-column:last-child h4 {
+.extras-column:last-child h4 {
     color: var(--yolo-primary);
 }
 
 /* extras-grid is a simple vertical list - no grid needed */
-.yolo-yacht-details-v3 .extras-grid {
+.extras-grid {
     display: flex;
     flex-direction: column;
     gap: clamp(10px, 2.5vw, 12px);
 }
 
-.yolo-yacht-details-v3 .extra-item {
+.extra-item {
     padding: clamp(14px, 3.5vw, 18px);
     background: var(--yolo-white);
     border-radius: var(--yolo-radius-md);
@@ -1034,39 +1089,39 @@
     box-shadow: var(--yolo-shadow-sm);
 }
 
-.yolo-yacht-details-v3 .extra-item.obligatory {
+.extra-item.obligatory {
     background: var(--yolo-danger-bg);
     border-color: #fecaca;
     border-left: 4px solid var(--yolo-danger);
 }
 
-.yolo-yacht-details-v3 .extra-item.optional {
+.extra-item.optional {
     background: #f0f9ff;
     border-color: #bfdbfe;
     border-left: 4px solid var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .extra-name {
+.extra-name {
     font-size: clamp(14px, 3.5vw, 16px);
     color: var(--yolo-text-dark);
     font-weight: 600;
 }
 
-.yolo-yacht-details-v3 .extra-price {
+.extra-price {
     font-size: clamp(15px, 3.5vw, 17px);
     font-weight: 700;
     color: var(--yolo-success);
     margin-top: 8px;
 }
 
-.yolo-yacht-details-v3 .price-unit {
+.price-unit {
     font-size: clamp(11px, 2.5vw, 12px);
     font-weight: 400;
     color: var(--yolo-text-light);
     margin-left: 4px;
 }
 
-.yolo-yacht-details-v3 .payment-location {
+.payment-location {
     font-size: clamp(11px, 2.5vw, 12px);
     color: var(--yolo-text-light);
     display: block;
@@ -1076,12 +1131,12 @@
 /* ============================================
    BACK BUTTON
    ============================================ */
-.yolo-yacht-details-v3 .yacht-actions {
+.yacht-actions {
     margin-top: clamp(30px, 6vw, 50px);
     text-align: center;
 }
 
-.yolo-yacht-details-v3 .btn-back {
+.btn-back {
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -1096,7 +1151,7 @@
     min-height: 52px;
 }
 
-.yolo-yacht-details-v3 .btn-back:hover {
+.btn-back:hover {
     background: #4b5563;
     transform: translateY(-2px);
     color: white;
@@ -1106,7 +1161,7 @@
    MOBILE SWIPE HINT
    ============================================ */
 @media (max-width: 767px) {
-    .yolo-yacht-details-v3 .price-carousel-container::after {
+    .price-carousel-container::after {
         content: '← Swipe to see more →';
         display: block;
         text-align: center;
@@ -1120,7 +1175,7 @@
 /* ============================================
    INFO CARDS (Security Deposit, Cancellation, Check-in)
    ============================================ */
-.yolo-yacht-details-v3 .info-card {
+.info-card {
     background: var(--yolo-white);
     border: 1px solid var(--yolo-border);
     border-radius: var(--yolo-radius-lg);
@@ -1129,13 +1184,13 @@
     transition: all var(--yolo-transition);
 }
 
-.yolo-yacht-details-v3 .info-card:hover {
+.info-card:hover {
     box-shadow: var(--yolo-shadow-md);
     transform: translateY(-2px);
 }
 
 /* Security Deposit Card */
-.yolo-yacht-details-v3 .deposit-amount-large {
+.deposit-amount-large {
     font-size: clamp(32px, 5vw, 48px);
     font-weight: 700;
     color: var(--yolo-primary);
@@ -1143,13 +1198,13 @@
     text-align: center;
 }
 
-.yolo-yacht-details-v3 .deposit-card p {
+.deposit-card p {
     margin-bottom: 15px;
     line-height: 1.6;
     color: var(--yolo-text);
 }
 
-.yolo-yacht-details-v3 .deposit-note {
+.deposit-note {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--yolo-border);
@@ -1157,14 +1212,14 @@
 }
 
 /* Cancellation Policy Card */
-.yolo-yacht-details-v3 .cancellation-timeline {
+.cancellation-timeline {
     display: flex;
     flex-direction: column;
     gap: 20px;
     margin-bottom: 25px;
 }
 
-.yolo-yacht-details-v3 .timeline-item {
+.timeline-item {
     display: flex;
     align-items: center;
     gap: 20px;
@@ -1174,34 +1229,34 @@
     transition: all var(--yolo-transition);
 }
 
-.yolo-yacht-details-v3 .timeline-item:hover {
+.timeline-item:hover {
     background: var(--yolo-primary-light);
     transform: translateX(5px);
 }
 
-.yolo-yacht-details-v3 .timeline-icon {
+.timeline-icon {
     font-size: 32px;
     color: var(--yolo-primary);
     flex-shrink: 0;
 }
 
-.yolo-yacht-details-v3 .timeline-content {
+.timeline-content {
     flex: 1;
 }
 
-.yolo-yacht-details-v3 .timeline-label {
+.timeline-label {
     font-weight: 600;
     color: var(--yolo-text);
     margin-bottom: 5px;
 }
 
-.yolo-yacht-details-v3 .timeline-value {
+.timeline-value {
     font-size: 1.1em;
     font-weight: 700;
     color: var(--yolo-primary);
 }
 
-.yolo-yacht-details-v3 .cancellation-note {
+.cancellation-note {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--yolo-border);
@@ -1210,20 +1265,20 @@
 }
 
 /* Check-in/Check-out Cards */
-.yolo-yacht-details-v3 .checkin-card,
-.yolo-yacht-details-v3 .checkout-card,
-.yolo-yacht-details-v3 .checkin-day-card {
+.checkin-card,
+.checkout-card,
+.checkin-day-card {
     text-align: center;
     padding: clamp(20px, 4vw, 30px);
 }
 
-.yolo-yacht-details-v3 .card-icon {
+.card-icon {
     font-size: 48px;
     color: var(--yolo-primary);
     margin-bottom: 15px;
 }
 
-.yolo-yacht-details-v3 .card-label {
+.card-label {
     font-size: 0.9em;
     color: var(--yolo-text-light);
     text-transform: uppercase;
@@ -1232,33 +1287,33 @@
     font-weight: 600;
 }
 
-.yolo-yacht-details-v3 .card-value {
+.card-value {
     font-size: clamp(20px, 3vw, 28px);
     font-weight: 700;
     color: var(--yolo-text-dark);
 }
 
-.yolo-yacht-details-v3 .checkout-card .card-icon {
+.checkout-card .card-icon {
     color: var(--yolo-danger);
 }
 
-.yolo-yacht-details-v3 .checkin-day-card .card-icon {
+.checkin-day-card .card-icon {
     color: var(--yolo-success);
 }
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
-    .yolo-yacht-details-v3 .cancellation-timeline {
+    .cancellation-timeline {
         gap: 15px;
     }
     
-    .yolo-yacht-details-v3 .timeline-item {
+    .timeline-item {
         flex-direction: column;
         text-align: center;
         gap: 10px;
     }
     
-    .yolo-yacht-details-v3 .timeline-icon {
+    .timeline-icon {
         font-size: 28px;
     }
 }
@@ -1267,14 +1322,16 @@
    PRINT STYLES
    ============================================ */
 @media print {
-    .yolo-yacht-details-v3 .yacht-booking-sidebar,
-    .yolo-yacht-details-v3 .carousel-prev,
-    .yolo-yacht-details-v3 .carousel-next,
-    .yolo-yacht-details-v3 .carousel-dots,
-    .yolo-yacht-details-v3 .price-carousel-prev,
-    .yolo-yacht-details-v3 .price-carousel-next {
+    .yacht-booking-sidebar,
+    .carousel-prev,
+    .carousel-next,
+    .carousel-dots,
+    .price-carousel-prev,
+    .price-carousel-next {
         display: none !important;
     }
     
     /* Bootstrap Grid handles layout */
 }
+</style>
+
