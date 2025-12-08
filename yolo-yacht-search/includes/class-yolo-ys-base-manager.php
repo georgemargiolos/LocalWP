@@ -425,25 +425,46 @@ class YOLO_YS_Base_Manager {
      * AJAX: Get yachts
      */
     public function ajax_get_yachts() {
-        error_log('YOLO BM: ajax_get_yachts called');
-        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        error_log('YOLO BM v41.4: ajax_get_yachts called');
+        
+        // Verify nonce
+        if (!check_ajax_referer('yolo_base_manager_nonce', 'nonce', false)) {
+            error_log('YOLO BM: Nonce verification FAILED');
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page.'));
+            return;
+        }
+        error_log('YOLO BM: Nonce verified OK');
         
         if (!current_user_can('edit_posts')) {
-            error_log('YOLO BM: Permission denied for ajax_get_yachts');
+            error_log('YOLO BM: Permission denied - user cannot edit_posts');
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
+        error_log('YOLO BM: Permission check passed');
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_bm_yachts';
         error_log('YOLO BM: Querying table: ' . $table_name);
         
+        // Check if table exists first
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        if ($table_exists != $table_name) {
+            error_log('YOLO BM: Table ' . $table_name . ' does NOT exist! Creating tables...');
+            require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-base-manager-database.php';
+            YOLO_YS_Base_Manager_Database::create_tables();
+        }
+        
         $yachts = $wpdb->get_results("SELECT * FROM $table_name ORDER BY yacht_name ASC");
-        error_log('YOLO BM: Found ' . count($yachts) . ' yachts');
         
         if ($wpdb->last_error) {
             error_log('YOLO BM: Database error: ' . $wpdb->last_error);
+            wp_send_json_error(array('message' => 'Database error: ' . $wpdb->last_error));
+            return;
         }
+        
+        $count = is_array($yachts) ? count($yachts) : 0;
+        error_log('YOLO BM: Found ' . $count . ' yachts');
+        error_log('YOLO BM: Yachts data: ' . print_r($yachts, true));
         
         wp_send_json_success($yachts);
     }
@@ -909,24 +930,47 @@ class YOLO_YS_Base_Manager {
      * AJAX: Get bookings calendar
      */
     public function ajax_get_bookings_calendar() {
-        error_log('YOLO BM: ajax_get_bookings_calendar called');
-        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
+        error_log('YOLO BM v41.4: ajax_get_bookings_calendar called');
+        
+        // Verify nonce
+        if (!check_ajax_referer('yolo_base_manager_nonce', 'nonce', false)) {
+            error_log('YOLO BM: Nonce verification FAILED for bookings');
+            wp_send_json_error(array('message' => 'Security check failed. Please refresh the page.'));
+            return;
+        }
+        error_log('YOLO BM: Nonce verified OK for bookings');
         
         if (!current_user_can('edit_posts')) {
             error_log('YOLO BM: Permission denied for ajax_get_bookings_calendar');
             wp_send_json_error(array('message' => 'Permission denied'));
             return;
         }
+        error_log('YOLO BM: Permission check passed for bookings');
         
         global $wpdb;
         $table_name = $wpdb->prefix . 'yolo_bookings';
         error_log('YOLO BM: Querying bookings table: ' . $table_name);
         
+        // Check if table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        if ($table_exists != $table_name) {
+            error_log('YOLO BM: Table ' . $table_name . ' does NOT exist!');
+            wp_send_json_error(array('message' => 'Bookings table not found. Please sync yachts first.'));
+            return;
+        }
+        
         $bookings = $wpdb->get_results("SELECT * FROM $table_name ORDER BY date_from ASC");
-        error_log('YOLO BM: Found ' . count($bookings) . ' bookings');
         
         if ($wpdb->last_error) {
             error_log('YOLO BM: Database error: ' . $wpdb->last_error);
+            wp_send_json_error(array('message' => 'Database error: ' . $wpdb->last_error));
+            return;
+        }
+        
+        $count = is_array($bookings) ? count($bookings) : 0;
+        error_log('YOLO BM: Found ' . $count . ' bookings');
+        if ($count > 0) {
+            error_log('YOLO BM: First booking: ' . print_r($bookings[0], true));
         }
         
         wp_send_json_success($bookings);

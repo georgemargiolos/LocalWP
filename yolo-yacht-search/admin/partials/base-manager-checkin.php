@@ -463,10 +463,21 @@ if (!current_user_can('edit_posts')) {
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 <script>
 jQuery(document).ready(function($) {
+    console.log('=== YOLO Base Manager Check-In v41.4 Initializing ===');
+    
+    // Verify ajaxurl is defined
+    if (typeof ajaxurl === 'undefined') {
+        console.error('CRITICAL: ajaxurl is undefined! WordPress admin AJAX will not work.');
+        alert('Configuration error: AJAX URL not found. Please refresh the page.');
+        return;
+    }
+    console.log('Check-In: ajaxurl verified:', ajaxurl);
+    
     let checkinSignaturePad = null;
     let selectedYachtId = null;
     
     // Load initial data
+    console.log('Check-In: Starting initial data load...');
     loadYachts();
     loadBookings();
     loadCheckins();
@@ -595,6 +606,9 @@ jQuery(document).ready(function($) {
     // Load yachts
     function loadYachts() {
         console.log('Check-In: Loading yachts...');
+        console.log('Check-In: AJAX URL:', ajaxurl);
+        console.log('Check-In: Action:', 'yolo_bm_get_yachts');
+        
         $.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -603,20 +617,42 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
             },
             success: function(response) {
-                console.log('Check-In: Yachts response:', response);
+                console.log('Check-In: Yachts AJAX SUCCESS');
+                console.log('Check-In: Full response object:', response);
+                console.log('Check-In: response.success:', response.success);
+                console.log('Check-In: response.data:', response.data);
+                
                 if (response.success && response.data) {
-                    let options = '<option value="">Choose yacht...</option>';
-                    response.data.forEach(function(yacht) {
-                        options += `<option value="${yacht.id}">${yacht.yacht_name}${yacht.yacht_model ? ' - ' + yacht.yacht_model : ''}</option>`;
-                    });
-                    $('#checkin-yacht-select').html(options);
-                    console.log('Check-In: Loaded ' + response.data.length + ' yachts');
+                    if (Array.isArray(response.data) && response.data.length > 0) {
+                        let options = '<option value="">Choose yacht...</option>';
+                        response.data.forEach(function(yacht) {
+                            console.log('Check-In: Processing yacht:', yacht);
+                            options += `<option value="${yacht.id}">${yacht.yacht_name}${yacht.yacht_model ? ' - ' + yacht.yacht_model : ''}</option>`;
+                        });
+                        $('#checkin-yacht-select').html(options);
+                        console.log('Check-In: Successfully loaded ' + response.data.length + ' yachts into dropdown');
+                    } else {
+                        console.warn('Check-In: No yachts found in response.data');
+                        $('#checkin-yacht-select').html('<option value="">No yachts available</option>');
+                    }
                 } else {
-                    console.error('Check-In: Failed to load yachts:', response);
+                    console.error('Check-In: Response indicates failure');
+                    console.error('Check-In: response.success:', response.success);
+                    console.error('Check-In: response.data:', response.data);
+                    if (response.data && response.data.message) {
+                        alert('Error loading yachts: ' + response.data.message);
+                    }
+                    $('#checkin-yacht-select').html('<option value="">Error loading yachts</option>');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Check-In: AJAX error loading yachts:', status, error, xhr);
+                console.error('Check-In: AJAX ERROR loading yachts');
+                console.error('Check-In: Status:', status);
+                console.error('Check-In: Error:', error);
+                console.error('Check-In: XHR object:', xhr);
+                console.error('Check-In: Response text:', xhr.responseText);
+                alert('Network error loading yachts. Check console for details.');
+                $('#checkin-yacht-select').html('<option value="">Network error</option>');
             }
         });
     }
@@ -624,6 +660,9 @@ jQuery(document).ready(function($) {
     // Load bookings
     function loadBookings() {
         console.log('Check-In: Loading bookings...');
+        console.log('Check-In: AJAX URL:', ajaxurl);
+        console.log('Check-In: Action:', 'yolo_bm_get_bookings_calendar');
+        
         $.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -632,20 +671,42 @@ jQuery(document).ready(function($) {
                 nonce: '<?php echo wp_create_nonce('yolo_base_manager_nonce'); ?>'
             },
             success: function(response) {
-                console.log('Check-In: Bookings response:', response);
+                console.log('Check-In: Bookings AJAX SUCCESS');
+                console.log('Check-In: Full response object:', response);
+                console.log('Check-In: response.success:', response.success);
+                console.log('Check-In: response.data:', response.data);
+                
                 if (response.success && response.data) {
-                    let options = '<option value="">Choose booking...</option>';
-                    response.data.forEach(function(booking) {
-                        options += `<option value="${booking.id}">BM-${booking.id} - ${booking.customer_name}${booking.yacht_name ? ' (' + booking.yacht_name + ')' : ''}</option>`;
-                    });
-                    $('#checkin-booking-select').html(options);
-                    console.log('Check-In: Loaded ' + response.data.length + ' bookings');
+                    if (Array.isArray(response.data) && response.data.length > 0) {
+                        let options = '<option value="">Choose booking...</option>';
+                        response.data.forEach(function(booking) {
+                            console.log('Check-In: Processing booking:', booking);
+                            options += `<option value="${booking.id}">BM-${booking.id} - ${booking.customer_name}${booking.yacht_name ? ' (' + booking.yacht_name + ')' : ''}</option>`;
+                        });
+                        $('#checkin-booking-select').html(options);
+                        console.log('Check-In: Successfully loaded ' + response.data.length + ' bookings into dropdown');
+                    } else {
+                        console.warn('Check-In: No bookings found in response.data');
+                        $('#checkin-booking-select').html('<option value="">No bookings available</option>');
+                    }
                 } else {
-                    console.error('Check-In: Failed to load bookings:', response);
+                    console.error('Check-In: Response indicates failure');
+                    console.error('Check-In: response.success:', response.success);
+                    console.error('Check-In: response.data:', response.data);
+                    if (response.data && response.data.message) {
+                        alert('Error loading bookings: ' + response.data.message);
+                    }
+                    $('#checkin-booking-select').html('<option value="">Error loading bookings</option>');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Check-In: AJAX error loading bookings:', status, error, xhr);
+                console.error('Check-In: AJAX ERROR loading bookings');
+                console.error('Check-In: Status:', status);
+                console.error('Check-In: Error:', error);
+                console.error('Check-In: XHR object:', xhr);
+                console.error('Check-In: Response text:', xhr.responseText);
+                alert('Network error loading bookings. Check console for details.');
+                $('#checkin-booking-select').html('<option value="">Network error</option>');
             }
         });
     }
