@@ -47,11 +47,23 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $checkin->yacht_id
         ));
         
+        // BUG FIX #6: Check if yacht exists
+        if (!$yacht) {
+            error_log('YOLO YS PDF: Yacht not found for check-in ID: ' . $checkin_id);
+            return false;
+        }
+        
         // Get booking data
         $booking = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d",
             $checkin->booking_id
         ));
+        
+        // BUG FIX #7: Check if booking exists
+        if (!$booking) {
+            error_log('YOLO YS PDF: Booking not found for check-in ID: ' . $checkin_id);
+            return false;
+        }
         
         // Create PDF
         $pdf = new self();
@@ -102,7 +114,8 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(50, 6, 'Customer:', 0, 0);
         $pdf->Cell(0, 6, $booking->customer_name ?? 'N/A', 0, 1);
         $pdf->Cell(50, 6, 'Check-in Date:', 0, 0);
-        $pdf->Cell(0, 6, date('d/m/Y', strtotime($booking->check_in_date)), 0, 1);
+        // BUG FIX #1: Use correct column name 'date_from' instead of 'check_in_date'
+        $pdf->Cell(0, 6, date('d/m/Y', strtotime($booking->date_from)), 0, 1);
         $pdf->Ln(10);
         
         // Checklist
@@ -119,8 +132,11 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $pdf->Cell(30, 6, 'Status', 1, 1, 'C', true);
             
             foreach ($checklist_data as $item) {
-                $pdf->Cell(100, 6, $item['name'], 1, 0);
-                $pdf->Cell(30, 6, $item['quantity'], 1, 0, 'C');
+                // BUG FIX #3: Handle both 'name' and 'item' keys, and missing 'quantity'
+                $itemName = isset($item['name']) ? $item['name'] : (isset($item['item']) ? $item['item'] : 'Unknown');
+                $itemQuantity = isset($item['quantity']) ? $item['quantity'] : '-';
+                $pdf->Cell(100, 6, $itemName, 1, 0);
+                $pdf->Cell(30, 6, $itemQuantity, 1, 0, 'C');
                 $pdf->Cell(30, 6, $item['checked'] ? 'OK' : 'Missing', 1, 1, 'C');
             }
         }
@@ -259,11 +275,23 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $checkout->yacht_id
         ));
         
+        // BUG FIX #6: Check if yacht exists
+        if (!$yacht) {
+            error_log('YOLO YS PDF: Yacht not found for check-out ID: ' . $checkout_id);
+            return false;
+        }
+        
         // Get booking data
         $booking = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}yolo_bookings WHERE id = %d",
             $checkout->booking_id
         ));
+        
+        // BUG FIX #7: Check if booking exists
+        if (!$booking) {
+            error_log('YOLO YS PDF: Booking not found for check-out ID: ' . $checkout_id);
+            return false;
+        }
         
         // Create PDF (similar to check-in but with "CHECK-OUT" title)
         $pdf = new self();
@@ -314,7 +342,8 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Cell(50, 6, 'Customer:', 0, 0);
         $pdf->Cell(0, 6, $booking->customer_name ?? 'N/A', 0, 1);
         $pdf->Cell(50, 6, 'Check-out Date:', 0, 0);
-        $pdf->Cell(0, 6, date('d/m/Y', strtotime($booking->check_out_date)), 0, 1);
+        // BUG FIX #2: Use correct column name 'date_to' instead of 'check_out_date'
+        $pdf->Cell(0, 6, date('d/m/Y', strtotime($booking->date_to)), 0, 1);
         $pdf->Ln(10);
         
         // Checklist
@@ -331,8 +360,11 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $pdf->Cell(30, 6, 'Status', 1, 1, 'C', true);
             
             foreach ($checklist_data as $item) {
-                $pdf->Cell(100, 6, $item['name'], 1, 0);
-                $pdf->Cell(30, 6, $item['quantity'], 1, 0, 'C');
+                // BUG FIX #4: Handle both 'name' and 'item' keys, and missing 'quantity'
+                $itemName = isset($item['name']) ? $item['name'] : (isset($item['item']) ? $item['item'] : 'Unknown');
+                $itemQuantity = isset($item['quantity']) ? $item['quantity'] : '-';
+                $pdf->Cell(100, 6, $itemName, 1, 0);
+                $pdf->Cell(30, 6, $itemQuantity, 1, 0, 'C');
                 $pdf->Cell(30, 6, $item['checked'] ? 'OK' : 'Damaged/Missing', 1, 1, 'C');
             }
         }

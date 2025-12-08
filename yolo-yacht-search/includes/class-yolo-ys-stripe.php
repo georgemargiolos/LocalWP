@@ -298,6 +298,8 @@ class YOLO_YS_Stripe {
             'currency' => isset($session['metadata']['currency']) ? $session['metadata']['currency'] : 'EUR',
             'customer_email' => $customer_email,
             'customer_name' => $customer_name,
+            // BUG FIX #5: Add customer_phone from session metadata
+            'customer_phone' => isset($session['metadata']['customer_phone']) ? $session['metadata']['customer_phone'] : '',
             'stripe_session_id' => $session['id'],
             'stripe_payment_intent' => isset($session['payment_intent']) ? $session['payment_intent'] : '',
             'payment_status' => 'deposit_paid',
