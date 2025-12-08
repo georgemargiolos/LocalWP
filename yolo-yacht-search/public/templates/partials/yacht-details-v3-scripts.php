@@ -267,7 +267,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     priceFinal.textContent = 'Not Available';
                     priceFinal.style.color = '#dc2626';
                     
-                    alert(data.data ? data.data.message : 'This yacht is not available for the selected dates. Please choose different dates.');
+                    Toastify({
+                        text: data.data ? data.data.message : 'This yacht is not available for the selected dates. Please choose different dates.',
+                        duration: 6000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#dc2626',
+                        stopOnFocus: true
+                    }).showToast();
                     
                     const bookNowBtn = document.getElementById('bookNowBtn');
                     if (bookNowBtn) {
@@ -281,7 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching live price:', error);
                 priceFinal.textContent = originalText;
                 priceFinal.style.opacity = '1';
-                alert('Failed to check availability. Please try again.');
+                Toastify({
+                    text: 'Failed to check availability. Please try again.',
+                    duration: 5000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#dc2626',
+                    stopOnFocus: true
+                }).showToast();
             });
         });
     }
@@ -638,6 +652,13 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                             <span class="yolo-booking-summary-value text-primary fw-bold fs-4">${priceFormatted}</span>
                         </div>
                     </div>
+                    
+                    <!-- Payment Information -->
+                    <div class="alert alert-info mt-3 mb-0" style="background-color: #e0f2fe; border-color: #0ea5e9; color: #0c4a6e;">
+                        <strong>💳 Payment Details:</strong><br>
+                        You will pay <strong>50% (${formatPrice(totalPrice * 0.5)} ${currency})</strong> now to secure your booking.<br>
+                        The remaining <strong>50% (${formatPrice(totalPrice * 0.5)} ${currency})</strong> will be paid later. We will contact you with payment instructions.
+                    </div>
                 </div>
                 
                 <!-- Customer Information Form -->
@@ -751,20 +772,41 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                     sessionId: data.data.session_id
                 }).then(function(result) {
                     if (result.error) {
-                        alert(result.error.message);
+                        Toastify({
+                            text: result.error.message,
+                            duration: 6000,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: '#dc2626',
+                            stopOnFocus: true
+                        }).showToast();
                         submitBtn.textContent = originalText;
                         submitBtn.disabled = false;
                     }
                 });
             } else {
-                alert('Error creating checkout session: ' + (data.data.message || 'Unknown error'));
+                Toastify({
+                    text: 'Error creating checkout session: ' + (data.data.message || 'Unknown error'),
+                    duration: 6000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#dc2626',
+                    stopOnFocus: true
+                }).showToast();
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to initiate checkout. Please try again.');
+            Toastify({
+                text: 'Failed to initiate checkout. Please try again.',
+                duration: 5000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#dc2626',
+                stopOnFocus: true
+            }).showToast();
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
         });
@@ -893,14 +935,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Show success message
-                    alert('✓ ' + data.data.message);
+                    Toastify({
+                        text: '✓ ' + data.data.message,
+                        duration: 4000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#10b981',
+                        stopOnFocus: true
+                    }).showToast();
                     // Reset form
                     quoteForm.reset();
                     // Hide form
                     toggleQuoteForm();
                 } else {
                     // Show error message
-                    alert('✗ ' + (data.data.message || 'Failed to submit quote request. Please try again.'));
+                    Toastify({
+                        text: '✗ ' + (data.data.message || 'Failed to submit quote request. Please try again.'),
+                        duration: 5000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#dc2626',
+                        stopOnFocus: true
+                    }).showToast();
                 }
                 // Restore button
                 submitBtn.textContent = originalText;
@@ -908,7 +964,14 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Quote submission error:', error);
-                alert('✗ Failed to submit quote request. Please try again or contact us directly.');
+                Toastify({
+                    text: '✗ Failed to submit quote request. Please try again or contact us directly.',
+                    duration: 5000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#dc2626',
+                    stopOnFocus: true
+                }).showToast();
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             });
