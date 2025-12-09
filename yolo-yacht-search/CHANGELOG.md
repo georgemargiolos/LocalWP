@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [41.28] - 2024-12-09
+
+### Fixed
+- **CRITICAL: Purchase Event Tracking** - Purchase event now fires correctly on booking confirmation page for both GA4 and Facebook
+
+### Added
+- **Client-Side GA4 Purchase Tracking** - Added dataLayer.push() for GTM on confirmation page with transaction_id, currency, value, and items
+- **Client-Side Facebook Pixel Purchase Tracking** - Added fbq() Purchase event with eventID for deduplication
+- **Server-Side Facebook CAPI Purchase Tracking** - Added Purchase tracking via CAPI with user data (email, phone, name) for better attribution
+
+### Changed
+- Modified `/public/templates/booking-confirmation.php` - Added Purchase event tracking in `yolo_show_booking_confirmation()` function (lines 197-230)
+- Modified `/public/templates/booking-confirmation.php` - Added Facebook CAPI Purchase tracking in `yolo_create_booking_from_stripe()` function (lines 339-358)
+- Updated plugin version from 41.27 to 41.28 in `yolo-yacht-search.php`
+
+### Technical Details
+- **Problem:** Purchase event was only in webhook handler (optional/not configured), so conversions weren't tracked
+- **Solution:** Added Purchase tracking to confirmation page where booking is actually created
+- **Event Flow:** Stripe payment → confirmation page → booking created → Purchase event fires (server-side CAPI) → confirmation displayed → Purchase event fires (client-side GA4 + Pixel)
+- **Deduplication:** eventID used to prevent double-counting between Pixel and CAPI
+- **User Data:** Email, phone, first name, last name sent to CAPI for better Facebook attribution
+
+### Impact
+- ✅ All 7 booking funnel events now working (search, view_item, add_to_cart, begin_checkout, add_payment_info, generate_lead, purchase)
+- ✅ Complete conversion tracking from search to purchase
+- ✅ Revenue data flows to GA4 and Facebook
+- ✅ ROAS (Return on Ad Spend) measurement enabled
+- ✅ Server-side tracking bypasses ad blockers
+- ✅ Event deduplication prevents double-counting
+
+### Files Modified
+- `/public/templates/booking-confirmation.php` - Added Purchase event tracking (client-side + server-side)
+- `/yolo-yacht-search.php` - Version bump to 41.28
+
+### Documentation
+- See [CHANGELOG-v41.28.md](CHANGELOG-v41.28.md) for detailed changelog
+- See [TESTING-GUIDE-v41.28.md](TESTING-GUIDE-v41.28.md) for testing instructions
+- See [HANDOFF-v41.28.md](HANDOFF-v41.28.md) for comprehensive handoff document
+
+---
+
 ## [30.6] - 2025-12-06
 
 ### Fixed

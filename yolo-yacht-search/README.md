@@ -3,17 +3,54 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 20.0
+**Version:** 41.28
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
-**Status:** Ready for Production Testing ✅
+**Status:** Production Ready ✅
 
 ## Overview
 
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v41.28 - Purchase Event Tracking Fix (December 9, 2024)
+
+**Critical Analytics Fix - Complete Conversion Tracking Now Operational**
+
+**Problem Solved:** Purchase event was missing from the booking confirmation flow, preventing conversion tracking in GA4 and Facebook.
+
+**Solution Implemented:**
+- ✅ **Client-Side GA4 Tracking** - Added dataLayer.push() for GTM on confirmation page
+- ✅ **Client-Side Facebook Pixel** - Added fbq() Purchase event with deduplication
+- ✅ **Server-Side Facebook CAPI** - Added Purchase tracking with user data for attribution
+- ✅ **No Webhook Dependency** - Works with Stripe redirect flow
+
+**All 7 Booking Funnel Events Now Working:**
+1. search - User searches for yachts (GA4 + Facebook)
+2. view_item - User views yacht details (GA4 + Facebook)
+3. add_to_cart - User selects week/price (GA4 + Facebook)
+4. begin_checkout - User clicks "Book Now" (GA4 + Facebook)
+5. add_payment_info - User submits booking form (GA4 + Facebook)
+6. generate_lead - User requests quote (Facebook only)
+7. **purchase** - Booking completed (GA4 + Facebook) **← FIXED**
+
+**Impact:**
+- ✅ Complete booking funnel tracked from search to purchase
+- ✅ Revenue data flows to GA4 and Facebook
+- ✅ ROAS (Return on Ad Spend) measurement enabled
+- ✅ Server-side tracking bypasses ad blockers
+- ✅ Event deduplication prevents double-counting
+
+**Files Modified:** 2 files (booking-confirmation.php, yolo-yacht-search.php)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+
+See [CHANGELOG-v41.28.md](CHANGELOG-v41.28.md) and [HANDOFF-v41.28.md](HANDOFF-v41.28.md) for complete details.
+
+---
+
 ### v20.0 - Search Results Performance & Code Quality Improvements (December 3, 2025)
 
 **4 Major Improvements:**
