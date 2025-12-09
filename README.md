@@ -1,12 +1,60 @@
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 41.27 📊  
+**Version:** 50.0 📊  
 **Last Updated:** December 9, 2025 GMT+2  
 **WordPress Plugin for Yacht Charter Search and Booking**
 
 ---
 
-## 🚀 What's New in v41.27 - Facebook Conversions API (Server-Side Tracking)
+## 🚀 What's New in v50.0 - Custom Gutenberg Blocks & Plugin Independence
+
+This version introduces **custom Gutenberg blocks** for displaying yacht information and blog posts, plus removes Contact Form 7 dependency for better plugin independence.
+
+### Major Features:
+
+1. ✅ **Horizontal Yacht Cards Block** - Display YOLO yachts in beautiful horizontal cards
+2. ✅ **Blog Posts Grid Block** - Display recent blog posts in responsive 3-column grid
+3. ✅ **Contact Form 7 Independence** - Standalone CSS eliminates CF7 dependency
+4. ✅ **Enhanced Yacht Details** - Map section anchoring for better navigation
+5. ✅ **Theme Font Inheritance** - All blocks inherit WordPress theme fonts
+
+### Horizontal Yacht Cards Block Features:
+
+- **Image Carousel** - Swiper.js integration with logo overlay (max 100px)
+- **Yacht Information** - Name, location, specs, description, pricing
+- **Responsive Design** - Horizontal on desktop, stacks on mobile
+- **Smart Linking** - Location links to yacht details map section (#yacht-map-section)
+- **Description Preview** - 100-word excerpt with "Read more..." link
+- **Front Page Support** - Works on homepage and all post types
+
+### Blog Posts Grid Block Features:
+
+- **Adjustable Count** - Display 1-12 posts via block settings
+- **Featured Images** - Hover zoom effect for engagement
+- **Category Badges** - Automatic display (hides "Uncategorized")
+- **Responsive Grid** - 3→2→1 columns on different screen sizes
+- **Custom Styling** - #1572F5 button color, 16px border-radius
+- **Theme Integration** - Inherits all fonts from WordPress theme
+
+### Key Changes:
+
+1. ✅ **Standalone CSS** - Contact Form 7 styles now bundled in plugin
+2. ✅ **Search Widget Update** - Background changed to #ffffff26
+3. ✅ **Map Section ID** - Added yacht-map-section ID for anchor linking
+4. ✅ **Block Registration** - Manual editor script enqueuing for reliability
+5. ✅ **Front Page Filter** - Priority 999 for theme compatibility
+
+### Setup Required:
+
+1. Install and activate YOLO Yacht Search & Booking Plugin v50.0
+2. Install standalone block plugins:
+   - YOLO Horizontal Yacht Cards Block v50.0
+   - YOLO Blog Posts Block v1.0.0
+3. Add blocks via Gutenberg editor (search "YOLO")
+
+---
+
+## 🎨 v41.27 - Facebook Conversions API (Server-Side Tracking)
 
 This version implements **true server-side Facebook Conversions API** tracking following Facebook's official best practices. Events are sent directly from your WordPress server to Facebook, providing superior data quality, better attribution, and cannot be blocked by browser ad blockers.
 
@@ -68,20 +116,30 @@ All yacht details page text is now customizable via WordPress admin.
 
 ---
 
-## 📋 Complete Session Summary (December 8, 2025)
+## 📋 Complete Session Summary (December 9, 2025)
 
-**Total Duration:** 6+ hours  
-**Versions Released:** v41.9 through v41.21 (13 versions!)  
-**Major Features Added:** Analytics & SEO, PDF Generator, Toastify, Settings Audit  
-**Critical Bugs Fixed:** 15+  
-**Files Modified:** 50+  
-**Lines Changed:** 2,000+
+**Total Duration:** 8+ hours  
+**Versions Released:** v41.28 through v50.0  
+**Major Features Added:** Custom Gutenberg Blocks, CF7 Independence  
+**Standalone Plugins Created:** 2 (Horizontal Yacht Cards, Blog Posts Grid)  
+**Files Modified:** 20+  
+**Lines Changed:** 1,500+
 
 ---
 
 ## 🔥 Recent Versions Highlights
 
-### v41.27 - Facebook Conversions API (CURRENT)
+### v50.0 - Custom Gutenberg Blocks (CURRENT)
+- Created YOLO Horizontal Yacht Cards Block v50.0
+- Created YOLO Blog Posts Block v1.0.0
+- Removed Contact Form 7 dependency
+- Added standalone CSS for contact forms
+- Updated search widget background to #ffffff26
+- Added yacht-map-section ID for anchor linking
+- All blocks inherit WordPress theme fonts
+- Front page support for all blocks
+
+### v41.27 - Facebook Conversions API
 - Implemented true server-side Facebook Conversions API
 - 3 events sent server-side (ViewContent, Lead, Purchase)
 - 4 events sent client-side (Search, AddToCart, InitiateCheckout, AddPaymentInfo)
@@ -134,43 +192,6 @@ All yacht details page text is now customizable via WordPress admin.
 - Added payment explanation in booking modal
 - Color-coded notifications (red=error, green=success, blue=info)
 
-### v41.16 - Book Now Button Fix
-- Fixed button staying greyed out after carousel selection
-- Fixed duplicate const declaration bug
-
-### v41.15 - Book Now Button Re-enable
-- Button now re-enables when selecting available week from carousel
-
-### v41.14 - Beautiful Notifications
-- Replaced ugly browser alerts with Toastify toasts
-- "Another customer just booked..." now shows as styled notification
-
-### v41.13 - Professional PDF Generator
-- Branded PDFs with company logo
-- Navy blue & green color scheme
-- Styled equipment tables
-- Side-by-side signature boxes
-- Terms & conditions page
-
-### v41.12 - Check-in/Checkout Lists
-- Added ajax_get_checkins handler
-- Added ajax_get_checkouts handler
-- Added ajax_upload_document handler
-
-### v41.11 - Base Manager Critical Fixes
-- Fixed check-in/checkout dropdowns not loading
-- Fixed Save PDF button
-- Fixed Send to Guest button
-- Fixed Guest Dashboard permissions
-
-### v41.10 - Nonce & JavaScript Fixes
-- Fixed hardcoded nonces in check-in/checkout templates
-- Removed conflicting base-manager.js from admin pages
-
-### v41.9 - Settings Fixes
-- Fixed FontAwesome setting not working
-- Removed Stripe test mode checkbox (auto-detect now)
-
 ---
 
 ## 🎯 Current Plugin Capabilities
@@ -188,6 +209,14 @@ All yacht details page text is now customizable via WordPress admin.
 - ✅ Auto-sync system (hourly)
 - ✅ Warehouse notifications
 - ✅ Admin documents system
+
+### Custom Blocks (v50.0):
+- ✅ Horizontal Yacht Cards Block
+- ✅ Blog Posts Grid Block
+- ✅ Front page support
+- ✅ Theme font inheritance
+- ✅ Responsive designs
+- ✅ Swiper.js integration
 
 ### Analytics & SEO (v41.19):
 - ✅ Google Analytics 4 (GA4)
@@ -230,7 +259,8 @@ All yacht details page text is now customizable via WordPress admin.
 
 ## 📦 Installation
 
-1. Download `yolo-yacht-search-v41.27.zip`
+### Main Plugin:
+1. Download `yolo-yacht-search-v50.0.zip`
 2. Upload to WordPress via Plugins → Add New → Upload
 3. Activate plugin
 4. Configure settings:
@@ -240,6 +270,13 @@ All yacht details page text is now customizable via WordPress admin.
    - GA4 Measurement ID (optional)
    - Facebook Pixel ID (optional)
 5. Customize colors and texts via admin
+
+### Standalone Block Plugins:
+1. Download `yolo-horizontal-yacht-cards-v50.0.zip`
+2. Download `yolo-blog-posts-block-v1.0.0.zip`
+3. Upload each to WordPress via Plugins → Add New → Upload
+4. Activate both plugins
+5. Add blocks via Gutenberg editor (search "YOLO")
 
 ---
 
@@ -256,12 +293,18 @@ All yacht details page text is now customizable via WordPress admin.
 - **Texts:** 71 customizable text strings
 - **Email:** SMTP settings for notifications
 
+### Block Settings:
+- **Horizontal Yacht Cards:** No settings (displays all YOLO yachts)
+- **Blog Posts Grid:** Adjustable post count (1-12 posts)
+
 ---
 
 ## 📚 Documentation
 
-- **CHANGELOG-v41.21.md** - Detailed changelog for v41.21
-- **HANDOFF-v41.11-December8-2025.md** - Technical handoff document
+- **CHANGELOG-v50.0.md** - Detailed changelog for v50.0
+- **HANDOFF-v50.0.md** - Technical handoff document
+- **BLOCKS-TRACKING.md** - Custom blocks documentation
+- **GTM_SETUP_GUIDE.md** - Google Tag Manager setup
 - **ANALYTICS-SEO-SETUP-GUIDE.md** - GA4 and Facebook Pixel setup
 - **BookingManagerAPIManual.md** - API integration guide
 - **FEATURE-STATUS.md** - Feature implementation status
@@ -272,24 +315,20 @@ All yacht details page text is now customizable via WordPress admin.
 
 ## 🐛 Known Issues
 
-None in v41.21! All critical bugs fixed.
+None in v50.0! All critical bugs fixed.
 
 ---
 
 ## 🚀 Roadmap
 
-### Completed in This Session:
-- ✅ FontAwesome setting fix
-- ✅ Stripe test mode removal
-- ✅ Check-in/checkout dropdowns fix
-- ✅ Base Manager buttons fix
-- ✅ Guest permissions fix
-- ✅ PDF generator upgrade
-- ✅ Toastify migration
-- ✅ Book Now button fix
-- ✅ Search widget responsive fix
-- ✅ Analytics & SEO system
-- ✅ Text & color settings audit
+### Completed in v50.0:
+- ✅ Custom Gutenberg blocks
+- ✅ Contact Form 7 independence
+- ✅ Horizontal yacht cards block
+- ✅ Blog posts grid block
+- ✅ Theme font inheritance
+- ✅ Front page support
+- ✅ Responsive designs
 
 ### Future Enhancements:
 - [ ] Multi-currency support
@@ -298,6 +337,7 @@ None in v41.21! All critical bugs fixed.
 - [ ] Yacht comparison feature
 - [ ] Customer reviews system
 - [ ] Loyalty program integration
+- [ ] Additional custom blocks (testimonials, pricing tables, etc.)
 
 ---
 
@@ -331,9 +371,10 @@ GitHub: [@georgemargiolos](https://github.com/georgemargiolos)
 - **Flatpickr** - Date picker
 - **FPDF** - PDF generation
 - **FontAwesome** - Icons
+- **Gutenberg** - WordPress block editor
 
 ---
 
-**Last Session:** December 8, 2025  
+**Last Session:** December 9, 2025  
 **Next Session:** TBD  
 **Status:** ✅ Production Ready
