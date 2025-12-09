@@ -1,12 +1,40 @@
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 41.21 🎨  
-**Last Updated:** December 8, 2025 GMT+2  
+**Version:** 41.26 📊  
+**Last Updated:** December 9, 2025 GMT+2  
 **WordPress Plugin for Yacht Charter Search and Booking**
 
 ---
 
-## 🎨 What's New in v41.21 - Text & Color Settings Audit Complete
+## 📊 What's New in v41.26 - Google Tag Manager Integration
+
+This version switches from direct analytics calls to **dataLayer.push()** for proper Google Tag Manager integration. All 7 custom yacht booking events now flow through GTM for full visibility, control, and flexibility.
+
+### Key Changes:
+
+1. ✅ **dataLayer Integration** - All events use dataLayer.push() instead of gtag()/fbq()
+2. ✅ **GTM Compatibility** - Events visible in GTM Preview mode
+3. ✅ **Flexible Routing** - Send to GA4, Facebook, or any platform via GTM
+4. ✅ **Better Debugging** - Inspect dataLayer in browser console
+5. ✅ **Future-Proof** - Easy to add new destinations without code changes
+
+### Events Tracked:
+
+- **search** - User searches for yachts
+- **view_item** - User views yacht details
+- **add_to_cart** - User selects a week/price
+- **begin_checkout** - User clicks "Book Now"
+- **add_payment_info** - User submits booking form
+- **generate_lead** - User requests a quote
+- **purchase** - Booking completed
+
+### Setup Required:
+
+See `/GTM_SETUP_GUIDE.md` for complete Google Tag Manager configuration instructions.
+
+---
+
+## 🎨 v41.21 - Text & Color Settings Audit Complete
 
 This version implements the **comprehensive text and color settings audit**, fixing 2 critical bugs and adding **40+ new customization options**.
 
@@ -45,7 +73,21 @@ All yacht details page text is now customizable via WordPress admin.
 
 ## 🔥 Recent Versions Highlights
 
-### v41.21 - Text & Color Settings Audit (CURRENT)
+### v41.26 - Google Tag Manager Integration (CURRENT)
+- Switched to dataLayer.push() for all events
+- Removed direct gtag()/fbq() calls
+- Added GTM compatibility
+- Created comprehensive GTM setup guide
+- 7 yacht booking events tracked
+
+### v41.25 - Analytics Cleanup
+- Removed GA4/FB Pixel base tracking from plugin
+- Kept all 7 custom yacht booking events
+- Integrated with external analytics plugins (PixelYourSite, Site Kit)
+- Removed duplicate tracking
+- Simplified analytics architecture
+
+### v41.21 - Text & Color Settings Audit
 - Fixed color loading bug in yacht-details-v3-styles.php
 - Removed PHP code from yacht-details-v3.css
 - Added 5 new color settings
