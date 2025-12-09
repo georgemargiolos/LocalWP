@@ -193,6 +193,41 @@ function yolo_show_booking_confirmation($booking) {
         </div>
     </div>
     </div>
+    
+    <!-- Purchase Event Tracking (GA4 + Facebook) -->
+    <script>
+    // Track Purchase event for GA4 (via GTM)
+    if (typeof window.dataLayer !== 'undefined') {
+        window.dataLayer.push({
+            event: 'purchase',
+            transaction_id: '<?php echo esc_js($booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id); ?>',
+            currency: '<?php echo esc_js($booking->currency); ?>',
+            value: <?php echo floatval($booking->total_price); ?>,
+            items: [{
+                item_id: '<?php echo esc_js($booking->yacht_id); ?>',
+                item_name: '<?php echo esc_js($booking->yacht_name); ?>',
+                price: <?php echo floatval($booking->total_price); ?>,
+                quantity: 1
+            }]
+        });
+        console.log('YOLO Analytics: Purchase event tracked (GA4)');
+    }
+    
+    // Track Purchase event for Facebook Pixel (client-side)
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Purchase', {
+            content_type: 'product',
+            content_ids: ['<?php echo esc_js($booking->yacht_id); ?>'],
+            content_name: '<?php echo esc_js($booking->yacht_name); ?>',
+            currency: '<?php echo esc_js($booking->currency); ?>',
+            value: <?php echo floatval($booking->total_price); ?>,
+            order_id: '<?php echo esc_js($booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id); ?>'
+        }, {
+            eventID: 'purchase_<?php echo esc_js($booking->id); ?>_<?php echo time(); ?>'
+        });
+        console.log('YOLO Analytics: Purchase event tracked (Facebook Pixel)');
+    }
+    </script>
     <?php
 }
 }
@@ -299,6 +334,27 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
                 YOLO_YS_Email::send_admin_notification($booking);
             } catch (Exception $e) {
                 error_log('YOLO YS: Email error - ' . $e->getMessage());
+            }
+            
+            // Track Purchase event via Facebook CAPI (server-side)
+            if (function_exists('yolo_analytics')) {
+                $transaction_id = $booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id;
+                $user_data = array(
+                    'em' => $customer_email,
+                    'ph' => $customer_phone,
+                    'fn' => $customer_first_name,
+                    'ln' => $customer_last_name
+                );
+                
+                yolo_analytics()->track_purchase(
+                    $transaction_id,
+                    $yacht_id,
+                    $total_price,
+                    $yacht_name,
+                    $user_data
+                );
+                
+                error_log('YOLO YS: Purchase event tracked via CAPI for booking #' . $booking_id);
             }
         }
         
