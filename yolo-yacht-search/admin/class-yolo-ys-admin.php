@@ -385,41 +385,6 @@ class YOLO_YS_Admin {
             'yolo-yacht-search'
         );
         
-        register_setting('yolo-yacht-search', 'yolo_ga4_measurement_id');
-        add_settings_field(
-            'yolo_ga4_measurement_id',
-            __('Google Analytics 4 Measurement ID', 'yolo-yacht-search'),
-            array($this, 'ga4_measurement_id_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_analytics_settings'
-        );
-        
-        register_setting('yolo-yacht-search', 'yolo_ga4_api_secret');
-        add_settings_field(
-            'yolo_ga4_api_secret',
-            __('GA4 API Secret (for server-side tracking)', 'yolo-yacht-search'),
-            array($this, 'ga4_api_secret_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_analytics_settings'
-        );
-        
-        register_setting('yolo-yacht-search', 'yolo_fb_pixel_id');
-        add_settings_field(
-            'yolo_fb_pixel_id',
-            __('Facebook Pixel ID', 'yolo-yacht-search'),
-            array($this, 'fb_pixel_id_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_analytics_settings'
-        );
-        
-        register_setting('yolo-yacht-search', 'yolo_fb_access_token');
-        add_settings_field(
-            'yolo_fb_access_token',
-            __('Facebook Access Token (for Conversions API)', 'yolo-yacht-search'),
-            array($this, 'fb_access_token_callback'),
-            'yolo-yacht-search',
-            'yolo_ys_analytics_settings'
-        );
         
         register_setting('yolo-yacht-search', 'yolo_default_og_image');
         add_settings_field(
@@ -599,32 +564,9 @@ class YOLO_YS_Admin {
     
     // Analytics & SEO Callbacks
     public function analytics_settings_callback() {
-        echo '<p>' . __('Configure Google Analytics 4, Facebook Pixel, and SEO settings for tracking and social sharing.', 'yolo-yacht-search') . '</p>';
+        echo '<p>' . __('Configure SEO settings for social sharing. Note: GA4 and Facebook Pixel base tracking should be managed by your site-wide analytics plugin. This plugin provides custom yacht booking events that integrate with your existing tracking.', 'yolo-yacht-search') . '</p>';
     }
     
-    public function ga4_measurement_id_callback() {
-        $value = get_option('yolo_ga4_measurement_id', '');
-        echo '<input type="text" name="yolo_ga4_measurement_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="G-XXXXXXXXXX" />';
-        echo '<p class="description">' . __('Your Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX). Find it in GA4 Admin > Data Streams.', 'yolo-yacht-search') . '</p>';
-    }
-    
-    public function ga4_api_secret_callback() {
-        $value = get_option('yolo_ga4_api_secret', '');
-        echo '<input type="text" name="yolo_ga4_api_secret" value="' . esc_attr($value) . '" class="regular-text" placeholder="xxxxxxxxxxxxxxxx" />';
-        echo '<p class="description">' . __('GA4 API Secret for server-side purchase tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.', 'yolo-yacht-search') . '</p>';
-    }
-    
-    public function fb_pixel_id_callback() {
-        $value = get_option('yolo_fb_pixel_id', '');
-        echo '<input type="text" name="yolo_fb_pixel_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="1234567890123456" />';
-        echo '<p class="description">' . __('Your Facebook Pixel ID (15-16 digits). Find it in Facebook Events Manager.', 'yolo-yacht-search') . '</p>';
-    }
-    
-    public function fb_access_token_callback() {
-        $value = get_option('yolo_fb_access_token', '');
-        echo '<input type="text" name="yolo_fb_access_token" value="' . esc_attr($value) . '" class="regular-text" placeholder="EAAxxxx" />';
-        echo '<p class="description">' . __('Facebook Access Token for Conversions API (server-side purchase tracking). Generate in Events Manager > Settings > Conversions API.', 'yolo-yacht-search') . '</p>';
-    }
     
     public function default_og_image_callback() {
         $value = get_option('yolo_default_og_image', '');

@@ -1,6 +1,20 @@
 /**
  * YOLO Yacht Search - Client-Side Analytics
  * @since 41.19
+ * @updated 41.25 - Removed GA4/FB Pixel initialization (handled by site-wide plugin)
+ *                  Kept 7 custom yacht booking funnel events that integrate with existing tracking
+ * 
+ * IMPORTANT: This script assumes GA4 gtag() and Facebook Pixel fbq() are already loaded
+ * by your site-wide analytics plugin (e.g., Site Kit, MonsterInsights, PixelYourSite).
+ * 
+ * Custom Events Tracked:
+ * 1. search - User searches for yachts
+ * 2. view_item - User views yacht details page
+ * 3. add_to_cart - User selects a week/price
+ * 4. begin_checkout - User clicks "Book Now"
+ * 5. add_payment_info - User submits booking form
+ * 6. generate_lead - User requests a quote
+ * 7. purchase - Booking completed (triggered from Stripe webhook)
  */
 (function($) {
     'use strict';
@@ -11,17 +25,29 @@
         if (config.debug_mode) console.log('[YOLO Analytics]', ...args);
     }
     
-    function hasGA4() { return typeof gtag === 'function' && config.ga4_id; }
-    function hasFB() { return typeof fbq === 'function' && config.fb_pixel_id; }
+    // Check if external plugins have loaded GA4/FB Pixel
+    function hasGA4() { 
+        return typeof gtag === 'function'; 
+    }
+    
+    function hasFB() { 
+        return typeof fbq === 'function'; 
+    }
     
     function trackGA4(event, params = {}) {
-        if (!hasGA4()) return;
+        if (!hasGA4()) {
+            debug('GA4 not available - ensure gtag() is loaded by site-wide analytics plugin');
+            return;
+        }
         debug('GA4:', event, params);
         gtag('event', event, params);
     }
     
     function trackFB(event, params = {}) {
-        if (!hasFB()) return;
+        if (!hasFB()) {
+            debug('Facebook Pixel not available - ensure fbq() is loaded by site-wide analytics plugin');
+            return;
+        }
         debug('FB:', event, params);
         fbq('track', event, params);
     }
@@ -38,7 +64,10 @@
     
     window.YoloAnalytics = {
         init: function() {
-            debug('Initializing...');
+            debug('Initializing custom yacht booking events...');
+            if (!hasGA4() && !hasFB()) {
+                debug('WARNING: Neither GA4 nor Facebook Pixel detected. Install site-wide analytics plugin.');
+            }
             this.autoTrack();
             this.bindEvents();
         },
@@ -148,6 +177,7 @@
     };
     
     $(document).ready(function() {
-        if (config.ga4_id || config.fb_pixel_id) YoloAnalytics.init();
+        // Always initialize - custom events will use external GA4/FB Pixel
+        YoloAnalytics.init();
     });
 })(jQuery);
