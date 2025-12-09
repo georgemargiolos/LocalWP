@@ -110,10 +110,25 @@ $form_id = 'yolo-contact-form-' . uniqid();
 </div>
 
 <style>
-/* Additional styling specific to YOLO contact form */
+/* YOLO Contact Form - Standalone Styles (No CF7 dependency) */
 .yolo-contact-form-wrapper {
     max-width: 700px;
     margin: 0 auto;
+}
+
+.yolo-contact-form {
+    width: 100%;
+}
+
+.yolo-contact-form p {
+    margin-bottom: 1.5em;
+}
+
+.yolo-contact-form label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: 500;
+    color: #333;
 }
 
 .yolo-contact-form .required {
@@ -126,7 +141,55 @@ $form_id = 'yolo-contact-form-' . uniqid();
     position: relative;
 }
 
-/* Submit button loading state */
+/* Form Controls */
+.yolo-contact-form .wpcf7-form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.yolo-contact-form .wpcf7-form-control:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.1);
+}
+
+.yolo-contact-form .wpcf7-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Submit Button */
+.yolo-contact-form .wpcf7-submit {
+    background: linear-gradient(135deg, #0073aa, #005a87);
+    color: #fff;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 150px;
+}
+
+.yolo-contact-form .wpcf7-submit:hover {
+    background: linear-gradient(135deg, #005a87, #004a6f);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 115, 170, 0.3);
+}
+
+.yolo-contact-form .wpcf7-submit.is-loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 .yolo-contact-form .wpcf7-submit.is-loading .submit-text {
     display: none;
 }
@@ -135,9 +198,38 @@ $form_id = 'yolo-contact-form-' . uniqid();
     display: inline !important;
 }
 
-.yolo-contact-form .wpcf7-submit.is-loading {
-    opacity: 0.7;
-    cursor: not-allowed;
+/* Validation Errors */
+.yolo-contact-form .wpcf7-not-valid {
+    border-color: #dc3232 !important;
+}
+
+.yolo-contact-form .wpcf7-not-valid-tip {
+    display: block;
+    color: #dc3232;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Response Messages */
+.yolo-contact-form .wpcf7-response-output {
+    margin-top: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    font-size: 15px;
+    animation: slideDown 0.3s ease;
+}
+
+.yolo-contact-form .wpcf7-mail-sent-ok {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.yolo-contact-form .wpcf7-mail-sent-ng,
+.yolo-contact-form .wpcf7-validation-errors {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
 }
 
 /* Success animation */
@@ -152,8 +244,15 @@ $form_id = 'yolo-contact-form-' . uniqid();
     }
 }
 
-.yolo-contact-form .wpcf7-response-output {
-    animation: slideDown 0.3s ease;
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .yolo-contact-form .wpcf7-form-control {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .yolo-contact-form .wpcf7-submit {
+        width: 100%;
+    }
 }
 </style>
 

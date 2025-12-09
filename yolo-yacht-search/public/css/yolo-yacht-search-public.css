@@ -1,6 +1,7 @@
 /* YOLO Yacht Search - Public Styles */
 /* v30.0 - Removed aggressive font wildcards that broke layouts */
 /* Fonts are inherited from WordPress theme automatically */
+/* v41.28 - Removed duplicate .yolo-ys-search-widget styles (already in yacht-search/style.css) */
 
 /* Import block styles */
 @import url('../blocks/yacht-search/style.css');
@@ -61,38 +62,9 @@
     }
 }
 
-/* ============================================
-   SEARCH WIDGET BOX STYLING
-   Added in v17.14 - Visible box around search criteria
-   ============================================ */
-
-.yolo-ys-search-widget {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    padding: 20px;
-    background: #ffffff;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.yolo-ys-search-form {
-    display: flex;
-    gap: 15px;
-    align-items: stretch;
-    background: transparent;
-    padding: 0;
-}
-
-@media (max-width: 768px) {
-    .yolo-ys-search-widget {
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-    
-    .yolo-ys-search-form {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
+/* NOTE: .yolo-ys-search-widget styles are defined in:
+   ../blocks/yacht-search/style.css (imported above)
+   
+   To change the search widget background, edit:
+   public/blocks/yacht-search/style.css lines 3-12
+*/

@@ -331,7 +331,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             
             <!-- Location Map -->
             <?php if ($yacht->home_base): ?>
-            <div class="yacht-map-section">
+            <div id="yacht-map-section" class="yacht-map-section">
                 <h3><i class="fa-solid fa-map-location-dot"></i> <?php yolo_ys_text_e('location', 'Location'); ?></h3>
                 <div class="map-container">
                     <?php 
