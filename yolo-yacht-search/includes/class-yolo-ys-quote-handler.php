@@ -66,6 +66,17 @@ class YOLO_YS_Quote_Handler {
         if ($result) {
             $quote_id = $wpdb->insert_id;
             
+            // Track lead generation event (server-side Facebook Conversions API)
+            if (function_exists('yolo_analytics')) {
+                $user_data = array(
+                    'email' => $email,
+                    'phone' => $phone,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name
+                );
+                yolo_analytics()->track_generate_lead(0, $user_data);
+            }
+            
             // Trigger notifications
             $this->trigger_notifications($quote_id, $data);
             

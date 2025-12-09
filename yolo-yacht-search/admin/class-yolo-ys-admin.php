@@ -421,6 +421,25 @@ class YOLO_YS_Admin {
             'yolo-yacht-search',
             'yolo_ys_analytics_settings'
         );
+        
+        // Facebook Conversions API Settings
+        register_setting('yolo-yacht-search', 'yolo_ys_fb_pixel_id');
+        add_settings_field(
+            'yolo_ys_fb_pixel_id',
+            __('Facebook Pixel ID', 'yolo-yacht-search'),
+            array($this, 'fb_pixel_id_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_fb_access_token');
+        add_settings_field(
+            'yolo_ys_fb_access_token',
+            __('Facebook Conversions API Access Token', 'yolo-yacht-search'),
+            array($this, 'fb_access_token_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
     }
     
     // Section Callbacks
@@ -564,7 +583,8 @@ class YOLO_YS_Admin {
     
     // Analytics & SEO Callbacks
     public function analytics_settings_callback() {
-        echo '<p>' . __('Configure SEO settings for social sharing. Note: GA4 and Facebook Pixel base tracking should be managed by your site-wide analytics plugin. This plugin provides custom yacht booking events that integrate with your existing tracking.', 'yolo-yacht-search') . '</p>';
+        echo '<p>' . __('Configure SEO and tracking settings. This plugin sends custom yacht booking events to both Google Analytics 4 (via GTM) and Facebook Conversions API (server-side).', 'yolo-yacht-search') . '</p>';
+        echo '<p><strong>' . __('Facebook Conversions API:', 'yolo-yacht-search') . '</strong> ' . __('Server-side tracking for better data quality and attribution. Events are sent directly from your WordPress server to Facebook, bypassing browser limitations.', 'yolo-yacht-search') . '</p>';
     }
     
     
@@ -590,6 +610,20 @@ class YOLO_YS_Admin {
         $value = get_option('yolo_enable_debug_mode', '0');
         echo '<input type="checkbox" name="yolo_enable_debug_mode" value="1" ' . checked('1', $value, false) . ' />';
         echo '<label>' . __('Enable debug mode (shows analytics events in browser console and logs server-side events)', 'yolo-yacht-search') . '</label>';
+    }
+    
+    public function fb_pixel_id_callback() {
+        $value = get_option('yolo_ys_fb_pixel_id', '');
+        echo '<input type="text" name="yolo_ys_fb_pixel_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="1896226957957033" />';
+        echo '<p class="description">' . __('Your Facebook Pixel ID (15-16 digits). Find it in Facebook Events Manager.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function fb_access_token_callback() {
+        $value = get_option('yolo_ys_fb_access_token', '');
+        echo '<textarea name="yolo_ys_fb_access_token" rows="3" class="large-text code" placeholder="EAAc8FRZAYvDs...">' . esc_textarea($value) . '</textarea>';
+        echo '<p class="description">' . __('Your Facebook Conversions API Access Token. Generate it in Facebook Events Manager > Settings > Conversions API.', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description"><strong>' . __('Events tracked server-side:', 'yolo-yacht-search') . '</strong> ViewContent (yacht view), Lead (quote request), Purchase (booking completed)</p>';
+        echo '<p class="description"><strong>' . __('Events tracked client-side:', 'yolo-yacht-search') . '</strong> Search, AddToCart (week selection), InitiateCheckout (book now), AddPaymentInfo (form submission)</p>';
     }
     
     /**

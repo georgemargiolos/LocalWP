@@ -309,6 +309,29 @@ class YOLO_YS_Stripe {
         
         $booking_id = $wpdb->insert_id;
         
+        // Track purchase event (server-side Facebook Conversions API)
+        if (function_exists('yolo_analytics')) {
+            // Parse customer name
+            $name_parts = explode(' ', $customer_name, 2);
+            $first_name = isset($name_parts[0]) ? $name_parts[0] : '';
+            $last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+            
+            $user_data = array(
+                'email' => $customer_email,
+                'phone' => isset($session['metadata']['customer_phone']) ? $session['metadata']['customer_phone'] : '',
+                'first_name' => $first_name,
+                'last_name' => $last_name
+            );
+            
+            yolo_analytics()->track_purchase(
+                $session['id'],
+                $yacht_id,
+                floatval($total_price),
+                $yacht_name,
+                $user_data
+            );
+        }
+        
         // Create guest user account
         $this->create_guest_user($booking_id, $customer_email, $customer_name, $session['id']);
         

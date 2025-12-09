@@ -3,18 +3,21 @@
  * @since 41.19
  * @updated 41.25 - Removed GA4/FB Pixel initialization (handled by site-wide plugin)
  * @updated 41.26 - Switched to dataLayer.push() for proper Google Tag Manager integration
+ * @updated 41.27 - Added Facebook Pixel event deduplication with server-side CAPI
  * 
- * IMPORTANT: This script pushes events to the dataLayer for Google Tag Manager.
- * You need to configure GTM to capture these events and send them to GA4/Facebook Pixel.
+ * IMPORTANT: This script works in conjunction with server-side Facebook Conversions API.
+ * - Server-side events (ViewContent, Lead, Purchase) are sent from PHP
+ * - Client-side events (AddToCart, InitiateCheckout, AddPaymentInfo, Search) are sent here
+ * - All events use event_id for deduplication to prevent double-counting
  * 
  * Custom Events Tracked (7 total):
- * 1. search - User searches for yachts
- * 2. view_item - User views yacht details page
- * 3. add_to_cart - User selects a week/price
- * 4. begin_checkout - User clicks "Book Now"
- * 5. add_payment_info - User submits booking form
- * 6. generate_lead - User requests a quote
- * 7. purchase - Booking completed (triggered from Stripe webhook)
+ * 1. search - User searches for yachts (client-side)
+ * 2. view_item - User views yacht details page (server-side ViewContent)
+ * 3. add_to_cart - User selects a week/price (client-side AddToCart)
+ * 4. begin_checkout - User clicks "Book Now" (client-side InitiateCheckout)
+ * 5. add_payment_info - User submits booking form (client-side AddPaymentInfo)
+ * 6. generate_lead - User requests a quote (server-side Lead)
+ * 7. purchase - Booking completed (server-side Purchase from Stripe webhook)
  */
 (function($) {
     'use strict';
@@ -26,6 +29,14 @@
     
     function debug(...args) {
         if (config.debug_mode) console.log('[YOLO Analytics]', ...args);
+    }
+    
+    /**
+     * Generate unique event ID for Facebook deduplication
+     * @returns {string} Unique event ID
+     */
+    function generateEventId() {
+        return 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
     
     /**
@@ -44,6 +55,29 @@
     }
     
     /**
+     * Send event to Facebook Pixel with deduplication
+     * @param {string} eventName - Facebook event name (e.g., 'AddToCart', 'InitiateCheckout')
+     * @param {object} params - Event parameters
+     * @param {string} eventId - Event ID for deduplication (optional, will be generated if not provided)
+     */
+    function sendToFacebookPixel(eventName, params = {}, eventId = null) {
+        // Check if Facebook Pixel is loaded
+        if (typeof fbq !== 'function') {
+            debug('Facebook Pixel not loaded, skipping event:', eventName);
+            return;
+        }
+        
+        // Generate event ID if not provided
+        if (!eventId) {
+            eventId = generateEventId();
+        }
+        
+        // Send to Facebook Pixel with event ID for deduplication
+        debug('fbq track:', eventName, params, 'eventID:', eventId);
+        fbq('track', eventName, params, {eventID: eventId});
+    }
+    
+    /**
      * Get yacht data from current page
      */
     function getYachtData() {
@@ -58,13 +92,14 @@
     
     window.YoloAnalytics = {
         init: function() {
-            debug('Initializing custom yacht booking events for GTM...');
+            debug('Initializing custom yacht booking events...');
             this.autoTrack();
             this.bindEvents();
         },
         
         autoTrack: function() {
             // Auto-track view_item on yacht details pages
+            // Note: ViewContent is sent server-side, we only send to dataLayer for GA4
             if ($('.yolo-yacht-details, .yolo-yacht-details-v3').length) {
                 const yacht = getYachtData();
                 if (yacht.id) this.trackViewYacht(yacht);
@@ -97,6 +132,7 @@
             });
             
             // Quote request (generate lead)
+            // Note: Lead is sent server-side, we only send to dataLayer for GA4
             $(document).on('submit', '.quote-form, #quote-request-form', function() {
                 self.trackQuoteRequest(getYachtData());
             });
@@ -104,17 +140,26 @@
         
         /**
          * Track search event
+         * Sent client-side to Facebook Pixel
          */
         trackSearch: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('search', {
                 search_term: p.search_term || ''
+            });
+            
+            // Send to Facebook Pixel
+            sendToFacebookPixel('Search', {
+                search_string: p.search_term || ''
             });
         },
         
         /**
          * Track yacht view (view_item)
+         * Server-side ViewContent is sent from PHP, this only sends to dataLayer for GA4
          */
         trackViewYacht: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('view_item', {
                 currency: p.currency,
                 value: p.price,
@@ -124,12 +169,17 @@
                     price: p.price
                 }]
             });
+            
+            // Note: ViewContent is sent server-side with better user data
+            // No need to send client-side to avoid duplication
         },
         
         /**
          * Track week selection (add_to_cart)
+         * Sent client-side to Facebook Pixel
          */
         trackSelectWeek: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('add_to_cart', {
                 currency: p.currency,
                 value: p.price,
@@ -139,12 +189,23 @@
                     price: p.price
                 }]
             });
+            
+            // Send to Facebook Pixel
+            sendToFacebookPixel('AddToCart', {
+                content_type: 'product',
+                content_ids: [String(p.id)],
+                content_name: p.name,
+                currency: p.currency,
+                value: p.price
+            });
         },
         
         /**
          * Track begin checkout
+         * Sent client-side to Facebook Pixel
          */
         trackBeginCheckout: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('begin_checkout', {
                 currency: p.currency,
                 value: p.price,
@@ -154,12 +215,23 @@
                     price: p.price
                 }]
             });
+            
+            // Send to Facebook Pixel
+            sendToFacebookPixel('InitiateCheckout', {
+                content_type: 'product',
+                content_ids: [String(p.id)],
+                content_name: p.name,
+                currency: p.currency,
+                value: p.price
+            });
         },
         
         /**
          * Track payment info added
+         * Sent client-side to Facebook Pixel
          */
         trackAddPaymentInfo: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('add_payment_info', {
                 currency: p.currency,
                 value: p.price,
@@ -169,22 +241,38 @@
                     price: p.price
                 }]
             });
-        },
-        
-        /**
-         * Track quote request (generate_lead)
-         */
-        trackQuoteRequest: function(p) {
-            pushToDataLayer('generate_lead', {
+            
+            // Send to Facebook Pixel
+            sendToFacebookPixel('AddPaymentInfo', {
+                content_type: 'product',
+                content_ids: [String(p.id)],
+                content_name: p.name,
                 currency: p.currency,
                 value: p.price
             });
         },
         
         /**
+         * Track quote request (generate_lead)
+         * Server-side Lead is sent from PHP, this only sends to dataLayer for GA4
+         */
+        trackQuoteRequest: function(p) {
+            // Send to dataLayer for GA4
+            pushToDataLayer('generate_lead', {
+                currency: p.currency,
+                value: p.price
+            });
+            
+            // Note: Lead is sent server-side with user data (email, phone, name)
+            // No need to send client-side to avoid duplication
+        },
+        
+        /**
          * Track purchase (called from server-side after Stripe payment)
+         * Server-side Purchase is sent from PHP, this only sends to dataLayer for GA4
          */
         trackPurchase: function(p) {
+            // Send to dataLayer for GA4
             pushToDataLayer('purchase', {
                 transaction_id: p.transaction_id,
                 currency: p.currency,
@@ -195,6 +283,9 @@
                     price: p.value
                 }]
             });
+            
+            // Note: Purchase is sent server-side with user data and better attribution
+            // No need to send client-side to avoid duplication
         }
     };
     

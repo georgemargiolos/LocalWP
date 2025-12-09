@@ -1,14 +1,22 @@
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 41.26 📊  
+**Version:** 41.27 📊  
 **Last Updated:** December 9, 2025 GMT+2  
 **WordPress Plugin for Yacht Charter Search and Booking**
 
 ---
 
-## 📊 What's New in v41.26 - Google Tag Manager Integration
+## 🚀 What's New in v41.27 - Facebook Conversions API (Server-Side Tracking)
 
-This version switches from direct analytics calls to **dataLayer.push()** for proper Google Tag Manager integration. All 7 custom yacht booking events now flow through GTM for full visibility, control, and flexibility.
+This version implements **true server-side Facebook Conversions API** tracking following Facebook's official best practices. Events are sent directly from your WordPress server to Facebook, providing superior data quality, better attribution, and cannot be blocked by browser ad blockers.
+
+### Major Features:
+
+1. ✅ **Server-Side Tracking** - 3 critical events sent from WordPress server
+2. ✅ **Event Deduplication** - Unique event_id prevents double-counting
+3. ✅ **User Data Hashing** - SHA-256 encryption for privacy compliance
+4. ✅ **High Match Quality** - 8-10/10 score with comprehensive user data
+5. ✅ **Non-Blocking** - Async requests won't slow down your site
 
 ### Key Changes:
 
@@ -73,7 +81,16 @@ All yacht details page text is now customizable via WordPress admin.
 
 ## 🔥 Recent Versions Highlights
 
-### v41.26 - Google Tag Manager Integration (CURRENT)
+### v41.27 - Facebook Conversions API (CURRENT)
+- Implemented true server-side Facebook Conversions API
+- 3 events sent server-side (ViewContent, Lead, Purchase)
+- 4 events sent client-side (Search, AddToCart, InitiateCheckout, AddPaymentInfo)
+- Event deduplication with unique event_id
+- User data hashing (email, phone, names)
+- High event match quality (8-10/10)
+- Added admin settings for Pixel ID and Access Token
+
+### v41.26 - Google Tag Manager Integration
 - Switched to dataLayer.push() for all events
 - Removed direct gtag()/fbq() calls
 - Added GTM compatibility
@@ -213,7 +230,7 @@ All yacht details page text is now customizable via WordPress admin.
 
 ## 📦 Installation
 
-1. Download `yolo-yacht-search-v41.21.zip`
+1. Download `yolo-yacht-search-v41.27.zip`
 2. Upload to WordPress via Plugins → Add New → Upload
 3. Activate plugin
 4. Configure settings:
