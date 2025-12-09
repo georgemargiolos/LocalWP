@@ -913,7 +913,7 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success && response.data && response.data.length > 0) {
                     console.log('Check-Out: Loaded ' + response.data.length + ' check-outs');
-                    let html = '<table class="yolo-bm-table"><thead><tr>';
+                    let html = '<div class="yolo-table-responsive-wrapper"><table class="yolo-bm-table"><thead><tr>';
                     html += '<th>ID</th><th>Booking</th><th>Yacht</th><th>Date</th><th>Status</th><th>Actions</th>';
                     html += '</tr></thead><tbody>';
                     
@@ -938,7 +938,7 @@ jQuery(document).ready(function($) {
                         html += '</tr>';
                     });
                     
-                    html += '</tbody></table>';
+                    html += '</tbody></table></div>';
                     $('#checkout-list').html(html);
                 } else {
                     console.log('Check-Out: No check-outs found');

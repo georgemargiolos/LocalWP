@@ -88,6 +88,7 @@ $responded_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE status
     </div>
     
     <!-- Messages Table -->
+    <div class="yolo-table-responsive-wrapper">
     <?php if (empty($messages)): ?>
         <div class="yolo-empty-state">
             <span class="dashicons dashicons-email-alt"></span>
@@ -137,9 +138,39 @@ $responded_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE status
             </tbody>
         </table>
     <?php endif; ?>
+    </div><!-- .yolo-table-responsive-wrapper -->
 </div>
 
 <style>
+/* Mobile-responsive table wrapper */
+.yolo-table-responsive-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+}
+
+.yolo-table-responsive-wrapper table {
+    min-width: 900px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 782px) {
+    .yolo-stats-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .yolo-filter-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+        flex: 1 1 45%;
+        margin: 5px;
+        text-align: center;
+    }
+}
+
 /* Statistics Dashboard */
 .yolo-stats-dashboard {
     display: grid;

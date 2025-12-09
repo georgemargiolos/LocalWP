@@ -93,6 +93,7 @@ $responded_quotes = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name} WHERE sta
     </div>
     
     <!-- Quotes Table -->
+    <div class="yolo-table-responsive-wrapper">
     <?php if (empty($quotes)): ?>
         <!-- Empty state OUTSIDE table to avoid DataTables column count error (v30.0 fix) -->
         <div class="notice notice-info" style="text-align: center; padding: 40px; margin: 20px 0;">
@@ -155,11 +156,49 @@ $responded_quotes = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name} WHERE sta
             </tbody>
         </table>
     <?php endif; ?>
+    </div><!-- .yolo-table-responsive-wrapper -->
 </div>
 
 <style>
 .yolo-quote-requests-wrapper {
     max-width: 100%;
+}
+
+/* Mobile-responsive table wrapper */
+.yolo-table-responsive-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 20px 0;
+}
+
+.yolo-table-responsive-wrapper table {
+    min-width: 900px; /* Force horizontal scroll on mobile */
+}
+
+/* Mobile optimizations */
+@media (max-width: 782px) {
+    .yolo-quote-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-box {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+    }
+    
+    .yolo-status-filter {
+        flex-wrap: wrap;
+    }
+    
+    .yolo-status-filter a {
+        flex: 1 1 45%;
+        margin: 5px;
+        text-align: center;
+    }
 }
 
 .yolo-quote-stats {
