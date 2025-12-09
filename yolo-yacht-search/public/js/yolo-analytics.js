@@ -2,12 +2,12 @@
  * YOLO Yacht Search - Client-Side Analytics
  * @since 41.19
  * @updated 41.25 - Removed GA4/FB Pixel initialization (handled by site-wide plugin)
- *                  Kept 7 custom yacht booking funnel events that integrate with existing tracking
+ * @updated 41.26 - Switched to dataLayer.push() for proper Google Tag Manager integration
  * 
- * IMPORTANT: This script assumes GA4 gtag() and Facebook Pixel fbq() are already loaded
- * by your site-wide analytics plugin (e.g., Site Kit, MonsterInsights, PixelYourSite).
+ * IMPORTANT: This script pushes events to the dataLayer for Google Tag Manager.
+ * You need to configure GTM to capture these events and send them to GA4/Facebook Pixel.
  * 
- * Custom Events Tracked:
+ * Custom Events Tracked (7 total):
  * 1. search - User searches for yachts
  * 2. view_item - User views yacht details page
  * 3. add_to_cart - User selects a week/price
@@ -21,37 +21,31 @@
     
     const config = window.yoloAnalyticsConfig || {};
     
+    // Initialize dataLayer if it doesn't exist
+    window.dataLayer = window.dataLayer || [];
+    
     function debug(...args) {
         if (config.debug_mode) console.log('[YOLO Analytics]', ...args);
     }
     
-    // Check if external plugins have loaded GA4/FB Pixel
-    function hasGA4() { 
-        return typeof gtag === 'function'; 
+    /**
+     * Push event to dataLayer for GTM
+     * @param {string} event - Event name (e.g., 'view_item', 'purchase')
+     * @param {object} params - Event parameters
+     */
+    function pushToDataLayer(event, params = {}) {
+        const eventData = {
+            event: event,
+            ...params
+        };
+        
+        debug('dataLayer.push:', eventData);
+        window.dataLayer.push(eventData);
     }
     
-    function hasFB() { 
-        return typeof fbq === 'function'; 
-    }
-    
-    function trackGA4(event, params = {}) {
-        if (!hasGA4()) {
-            debug('GA4 not available - ensure gtag() is loaded by site-wide analytics plugin');
-            return;
-        }
-        debug('GA4:', event, params);
-        gtag('event', event, params);
-    }
-    
-    function trackFB(event, params = {}) {
-        if (!hasFB()) {
-            debug('Facebook Pixel not available - ensure fbq() is loaded by site-wide analytics plugin');
-            return;
-        }
-        debug('FB:', event, params);
-        fbq('track', event, params);
-    }
-    
+    /**
+     * Get yacht data from current page
+     */
     function getYachtData() {
         const urlParams = new URLSearchParams(window.location.search);
         return {
@@ -64,15 +58,13 @@
     
     window.YoloAnalytics = {
         init: function() {
-            debug('Initializing custom yacht booking events...');
-            if (!hasGA4() && !hasFB()) {
-                debug('WARNING: Neither GA4 nor Facebook Pixel detected. Install site-wide analytics plugin.');
-            }
+            debug('Initializing custom yacht booking events for GTM...');
             this.autoTrack();
             this.bindEvents();
         },
         
         autoTrack: function() {
+            // Auto-track view_item on yacht details pages
             if ($('.yolo-yacht-details, .yolo-yacht-details-v3').length) {
                 const yacht = getYachtData();
                 if (yacht.id) this.trackViewYacht(yacht);
@@ -87,97 +79,127 @@
                 self.trackSearch({ search_term: $(this).find('input[name="search"]').val() });
             });
             
-            // Week selection
+            // Week selection (add to cart)
             $(document).on('click', '.week-price-card, .price-carousel-item', function() {
                 const yacht = getYachtData();
                 yacht.price = parseFloat($(this).find('.price').text().replace(/[^\d.]/g, '')) || yacht.price;
                 self.trackSelectWeek(yacht);
             });
             
-            // Book Now
+            // Book Now (begin checkout)
             $(document).on('click', '#bookNowBtn, .book-now-btn', function() {
                 self.trackBeginCheckout(getYachtData());
             });
             
-            // Booking form
+            // Booking form submission (add payment info)
             $(document).on('submit', '#booking-form, .yolo-booking-form', function() {
                 self.trackAddPaymentInfo(getYachtData());
             });
             
-            // Quote
+            // Quote request (generate lead)
             $(document).on('submit', '.quote-form, #quote-request-form', function() {
                 self.trackQuoteRequest(getYachtData());
             });
         },
         
+        /**
+         * Track search event
+         */
         trackSearch: function(p) {
-            trackGA4('search', { search_term: p.search_term || '' });
-            trackFB('Search', { search_string: p.search_term || '' });
+            pushToDataLayer('search', {
+                search_term: p.search_term || ''
+            });
         },
         
+        /**
+         * Track yacht view (view_item)
+         */
         trackViewYacht: function(p) {
-            trackGA4('view_item', {
-                currency: p.currency, value: p.price,
-                items: [{ item_id: String(p.id), item_name: p.name, price: p.price }]
-            });
-            trackFB('ViewContent', {
-                content_type: 'product', content_ids: [String(p.id)],
-                content_name: p.name, currency: p.currency, value: p.price
+            pushToDataLayer('view_item', {
+                currency: p.currency,
+                value: p.price,
+                items: [{
+                    item_id: String(p.id),
+                    item_name: p.name,
+                    price: p.price
+                }]
             });
         },
         
+        /**
+         * Track week selection (add_to_cart)
+         */
         trackSelectWeek: function(p) {
-            trackGA4('add_to_cart', {
-                currency: p.currency, value: p.price,
-                items: [{ item_id: String(p.id), item_name: p.name, price: p.price }]
-            });
-            trackFB('AddToCart', {
-                content_type: 'product', content_ids: [String(p.id)],
-                currency: p.currency, value: p.price
+            pushToDataLayer('add_to_cart', {
+                currency: p.currency,
+                value: p.price,
+                items: [{
+                    item_id: String(p.id),
+                    item_name: p.name,
+                    price: p.price
+                }]
             });
         },
         
+        /**
+         * Track begin checkout
+         */
         trackBeginCheckout: function(p) {
-            trackGA4('begin_checkout', {
-                currency: p.currency, value: p.price,
-                items: [{ item_id: String(p.id), item_name: p.name, price: p.price }]
-            });
-            trackFB('InitiateCheckout', {
-                content_type: 'product', content_ids: [String(p.id)],
-                currency: p.currency, value: p.price
+            pushToDataLayer('begin_checkout', {
+                currency: p.currency,
+                value: p.price,
+                items: [{
+                    item_id: String(p.id),
+                    item_name: p.name,
+                    price: p.price
+                }]
             });
         },
         
+        /**
+         * Track payment info added
+         */
         trackAddPaymentInfo: function(p) {
-            trackGA4('add_payment_info', {
-                currency: p.currency, value: p.price,
-                items: [{ item_id: String(p.id), item_name: p.name, price: p.price }]
-            });
-            trackFB('AddPaymentInfo', {
-                content_type: 'product', content_ids: [String(p.id)],
-                currency: p.currency, value: p.price
+            pushToDataLayer('add_payment_info', {
+                currency: p.currency,
+                value: p.price,
+                items: [{
+                    item_id: String(p.id),
+                    item_name: p.name,
+                    price: p.price
+                }]
             });
         },
         
+        /**
+         * Track quote request (generate_lead)
+         */
         trackQuoteRequest: function(p) {
-            trackGA4('generate_lead', { currency: p.currency, value: p.price });
-            trackFB('Lead', { content_ids: [String(p.id)], currency: p.currency, value: p.price });
+            pushToDataLayer('generate_lead', {
+                currency: p.currency,
+                value: p.price
+            });
         },
         
+        /**
+         * Track purchase (called from server-side after Stripe payment)
+         */
         trackPurchase: function(p) {
-            trackGA4('purchase', {
-                transaction_id: p.transaction_id, currency: p.currency, value: p.value,
-                items: [{ item_id: String(p.yacht_id), item_name: p.yacht_name, price: p.value }]
-            });
-            trackFB('Purchase', {
-                content_type: 'product', content_ids: [String(p.yacht_id)],
-                currency: p.currency, value: p.value
+            pushToDataLayer('purchase', {
+                transaction_id: p.transaction_id,
+                currency: p.currency,
+                value: p.value,
+                items: [{
+                    item_id: String(p.yacht_id),
+                    item_name: p.yacht_name,
+                    price: p.value
+                }]
             });
         }
     };
     
+    // Initialize on document ready
     $(document).ready(function() {
-        // Always initialize - custom events will use external GA4/FB Pixel
         YoloAnalytics.init();
     });
 })(jQuery);
