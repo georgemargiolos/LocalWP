@@ -174,23 +174,19 @@
 
 .yolo-yacht-details-v3 .yacht-image-swiper {
     width: 100%;
-    height: clamp(250px, 50vw, 550px);
-}
-
-@media (min-width: 768px) {
-    .yolo-yacht-details-v3 .yacht-image-swiper {
-        height: clamp(350px, 45vw, 550px);
-    }
+    aspect-ratio: 3 / 2;
 }
 
 .yolo-yacht-details-v3 .yacht-image-swiper .swiper-slide {
     overflow: hidden;
+    aspect-ratio: 3 / 2;
 }
 
 .yolo-yacht-details-v3 .yacht-image-swiper .swiper-slide img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    object-position: center;
     display: block;
 }
 

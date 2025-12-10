@@ -175,7 +175,7 @@ article .yolo-ys-search-results {
 
 .yolo-ys-yacht-image {
     width: 100% !important;
-    height: 240px !important;
+    aspect-ratio: 3 / 2 !important;
     overflow: hidden !important;
     background: #f3f4f6 !important;
     position: relative !important;
@@ -185,7 +185,8 @@ article .yolo-ys-search-results {
 .yolo-ys-yacht-image img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
+    object-position: center !important;
     transition: transform 0.3s ease !important;
     display: block !important;
 }
