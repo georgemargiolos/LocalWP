@@ -25,12 +25,18 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
     $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
     $min_price = class_exists('YOLO_YS_Database_Prices') ? YOLO_YS_Database_Prices::get_min_price($yacht->id) : null;
     
-    // Prepare description with read more
+    // Prepare description with read more (responsive word count)
     $full_description = wp_strip_all_tags($yacht->description);
     $description_words = str_word_count($full_description, 1);
     $word_count = count($description_words);
-    $trimmed_description = wp_trim_words($full_description, 100, '');
-    $needs_read_more = $word_count > 100;
+    
+    // Desktop: 100 words, Mobile: 50 words
+    $desktop_words = 100;
+    $mobile_words = 50;
+    $trimmed_description_desktop = wp_trim_words($full_description, $desktop_words, '');
+    $trimmed_description_mobile = wp_trim_words($full_description, $mobile_words, '');
+    $needs_read_more_desktop = $word_count > $desktop_words;
+    $needs_read_more_mobile = $word_count > $mobile_words;
 ?>
 <div class="yolo-hyc-card">
     <div class="yolo-hyc-images">
@@ -51,18 +57,23 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
         <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yolo-hyc-logo">
     </div>
     <div class="yolo-hyc-content">
-        <h2 class="yolo-hyc-name">
-            <?php echo esc_html($yacht->name); ?>
-            <?php if (!empty($yacht->home_base)): ?>
-                <span class="yolo-hyc-separator">|</span>
-                <a href="<?php echo esc_url($details_url . '#yacht-map-section'); ?>" class="yolo-hyc-location">📍 <?php echo esc_html($yacht->home_base); ?></a>
-            <?php endif; ?>
-        </h2>
+        <h2 class="yolo-hyc-name"><?php echo esc_html($yacht->name); ?></h2>
+        <?php if (!empty($yacht->home_base)): ?>
+        <div class="yolo-hyc-location-line">
+            <a href="<?php echo esc_url($details_url . '#yacht-map-section'); ?>" class="yolo-hyc-location">📍 <?php echo esc_html($yacht->home_base); ?></a>
+        </div>
+        <?php endif; ?>
         <h4 class="yolo-hyc-model"><?php echo esc_html($yacht->model); ?></h4>
         <?php if (!empty($yacht->description)): ?>
-        <p class="yolo-hyc-desc">
-            <?php echo esc_html($trimmed_description); ?>
-            <?php if ($needs_read_more): ?>
+        <p class="yolo-hyc-desc yolo-hyc-desc-desktop">
+            <?php echo esc_html($trimmed_description_desktop); ?>
+            <?php if ($needs_read_more_desktop): ?>
+                <a href="<?php echo esc_url($details_url); ?>" class="yolo-hyc-read-more">Read more...</a>
+            <?php endif; ?>
+        </p>
+        <p class="yolo-hyc-desc yolo-hyc-desc-mobile">
+            <?php echo esc_html($trimmed_description_mobile); ?>
+            <?php if ($needs_read_more_mobile): ?>
                 <a href="<?php echo esc_url($details_url); ?>" class="yolo-hyc-read-more">Read more...</a>
             <?php endif; ?>
         </p>

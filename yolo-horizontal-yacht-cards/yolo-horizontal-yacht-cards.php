@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Horizontal Yacht Cards
  * Plugin URI: https://yolo-charters.com
  * Description: Display YOLO company yachts in horizontal cards with image carousel. Requires YOLO Yacht Search & Booking plugin.
- * Version: 55.1
+ * Version: 55.2
  * Author: George Margiolos
  * Author URI: https://yolo-charters.com
  * License: GPL v2 or later
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('YOLO_HYC_VERSION', '55.1');
+define('YOLO_HYC_VERSION', '55.2');
 define('YOLO_HYC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('YOLO_HYC_PLUGIN_URL', plugin_dir_url(__FILE__));
 
