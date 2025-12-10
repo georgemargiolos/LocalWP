@@ -299,6 +299,36 @@ class YOLO_YS_Database {
         
         // Delete old related data
         $wpdb->delete($this->table_products, array('yacht_id' => $yacht_id));
+        
+        // Delete old local image files before deleting database records
+        $old_images = $wpdb->get_results($wpdb->prepare(
+            "SELECT image_url, thumbnail_url FROM {$this->table_images} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        $upload_dir = wp_upload_dir();
+        $yolo_images_dir = $upload_dir['basedir'] . '/yolo-yacht-images';
+        
+        foreach ($old_images as $old_image) {
+            // Delete main image if it's a local file
+            if (!empty($old_image->image_url) && strpos($old_image->image_url, $upload_dir['baseurl']) !== false) {
+                $filename = basename($old_image->image_url);
+                $file_path = $yolo_images_dir . '/' . $filename;
+                if (file_exists($file_path)) {
+                    @unlink($file_path);
+                }
+            }
+            
+            // Delete thumbnail if it's a local file
+            if (!empty($old_image->thumbnail_url) && strpos($old_image->thumbnail_url, $upload_dir['baseurl']) !== false) {
+                $thumb_filename = basename($old_image->thumbnail_url);
+                $thumb_path = $yolo_images_dir . '/' . $thumb_filename;
+                if (file_exists($thumb_path)) {
+                    @unlink($thumb_path);
+                }
+            }
+        }
+        
         $wpdb->delete($this->table_images, array('yacht_id' => $yacht_id));
         $wpdb->delete($this->table_extras, array('yacht_id' => $yacht_id));
         $wpdb->delete($this->table_equipment, array('yacht_id' => $yacht_id));
@@ -317,17 +347,62 @@ class YOLO_YS_Database {
             }
         }
         
-        // Store images
+        // Store images - Download and save locally
         if (isset($yacht_data['images']) && is_array($yacht_data['images'])) {
+            // Create upload directory if it doesn't exist
+            $upload_dir = wp_upload_dir();
+            $yolo_images_dir = $upload_dir['basedir'] . '/yolo-yacht-images';
+            $yolo_images_url = $upload_dir['baseurl'] . '/yolo-yacht-images';
+            
+            if (!file_exists($yolo_images_dir)) {
+                wp_mkdir_p($yolo_images_dir);
+            }
+            
             foreach ($yacht_data['images'] as $index => $image) {
                 if (empty($image['url'])) {
                     continue; // Skip if no URL
                 }
                 
+                // Download image from Booking Manager CDN
+                $remote_url = $image['url'];
+                $filename = basename(parse_url($remote_url, PHP_URL_PATH));
+                $local_path = $yolo_images_dir . '/' . $filename;
+                $local_url = $yolo_images_url . '/' . $filename;
+                
+                // Download if not already exists
+                if (!file_exists($local_path)) {
+                    $image_data = @file_get_contents($remote_url);
+                    if ($image_data !== false) {
+                        file_put_contents($local_path, $image_data);
+                    } else {
+                        // If download fails, use CDN URL as fallback
+                        $local_url = $remote_url;
+                    }
+                }
+                
+                // Download thumbnail if available
+                $thumbnail_local_url = null;
+                if (!empty($image['thumbnailUrl'])) {
+                    $thumb_remote_url = $image['thumbnailUrl'];
+                    $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+                    $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
+                    $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
+                    
+                    if (!file_exists($thumb_local_path)) {
+                        $thumb_data = @file_get_contents($thumb_remote_url);
+                        if ($thumb_data !== false) {
+                            file_put_contents($thumb_local_path, $thumb_data);
+                        } else {
+                            $thumbnail_local_url = $thumb_remote_url;
+                        }
+                    }
+                }
+                
+                // Store local URL in database
                 $wpdb->insert($this->table_images, array(
                     'yacht_id' => $yacht_id,
-                    'image_url' => $image['url'],
-                    'thumbnail_url' => isset($image['thumbnailUrl']) ? $image['thumbnailUrl'] : null,
+                    'image_url' => $local_url,
+                    'thumbnail_url' => $thumbnail_local_url,
                     'is_primary' => ($index === 0) ? 1 : 0,
                     'sort_order' => $index
                 ));
