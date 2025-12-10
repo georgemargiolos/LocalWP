@@ -364,6 +364,11 @@
             ? `<img src="${boat.image_url}" alt="${boat.yacht}" loading="lazy">` 
             : '<div class="yolo-ys-yacht-placeholder">⛵</div>';
         
+        // YOLO logo for YOLO yachts
+        const yoloLogoHtml = isYolo 
+            ? '<img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yolo-ys-yacht-logo">' 
+            : '';
+        
         // Details URL
         const detailsUrl = boat.details_url || '#';
         
@@ -440,6 +445,7 @@
                     <a href="${detailsUrl}">
                         ${imageHtml}
                     </a>
+                    ${yoloLogoHtml}
                 </div>
                 <div class="yolo-ys-yacht-content">
                     <div class="yolo-ys-yacht-location">
@@ -451,7 +457,7 @@
                         ${yachtModel ? `<h4 class="yolo-ys-yacht-model">${yachtModel}</h4>` : ''}
                     </div>
                     <div class="yolo-ys-yacht-specs-grid">
-                        <div class="row g-2">
+                        <div class="row g-2 mb-2">
                             <div class="col-6">
                                 <div class="yolo-ys-spec-item">
                                     <div class="yolo-ys-spec-value">${boat.cabins || 0}</div>
@@ -466,19 +472,20 @@
                             </div>
                         </div>
                         <div class="row g-2">
-                            <div class="col-4">
+                            <div class="${boat.refit_year ? 'col-4' : 'col-6'}">
                                 <div class="yolo-ys-spec-item">
                                     <div class="yolo-ys-spec-value">${boat.year_of_build || 'N/A'}</div>
                                     <div class="yolo-ys-spec-label">BUILT YEAR</div>
                                 </div>
                             </div>
+                            ${boat.refit_year ? `
                             <div class="col-4">
                                 <div class="yolo-ys-spec-item">
-                                    <div class="yolo-ys-spec-value">${refitDisplay || ''}</div>
+                                    <div class="yolo-ys-spec-value">${refitDisplay}</div>
                                     <div class="yolo-ys-spec-label">REFIT</div>
                                 </div>
-                            </div>
-                            <div class="col-4">
+                            </div>` : ''}
+                            <div class="${boat.refit_year ? 'col-4' : 'col-6'}">
                                 <div class="yolo-ys-spec-item">
                                     <div class="yolo-ys-spec-value">${lengthFt} ft</div>
                                     <div class="yolo-ys-spec-label">LENGTH</div>

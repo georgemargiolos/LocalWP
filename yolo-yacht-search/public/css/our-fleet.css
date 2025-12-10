@@ -2,7 +2,7 @@
     max-width: 100%;
     width: 100%;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 0 20px 40px 20px; /* Removed top padding and margin */
     overflow-x: hidden; /* Prevent horizontal scroll */
     box-sizing: border-box;
 }
@@ -56,7 +56,7 @@
  */
 @media (max-width: 768px) {
     .yolo-ys-our-fleet {
-        padding: 30px 15px;
+        padding: 0 15px 30px 15px; /* Removed top padding */
     }
     
     .yolo-ys-fleet-section {
@@ -91,7 +91,7 @@
 
 @media (max-width: 480px) {
     .yolo-ys-our-fleet {
-        padding: 20px 10px;
+        padding: 0 10px 20px 10px; /* Removed top padding */
     }
     
     .yolo-ys-fleet-title {
