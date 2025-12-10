@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yolo-hyc/horizontal-yacht-cards",
+  "title": "YOLO Horizontal Yacht Cards",
+  "category": "widgets",
+  "icon": "slides",
+  "description": "Display YOLO company yachts in horizontal cards with image carousel",
+  "keywords": ["yacht", "horizontal", "carousel", "fleet", "yolo"],
+  "textdomain": "yolo-horizontal-yacht-cards",
+  "supports": {
+    "html": false,
+    "inserter": true
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}
