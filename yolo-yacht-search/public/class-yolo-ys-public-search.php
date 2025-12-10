@@ -52,6 +52,7 @@ function yolo_ys_ajax_search_yachts() {
                 y.berths,
                 y.year_of_build,
                 y.refit_year,
+                y.raw_data,
                 p.date_from,
                 p.date_to,
                 p.price,
@@ -59,7 +60,7 @@ function yolo_ys_ajax_search_yachts() {
                 p.currency,
                 p.discount_percentage as discount,
                 'Bareboat' as product,
-                (SELECT image_url FROM {$images_table} img WHERE img.yacht_id = y.id AND img.is_primary = 1 LIMIT 1) as image_url
+                (SELECT image_url FROM {$images_table} img WHERE img.yacht_id = y.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as image_url
             FROM {$yachts_table} y
             INNER JOIN {$prices_table} p ON y.id = p.yacht_id
             WHERE p.date_from >= %s 
@@ -96,6 +97,23 @@ function yolo_ys_ajax_search_yachts() {
     foreach ($results as $row) {
         // Primary image already fetched in main query to avoid N+1 problem
         $primary_image = $row->image_url;
+        
+        // Fallback: Extract from raw_data if no image in database
+        if (empty($primary_image) && !empty($row->raw_data)) {
+            $raw_data = json_decode($row->raw_data, true);
+            if (!empty($raw_data['images'])) {
+                // Find primary image or use first image
+                foreach ($raw_data['images'] as $img) {
+                    if (!empty($img['primary']) && $img['primary']) {
+                        $primary_image = $img['url'];
+                        break;
+                    }
+                }
+                if (empty($primary_image) && !empty($raw_data['images'][0]['url'])) {
+                    $primary_image = $raw_data['images'][0]['url'];
+                }
+            }
+        }
         
         // Build details URL with search dates
         $search_week_from = date('Y-m-d', strtotime($row->date_from));

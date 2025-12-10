@@ -87,8 +87,8 @@ class YOLO_YS_Admin_Bookings_Manager {
         }
         
         if (!empty($_GET['yacht_id'])) {
-            $where[] = 'yacht_id = %d';
-            $where_values[] = intval($_GET['yacht_id']);
+            $where[] = 'yacht_id = %s';
+            $where_values[] = sanitize_text_field($_GET['yacht_id']);
         }
         
         $where_clause = implode(' AND ', $where);

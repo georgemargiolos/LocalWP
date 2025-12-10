@@ -565,7 +565,7 @@ class YOLO_YS_Base_Manager {
         $table_name = $wpdb->prefix . 'yolo_bm_equipment_categories';
         
         $categories = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE yacht_id = %d ORDER BY category_name ASC",
+            "SELECT * FROM $table_name WHERE yacht_id = %s ORDER BY category_name ASC",
             $yacht_id
         ));
         
@@ -1040,7 +1040,7 @@ class YOLO_YS_Base_Manager {
         
         if ($yacht_id > 0) {
             $items = $wpdb->get_results($wpdb->prepare(
-                "SELECT * FROM $table_name WHERE yacht_id = %d ORDER BY item_name ASC",
+                "SELECT * FROM $table_name WHERE yacht_id = %s ORDER BY item_name ASC",
                 $yacht_id
             ));
         } else {

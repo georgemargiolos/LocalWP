@@ -185,7 +185,7 @@ article .yolo-ys-search-results {
 .yolo-ys-yacht-image img {
     width: 100% !important;
     height: 100% !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
     transition: transform 0.3s ease !important;
     display: block !important;
 }
@@ -267,6 +267,11 @@ article .yolo-ys-search-results {
     text-align: right !important;
 }
 
+/* Add margin between rows for better spacing */
+.yolo-ys-yacht-specs-grid > .row:first-child {
+    margin-bottom: 8px !important;
+}
+
 .yolo-ys-spec-value {
     font-size: 18px !important;
     font-weight: 700 !important;
@@ -278,6 +283,19 @@ article .yolo-ys-search-results {
     font-size: 13px !important;
     color: #6b7280 !important;
     text-transform: uppercase !important;
+}
+
+/* Style the refit spec item with subtle background */
+.yolo-ys-yacht-specs-grid .row .col-4:nth-child(2) .yolo-ys-spec-item {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border-left: 3px solid #3b82f6 !important;
+}
+
+/* Style year built with subtle accent */
+.yolo-ys-yacht-specs-grid .row:last-child .col-4:first-child .yolo-ys-spec-item,
+.yolo-ys-yacht-specs-grid .row:last-child .col-6:first-child .yolo-ys-spec-item {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+    border-left: 3px solid #22c55e !important;
 }
 
 .yolo-ys-refit-note {

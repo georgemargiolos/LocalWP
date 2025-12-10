@@ -197,8 +197,8 @@ class YOLO_YS_Admin_Bookings extends WP_List_Table {
         }
 
         if (!empty($_GET['yacht_id'])) {
-            $where[] = 'yacht_id = %d';
-            $where_values[] = intval($_GET['yacht_id']);
+            $where[] = 'yacht_id = %s';
+            $where_values[] = sanitize_text_field($_GET['yacht_id']);
         }
 
         if (!empty($_GET['search'])) {

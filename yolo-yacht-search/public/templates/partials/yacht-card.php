@@ -23,6 +23,21 @@ if (!empty($yacht->images)) {
     if (empty($primary_image)) {
         $primary_image = $yacht->images[0]->image_url;
     }
+} else if (!empty($yacht->raw_data)) {
+    // Fallback: Extract primary image from raw_data JSON
+    $raw_data = json_decode($yacht->raw_data, true);
+    if (!empty($raw_data['images'])) {
+        // Find primary image or use first image
+        foreach ($raw_data['images'] as $img) {
+            if (!empty($img['primary']) && $img['primary']) {
+                $primary_image = $img['url'];
+                break;
+            }
+        }
+        if (empty($primary_image) && !empty($raw_data['images'][0]['url'])) {
+            $primary_image = $raw_data['images'][0]['url'];
+        }
+    }
 }
 
 // Format refit display
