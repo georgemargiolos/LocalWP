@@ -33,7 +33,7 @@ $partner_yachts = array_filter($partner_yachts, function($yacht) use ($yolo_comp
                 <div class="container-fluid">
                     <div class="row g-4 yolo-ys-yacht-grid">
                         <?php foreach ($yolo_yachts as $yacht): ?>
-                            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                            <div class="col-12 col-sm-6 col-lg-4">
                             <?php include YOLO_YS_PLUGIN_DIR . 'public/templates/partials/yacht-card.php'; ?>
                             </div>
                         <?php endforeach; ?>
@@ -50,7 +50,7 @@ $partner_yachts = array_filter($partner_yachts, function($yacht) use ($yolo_comp
                 <div class="container-fluid">
                     <div class="row g-4 yolo-ys-yacht-grid">
                         <?php foreach ($partner_yachts as $yacht): ?>
-                            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                            <div class="col-12 col-sm-6 col-lg-4">
                             <?php include YOLO_YS_PLUGIN_DIR . 'public/templates/partials/yacht-card.php'; ?>
                             </div>
                         <?php endforeach; ?>
