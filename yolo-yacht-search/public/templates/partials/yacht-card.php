@@ -42,6 +42,9 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
         <?php else: ?>
             <div class="yolo-ys-yacht-placeholder">⛵</div>
         <?php endif; ?>
+        <?php if ($is_yolo): ?>
+            <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yolo-ys-yacht-logo">
+        <?php endif; ?>
     </div>
     
     <div class="yolo-ys-yacht-content">
@@ -73,27 +76,25 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
                 </div>
             </div>
             
-            <!-- Row 2: Built Year + Refit + Length -->
+            <!-- Row 2: Built Year + Refit (if exists) + Length -->
             <div class="row g-2">
-                <div class="col-4 yolo-ys-spec-item">
+                <div class="<?php echo $refit_display ? 'col-4' : 'col-6'; ?> yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value">
                         <?php echo esc_html($yacht->year_of_build); ?>
                     </div>
                     <div class="yolo-ys-spec-label"><?php yolo_ys_text_e('year_built', 'Built year'); ?></div>
                 </div>
                 
+                <?php if ($refit_display): ?>
                 <div class="col-4 yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value">
-                        <?php if ($refit_display): ?>
-                            <?php echo $refit_display; ?>
-                        <?php else: ?>
-                            —
-                        <?php endif; ?>
+                        <?php echo $refit_display; ?>
                     </div>
                     <div class="yolo-ys-spec-label">Refit</div>
                 </div>
+                <?php endif; ?>
                 
-                <div class="col-4 yolo-ys-spec-item">
+                <div class="<?php echo $refit_display ? 'col-4' : 'col-6'; ?> yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value"><?php echo esc_html($length_ft); ?> ft</div>
                     <div class="yolo-ys-spec-label"><?php yolo_ys_text_e('length', 'Length'); ?></div>
                 </div>

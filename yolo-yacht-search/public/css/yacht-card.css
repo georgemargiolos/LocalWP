@@ -148,21 +148,20 @@ article .yolo-ys-search-results {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* YOLO Fleet Badge */
-.yolo-ys-yacht-card.yolo-yacht {
-    /* Red border removed as per user request */
-}
-
-.yolo-ys-yacht-card.yolo-yacht::before {
-    content: 'YOLO FLEET' !important;
+/* YOLO Charters Logo on yacht cards */
+.yolo-ys-yacht-logo {
     position: absolute !important;
-    top: 15px !important;
-    right: 15px !important;
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
-    color: white !important;
-    padding: 8px 16px !important;
-    border-radius: 25px !important;
-    font-size: 11px !important;
+    top: 12px !important;
+    left: 12px !important;
+    z-index: 10 !important;
+    max-width: 100px !important;
+    height: auto !important;
+    max-height: 60px !important;
+    object-fit: contain !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 6px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     font-weight: 800 !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
@@ -258,7 +257,7 @@ article .yolo-ys-search-results {
 }
 
 .yolo-ys-spec-item {
-    text-align: center !important;
+    text-align: left !important;
 }
 
 .yolo-ys-spec-value {
@@ -417,6 +416,14 @@ a.yolo-ys-details-btn:hover {
     
     .yolo-ys-yacht-card {
         margin-bottom: 16px !important;
+    }
+    
+    /* Smaller logo on mobile */
+    .yolo-ys-yacht-logo {
+        max-width: 70px !important;
+        max-height: 45px !important;
+        top: 8px !important;
+        left: 8px !important;
     }
 }
 

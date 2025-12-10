@@ -30,11 +30,6 @@ $partner_yachts = array_filter($partner_yachts, function($yacht) use ($yolo_comp
         <!-- YOLO Fleet Section -->
         <?php if (!empty($yolo_yachts)): ?>
             <div class="yolo-ys-fleet-section yolo-ys-yolo-fleet">
-                <h2 class="yolo-ys-fleet-title">
-                    <span class="yolo-ys-fleet-badge">YOLO Charters</span>
-                    <?php yolo_ys_text_e('our_fleet_title', 'Our Fleet'); ?>
-                </h2>
-                
                 <div class="container-fluid">
                     <div class="row g-4 yolo-ys-yacht-grid">
                         <?php foreach ($yolo_yachts as $yacht): ?>
