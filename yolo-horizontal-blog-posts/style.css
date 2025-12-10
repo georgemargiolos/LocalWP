@@ -1,0 +1,211 @@
+/**
+ * YOLO Horizontal Blog Posts Block - Frontend Styles
+ * Version: 1.0.0
+ * 
+ * Design Principles:
+ * - Theme font inheritance (no font-family or font-size declarations)
+ * - Fully responsive (horizontal on desktop, stacked on mobile)
+ * - Clean, modern design matching YOLO brand
+ */
+
+/* Container */
+.yolo-horizontal-blog-posts-container {
+    width: 100%;
+    padding: 20px 0;
+}
+
+/* Individual Blog Post Card */
+.yolo-horizontal-blog-post-card {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    margin-bottom: 40px;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.yolo-horizontal-blog-post-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.yolo-horizontal-blog-post-card:last-child {
+    margin-bottom: 0;
+}
+
+/* Image Section (Left Side) */
+.yolo-horizontal-blog-post-image {
+    flex: 0 0 300px;
+    width: 300px;
+    height: auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.yolo-horizontal-blog-post-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.yolo-blog-post-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.yolo-horizontal-blog-post-card:hover .yolo-blog-post-img {
+    transform: scale(1.05);
+}
+
+/* No Image Placeholder */
+.yolo-blog-post-no-image {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+/* Content Section (Right Side) */
+.yolo-horizontal-blog-post-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 250px;
+}
+
+/* Title */
+.yolo-horizontal-blog-post-title {
+    margin: 0 0 15px 0;
+    line-height: 1.3;
+}
+
+.yolo-horizontal-blog-post-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.yolo-horizontal-blog-post-title a:hover {
+    color: #1572F5;
+}
+
+/* Excerpt */
+.yolo-horizontal-blog-post-excerpt {
+    margin: 0 0 20px 0;
+    line-height: 1.6;
+    color: #666;
+    flex-grow: 1;
+}
+
+/* Read more link in excerpt */
+.yolo-horizontal-blog-read-more-link {
+    color: #1572F5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.yolo-horizontal-blog-read-more-link:hover {
+    color: #0d5fd4;
+    text-decoration: underline;
+}
+
+/* Button Wrapper */
+.yolo-horizontal-blog-post-button-wrapper {
+    margin-top: auto;
+}
+
+/* Read More Button */
+.yolo-horizontal-blog-post-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #1572F5;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 500;
+}
+
+.yolo-horizontal-blog-post-button:hover {
+    background-color: #0d5fd4;
+    transform: translateY(-2px);
+    color: #ffffff;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 992px) {
+    .yolo-horizontal-blog-post-image {
+        flex: 0 0 250px;
+        width: 250px;
+    }
+    
+    .yolo-horizontal-blog-post-content {
+        padding: 20px;
+    }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+    .yolo-horizontal-blog-post-card {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .yolo-horizontal-blog-post-image {
+        flex: 0 0 auto;
+        width: 100%;
+        height: 250px;
+    }
+    
+    .yolo-blog-post-no-image {
+        height: 250px;
+    }
+    
+    .yolo-horizontal-blog-post-content {
+        padding: 20px;
+    }
+    
+    .yolo-horizontal-blog-post-button {
+        display: block;
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+    .yolo-horizontal-blog-posts-container {
+        padding: 10px 0;
+    }
+    
+    .yolo-horizontal-blog-post-card {
+        margin-bottom: 30px;
+    }
+    
+    .yolo-horizontal-blog-post-image {
+        height: 200px;
+    }
+    
+    .yolo-blog-post-no-image {
+        height: 200px;
+    }
+    
+    .yolo-horizontal-blog-post-content {
+        padding: 15px;
+    }
+    
+    .yolo-horizontal-blog-post-button {
+        padding: 10px 20px;
+    }
+}

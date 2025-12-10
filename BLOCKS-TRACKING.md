@@ -1,7 +1,7 @@
 # YOLO Custom Gutenberg Blocks - Tracking & Documentation
 
-**Last Updated:** December 9, 2025 GMT+2  
-**Total Blocks:** 2  
+**Last Updated:** December 10, 2025 GMT+2  
+**Total Blocks:** 3  
 **Status:** ✅ Production Ready
 
 ---
@@ -294,15 +294,178 @@ yolo-blog-posts-block/
 
 ---
 
+## 📰 Block 3: YOLO Horizontal Blog Posts
+
+### Basic Information
+
+| Property | Value |
+|----------|-------|
+| **Block Name** | YOLO Horizontal Blog Posts |
+| **Namespace** | yolo-blog-posts/horizontal-blog-posts |
+| **Version** | 1.0.0 |
+| **Plugin Name** | YOLO Horizontal Blog Posts Block |
+| **Status** | ✅ Active & Production Ready |
+| **Created** | December 10, 2025 |
+| **Last Updated** | December 10, 2025 |
+
+### Description
+
+Displays blog posts in a horizontal card layout with featured image on the left and content on the right. Perfect for blog pages where you want a more detailed, article-style presentation of posts.
+
+### Features
+
+**Visual Features:**
+- Horizontal card layout (image left, content right)
+- Featured image (300px width on desktop)
+- Stacked layout on mobile (image top, content below)
+- White cards with subtle shadow and hover effects
+- Image zoom on hover (scale 1.05)
+- Min-height: 250px for consistent card heights
+- #1572F5 button color (brand color)
+
+**Content Features:**
+- Post featured image with fallback
+- Post title (linked to post)
+- Full post content excerpt (up to 500 words)
+- Clickable "Read more..." link in excerpt
+- "Read More" button at bottom
+- Adjustable post count (1-20 posts)
+
+**Technical Features:**
+- Server-side rendering via render.php
+- Uses get_the_content() for full content (not WordPress excerpt)
+- 500-word maximum to fill space properly
+- Theme font inheritance (no font overrides)
+- Fully responsive CSS with flexbox
+- No front page filter (works on all pages by default)
+- Manual editor script enqueuing for reliability
+
+### Usage
+
+**Installation:**
+1. Upload `yolo-horizontal-blog-posts-v1.0.0.zip` to WordPress
+2. Activate plugin via Plugins → Installed Plugins
+3. No other dependencies required
+
+**Adding to Page/Post:**
+1. Edit page/post in Gutenberg editor
+2. Click "+" to add new block
+3. Search for "YOLO Horizontal Blog Posts" or "blog"
+4. Click block to insert
+5. Adjust post count in block settings (right sidebar)
+6. Preview and publish
+
+**Block Settings:**
+- **Post Count:** 1-20 posts (default: 10)
+  - Adjust via RangeControl slider in block settings panel
+
+### Technical Specifications
+
+**WP_Query:**
+```php
+$args = array(
+    'post_type' => 'post',
+    'posts_per_page' => $post_count,
+    'post_status' => 'publish',
+    'orderby' => 'date',
+    'order' => 'DESC'
+);
+$query = new WP_Query($args);
+```
+
+**Content Extraction:**
+```php
+// Get the full content (not excerpt which is limited by WordPress)
+$content = get_the_content();
+$content = strip_tags($content);
+$content = strip_shortcodes($content);
+$content = wp_strip_all_tags($content);
+
+// Limit to maximum 500 words to fill the space
+$words = explode(' ', $content);
+if (count($words) > 500) {
+    $words = array_slice($words, 0, 500);
+    $content = implode(' ', $words);
+}
+```
+
+**File Structure:**
+```
+yolo-horizontal-blog-posts/
+├── yolo-horizontal-blog-posts.php     # Main plugin file
+├── block.json                         # Block metadata
+├── render.php                         # Server-side rendering
+├── index.js                           # Block registration (no JSX)
+├── style.css                          # Frontend styles
+├── editor.css                         # Editor styles
+└── README.md                          # Block documentation
+```
+
+**Dependencies:**
+- WordPress 5.8+
+- Published blog posts with featured images (recommended)
+
+**Responsive Breakpoints:**
+- Desktop (>992px): Full horizontal layout (300px image + flex content)
+- Tablet (768px-992px): Compact horizontal (200px image + flex content)
+- Mobile (≤768px): Stacked vertical layout
+- Extra Small (≤480px): Optimized spacing
+
+### Customization Options
+
+**Available Customizations:**
+- **Post Count:** 1-20 posts (via RangeControl)
+
+**Future Customization Ideas:**
+- Category filter
+- Tag filter
+- Sort order (date, title, random)
+- Show/hide featured image
+- Show/hide "Read More" button
+- Custom button text
+- Custom button color
+- Adjustable image width
+
+### Known Issues & Limitations
+
+**Limitations:**
+- Maximum 20 posts (can be increased if needed)
+- No pagination (displays set number of posts)
+- Requires featured images for best appearance
+- 500-word excerpt maximum (prevents overly long cards)
+
+**Known Issues:**
+- None currently
+
+**Critical Fixes Applied:**
+- v1.0.4: Removed problematic allowed_block_types_all filter that blocked all other blocks
+- v1.0.9: Fixed excerpt to use get_the_content() instead of get_the_excerpt() to properly fill white space
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | Dec 10, 2025 | Stable release with full content extraction and proper space filling |
+
+### Package Location
+
+**File:** `/home/ubuntu/LocalWP/yolo-horizontal-blog-posts/`  
+**Zip:** `yolo-horizontal-blog-posts-v1.0.0.zip`  
+**Size:** ~8KB  
+**Install:** WordPress → Plugins → Add New → Upload
+
+---
+
 ## 🎨 Design Guidelines
 
 ### Color Palette
 
-**Blog Posts Block:**
+**All Blocks:**
 - Button Color: #1572F5 (brand blue)
-- Button Hover: Darker shade of #1572F5
+- Button Hover: #0d5fd4 (darker blue)
 - Card Background: White (#ffffff)
 - Text: Inherits from theme
+- Links: #1572F5
 
 **Horizontal Yacht Cards:**
 - All colors inherit from WordPress theme
@@ -330,6 +493,13 @@ yolo-blog-posts-block/
 - Card padding: 20px
 - Margin bottom: 30px
 
+**Horizontal Blog Posts:**
+- Card padding: 0 (image edge-to-edge)
+- Content padding: 30px
+- Gap between image and content: 0
+- Margin between cards: 30px
+- Min-height: 250px
+
 ### Responsive Design
 
 **Mobile-First Approach:**
@@ -342,262 +512,190 @@ yolo-blog-posts-block/
 - Mobile: 0-767px
 - Tablet: 768px-991px
 - Desktop: 992px+
+- Extra Small: 0-480px (for horizontal blog posts)
 
 ---
 
-## 🔧 Development Guidelines
+## 🚀 Deployment Guide
 
-### Block Development Standards
+### Installation Steps
 
-**1. File Structure:**
-```
-block-name/
-├── block-name.php       # Main plugin file
-├── block.json           # Block metadata (required)
-├── render.php           # Server-side rendering (required)
-├── index.js             # Block registration (required)
-├── style.css            # Frontend styles (required)
-├── editor.css           # Editor styles (optional)
-└── README.md            # Documentation (recommended)
-```
-
-**2. Block Registration:**
-- Use block.json for metadata
-- Register via register_block_type()
-- Manual editor script enqueuing for reliability
-- Add front page support with priority 999 filter
-
-**3. JavaScript Guidelines:**
-- No JSX syntax (use React.createElement)
-- Browser-compatible code only
-- Proper dependency management
-- Version numbers based on file modification time
-
-**4. CSS Guidelines:**
-- No font-family declarations
-- No font-size declarations
-- Use relative units (em, rem) for spacing
-- Mobile-first responsive design
-- Avoid !important unless absolutely necessary
-
-**5. PHP Guidelines:**
-- Sanitize all user input
-- Escape all output
-- Use prepared statements for database queries
-- Follow WordPress coding standards
-- Add ABSPATH check to prevent direct access
+**For All Blocks:**
+1. Download the block ZIP file
+2. Go to WordPress Admin → Plugins → Add New
+3. Click "Upload Plugin"
+4. Choose the ZIP file
+5. Click "Install Now"
+6. Click "Activate"
+7. Block is ready to use in Gutenberg editor
 
 ### Testing Checklist
 
-**Before Release:**
-- ✅ Test on front page
-- ✅ Test on posts and pages
-- ✅ Test on desktop (>992px)
-- ✅ Test on tablet (768px-992px)
-- ✅ Test on mobile (<768px)
-- ✅ Test in Chrome/Edge
-- ✅ Test in Firefox
-- ✅ Test in Safari
-- ✅ Test with different themes
-- ✅ Check console for errors
-- ✅ Check PHP error log
-- ✅ Verify font inheritance
-- ✅ Verify responsive design
-- ✅ Test all links
-- ✅ Test all interactions
+**Before Deployment:**
+- [ ] Test on desktop (Chrome, Firefox, Safari)
+- [ ] Test on tablet (iPad, Android tablet)
+- [ ] Test on mobile (iPhone, Android phone)
+- [ ] Verify all links work correctly
+- [ ] Check hover effects
+- [ ] Verify theme font inheritance
+- [ ] Test with different post counts
+- [ ] Check with and without featured images
+- [ ] Verify responsive breakpoints
+- [ ] Test in Gutenberg editor
+- [ ] Test on front page (if applicable)
+- [ ] Check for console errors
+- [ ] Verify database queries work
+
+### Troubleshooting
+
+**Block Not Appearing:**
+- Ensure plugin is activated
+- Clear browser cache
+- Refresh Gutenberg editor
+- Check for JavaScript errors in console
+
+**Styling Issues:**
+- Clear WordPress cache
+- Clear browser cache
+- Check for CSS conflicts with theme
+- Verify no font overrides in block CSS
+
+**Content Not Displaying:**
+- Check database connection
+- Verify required tables exist
+- Check post status (must be "publish")
+- Verify featured images are set
+
+**All Blocks Disappearing (Horizontal Blog Posts specific):**
+- This was caused by the allowed_block_types_all filter
+- Fixed in v1.0.4 by removing the filter
+- Block now uses standard WordPress registration
 
 ---
 
-## 📊 Block Comparison
-
-| Feature | Horizontal Yacht Cards | Blog Posts Grid |
-|---------|------------------------|-----------------|
-| **Version** | 50.0 | 1.0.0 |
-| **Layout** | Horizontal cards | 3-column grid |
-| **Data Source** | wp_yolo_yachts table | WordPress posts |
-| **Settings** | None | Post count (1-12) |
-| **Dependencies** | YOLO plugin v50.0+ | None |
-| **Responsive** | Horizontal → Stacked | 3 → 2 → 1 columns |
-| **Images** | Swiper carousel | Featured images |
-| **Special Features** | Logo overlay, map linking | Hover zoom, category badges |
-| **Font Inheritance** | ✅ Yes | ✅ Yes |
-| **Front Page Support** | ✅ Yes | ✅ Yes |
-
----
-
-## 🚀 Future Block Ideas
-
-### Planned Blocks
-
-**1. YOLO Testimonials Block**
-- Display customer testimonials in carousel or grid
-- Star ratings
-- Customer photos
-- Responsive design
-
-**2. YOLO Pricing Tables Block**
-- Compare yacht charter packages
-- Highlight popular options
-- Call-to-action buttons
-- Responsive columns
-
-**3. YOLO FAQ Accordion Block**
-- Frequently asked questions
-- Expandable/collapsible sections
-- Search functionality
-- Category filtering
-
-**4. YOLO Image Gallery Block**
-- Yacht photo galleries
-- Lightbox functionality
-- Grid or masonry layout
-- Filtering by yacht
-
-**5. YOLO Contact Form Block**
-- Custom contact form
-- Email integration
-- Form validation
-- Success messages
-
-### Enhancement Ideas
-
-**For Existing Blocks:**
-
-**Horizontal Yacht Cards:**
-- Add filter by yacht type
-- Add sort options
-- Add pagination
-- Add "Compare Yachts" feature
-- Add availability calendar preview
-
-**Blog Posts Grid:**
-- Add category filter
-- Add tag filter
-- Add search functionality
-- Add load more button
-- Add post date display
-- Add author display
-
----
-
-## 📚 Resources & References
-
-### WordPress Documentation
-- [Block Editor Handbook](https://developer.wordpress.org/block-editor/)
-- [Block API Reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/)
-- [Server-Side Rendering](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/)
-
-### Libraries Used
-- [Swiper.js](https://swiperjs.com/) - Image carousel
-- [WordPress React Components](https://developer.wordpress.org/block-editor/reference-guides/components/) - Block controls
+## 📚 Development Notes
 
 ### Code Standards
-- [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)
-- [WordPress PHP Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/)
-- [WordPress JavaScript Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/)
 
----
+**PHP:**
+- WordPress Coding Standards
+- Escape all output (esc_html, esc_url, esc_attr)
+- Sanitize all input
+- Use prepared statements for database queries
+- Check for ABSPATH to prevent direct access
 
-## 🔐 Security Considerations
+**JavaScript:**
+- No JSX syntax (browser-compatible ES5/ES6)
+- Use wp.element.createElement() instead of JSX
+- Register blocks with wp.blocks.registerBlockType()
+- Use WordPress components (RangeControl, InspectorControls)
 
-### Security Best Practices
+**CSS:**
+- Mobile-first approach
+- No font-family or font-size declarations
+- Use flexbox and CSS Grid for layouts
+- Smooth transitions for hover effects
+- Consistent spacing and padding
 
-**1. Input Sanitization:**
-- Sanitize all user input with appropriate functions
-- Use `sanitize_text_field()` for text
-- Use `absint()` for integers
-- Use `esc_url()` for URLs
+### Best Practices
 
-**2. Output Escaping:**
-- Escape all output with appropriate functions
-- Use `esc_html()` for HTML content
-- Use `esc_attr()` for attributes
-- Use `esc_url()` for URLs
+**Server-Side Rendering:**
+- Always use render.php for dynamic content
+- Improves SEO and performance
+- Enables caching
+- Better for database queries
 
-**3. Database Security:**
-- Use `$wpdb->prepare()` for all queries
-- Never use direct SQL queries
-- Validate data types before queries
+**Theme Independence:**
+- Never override theme fonts
+- Use theme colors where possible
+- Adapt to any WordPress theme
+- Test with multiple themes
 
-**4. File Security:**
-- Add ABSPATH check to all PHP files
-- Prevent direct file access
-- Validate file uploads (if applicable)
+**Performance:**
+- Minimize database queries
+- Use WordPress caching
+- Optimize images
+- Lazy load when possible
 
-**5. Nonce Verification:**
-- Add nonces to all AJAX requests
-- Verify nonces before processing
-- Use unique nonce names
+### Common Pitfalls
+
+**Avoid:**
+- ❌ Using get_the_excerpt() (limited to 55 words by WordPress)
+- ❌ Adding allowed_block_types_all filters (blocks all other blocks)
+- ❌ Hardcoding font families or sizes
+- ❌ Using target="_blank" without user consent
+- ❌ Forgetting to escape output
+- ❌ Not checking for empty data
+- ❌ Ignoring mobile responsiveness
+
+**Do:**
+- ✅ Use get_the_content() for full content
+- ✅ Use standard WordPress block registration
+- ✅ Inherit fonts from theme
+- ✅ Open links in same page by default
+- ✅ Always escape and sanitize
+- ✅ Provide fallbacks for missing data
+- ✅ Test on all devices
 
 ---
 
 ## 📞 Support & Maintenance
 
-### Support Channels
-- **GitHub Issues:** https://github.com/georgemargiolos/LocalWP/issues
-- **Repository:** https://github.com/georgemargiolos/LocalWP
-- **Documentation:** This file + individual block README files
-
 ### Maintenance Schedule
-- **Weekly:** Review GitHub issues
-- **Monthly:** Security updates
-- **Quarterly:** Feature enhancements
-- **Annually:** Major version updates
 
-### Version Numbering
-- **Major.Minor.Patch** (e.g., 1.0.0)
-- **Major:** Breaking changes or major features
-- **Minor:** New features, backward compatible
-- **Patch:** Bug fixes, minor improvements
+**Regular Tasks:**
+- Test blocks with WordPress updates
+- Test blocks with theme updates
+- Monitor for JavaScript errors
+- Check database performance
+- Review user feedback
+- Update documentation
+
+**Version Updates:**
+- Increment version numbers in all files
+- Update BLOCKS-TRACKING.md
+- Create changelog entries
+- Test thoroughly before release
+- Create new ZIP packages
+
+### Contact Information
+
+**Developer:** George Margiolos  
+**GitHub:** https://github.com/georgemargiolos/LocalWP  
+**Last Updated:** December 10, 2025 GMT+2
 
 ---
 
-## 📝 Changelog
+## 📋 Quick Reference
 
-### December 9, 2025
-- ✅ Created YOLO Horizontal Yacht Cards Block v50.0
-- ✅ Created YOLO Blog Posts Block v1.0.0
-- ✅ Created this tracking document
-- ✅ Documented all blocks comprehensively
+### Block Comparison
 
----
+| Feature | Yacht Cards | Blog Grid | Blog Horizontal |
+|---------|-------------|-----------|-----------------|
+| Layout | Horizontal | 3-Column Grid | Horizontal |
+| Data Source | Database | WP Posts | WP Posts |
+| Customization | None | Post Count | Post Count |
+| Image Position | Left | Top | Left |
+| Responsive | Yes | Yes | Yes |
+| Font Inheritance | Yes | Yes | Yes |
+| Front Page Support | Yes | Yes | No (works everywhere) |
 
-## 🎯 Quick Reference
+### Quick Install Commands
 
-### Block Namespaces
-- **Horizontal Yacht Cards:** `yolo-yacht-search/yacht-horizontal-cards`
-- **Blog Posts Grid:** `yolo-blog-posts/blog-posts-grid`
-
-### Package Locations
-- **Horizontal Yacht Cards:** `/home/ubuntu/yolo-horizontal-yacht-cards-v50.0.zip`
-- **Blog Posts Grid:** `/home/ubuntu/yolo-blog-posts-block-v1.0.0.zip`
-
-### Installation Commands (WP-CLI)
 ```bash
-# Install Horizontal Yacht Cards
-wp plugin install /path/to/yolo-horizontal-yacht-cards-v50.0.zip --activate
+# Download blocks
+cd /home/ubuntu/LocalWP/
 
-# Install Blog Posts Grid
-wp plugin install /path/to/yolo-blog-posts-block-v1.0.0.zip --activate
+# Yacht Cards
+zip -r yolo-horizontal-yacht-cards-v50.0.zip yolo-yacht-search/public/blocks/yacht-horizontal-cards/
 
-# Check status
-wp plugin list | grep yolo
+# Blog Grid
+zip -r yolo-blog-posts-block-v1.0.0.zip yolo-blog-posts-block/
+
+# Blog Horizontal
+zip -r yolo-horizontal-blog-posts-v1.0.0.zip yolo-horizontal-blog-posts/
 ```
 
-### Uninstallation Commands (WP-CLI)
-```bash
-# Deactivate and delete Horizontal Yacht Cards
-wp plugin deactivate yolo-horizontal-yacht-cards
-wp plugin delete yolo-horizontal-yacht-cards
-
-# Deactivate and delete Blog Posts Grid
-wp plugin deactivate yolo-blog-posts-block
-wp plugin delete yolo-blog-posts-block
-```
-
 ---
 
-**Document Maintained By:** George Margiolos / AI Assistant (Manus)  
-**Last Updated:** December 9, 2025 GMT+2  
-**Next Review:** January 9, 2026  
-**Status:** ✅ Current & Complete
+**End of Documentation**

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "yolo-blog-posts/horizontal-blog-posts",
+  "title": "YOLO Horizontal Blog Posts",
+  "category": "widgets",
+  "icon": "admin-post",
+  "description": "Display blog posts in horizontal card layout with featured image on left and content on right",
+  "keywords": ["blog", "posts", "horizontal", "yolo"],
+  "version": "1.0.0",
+  "textDomain": "yolo-horizontal-blog-posts",
+  "attributes": {
+    "postCount": {
+      "type": "number",
+      "default": 10
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": true
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css"
+}
