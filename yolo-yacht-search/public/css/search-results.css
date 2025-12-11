@@ -406,8 +406,15 @@ main .yolo-ys-search-results,
     margin-bottom: 20px;
 }
 
+/* Specs row - justified layout with space-between */
+.yolo-ys-specs-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
 .yolo-ys-spec-item {
-    text-align: center;
+    text-align: left;
 }
 
 .yolo-ys-spec-value {
@@ -417,12 +424,9 @@ main .yolo-ys-search-results,
     margin-bottom: 4px;
 }
 
-.yolo-ys-refit-note {
-    display: block;
-    font-size: 12px;
-    font-weight: 400;
-    color: #6b7280;
-    margin-top: 2px;
+/* Refit year BOLD only */
+.yolo-ys-refit-bold {
+    font-weight: 900;
 }
 
 .yolo-ys-spec-label {

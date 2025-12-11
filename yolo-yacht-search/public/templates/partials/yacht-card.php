@@ -78,22 +78,22 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
         
         <!-- Specs Grid - 2 rows: Row 1 (Cabins + Heads), Row 2 (Built Year + Refit + Length) -->
         <div class="yolo-ys-yacht-specs-grid">
-            <!-- Row 1: Cabins + Heads -->
-            <div class="row g-2 mb-2">
-                <div class="col-6 yolo-ys-spec-item">
+            <!-- Row 1: Cabins (left) + WC (right) -->
+            <div class="yolo-ys-specs-row">
+                <div class="yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value"><?php echo esc_html($yacht->cabins); ?></div>
                     <div class="yolo-ys-spec-label"><?php yolo_ys_text_e('cabins', 'Cabins'); ?></div>
                 </div>
                 
-                <div class="col-6 yolo-ys-spec-item">
+                <div class="yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value"><?php echo esc_html($yacht->wc ?? 'N/A'); ?></div>
                     <div class="yolo-ys-spec-label"><?php yolo_ys_text_e('wc', 'Heads'); ?></div>
                 </div>
             </div>
             
-            <!-- Row 2: Built Year + Refit (if exists) + Length -->
-            <div class="row g-2">
-                <div class="<?php echo $refit_display ? 'col-4' : 'col-6'; ?> yolo-ys-spec-item">
+            <!-- Row 2: Built Year (left) + Refit (middle, bold) + Length (right) -->
+            <div class="yolo-ys-specs-row">
+                <div class="yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value">
                         <?php echo esc_html($yacht->year_of_build); ?>
                     </div>
@@ -101,15 +101,15 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
                 </div>
                 
                 <?php if ($refit_display): ?>
-                <div class="col-4 yolo-ys-spec-item">
-                    <div class="yolo-ys-spec-value">
+                <div class="yolo-ys-spec-item">
+                    <div class="yolo-ys-spec-value yolo-ys-refit-bold">
                         <?php echo $refit_display; ?>
                     </div>
                     <div class="yolo-ys-spec-label">Refit</div>
                 </div>
                 <?php endif; ?>
                 
-                <div class="<?php echo $refit_display ? 'col-4' : 'col-6'; ?> yolo-ys-spec-item">
+                <div class="yolo-ys-spec-item">
                     <div class="yolo-ys-spec-value"><?php echo esc_html($length_ft); ?> ft</div>
                     <div class="yolo-ys-spec-label"><?php yolo_ys_text_e('length', 'Length'); ?></div>
                 </div>
