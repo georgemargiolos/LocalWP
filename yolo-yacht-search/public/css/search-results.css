@@ -484,6 +484,7 @@ main .yolo-ys-search-results,
     .yolo-ys-section-header + .container-fluid .row.g-4 .col-lg-4:first-child:last-child {
         max-width: 100% !important;
         flex: 0 0 100% !important;
+        width: 100% !important;
     }
 }
 

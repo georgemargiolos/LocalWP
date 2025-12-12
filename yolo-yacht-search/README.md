@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 60.1
+**Version:** 60.2
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -15,33 +15,47 @@ The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter bu
 
 ## 🚀 Latest Updates
 
-### v60.1 - Search Results Layout Fix (December 12, 2025)
+### v60.2 - Search Results Layout Fix (WORKING) (December 12, 2025)
 
-**Bug Fix - Single Catamaran Display**
+**Critical Fix - v60.1 Was Broken**
 
-**Issue:** When searching for catamarans only, the single yacht card (Strawberry) was constrained to 33.33% width instead of full width, leaving large empty space.
+**Issue:** v60.1 CSS fix didn't actually work - missing `width: 100%` property.
 
 **Fix Applied:**
-- ✅ **CSS Solution** - Added `:first-child:last-child` selector to target single cards
+- ✅ **Complete CSS Solution** - Added all three required properties
+- ✅ **Tested & Verified** - Manually tested on test server
 - ✅ **Full Width Display** - Single yachts now take 100% width on large screens
 - ✅ **Grid Preserved** - Multiple yachts still display in 3-column layout
-- ✅ **Responsive** - Mobile/tablet layouts unaffected
 
 **Technical Details:**
 ```css
-/* Location: public/css/search-results.css, lines 481-488 */
+/* Location: public/css/search-results.css, lines 484-488 */
 @media (min-width: 992px) {
     .yolo-ys-section-header + .container-fluid .row.g-4 .col-lg-4:first-child:last-child {
         max-width: 100% !important;
         flex: 0 0 100% !important;
+        width: 100% !important;  /* ← THIS WAS MISSING IN v60.1 */
     }
 }
 ```
 
+**Why v60.1 Failed:**
+- Bootstrap's flex system requires all three properties to override
+- Without `width: 100%`, card stayed at 33.33% width
+- Fix was tested in console but not verified on actual server
+
 **Files Modified:** 2 files (yolo-yacht-search.php, search-results.css)  
 **Backward Compatible:** Yes  
 **Breaking Changes:** None  
-**Production Ready:** ✅
+**Production Ready:** ✅ (Tested & Verified)
+
+---
+
+### v60.1 - Search Results Layout Fix (BROKEN - DO NOT USE)
+
+**Status:** ❌ **BROKEN** - Use v60.2 instead
+
+**Issue:** CSS fix incomplete, missing `width: 100%` property
 
 ---
 
