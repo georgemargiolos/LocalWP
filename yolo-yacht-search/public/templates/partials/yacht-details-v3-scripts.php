@@ -68,7 +68,7 @@ function showCustomDatesModal(dateFrom, dateTo) {
                     <input type="hidden" name="date_to" value="${dateTo}">
                     <div class="yolo-quote-modal-buttons">
                         <button type="submit" class="yolo-quote-btn-submit">SEND REQUEST</button>
-                        <button type="button" onclick="closeCustomDatesModal()" class="yolo-quote-btn-cancel">CANCEL</button>
+                        <button type="button" onclick="closeCustomDatesModal()" class="yolo-quote-btn-cancel">${cancelText}</button>
                     </div>
                 </form>
             </div>
@@ -694,7 +694,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                     <input type="hidden" name="currency" value="${currency}">
                     
                     <div class="yolo-booking-form-buttons">
-                        <button type="button" onclick="closeBookingFormModal()" class="yolo-booking-btn-cancel">CANCEL</button>
+                        <button type="button" onclick="closeBookingFormModal()" class="yolo-booking-btn-cancel">${cancelText}</button>
                         <button type="submit" class="yolo-booking-btn-submit">PROCEED TO PAYMENT →</button>
                     </div>
                 </form>
@@ -840,10 +840,13 @@ setTimeout(() => { isInitialLoad = false; }, 1000);
 // Flag to skip API call when date is set programmatically from carousel
 let skipApiCallForCarouselSelection = false;
 
+// Customizable texts
+const cancelText = <?php echo json_encode(get_option('yolo_ys_text_cancel', 'CANCEL')); ?>;
+const remainingText = <?php echo json_encode(get_option('yolo_ys_text_remaining', 'Remaining:')); ?>;
+
 // Update price display with deposit information
 function updatePriceDisplayWithDeposit() {
     const depositPercentage = <?php echo intval(get_option('yolo_ys_deposit_percentage', 50)); ?>;
-    const remainingText = <?php echo json_encode(get_option('yolo_ys_text_remaining', 'Remaining:')); ?>;
     const activeSlide = document.querySelector('.price-slide.active');
     
     let totalPrice, currency;

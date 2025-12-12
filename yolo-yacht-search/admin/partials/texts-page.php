@@ -112,6 +112,12 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_special_requests' => sanitize_text_field($_POST['yolo_ys_text_special_requests']),
         'yolo_ys_text_required_field' => sanitize_text_field($_POST['yolo_ys_text_required_field']),
         'yolo_ys_text_quote_description' => sanitize_text_field($_POST['yolo_ys_text_quote_description']),
+        
+        // Additional UI Elements
+        'yolo_ys_text_cancel' => sanitize_text_field($_POST['yolo_ys_text_cancel']),
+        'yolo_ys_text_free' => sanitize_text_field($_POST['yolo_ys_text_free']),
+        'yolo_ys_text_catamaran' => sanitize_text_field($_POST['yolo_ys_text_catamaran']),
+        'yolo_ys_text_message_placeholder' => sanitize_text_field($_POST['yolo_ys_text_message_placeholder']),
     );
     
     foreach ($text_options as $key => $value) {
@@ -222,6 +228,12 @@ $texts = array(
     'special_requests' => get_option('yolo_ys_text_special_requests', 'Special requests'),
     'required_field' => get_option('yolo_ys_text_required_field', '* Required field'),
     'quote_description' => get_option('yolo_ys_text_quote_description', 'Quick and free quotation for your sailing holiday.'),
+    
+    // Additional UI Elements
+    'cancel' => get_option('yolo_ys_text_cancel', 'CANCEL'),
+    'free' => get_option('yolo_ys_text_free', 'Free'),
+    'catamaran' => get_option('yolo_ys_text_catamaran', 'Catamaran'),
+    'message_placeholder' => get_option('yolo_ys_text_message_placeholder', 'Message'),
 );
 ?>
 
@@ -595,6 +607,27 @@ $texts = array(
             <tr>
                 <th scope="row"><label for="yolo_ys_text_quote_description"><?php _e('Quote Form Description', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_quote_description" name="yolo_ys_text_quote_description" value="<?php echo esc_attr(get_option('yolo_ys_text_quote_description', 'Quick and free quotation for your sailing holiday.')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Additional UI Elements -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Additional UI Elements', 'yolo-yacht-search'); ?></h2></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_cancel"><?php _e('Cancel Button', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_cancel" name="yolo_ys_text_cancel" value="<?php echo esc_attr($texts['cancel']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_free"><?php _e('Free Label (for extras)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_free" name="yolo_ys_text_free" value="<?php echo esc_attr($texts['free']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_catamaran"><?php _e('Catamaran (boat type)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_catamaran" name="yolo_ys_text_catamaran" value="<?php echo esc_attr($texts['catamaran']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_message_placeholder"><?php _e('Message Placeholder', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_message_placeholder" name="yolo_ys_text_message_placeholder" value="<?php echo esc_attr($texts['message_placeholder']); ?>" class="regular-text"></td>
             </tr>
         </table>
         
