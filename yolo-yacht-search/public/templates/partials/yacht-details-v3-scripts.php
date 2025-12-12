@@ -843,6 +843,7 @@ let skipApiCallForCarouselSelection = false;
 // Update price display with deposit information
 function updatePriceDisplayWithDeposit() {
     const depositPercentage = <?php echo intval(get_option('yolo_ys_deposit_percentage', 50)); ?>;
+    const remainingText = <?php echo json_encode(get_option('yolo_ys_text_remaining', 'Remaining:')); ?>;
     const activeSlide = document.querySelector('.price-slide.active');
     
     let totalPrice, currency;
@@ -883,7 +884,7 @@ function updatePriceDisplayWithDeposit() {
         // Always update the innerHTML with current prices
         depositInfo.innerHTML = `
             <div>Deposit (${depositPercentage}%): <strong>${formatEuropeanPrice(depositAmount)} ${currency}</strong></div>
-            <div>Remaining: <strong>${formatEuropeanPrice(remainingBalance)} ${currency}</strong></div>
+            <div>${remainingText} <strong>${formatEuropeanPrice(remainingBalance)} ${currency}</strong></div>
         `;
     }
 }

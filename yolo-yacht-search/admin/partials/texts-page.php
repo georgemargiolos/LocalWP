@@ -21,6 +21,7 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_total_price' => sanitize_text_field($_POST['yolo_ys_text_total_price']),
         'yolo_ys_text_deposit_required' => sanitize_text_field($_POST['yolo_ys_text_deposit_required']),
         'yolo_ys_text_remaining_balance' => sanitize_text_field($_POST['yolo_ys_text_remaining_balance']),
+        'yolo_ys_text_remaining' => sanitize_text_field($_POST['yolo_ys_text_remaining']),
         
         // Quote Form
         'yolo_ys_text_quote_form_title' => sanitize_text_field($_POST['yolo_ys_text_quote_form_title']),
@@ -130,6 +131,7 @@ $texts = array(
     'total_price' => get_option('yolo_ys_text_total_price', 'Total Price'),
     'deposit_required' => get_option('yolo_ys_text_deposit_required', 'Deposit Required (50%)'),
     'remaining_balance' => get_option('yolo_ys_text_remaining_balance', 'Remaining Balance'),
+    'remaining' => get_option('yolo_ys_text_remaining', 'Remaining:'),
     
     // Quote Form
     'quote_form_title' => get_option('yolo_ys_text_quote_form_title', 'Request a Quote'),
@@ -262,6 +264,10 @@ $texts = array(
             <tr>
                 <th scope="row"><label for="yolo_ys_text_remaining_balance"><?php _e('Remaining Balance Label', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_remaining_balance" name="yolo_ys_text_remaining_balance" value="<?php echo esc_attr($texts['remaining_balance']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_remaining"><?php _e('Remaining Label (in price box)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_remaining" name="yolo_ys_text_remaining" value="<?php echo esc_attr($texts['remaining']); ?>" class="regular-text"></td>
             </tr>
             
             <!-- Quote Form -->
