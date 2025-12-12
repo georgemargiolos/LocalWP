@@ -71,6 +71,46 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_booking_reference' => sanitize_text_field($_POST['yolo_ys_text_booking_reference']),
         'yolo_ys_text_payment_received' => sanitize_text_field($_POST['yolo_ys_text_payment_received']),
         'yolo_ys_text_confirmation_email' => sanitize_text_field($_POST['yolo_ys_text_confirmation_email']),
+        
+        // Yacht Details Page Sections
+        'yolo_ys_text_weekly_prices_title' => sanitize_text_field($_POST['yolo_ys_text_weekly_prices_title']),
+        'yolo_ys_text_discount_off' => sanitize_text_field($_POST['yolo_ys_text_discount_off']),
+        'yolo_ys_text_select_week' => sanitize_text_field($_POST['yolo_ys_text_select_week']),
+        'yolo_ys_text_read_more' => sanitize_text_field($_POST['yolo_ys_text_read_more']),
+        'yolo_ys_text_read_less' => sanitize_text_field($_POST['yolo_ys_text_read_less']),
+        'yolo_ys_text_location' => sanitize_text_field($_POST['yolo_ys_text_location']),
+        'yolo_ys_text_availability_pricing' => sanitize_text_field($_POST['yolo_ys_text_availability_pricing']),
+        'yolo_ys_text_no_pricing' => sanitize_text_field($_POST['yolo_ys_text_no_pricing']),
+        'yolo_ys_text_choose_custom_dates' => sanitize_text_field($_POST['yolo_ys_text_choose_custom_dates']),
+        'yolo_ys_text_loading' => sanitize_text_field($_POST['yolo_ys_text_loading']),
+        
+        // Extras Section
+        'yolo_ys_text_extras' => sanitize_text_field($_POST['yolo_ys_text_extras']),
+        'yolo_ys_text_payable_at_base' => sanitize_text_field($_POST['yolo_ys_text_payable_at_base']),
+        'yolo_ys_text_per_booking' => sanitize_text_field($_POST['yolo_ys_text_per_booking']),
+        'yolo_ys_text_per_night' => sanitize_text_field($_POST['yolo_ys_text_per_night']),
+        'yolo_ys_text_per_day' => sanitize_text_field($_POST['yolo_ys_text_per_day']),
+        'yolo_ys_text_per_hour' => sanitize_text_field($_POST['yolo_ys_text_per_hour']),
+        'yolo_ys_text_per_person' => sanitize_text_field($_POST['yolo_ys_text_per_person']),
+        
+        // Additional Technical Specs
+        'yolo_ys_text_draught' => sanitize_text_field($_POST['yolo_ys_text_draught']),
+        'yolo_ys_text_engine' => sanitize_text_field($_POST['yolo_ys_text_engine']),
+        'yolo_ys_text_refit' => sanitize_text_field($_POST['yolo_ys_text_refit']),
+        
+        // Fleet Pages
+        'yolo_ys_text_our_fleet_title' => sanitize_text_field($_POST['yolo_ys_text_our_fleet_title']),
+        'yolo_ys_text_partner_title' => sanitize_text_field($_POST['yolo_ys_text_partner_title']),
+        'yolo_ys_text_no_yachts' => sanitize_text_field($_POST['yolo_ys_text_no_yachts']),
+        'yolo_ys_text_details_button' => sanitize_text_field($_POST['yolo_ys_text_details_button']),
+        
+        // Quote Form Additional Fields
+        'yolo_ys_text_quote_tagline' => sanitize_text_field($_POST['yolo_ys_text_quote_tagline']),
+        'yolo_ys_text_first_name' => sanitize_text_field($_POST['yolo_ys_text_first_name']),
+        'yolo_ys_text_last_name' => sanitize_text_field($_POST['yolo_ys_text_last_name']),
+        'yolo_ys_text_special_requests' => sanitize_text_field($_POST['yolo_ys_text_special_requests']),
+        'yolo_ys_text_required_field' => sanitize_text_field($_POST['yolo_ys_text_required_field']),
+        'yolo_ys_text_quote_description' => sanitize_text_field($_POST['yolo_ys_text_quote_description']),
     );
     
     foreach ($text_options as $key => $value) {
@@ -140,6 +180,46 @@ $texts = array(
     'booking_reference' => get_option('yolo_ys_text_booking_reference', 'Booking Reference'),
     'payment_received' => get_option('yolo_ys_text_payment_received', 'Payment Received'),
     'confirmation_email' => get_option('yolo_ys_text_confirmation_email', 'A confirmation email has been sent to'),
+    
+    // Yacht Details Page Sections
+    'weekly_prices_title' => get_option('yolo_ys_text_weekly_prices_title', 'Peak Season Pricing (May - September)'),
+    'discount_off' => get_option('yolo_ys_text_discount_off', 'OFF'),
+    'select_week' => get_option('yolo_ys_text_select_week', 'Select This Week'),
+    'read_more' => get_option('yolo_ys_text_read_more', 'More...'),
+    'read_less' => get_option('yolo_ys_text_read_less', 'Less'),
+    'location' => get_option('yolo_ys_text_location', 'Location'),
+    'availability_pricing' => get_option('yolo_ys_text_availability_pricing', 'Availability & Pricing'),
+    'no_pricing' => get_option('yolo_ys_text_no_pricing', 'No pricing available. Please contact us for a quote.'),
+    'choose_custom_dates' => get_option('yolo_ys_text_choose_custom_dates', 'Or Choose Custom Dates'),
+    'loading' => get_option('yolo_ys_text_loading', 'Loading...'),
+    
+    // Extras Section
+    'extras' => get_option('yolo_ys_text_extras', 'Extras'),
+    'payable_at_base' => get_option('yolo_ys_text_payable_at_base', 'Payable at the base'),
+    'per_booking' => get_option('yolo_ys_text_per_booking', 'Per Booking'),
+    'per_night' => get_option('yolo_ys_text_per_night', 'Per Night'),
+    'per_day' => get_option('yolo_ys_text_per_day', 'Per Day'),
+    'per_hour' => get_option('yolo_ys_text_per_hour', 'Per Hour'),
+    'per_person' => get_option('yolo_ys_text_per_person', 'Per Person'),
+    
+    // Additional Technical Specs
+    'draught' => get_option('yolo_ys_text_draught', 'DRAUGHT'),
+    'engine' => get_option('yolo_ys_text_engine', 'ENGINE'),
+    'refit' => get_option('yolo_ys_text_refit', 'Refit'),
+    
+    // Fleet Pages
+    'our_fleet_title' => get_option('yolo_ys_text_our_fleet_title', 'Our Fleet'),
+    'partner_title' => get_option('yolo_ys_text_partner_title', 'Partner Companies'),
+    'no_yachts' => get_option('yolo_ys_text_no_yachts', 'No yachts available. Please sync yacht data from the admin panel.'),
+    'details_button' => get_option('yolo_ys_text_details_button', 'DETAILS'),
+    
+    // Quote Form Additional Fields
+    'quote_tagline' => get_option('yolo_ys_text_quote_tagline', 'Need something special?'),
+    'first_name' => get_option('yolo_ys_text_first_name', 'First name *'),
+    'last_name' => get_option('yolo_ys_text_last_name', 'Last name *'),
+    'special_requests' => get_option('yolo_ys_text_special_requests', 'Special requests'),
+    'required_field' => get_option('yolo_ys_text_required_field', '* Required field'),
+    'quote_description' => get_option('yolo_ys_text_quote_description', 'Quick and free quotation for your sailing holiday.'),
 );
 ?>
 
