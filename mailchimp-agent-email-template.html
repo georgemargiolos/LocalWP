@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Charters - New Preveza Base & Fleet 2026</title>
+    <!--
+    BRAND COLORS FROM LOGO:
+    - Navy Blue: #1A4D6D (YOLO text)
+    - Green: #7CB342 (compass top)
+    - Red: #D32F2F (compass left)
+    - Orange: #F57C00 (compass accent)
+    - Blue: #1976D2 (compass bottom)
+    - Yellow: #FBC02D (compass right)
+    - Black: #000000 (CHARTERS text)
+    -->
+    <style>
+        /* Email-safe CSS - Inline styles are better for email clients */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+        }
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #1A4D6D 0%, #1976D2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            color: #FBC02D;
+            font-size: 16px;
+            margin: 0;
+            font-weight: 500;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .intro h2 {
+            color: #1A4D6D;
+            font-size: 24px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+        .intro p {
+            color: #555555;
+            font-size: 16px;
+            line-height: 1.7;
+            margin: 0 0 10px 0;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            border-left: 5px solid #1976D2;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 10px;
+        }
+        .highlight-box h3 {
+            color: #1A4D6D;
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+        .highlight-box p {
+            color: #333333;
+            font-size: 15px;
+            line-height: 1.8;
+            margin: 0;
+        }
+        .yacht-section {
+            margin: 40px 0;
+        }
+        .section-title {
+            text-align: center;
+            color: #1A4D6D;
+            font-size: 26px;
+            margin: 0 0 30px 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 3px solid #FBC02D;
+            padding-bottom: 15px;
+        }
+        /* Yacht Card - Vertical Design (Email-safe) */
+        .yacht-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(26, 77, 109, 0.15);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 2px solid #E3F2FD;
+        }
+        .yacht-image-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
+        .yacht-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .yacht-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            max-width: 100px;
+            height: auto;
+            background: rgba(255,255,255,0.98);
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+        }
+        .yacht-content {
+            padding: 30px;
+        }
+        .yacht-location {
+            color: #7CB342;
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .yacht-name {
+            color: #1A4D6D;
+            font-size: 26px;
+            margin: 0 0 5px 0;
+            font-weight: 700;
+        }
+        .yacht-model {
+            color: #1976D2;
+            font-size: 17px;
+            margin: 0 0 20px 0;
+            font-weight: 500;
+        }
+        .yacht-specs {
+            display: table;
+            width: 100%;
+            background: linear-gradient(135deg, #F5F5F5 0%, #FAFAFA 100%);
+            padding: 18px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #E0E0E0;
+        }
+        .specs-row {
+            display: table-row;
+        }
+        .spec-item {
+            display: table-cell;
+            text-align: center;
+            padding: 10px 5px;
+            vertical-align: top;
+        }
+        .spec-value {
+            color: #1A4D6D;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .spec-label {
+            color: #666666;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .yacht-highlights {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CD 100%);
+            border-left: 4px solid #F57C00;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .yacht-highlights p {
+            color: #444444;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0;
+        }
+        .yacht-price {
+            text-align: center;
+            font-size: 16px;
+            color: #333333;
+            margin: 25px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: 8px;
+            border: 2px solid #7CB342;
+        }
+        .yacht-price strong {
+            color: #1A4D6D;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .cta-button {
+            display: block;
+            width: 100%;
+            max-width: 280px;
+            margin: 20px auto;
+            padding: 16px 35px;
+            background: linear-gradient(135deg, #1A4D6D 0%, #1976D2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(26, 77, 109, 0.3);
+        }
+        .cta-button:hover {
+            background: linear-gradient(135deg, #1976D2 0%, #1A4D6D 100%);
+        }
+        .accent-bar {
+            height: 5px;
+            background: linear-gradient(90deg, #7CB342 0%, #FBC02D 25%, #F57C00 50%, #D32F2F 75%, #1976D2 100%);
+            margin: 0;
+        }
+        .footer {
+            background: #1A4D6D;
+            padding: 35px 30px;
+            text-align: center;
+        }
+        .footer p {
+            color: #B0BEC5;
+            font-size: 14px;
+            margin: 5px 0;
+            line-height: 1.7;
+        }
+        .footer a {
+            color: #FBC02D;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer a:hover {
+            color: #F57C00;
+        }
+        .footer-logo {
+            max-width: 140px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+        }
+        .social-links {
+            margin: 25px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 12px;
+            color: #FBC02D;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #1976D2 50%, transparent 100%);
+            margin: 30px 0;
+        }
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .header h1 { font-size: 24px; }
+            .intro h2 { font-size: 20px; }
+            .section-title { font-size: 22px; }
+            .yacht-name { font-size: 22px; }
+            .content { padding: 25px 20px; }
+            .yacht-content { padding: 25px 20px; }
+            .spec-item { font-size: 12px; padding: 8px 3px; }
+            .spec-value { font-size: 18px; }
+            .yacht-image-container { height: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        
+        <!-- Accent Bar -->
+        <div class="accent-bar"></div>
+        
+        <!-- Header -->
+        <div class="header">
+            <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters Logo">
+            <h1>🌊 Discover Our New Preveza Base</h1>
+            <p>Premium Yacht Charters in the Ionian Sea</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            
+            <!-- Introduction -->
+            <div class="intro">
+                <h2>Exciting News for 2026!</h2>
+                <p><strong>Dear Valued Charter Agent,</strong></p>
+                <p>We are thrilled to announce the opening of our <strong style="color: #1A4D6D;">brand new base in Preveza</strong>, Greece – your gateway to the stunning Ionian Islands! With crystal-clear turquoise waters, charming traditional villages, and perfect sailing conditions year-round, Preveza offers an unforgettable yachting experience for your clients.</p>
+            </div>
+            
+            <!-- Highlight Box -->
+            <div class="highlight-box">
+                <h3>🏆 Why YOLO Charters Stands Out</h3>
+                <p><strong style="color: #1A4D6D;">✓ Premium Fleet:</strong> Modern, meticulously maintained yachts with top-tier equipment and luxury amenities<br><br>
+                <strong style="color: #1A4D6D;">✓ Competitive Rates:</strong> Attractive agent commissions (20%) and exclusive special offers for your clients<br><br>
+                <strong style="color: #1A4D6D;">✓ Full Support:</strong> 24/7 customer service, dedicated agent portal, and multilingual crew assistance<br><br>
+                <strong style="color: #1A4D6D;">✓ Prime Location:</strong> Preveza Main Port – the ideal starting point for exploring the Ionian Islands<br><br>
+                <strong style="color: #1A4D6D;">✓ Extras Included:</strong> Solar panels, SUPs, snorkeling gear, outboard engines, espresso machines & more!</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Yacht Section -->
+            <div class="yacht-section">
+                <h2 class="section-title">⛵ Our Premium Fleet in Preveza</h2>
+                
+                <!-- Yacht 1: Strawberry -->
+                <table class="yacht-card" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td>
+                            <div class="yacht-image-container">
+                                <img src="https://www.booking-manager.com/cbm/documents/7136957950000107850_Strawberry_16.jpg" alt="Strawberry - Lagoon 440 Catamaran" class="yacht-image">
+                                <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yacht-logo">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="yacht-content">
+                            <p class="yacht-location">📍 Preveza Main Port, Ionian Sea, Greece</p>
+                            <h3 class="yacht-name">Strawberry</h3>
+                            <h4 class="yacht-model">Lagoon 440 - Premium Catamaran</h4>
+                            
+                            <table class="yacht-specs" width="100%" cellpadding="0" cellspacing="0">
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">4</div>
+                                        <div class="spec-label">Cabins</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">4</div>
+                                        <div class="spec-label">WC/Heads</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">10</div>
+                                        <div class="spec-label">Berths</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">45ft</div>
+                                        <div class="spec-label">Length</div>
+                                    </td>
+                                </tr>
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">2008</div>
+                                        <div class="spec-label">Built</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value" style="color: #7CB342;">2026</div>
+                                        <div class="spec-label">Refit</div>
+                                    </td>
+                                    <td class="spec-item" colspan="2">
+                                        <div class="spec-value">⭐⭐⭐</div>
+                                        <div class="spec-label">Premium</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="yacht-highlights">
+                                <p><strong style="color: #F57C00;">🌟 Luxury Extras Included:</strong><br>
+                                ✓ Solar Panels • Espresso Coffee Machine • Extra Cushions & Sunbeds<br>
+                                ✓ Free SUP • Free Snorkeling Equipment • Free Outboard Engine<br>
+                                ✓ 2x50m Floating Stern Lines • Full Safety Equipment</p>
+                            </div>
+                            
+                            <p class="yacht-price">Starting from <strong>€3,500</strong> / week<br>
+                            <span style="font-size: 13px; color: #666;">*Peak season rates | Special offers available</span></p>
+                            
+                            <a href="https://yolo-charters.com/yacht-details-page/?yacht_id=7136018700000107850" class="cta-button">View Details</a>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Yacht 2: Aquilo -->
+                <table class="yacht-card" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td>
+                            <div class="yacht-image-container">
+                                <img src="https://www.booking-manager.com/cbm/documents/7216949590000107850_Aquilo_ext3.jpg" alt="Aquilo - Bavaria Cruiser 46" class="yacht-image">
+                                <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yacht-logo">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="yacht-content">
+                            <p class="yacht-location">📍 Preveza Main Port, Ionian Sea, Greece</p>
+                            <h3 class="yacht-name">Aquilo</h3>
+                            <h4 class="yacht-model">Bavaria Cruiser 46 - Performance Cruiser</h4>
+                            
+                            <table class="yacht-specs" width="100%" cellpadding="0" cellspacing="0">
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">4</div>
+                                        <div class="spec-label">Cabins</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">3</div>
+                                        <div class="spec-label">WC/Heads</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">8</div>
+                                        <div class="spec-label">Berths</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">48ft</div>
+                                        <div class="spec-label">Length</div>
+                                    </td>
+                                </tr>
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">2014</div>
+                                        <div class="spec-label">Built</div>
+                                    </td>
+                                    <td class="spec-item" colspan="3">
+                                        <div class="spec-value" style="color: #1976D2;">Modern</div>
+                                        <div class="spec-label">Performance</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="yacht-highlights">
+                                <p><strong style="color: #F57C00;">🌟 Premium Extras Included:</strong><br>
+                                ✓ Solar Panels • Dinghy with Free Outboard Engine<br>
+                                ✓ Espresso Coffee Machine • Bow Thruster for Easy Maneuvering<br>
+                                ✓ Free SUP • Free Snorkeling Equipment • Full Safety Equipment</p>
+                            </div>
+                            
+                            <p class="yacht-price">Starting from <strong>€2,800</strong> / week<br>
+                            <span style="font-size: 13px; color: #666;">*Peak season rates | Special offers available</span></p>
+                            
+                            <a href="https://yolo-charters.com/yacht-details-page/?yacht_id=7208135200000107850" class="cta-button">View Details</a>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Yacht 3: Lemon -->
+                <table class="yacht-card" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td>
+                            <div class="yacht-image-container">
+                                <img src="https://www.booking-manager.com/cbm/documents/6604179230000107850_Lemon_0008.jpg" alt="Lemon - Sun Odyssey 469" class="yacht-image">
+                                <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yacht-logo">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="yacht-content">
+                            <p class="yacht-location">📍 Preveza Main Port, Ionian Sea, Greece</p>
+                            <h3 class="yacht-name">Lemon</h3>
+                            <h4 class="yacht-model">Sun Odyssey 469 - Elegant Cruiser</h4>
+                            
+                            <table class="yacht-specs" width="100%" cellpadding="0" cellspacing="0">
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">4</div>
+                                        <div class="spec-label">Cabins</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">4</div>
+                                        <div class="spec-label">WC/Heads</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">10</div>
+                                        <div class="spec-label">Berths</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value">46ft</div>
+                                        <div class="spec-label">Length</div>
+                                    </td>
+                                </tr>
+                                <tr class="specs-row">
+                                    <td class="spec-item">
+                                        <div class="spec-value">2013</div>
+                                        <div class="spec-label">Built</div>
+                                    </td>
+                                    <td class="spec-item">
+                                        <div class="spec-value" style="color: #7CB342;">2025</div>
+                                        <div class="spec-label">Refit</div>
+                                    </td>
+                                    <td class="spec-item" colspan="2">
+                                        <div class="spec-value">⭐⭐</div>
+                                        <div class="spec-label">Great Value</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div class="yacht-highlights">
+                                <p><strong style="color: #F57C00;">🌟 Premium Extras Included:</strong><br>
+                                ✓ Solar Panels • Espresso Coffee Machine • Extra Cushions & Sunbeds<br>
+                                ✓ Free SUP • Free Snorkeling Equipment • Free Outboard Engine<br>
+                                ✓ 2x50m Floating Stern Lines • Full Safety Equipment</p>
+                            </div>
+                            
+                            <p class="yacht-price">Starting from <strong>€2,600</strong> / week<br>
+                            <span style="font-size: 13px; color: #666;">*Peak season rates | Special offers available</span></p>
+                            
+                            <a href="https://yolo-charters.com/yacht-details-page/?yacht_id=6362109340000107850" class="cta-button">View Details</a>
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Call to Action -->
+            <div class="highlight-box" style="text-align: center; margin-top: 40px; background: linear-gradient(135deg, #FFF9E6 0%, #FFE082 100%); border-left: 5px solid #F57C00;">
+                <h3 style="color: #1A4D6D;">🤝 Partner With YOLO Charters Today!</h3>
+                <p style="margin-bottom: 20px; font-size: 16px;">Join our growing network of charter agents worldwide and offer your clients the ultimate Ionian sailing experience. <strong>Competitive 20% commissions</strong>, dedicated support, and premium yachts await!</p>
+                <a href="https://yolo-charters.com/contact/" class="cta-button" style="margin: 10px auto;">Contact Us Now</a>
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">📧 Email us at <a href="mailto:info@yolo-charters.com" style="color: #1A4D6D; font-weight: 600;">info@yolo-charters.com</a><br>
+                📞 Call us at +30 XXX XXX XXXX</p>
+            </div>
+            
+        </div>
+        
+        <!-- Accent Bar -->
+        <div class="accent-bar"></div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="footer-logo">
+            <p style="color: #FBC02D; font-size: 18px; font-weight: 700; margin-bottom: 10px;">YOLO CHARTERS</p>
+            <p>Premium Yacht Charters | Preveza Main Port, Greece</p>
+            <p>📧 <a href="mailto:info@yolo-charters.com">info@yolo-charters.com</a></p>
+            <p>🌐 <a href="https://yolo-charters.com">www.yolo-charters.com</a></p>
+            <p>📞 +30 XXX XXX XXXX</p>
+            
+            <div class="social-links">
+                <a href="#">📘 Facebook</a> • 
+                <a href="#">📷 Instagram</a> • 
+                <a href="#">💼 LinkedIn</a>
+            </div>
+            
+            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="font-size: 12px; color: #90A4AE;">
+                    You are receiving this email because you are a registered charter agent with YOLO Charters.<br>
+                    <a href="#" style="color: #FBC02D;">Unsubscribe</a> | <a href="#" style="color: #FBC02D;">Update Preferences</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Accent Bar -->
+        <div class="accent-bar"></div>
+        
+    </div>
+</body>
+</html>

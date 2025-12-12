@@ -472,6 +472,21 @@ main .yolo-ys-search-results,
     color: white;
 }
 
+/* ========================================
+   FIX: Single Yacht Full Width Layout
+   When only one yacht in a row, make it full width
+   instead of constrained to 33.33% (col-lg-4)
+   ======================================== */
+
+/* Make all yacht cards in search results full width on large screens when there's only one */
+@media (min-width: 992px) {
+    /* Target the row that contains yacht cards */
+    .yolo-ys-section-header + .container-fluid .row.g-4 .col-lg-4:first-child:last-child {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}
+
 /* Mobile responsiveness for yacht cards */
 @media (max-width: 768px) {
     .yolo-ys-yacht-image {

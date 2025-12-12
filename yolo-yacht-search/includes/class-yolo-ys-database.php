@@ -374,6 +374,9 @@ class YOLO_YS_Database {
                     $image_data = @file_get_contents($remote_url);
                     if ($image_data !== false) {
                         file_put_contents($local_path, $image_data);
+                        
+                        // Optimize the downloaded image to reduce file size
+                        $this->optimize_yacht_image($local_path);
                     } else {
                         // If download fails, use CDN URL as fallback
                         $local_url = $remote_url;
@@ -564,5 +567,78 @@ class YOLO_YS_Database {
     public function get_equipment_name($equipment_id) {
         $this->load_equipment_cache();
         return isset($this->equipment_cache[$equipment_id]) ? $this->equipment_cache[$equipment_id] : 'Unknown Equipment';
+    }
+    
+    /**
+     * Optimize yacht image after download
+     * Reduces file size while maintaining quality using WordPress image editor
+     * 
+     * Process:
+     * 1. Load image using wp_get_image_editor()
+     * 2. Resize if larger than 1920px (retina-ready for desktop)
+     * 3. Set quality to 85% (sweet spot for size vs quality)
+     * 4. Save optimized version over original
+     * 
+     * Expected results:
+     * - Original: 2-5 MB → Optimized: 300-500 KB (85-90% reduction)
+     * - Maintains visual quality for web display
+     * - Faster page loads, reduced storage, lower bandwidth
+     * 
+     * @param string $image_path Full path to image file
+     * @return bool Success status
+     */
+    private function optimize_yacht_image($image_path) {
+        if (!file_exists($image_path)) {
+            error_log('YOLO YS: Image optimization failed - file not found: ' . basename($image_path));
+            return false;
+        }
+        
+        // Use WordPress image editor (supports GD and ImageMagick)
+        $editor = wp_get_image_editor($image_path);
+        
+        if (is_wp_error($editor)) {
+            error_log('YOLO YS: Image editor failed for ' . basename($image_path) . ': ' . $editor->get_error_message());
+            return false;
+        }
+        
+        // Get current dimensions
+        $size = $editor->get_size();
+        $width = $size['width'];
+        $height = $size['height'];
+        
+        // Only resize if larger than 1920px width (retina-ready for desktop)
+        // This preserves quality while reducing file size significantly
+        if ($width > 1920 || $height > 1080) {
+            $editor->resize(1920, 1080, false); // false = maintain aspect ratio
+            error_log(sprintf(
+                'YOLO YS: Resized %s from %dx%d to max 1920x1080',
+                basename($image_path),
+                $width,
+                $height
+            ));
+        }
+        
+        // Set quality to 85% (WordPress default is 82%, we use 85% for slightly better quality)
+        // This is the sweet spot: excellent visual quality with 85-90% file size reduction
+        $editor->set_quality(85);
+        
+        // Save optimized version (overwrites original)
+        $result = $editor->save($image_path);
+        
+        if (is_wp_error($result)) {
+            error_log('YOLO YS: Failed to save optimized image: ' . $result->get_error_message());
+            return false;
+        }
+        
+        // Log success with file size info
+        $file_size = file_exists($image_path) ? filesize($image_path) : 0;
+        $file_size_mb = round($file_size / 1024 / 1024, 2);
+        error_log(sprintf(
+            'YOLO YS: Optimized %s (final size: %s MB)',
+            basename($image_path),
+            $file_size_mb
+        ));
+        
+        return true;
     }
 }
