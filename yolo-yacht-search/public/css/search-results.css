@@ -66,6 +66,14 @@ main .yolo-ys-search-results,
     box-sizing: border-box;
 }
 
+/* Force full width for single yacht in a section */
+.yolo-ys-search-results .container-fluid .row .col-lg-4:only-child,
+.yolo-ys-search-results .container-fluid .row .col-lg-4:first-child:last-child {
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+}
+
 .yolo-ys-no-results {
     text-align: center;
     padding: 60px 20px;
