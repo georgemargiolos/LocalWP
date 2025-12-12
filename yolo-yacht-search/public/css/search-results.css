@@ -66,12 +66,38 @@ main .yolo-ys-search-results,
     box-sizing: border-box;
 }
 
-/* Force full width for single yacht in a section */
-.yolo-ys-search-results .container-fluid .row .col-lg-4:only-child,
-.yolo-ys-search-results .container-fluid .row .col-lg-4:first-child:last-child {
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-    width: 100% !important;
+/* Single/Few Yachts Layout Fix - Desktop Only */
+@media (min-width: 992px) {
+    /* Target columns with col-12 col-sm-6 col-lg-4 classes */
+    /* Method 1: :has() selector - only child gets full width */
+    .yolo-ys-search-results .row.g-4:has([class*="col-lg-4"]:only-child) [class*="col-lg-4"] {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+    }
+    
+    /* Method 2: Sibling selector fallback for older browsers */
+    .yolo-ys-section-header + .container-fluid .row.g-4 [class*="col-lg-4"]:first-child:last-child,
+    .yolo-ys-search-results .container-fluid .row.g-4 [class*="col-lg-4"]:first-child:last-child {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+    }
+    
+    /* When exactly 2 yachts, make them 50% each (2 columns) */
+    .yolo-ys-search-results .row.g-4:has([class*="col-lg-4"]:first-child:nth-last-child(2)) [class*="col-lg-4"] {
+        max-width: 50% !important;
+        flex: 0 0 50% !important;
+        width: 50% !important;
+    }
+    
+    /* Extra specificity - target the exact class combination */
+    .yolo-ys-search-results .row.g-4 .col-12.col-sm-6.col-lg-4:only-child,
+    .yolo-ys-search-results .row.g-4 .col-12.col-sm-6.col-lg-4:first-child:last-child {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+    }
 }
 
 .yolo-ys-no-results {
