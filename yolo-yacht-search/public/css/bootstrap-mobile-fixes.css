@@ -47,7 +47,7 @@
 .yolo-guest-login-container,
 .yolo-guest-dashboard {
     overflow-x: clip; /* clip prevents scroll but doesn't break position:sticky like hidden does */
-    max-width: 100%;
+    /* max-width: 100%; REMOVED - This was conflicting with template-specific max-width rules */
 }
 
 /* ============================================

@@ -98,7 +98,7 @@ class YOLO_YS_Public {
                 wp_enqueue_style(
                     'yolo-ys-search-results',
                     YOLO_YS_PLUGIN_URL . 'public/css/search-results.css',
-                    array(),
+                    array('yolo-ys-bootstrap-mobile'),  // Load AFTER bootstrap-mobile-fixes to ensure max-width:none !important wins
                     $this->version
                 );
                 
