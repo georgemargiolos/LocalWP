@@ -318,13 +318,12 @@
                 <div class="yolo-ys-section-header">
                     <h3>YOLO Charters Fleet</h3>
                 </div>
-                <div class="container-fluid">
-                    <div class="row g-4">
+                <div class="row g-4">
             `;
             data.yolo_boats.forEach(boat => {
                 html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, true)}</div>`;
             });
-            html += '</div></div>';
+            html += '</div>';
         }
         
         // Render friend boats
@@ -333,13 +332,12 @@
                 <div class="yolo-ys-section-header friends">
                     <h3>Partner Fleet</h3>
                 </div>
-                <div class="container-fluid">
-                    <div class="row g-4">
+                <div class="row g-4">
             `;
             data.friend_boats.forEach(boat => {
                 html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, false)}</div>`;
             });
-            html += '</div></div>';
+            html += '</div>';
         }
         
         resultsContainer.html(html);
