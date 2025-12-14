@@ -37,6 +37,8 @@ class YOLO_YS_Meta_Tags {
         add_action('wp_head', array($this, 'output_meta_description'), 1);
         add_action('wp_head', array($this, 'output_meta_tags'), 5);
         add_action('wp_head', array($this, 'output_schema_json_ld'), 6);
+        add_filter('pre_get_document_title', array($this, 'filter_yacht_page_title'), 10);
+        add_filter('wp_title', array($this, 'filter_yacht_page_title'), 10, 2);
     }
     
     private function is_yacht_page() {
@@ -118,8 +120,8 @@ class YOLO_YS_Meta_Tags {
         
         // Build title
         $title = $name;
-        if ($model) $title .= ' - ' . $model;
-        $title .= ' | ' . get_bloginfo('name');
+        if ($model) $title .= ' | ' . $model;
+        $title .= ' – Yolo Charters';
         
         // Build description
         $desc = '';
@@ -351,6 +353,31 @@ class YOLO_YS_Meta_Tags {
 <?php echo json_encode($place_schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
 </script>
         <?php
+    }
+    
+    /**
+     * Filter WordPress page title for yacht details pages
+     */
+    public function filter_yacht_page_title($title, $sep = null) {
+        if (!$this->is_yacht_page()) {
+            return $title;
+        }
+        
+        $yacht = $this->get_current_yacht();
+        if (empty($yacht)) {
+            return $title;
+        }
+        
+        $name = $yacht['name'] ?? 'Yacht';
+        $model = $yacht['model'] ?? '';
+        
+        $new_title = $name;
+        if ($model) {
+            $new_title .= ' | ' . $model;
+        }
+        $new_title .= ' – Yolo Charters';
+        
+        return $new_title;
     }
 }
 
