@@ -97,10 +97,13 @@ class YOLO_YS_Analytics {
         $this->send_to_facebook_api(array($event_payload));
         
         // Store event_id in session for client-side deduplication
-        if (!session_id()) {
-            session_start();
+        // FIXED: Check headers_sent() to prevent PHP warnings that break JavaScript output
+        if (!session_id() && !headers_sent()) {
+            @session_start();
         }
-        $_SESSION['yolo_last_fb_event_id'] = $event_id;
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION['yolo_last_fb_event_id'] = $event_id;
+        }
         
         if ($this->debug_mode) {
             error_log('YOLO Analytics: Sent ' . $event_name . ' to Facebook CAPI (event_id: ' . $event_id . ')');
