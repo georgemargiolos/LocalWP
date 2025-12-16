@@ -38,8 +38,9 @@
             minDate: new Date(),
             numberOfColumns: 2,
             numberOfMonths: 2,
-            startDate: firstSaturday,
-            endDate: nextSaturday,
+            // Don't auto-populate dates - show placeholder instead
+            // startDate: firstSaturday,
+            // endDate: nextSaturday,
             disallowLockDaysInRange: true,
             position: 'top',
             tooltipNumber: (totalDays) => {
