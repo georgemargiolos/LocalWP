@@ -67,6 +67,7 @@ class YOLO_YS_Quote_Handler {
             $quote_id = $wpdb->insert_id;
             
             // Track lead generation event (server-side Facebook Conversions API)
+            $event_id = false;
             if (function_exists('yolo_analytics')) {
                 $user_data = array(
                     'email' => $email,
@@ -74,7 +75,7 @@ class YOLO_YS_Quote_Handler {
                     'first_name' => $first_name,
                     'last_name' => $last_name
                 );
-                yolo_analytics()->track_generate_lead(0, $user_data);
+                $event_id = yolo_analytics()->track_generate_lead(0, $user_data);
             }
             
             // Trigger notifications
@@ -82,7 +83,8 @@ class YOLO_YS_Quote_Handler {
             
             wp_send_json_success(array(
                 'message' => 'Quote request submitted successfully! We will contact you soon.',
-                'quote_id' => $quote_id
+                'quote_id' => $quote_id,
+                'event_id' => $event_id
             ));
         } else {
             wp_send_json_error(array('message' => 'Failed to submit quote request. Please try again.'));

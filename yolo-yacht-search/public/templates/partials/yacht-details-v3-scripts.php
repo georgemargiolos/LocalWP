@@ -613,6 +613,31 @@ function bookNow() {
     const yachtId = "<?php echo esc_attr($yacht->id ?? ''); ?>";
     const yachtName = <?php echo json_encode($yacht->name ?? ''); ?>;
     
+    // Track AddToCart event (server-side CAPI + client-side Pixel with deduplication)
+    jQuery.ajax({
+        url: yoloYSPublic.ajaxurl,
+        type: 'POST',
+        data: {
+            action: 'yolo_track_add_to_cart',
+            yacht_id: yachtId,
+            yacht_name: yachtName,
+            price: totalPrice
+        },
+        success: function(response) {
+            if (response.success && response.data.event_id) {
+                // Track on client-side with same event_id for deduplication
+                if (typeof YoloAnalytics !== 'undefined') {
+                    YoloAnalytics.trackSelectWeek({
+                        yacht_id: yachtId,
+                        yacht_name: yachtName,
+                        price: totalPrice,
+                        currency: currency
+                    }, response.data.event_id);
+                }
+            }
+        }
+    });
+    
     // Show booking form modal
     showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, currency);
 }
@@ -740,6 +765,35 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Processing...';
         submitBtn.disabled = true;
+        
+        // Track InitiateCheckout event (server-side CAPI + client-side Pixel with deduplication)
+        jQuery.ajax({
+            url: yoloYSPublic.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_track_initiate_checkout',
+                yacht_id: yachtId,
+                yacht_name: yachtName,
+                price: totalPrice,
+                date_from: dateFrom,
+                date_to: dateTo
+            },
+            success: function(response) {
+                if (response.success && response.data.event_id) {
+                    // Track on client-side with same event_id for deduplication
+                    if (typeof YoloAnalytics !== 'undefined') {
+                        YoloAnalytics.trackBeginCheckout({
+                            yacht_id: yachtId,
+                            yacht_name: yachtName,
+                            price: totalPrice,
+                            currency: currency,
+                            date_from: dateFrom,
+                            date_to: dateTo
+                        }, response.data.event_id);
+                    }
+                }
+            }
+        });
         
         // Create Stripe Checkout Session with customer data
         fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
@@ -941,6 +995,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Track Lead event on client-side with event_id from server-side for deduplication
+                    if (data.data.event_id && typeof YoloAnalytics !== 'undefined') {
+                        YoloAnalytics.trackLead({
+                            yacht_id: "<?php echo esc_attr($yacht->id ?? ''); ?>",
+                            yacht_name: "<?php echo esc_js($yacht->name ?? ''); ?>",
+                            value: 0
+                        }, data.data.event_id);
+                    }
+                    
                     // Show success message
                     Toastify({
                         text: '✓ ' + data.data.message,

@@ -121,14 +121,14 @@
                 self.trackSelectWeek(yacht);
             });
             
-            // Book Now (begin checkout)
+            // Book Now (add to cart)
             $(document).on('click', '#bookNowBtn, .book-now-btn', function() {
-                self.trackBeginCheckout(getYachtData());
+                self.trackSelectWeek(getYachtData());
             });
             
-            // Booking form submission (add payment info)
+            // Booking form submission (initiate checkout / proceed to checkout)
             $(document).on('submit', '#booking-form, .yolo-booking-form', function() {
-                self.trackAddPaymentInfo(getYachtData());
+                self.trackBeginCheckout(getYachtData());
             });
             
             // Quote request (generate lead)
@@ -183,9 +183,11 @@
         
         /**
          * Track week selection (add_to_cart)
-         * Sent client-side to Facebook Pixel
+         * Sent to BOTH server-side (CAPI) and client-side (Pixel) for proper deduplication
+         * @param {object} p - Yacht data
+         * @param {string} eventId - Optional event ID from server-side for deduplication
          */
-        trackSelectWeek: function(p) {
+        trackSelectWeek: function(p, eventId) {
             // Send to dataLayer for GA4
             pushToDataLayer('add_to_cart', {
                 currency: p.currency,
@@ -197,21 +199,23 @@
                 }]
             });
             
-            // Send to Facebook Pixel
+            // Send to Facebook Pixel with event_id from server-side for deduplication
             sendToFacebookPixel('AddToCart', {
                 content_type: 'product',
-                content_ids: [String(p.id)],
-                content_name: p.name,
+                content_ids: [String(p.yacht_id || p.id)],
+                content_name: p.yacht_name || p.name,
                 currency: p.currency,
                 value: p.price
-            });
+            }, eventId || null);
         },
         
         /**
          * Track begin checkout
-         * Sent client-side to Facebook Pixel
+         * Sent to BOTH server-side (CAPI) and client-side (Pixel) for proper deduplication
+         * @param {object} p - Yacht data
+         * @param {string} eventId - Optional event ID from server-side for deduplication
          */
-        trackBeginCheckout: function(p) {
+        trackBeginCheckout: function(p, eventId) {
             // Send to dataLayer for GA4
             pushToDataLayer('begin_checkout', {
                 currency: p.currency,
@@ -223,14 +227,14 @@
                 }]
             });
             
-            // Send to Facebook Pixel
+            // Send to Facebook Pixel with event_id from server-side for deduplication
             sendToFacebookPixel('InitiateCheckout', {
                 content_type: 'product',
-                content_ids: [String(p.id)],
-                content_name: p.name,
+                content_ids: [String(p.yacht_id || p.id)],
+                content_name: p.yacht_name || p.name,
                 currency: p.currency,
                 value: p.price
-            });
+            }, eventId || null);
         },
         
         /**
@@ -272,6 +276,27 @@
             
             // Note: Lead is sent server-side with user data (email, phone, name)
             // No need to send client-side to avoid duplication
+        },
+        
+        /**
+         * Track lead generation (quote request submission)
+         * Sent to BOTH server-side (CAPI) and client-side (Pixel) for proper deduplication
+         * @param {object} p - Lead data
+         * @param {string} eventId - Event ID from server-side for deduplication
+         */
+        trackLead: function(p, eventId) {
+            // Send to dataLayer for GA4
+            pushToDataLayer('generate_lead', {
+                currency: 'EUR',
+                value: p.value || 0
+            });
+            
+            // Send to Facebook Pixel with event_id from server-side for deduplication
+            sendToFacebookPixel('Lead', {
+                content_name: p.yacht_name || '',
+                currency: 'EUR',
+                value: p.value || 0
+            }, eventId || null);
         },
         
         /**

@@ -392,3 +392,46 @@ class YOLO_YS_Public {
         wp_send_json($response);
     }
 }
+
+    /**
+     * AJAX handler for tracking AddToCart event (BOOK NOW button click)
+     */
+    public function ajax_track_add_to_cart() {
+        // Get yacht data from request
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $yacht_name = isset($_POST['yacht_name']) ? sanitize_text_field($_POST['yacht_name']) : '';
+        $price = isset($_POST['price']) ? floatval($_POST['price']) : 0;
+        
+        // Track AddToCart event via Facebook CAPI
+        $event_id = false;
+        if (function_exists('yolo_analytics')) {
+            $event_id = yolo_analytics()->track_add_to_cart($yacht_id, $yacht_name, $price);
+        }
+        
+        wp_send_json_success(array(
+            'event_id' => $event_id
+        ));
+    }
+    
+    /**
+     * AJAX handler for tracking InitiateCheckout event (booking form submission)
+     */
+    public function ajax_track_initiate_checkout() {
+        // Get booking data from request
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $yacht_name = isset($_POST['yacht_name']) ? sanitize_text_field($_POST['yacht_name']) : '';
+        $price = isset($_POST['price']) ? floatval($_POST['price']) : 0;
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : '';
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
+        
+        // Track InitiateCheckout event via Facebook CAPI
+        $event_id = false;
+        if (function_exists('yolo_analytics')) {
+            $event_id = yolo_analytics()->track_initiate_checkout($yacht_id, $yacht_name, $price, $date_from, $date_to);
+        }
+        
+        wp_send_json_success(array(
+            'event_id' => $event_id
+        ));
+    }
+}

@@ -76,7 +76,14 @@ class YOLO_YS_Yacht_Search {
         
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-        // AJAX handlers are registered in class-yolo-ys-public-search.php
+        
+        // AJAX handlers for Facebook event tracking
+        $this->loader->add_action('wp_ajax_yolo_track_add_to_cart', $plugin_public, 'ajax_track_add_to_cart');
+        $this->loader->add_action('wp_ajax_nopriv_yolo_track_add_to_cart', $plugin_public, 'ajax_track_add_to_cart');
+        $this->loader->add_action('wp_ajax_yolo_track_initiate_checkout', $plugin_public, 'ajax_track_initiate_checkout');
+        $this->loader->add_action('wp_ajax_nopriv_yolo_track_initiate_checkout', $plugin_public, 'ajax_track_initiate_checkout');
+        
+        // Other AJAX handlers are registered in class-yolo-ys-public-search.php
         
         // Initialize quote handler for quote request form
         new YOLO_YS_Quote_Handler();
