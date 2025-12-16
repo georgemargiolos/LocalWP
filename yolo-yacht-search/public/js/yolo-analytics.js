@@ -156,7 +156,7 @@
         
         /**
          * Track yacht view (view_item)
-         * Server-side ViewContent is sent from PHP, this only sends to dataLayer for GA4
+         * Sent to BOTH server-side (CAPI) and client-side (Pixel) for proper deduplication
          */
         trackViewYacht: function(p) {
             // Send to dataLayer for GA4
@@ -170,8 +170,15 @@
                 }]
             });
             
-            // Note: ViewContent is sent server-side with better user data
-            // No need to send client-side to avoid duplication
+            // Send to Facebook Pixel with event_id from server-side for deduplication
+            const eventId = window.fbViewContentEventId || null;
+            sendToFacebookPixel('ViewContent', {
+                content_type: 'product',
+                content_ids: [String(p.id)],
+                content_name: p.name,
+                currency: p.currency,
+                value: p.price
+            }, eventId);
         },
         
         /**

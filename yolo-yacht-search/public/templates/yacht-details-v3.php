@@ -50,10 +50,11 @@ if (!$yacht) {
 }
 
 // Track yacht view event (server-side Facebook Conversions API)
+$fb_event_id = '';
 if (function_exists('yolo_analytics')) {
     $yacht_price = !empty($yacht->price) ? floatval($yacht->price) : 0;
     $yacht_name = !empty($yacht->name) ? $yacht->name : '';
-    yolo_analytics()->track_yacht_view($yacht_id, $yacht_price, $yacht_name);
+    $fb_event_id = yolo_analytics()->track_yacht_view($yacht_id, $yacht_price, $yacht_name);
 }
 
 // Get images

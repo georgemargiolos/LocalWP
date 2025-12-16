@@ -9,6 +9,9 @@
  */
 ?>
 <script>
+// Facebook event_id for deduplication (from server-side CAPI)
+const fbViewContentEventId = '<?php echo esc_js($fb_event_id); ?>';
+
 // ============================================
 // FIXED: Toggle Description "More..." / "Less"
 // This function was MISSING - causing the button to not work!

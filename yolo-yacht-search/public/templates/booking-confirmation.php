@@ -213,8 +213,11 @@ function yolo_show_booking_confirmation($booking) {
         console.log('YOLO Analytics: Purchase event tracked (GA4)');
     }
     
-    // Track Purchase event for Facebook Pixel (client-side)
+    // Track Purchase event for Facebook Pixel (client-side) with deduplication
     if (typeof fbq !== 'undefined') {
+        // Use event_id from server-side CAPI for proper deduplication
+        const eventId = window.fbPurchaseEventId || 'purchase_<?php echo esc_js($booking->id); ?>_<?php echo time(); ?>';
+        
         fbq('track', 'Purchase', {
             content_type: 'product',
             content_ids: ['<?php echo esc_js($booking->yacht_id); ?>'],
@@ -223,9 +226,9 @@ function yolo_show_booking_confirmation($booking) {
             value: <?php echo floatval($booking->total_price); ?>,
             order_id: '<?php echo esc_js($booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id); ?>'
         }, {
-            eventID: 'purchase_<?php echo esc_js($booking->id); ?>_<?php echo time(); ?>'
+            eventID: eventId
         });
-        console.log('YOLO Analytics: Purchase event tracked (Facebook Pixel)');
+        console.log('YOLO Analytics: Purchase event tracked (Facebook Pixel) with event_id:', eventId);
     }
     </script>
     <?php
@@ -346,7 +349,7 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
                     'ln' => $customer_last_name
                 );
                 
-                yolo_analytics()->track_purchase(
+                $fb_purchase_event_id = yolo_analytics()->track_purchase(
                     $transaction_id,
                     $yacht_id,
                     $total_price,
@@ -354,7 +357,10 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
                     $user_data
                 );
                 
-                error_log('YOLO YS: Purchase event tracked via CAPI for booking #' . $booking_id);
+                error_log('YOLO YS: Purchase event tracked via CAPI for booking #' . $booking_id . ' (event_id: ' . $fb_purchase_event_id . ')');
+                
+                // Pass event_id to JavaScript for client-side deduplication
+                echo '<script>window.fbPurchaseEventId = "' . esc_js($fb_purchase_event_id) . '";</script>';
             }
         }
         
