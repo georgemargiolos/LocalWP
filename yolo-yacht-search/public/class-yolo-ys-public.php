@@ -391,8 +391,7 @@ class YOLO_YS_Public {
         
         wp_send_json($response);
     }
-}
-
+    
     /**
      * AJAX handler for tracking AddToCart event (BOOK NOW button click)
      */
@@ -435,3 +434,4 @@ class YOLO_YS_Public {
         ));
     }
 }
+
