@@ -498,7 +498,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-file-lines"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Transit Log</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_transit_log', 'Official cruising permit required for sailing in Greek waters.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_transit_log', 'Official cruising permit required for sailing in Greek waters. We handle all the paperwork so you can focus on your adventure.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -507,7 +507,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-clipboard-check"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Professional Check-in/Check-out</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_checkin', 'Experienced staff will guide you through the yacht and ensure a smooth handover.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_checkin', 'Our experienced staff will guide you through the yacht, explain all systems, and ensure a smooth handover.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -516,7 +516,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-broom"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Final Cleaning</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_cleaning', 'Return the yacht without worrying about cleaning.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_cleaning', 'Return the yacht without worrying about cleaning. Our team will take care of everything after your charter.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -525,7 +525,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-bed"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Bed Linen & Bath Towels</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_linen', 'Fresh linens and towels for all guests.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_linen', 'Fresh, high-quality linens and towels for all guests. Everything you need for a comfortable stay onboard.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -534,7 +534,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-fire-flame-simple"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Gas Bottle</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_gas', 'Full gas bottle for cooking throughout your charter.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_gas', 'Full gas bottle for cooking. Prepare delicious meals in the galley throughout your charter.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -543,7 +543,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-anchor"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Dinghy with Outboard Engine</h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_dinghy', 'Explore secluded beaches and coves with the included tender.')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_dinghy', 'Explore secluded beaches and coves with the included tender. Perfect for shore excursions and provisioning runs.')); ?></p>
                                         </div>
                                     </div>
                                     
@@ -552,7 +552,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                         <div class="pack-item-icon"><i class="fa-solid fa-person-swimming"></i></div>
                                         <div class="pack-item-content">
                                             <h6>Stand Up Paddle Board (SUP) <span class="free-badge">FREE</span></h6>
-                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_sup', 'Complimentary SUP board for exercise and exploring!')); ?></p>
+                                            <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_sup', 'Glide across crystal-clear Greek waters on our complimentary SUP board. Great for exercise and exploring!')); ?></p>
                                         </div>
                                     </div>
                                 </div>
