@@ -15,6 +15,8 @@ if (!defined('ABSPATH')) {
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background-color: #f3f4f6;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
         }
         .email-wrapper {
             max-width: 600px;
@@ -27,7 +29,7 @@ if (!defined('ABSPATH')) {
             text-align: center;
         }
         .email-header img {
-            max-width: 200px;
+            max-width: 180px;
             height: auto;
         }
         .email-header h1 {
@@ -65,25 +67,26 @@ if (!defined('ABSPATH')) {
             border-bottom: 2px solid #e5e7eb;
         }
         .detail-row {
-            display: table;
-            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             padding: 14px 0;
             border-bottom: 1px solid #e5e7eb;
+            flex-wrap: wrap;
         }
         .detail-row:last-child {
             border-bottom: none;
         }
         .detail-label {
-            display: table-cell;
             color: #6b7280;
             font-weight: 500;
-            width: 40%;
+            flex: 0 0 40%;
         }
         .detail-value {
-            display: table-cell;
             color: #1f2937;
             font-weight: 600;
             text-align: right;
+            flex: 0 0 60%;
         }
         .highlight-box {
             background: #fef3c7;
@@ -107,6 +110,27 @@ if (!defined('ABSPATH')) {
             margin: 0;
             color: #065f46;
         }
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 24px;
+            margin: 32px 0;
+            border-radius: 6px;
+        }
+        .info-box p {
+            margin: 0 0 12px 0;
+            color: #1e40af;
+        }
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+        .info-box code {
+            background: #bfdbfe;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
         .button {
             display: inline-block;
             padding: 16px 40px;
@@ -120,6 +144,20 @@ if (!defined('ABSPATH')) {
         }
         .button:hover {
             background: #b91c1c;
+        }
+        .button-secondary {
+            display: inline-block;
+            padding: 14px 32px;
+            background: #3b82f6;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            margin: 16px 0;
+        }
+        .button-secondary:hover {
+            background: #2563eb;
         }
         .email-footer {
             background: #1f2937;
@@ -135,31 +173,91 @@ if (!defined('ABSPATH')) {
             color: #60a5fa;
             text-decoration: none;
         }
+        
+        /* Mobile Responsive Styles */
         @media only screen and (max-width: 600px) {
             .email-header {
                 padding: 40px 20px;
             }
+            .email-header img {
+                max-width: 150px;
+            }
+            .email-header h1 {
+                font-size: 24px;
+            }
             .email-body {
-                padding: 40px 24px;
+                padding: 32px 20px;
+            }
+            .email-body h2 {
+                font-size: 20px;
+            }
+            .email-body p {
+                font-size: 15px;
             }
             .booking-card {
-                padding: 24px;
-            }
-            .highlight-box,
-            .success-box {
                 padding: 20px;
+                margin: 24px 0;
+            }
+            .booking-card h3 {
+                font-size: 16px;
             }
             .detail-row {
-                display: block;
+                flex-direction: column;
+                padding: 12px 0;
             }
-            .detail-label,
+            .detail-label {
+                flex: 0 0 100%;
+                margin-bottom: 4px;
+                font-size: 14px;
+            }
             .detail-value {
-                display: block;
-                width: 100%;
+                flex: 0 0 100%;
                 text-align: left;
+                font-size: 15px;
             }
-            .detail-value {
-                margin-top: 6px;
+            .highlight-box,
+            .success-box,
+            .info-box {
+                padding: 20px 16px;
+                margin: 24px 0;
+            }
+            .highlight-box p,
+            .success-box p,
+            .info-box p {
+                font-size: 14px;
+            }
+            .button {
+                display: block;
+                text-align: center;
+                padding: 16px 24px;
+                font-size: 15px;
+            }
+            .button-secondary {
+                display: block;
+                text-align: center;
+                padding: 14px 20px;
+                font-size: 14px;
+            }
+            .email-footer {
+                padding: 32px 20px;
+            }
+            .email-footer p {
+                font-size: 13px;
+            }
+        }
+        
+        @media only screen and (max-width: 400px) {
+            .email-header {
+                padding: 32px 16px;
+            }
+            .email-header img {
+                max-width: 130px;
+            }
+            .email-body {
+                padding: 24px 16px;
+            }
+            .booking-card {
+                padding: 16px;
             }
         }
     </style>

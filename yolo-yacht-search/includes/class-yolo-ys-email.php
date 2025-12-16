@@ -24,6 +24,7 @@ class YOLO_YS_Email {
         $variables = array(
             'booking_reference' => $booking_reference,
             'customer_name' => $booking->customer_name,
+            'customer_email' => $booking->customer_email,
             'yacht_name' => $booking->yacht_name,
             'date_from' => $booking->date_from,
             'date_to' => $booking->date_to,

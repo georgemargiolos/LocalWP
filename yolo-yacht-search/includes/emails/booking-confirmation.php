@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
  * Variables available:
  * - $booking_reference
  * - $customer_name
+ * - $customer_email
  * - $yacht_name
  * - $date_from
  * - $date_to
@@ -18,6 +19,8 @@ if (!defined('ABSPATH')) {
  * - $remaining_balance
  * - $currency
  * - $balance_payment_url
+ * - $guest_login_url (optional)
+ * - $guest_password (optional)
  */
 ?>
 
@@ -79,6 +82,26 @@ if (!defined('ABSPATH')) {
     </a>
 </div>
 <?php endif; ?>
+
+<!-- Guest Login Section -->
+<?php 
+$guest_login_url = home_url('/guest-login');
+$guest_password = $booking_reference . 'YoLo';
+?>
+<div class="info-box">
+    <p><strong>🔐 Your Guest Account</strong></p>
+    <p>We've created a guest account for you to manage your booking, view documents, and track your charter details.</p>
+    <p><strong>Login URL:</strong> <a href="<?php echo esc_url($guest_login_url); ?>" style="color: #1e40af;"><?php echo esc_html(str_replace(['https://', 'http://'], '', $guest_login_url)); ?></a></p>
+    <p><strong>Email:</strong> <code><?php echo esc_html($customer_email); ?></code></p>
+    <p><strong>Password:</strong> <code><?php echo esc_html($guest_password); ?></code></p>
+    <p style="font-size: 13px; color: #3b82f6; margin-top: 8px;"><em>Your password is your Booking Reference + "YoLo"</em></p>
+</div>
+
+<div style="text-align: center;">
+    <a href="<?php echo esc_url($guest_login_url); ?>" class="button-secondary">
+        Access Guest Portal
+    </a>
+</div>
 
 <h2>What's Next?</h2>
 
