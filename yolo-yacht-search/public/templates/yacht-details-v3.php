@@ -517,7 +517,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     <?php 
                     // Show "What's Included" section for YOLO boats with obligatory extras
                     $my_company_id = get_option('yolo_ys_my_company_id', '7850');
-                    if (!empty($obligatory_extras) && isset($yacht->companyId) && $yacht->companyId == $my_company_id): 
+                    if (!empty($obligatory_extras) && isset($yacht->company_id) && $yacht->company_id == $my_company_id): 
                     ?>
                     <!-- What's Included in Your Deluxe Charter Pack -->
                     <div class="charter-pack-included mt-4">
