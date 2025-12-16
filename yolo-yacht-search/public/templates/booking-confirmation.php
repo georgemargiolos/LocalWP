@@ -223,22 +223,37 @@ function yolo_show_booking_confirmation($booking) {
     }
     
     // Track Purchase event for Facebook Pixel (client-side) with deduplication
-    if (typeof fbq !== 'undefined') {
+    // FIX: Add retry logic because PixelYourSite loads fbq asynchronously
+    (function sendPurchaseToFacebook(retryCount) {
+        retryCount = retryCount || 0;
+        
+        // Check if fbq is loaded
+        if (typeof fbq !== 'function') {
+            // Retry up to 10 times (5 seconds total)
+            if (retryCount < 10) {
+                console.log('YOLO Analytics: Facebook Pixel not loaded yet, retrying in 500ms... (attempt ' + (retryCount + 1) + '/10)');
+                setTimeout(function() { sendPurchaseToFacebook(retryCount + 1); }, 500);
+                return;
+            }
+            console.log('YOLO Analytics: Facebook Pixel not loaded after 10 retries, skipping Purchase event');
+            return;
+        }
+        
         // Use event_id from server-side CAPI for proper deduplication
-        const eventId = window.fbPurchaseEventId || 'purchase_<?php echo esc_js($booking_id_safe); ?>_<?php echo time(); ?>';
+        const eventId = window.fbPurchaseEventId || 'purchase_' + <?php echo json_encode($booking_id_safe); ?> + '_<?php echo time(); ?>';
         
         fbq('track', 'Purchase', {
             content_type: 'product',
-            content_ids: ['<?php echo esc_js($booking_yacht_id_safe); ?>'],
-            content_name: '<?php echo esc_js($booking_yacht_name_safe); ?>',
-            currency: '<?php echo esc_js($booking_currency_safe); ?>',
+            content_ids: [<?php echo json_encode($booking_yacht_id_safe); ?>],
+            content_name: <?php echo json_encode($booking_yacht_name_safe); ?>,
+            currency: <?php echo json_encode($booking_currency_safe); ?>,
             value: <?php echo $booking_total_price_safe; ?>,
-            order_id: '<?php echo esc_js($booking_stripe_session_safe ? $booking_stripe_session_safe : 'booking-' . $booking_id_safe); ?>'
+            order_id: <?php echo json_encode($booking_stripe_session_safe ? $booking_stripe_session_safe : 'booking-' . $booking_id_safe); ?>
         }, {
             eventID: eventId
         });
         console.log('YOLO Analytics: Purchase event tracked (Facebook Pixel) with event_id:', eventId);
-    }
+    })();
     </script>
     <?php
 }
