@@ -30,12 +30,13 @@
     flex: 0 0 auto;
     width: 280px;
     min-width: 200px;
+    position: relative;
 }
 
 .yolo-ys-field-select select {
     width: 100%;
     height: 56px;
-    padding: 0 20px;
+    padding: 0 45px 0 20px;
     font-size: 18px;
     font-weight: 400;
     color: #142942;
@@ -43,8 +44,26 @@
     border: none;
     border-radius: 8px;
     appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+/* Dropdown Arrow Icon */
+.yolo-ys-select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #142942;
+    font-size: 14px;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.yolo-ys-field-select select:focus + .yolo-ys-select-arrow {
+    transform: translateY(-50%) rotate(180deg);
 }
 
 .yolo-ys-field-select select:hover {
@@ -62,12 +81,25 @@
 .yolo-ys-field-date {
     flex: 1;
     min-width: 200px;
+    position: relative;
+}
+
+/* Calendar Icon */
+.yolo-ys-date-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #142942;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .yolo-ys-field-date input {
     width: 100%;
     height: 56px;
-    padding: 0 20px;
+    padding: 0 20px 0 45px;
     font-size: 18px;
     font-weight: 400;
     color: #142942;
