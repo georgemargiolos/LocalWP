@@ -84,6 +84,7 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_no_pricing' => sanitize_text_field($_POST['yolo_ys_text_no_pricing']),
         'yolo_ys_text_choose_custom_dates' => sanitize_text_field($_POST['yolo_ys_text_choose_custom_dates']),
         'yolo_ys_text_loading' => sanitize_text_field($_POST['yolo_ys_text_loading']),
+        'yolo_ys_text_checking_availability' => sanitize_text_field($_POST['yolo_ys_text_checking_availability']),
         
         // Extras Section
         'yolo_ys_text_extras' => sanitize_text_field($_POST['yolo_ys_text_extras']),
@@ -200,6 +201,7 @@ $texts = array(
     'no_pricing' => get_option('yolo_ys_text_no_pricing', 'No pricing available. Please contact us for a quote.'),
     'choose_custom_dates' => get_option('yolo_ys_text_choose_custom_dates', 'Or Choose Custom Dates'),
     'loading' => get_option('yolo_ys_text_loading', 'Loading...'),
+    'checking_availability' => get_option('yolo_ys_text_checking_availability', 'Checking real-time availability, please wait...'),
     
     // Extras Section
     'extras' => get_option('yolo_ys_text_extras', 'Extras'),
@@ -507,6 +509,10 @@ $texts = array(
             <tr>
                 <th scope="row"><label for="yolo_ys_text_loading"><?php _e('Loading Text', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_loading" name="yolo_ys_text_loading" value="<?php echo esc_attr(get_option('yolo_ys_text_loading', 'Loading...')); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_checking_availability"><?php _e('Checking Availability Text', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_checking_availability" name="yolo_ys_text_checking_availability" value="<?php echo esc_attr(get_option('yolo_ys_text_checking_availability', 'Checking real-time availability, please wait...')); ?>" class="regular-text"></td>
             </tr>
             
             <!-- Extras Section -->

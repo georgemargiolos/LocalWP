@@ -219,11 +219,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Show loading state
+            // Show loading state with spinner
             const priceFinal = document.getElementById('selectedPriceFinal');
             const originalText = priceFinal.textContent;
-            priceFinal.textContent = 'Checking availability...';
-            priceFinal.style.opacity = '0.6';
+            const checkingText = <?php echo json_encode(get_option('yolo_ys_text_checking_availability', 'Checking real-time availability, please wait...')); ?>;
+            
+            // Create spinner element
+            priceFinal.innerHTML = '<span class="yolo-spinner"></span> ' + checkingText;
+            priceFinal.style.opacity = '0.8';
+            priceFinal.style.fontSize = '14px';
+            priceFinal.style.color = '#6b7280';
             
             // Fetch live price from Booking Manager API
             fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
@@ -240,7 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                // Reset styles after loading
                 priceFinal.style.opacity = '1';
+                priceFinal.style.fontSize = '';
+                priceFinal.style.color = '';
                 
                 // Check response success and availability
                 if (data.success) {
@@ -319,6 +327,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching live price:', error);
                 priceFinal.textContent = originalText;
                 priceFinal.style.opacity = '1';
+                priceFinal.style.fontSize = '';
+                priceFinal.style.color = '';
                 Toastify({
                     text: 'Failed to check availability. Please try again.',
                     duration: 5000,
