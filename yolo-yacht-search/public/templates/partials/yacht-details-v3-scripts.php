@@ -28,7 +28,8 @@ $yacht_id_safe = ($yacht && isset($yacht->id)) ? $yacht->id : $yacht_id;
 ?>
 <script>
 // Facebook event_id for deduplication (from server-side CAPI)
-const fbViewContentEventId = <?php echo json_encode($fb_event_id); ?>;
+// MUST use window. so yolo-analytics.js can access it
+window.fbViewContentEventId = <?php echo json_encode($fb_event_id); ?>;
 
 // ============================================
 // FIXED: Toggle Description "More..." / "Less"
