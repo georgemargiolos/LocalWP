@@ -251,9 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 priceFinal.style.color = '';
                 
                 // Check response success and availability
-                if (data.success) {
-                if (data.data) {
-                if (data.data.available) {
+                // WordPress wp_send_json_success returns {success: true, data: {...}}
+                // WordPress wp_send_json_error returns {success: false, data: {...}}
+                if (data.success && data.data && data.data.available) {
+                    // AVAILABLE - show price and enable booking
                     const price = data.data.final_price;
                     const startPrice = data.data.price;
                     const discount = data.data.discount;
@@ -301,11 +302,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         bookNowBtn.style.cursor = 'pointer';
                     }
                 } else {
+                    // NOT AVAILABLE or ERROR - show unavailable message
                     priceFinal.textContent = 'Not Available';
                     priceFinal.style.color = '#dc2626';
                     
+                    // Get message from response (works for both success:false and success:true with available:false)
+                    const errorMessage = (data.data && data.data.message) 
+                        ? data.data.message 
+                        : 'This yacht is not available for the selected dates. Please choose different dates.';
+                    
                     Toastify({
-                        text: data.data ? data.data.message : 'This yacht is not available for the selected dates. Please choose different dates.',
+                        text: errorMessage,
                         duration: 6000,
                         gravity: 'top',
                         position: 'right',
@@ -320,8 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         bookNowBtn.style.cursor = 'not-allowed';
                     }
                 }
-                } // Close data.data check
-                } // Close data.success check
             })
             .catch(error => {
                 console.error('Error fetching live price:', error);
