@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
         }
         .email-header {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            padding: 40px 20px;
+            padding: 50px 30px;
             text-align: center;
         }
         .email-header img {
@@ -32,42 +32,42 @@ if (!defined('ABSPATH')) {
         }
         .email-header h1 {
             color: #ffffff;
-            margin: 20px 0 0 0;
+            margin: 25px 0 0 0;
             font-size: 28px;
             font-weight: 700;
         }
         .email-body {
-            padding: 40px 30px;
+            padding: 50px 40px;
         }
         .email-body h2 {
             color: #1f2937;
             font-size: 22px;
-            margin: 0 0 20px 0;
+            margin: 0 0 24px 0;
         }
         .email-body p {
             color: #4b5563;
             font-size: 16px;
-            line-height: 1.6;
-            margin: 0 0 16px 0;
+            line-height: 1.7;
+            margin: 0 0 20px 0;
         }
         .booking-card {
             background: #f9fafb;
             border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
         }
         .booking-card h3 {
             color: #1f2937;
             font-size: 18px;
-            margin: 0 0 16px 0;
-            padding-bottom: 12px;
+            margin: 0 0 20px 0;
+            padding-bottom: 16px;
             border-bottom: 2px solid #e5e7eb;
         }
         .detail-row {
             display: table;
             width: 100%;
-            padding: 10px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #e5e7eb;
         }
         .detail-row:last-child {
@@ -88,9 +88,9 @@ if (!defined('ABSPATH')) {
         .highlight-box {
             background: #fef3c7;
             border-left: 4px solid #f59e0b;
-            padding: 16px;
-            margin: 24px 0;
-            border-radius: 4px;
+            padding: 24px;
+            margin: 32px 0;
+            border-radius: 6px;
         }
         .highlight-box p {
             margin: 0;
@@ -99,9 +99,9 @@ if (!defined('ABSPATH')) {
         .success-box {
             background: #d1fae5;
             border-left: 4px solid #10b981;
-            padding: 16px;
-            margin: 24px 0;
-            border-radius: 4px;
+            padding: 24px;
+            margin: 32px 0;
+            border-radius: 6px;
         }
         .success-box p {
             margin: 0;
@@ -109,38 +109,45 @@ if (!defined('ABSPATH')) {
         }
         .button {
             display: inline-block;
-            padding: 14px 32px;
+            padding: 16px 40px;
             background: #dc2626;
             color: #ffffff !important;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 700;
             font-size: 16px;
-            margin: 20px 0;
+            margin: 24px 0;
         }
         .button:hover {
             background: #b91c1c;
         }
         .email-footer {
             background: #1f2937;
-            padding: 30px 20px;
+            padding: 40px 30px;
             text-align: center;
         }
         .email-footer p {
             color: #9ca3af;
             font-size: 14px;
-            margin: 8px 0;
+            margin: 10px 0;
         }
         .email-footer a {
             color: #60a5fa;
             text-decoration: none;
         }
         @media only screen and (max-width: 600px) {
+            .email-header {
+                padding: 40px 20px;
+            }
             .email-body {
-                padding: 30px 20px;
+                padding: 40px 24px;
             }
             .booking-card {
-                padding: 16px;
+                padding: 24px;
+            }
+            .highlight-box,
+            .success-box {
+                padding: 20px;
             }
             .detail-row {
                 display: block;
@@ -152,7 +159,7 @@ if (!defined('ABSPATH')) {
                 text-align: left;
             }
             .detail-value {
-                margin-top: 4px;
+                margin-top: 6px;
             }
         }
     </style>
