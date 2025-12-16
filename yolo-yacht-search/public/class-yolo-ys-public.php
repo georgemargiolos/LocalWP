@@ -402,9 +402,10 @@ class YOLO_YS_Public {
         $price = isset($_POST['price']) ? floatval($_POST['price']) : 0;
         
         // Track AddToCart event via Facebook CAPI
+        // Note: track_add_to_cart($yacht_id, $price, $yacht_name) - price is 2nd param
         $event_id = false;
         if (function_exists('yolo_analytics')) {
-            $event_id = yolo_analytics()->track_add_to_cart($yacht_id, $yacht_name, $price);
+            $event_id = yolo_analytics()->track_add_to_cart($yacht_id, $price, $yacht_name);
         }
         
         wp_send_json_success(array(
@@ -424,9 +425,10 @@ class YOLO_YS_Public {
         $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : '';
         
         // Track InitiateCheckout event via Facebook CAPI
+        // Note: track_begin_checkout($yacht_id, $price, $yacht_name) - correct method name
         $event_id = false;
         if (function_exists('yolo_analytics')) {
-            $event_id = yolo_analytics()->track_initiate_checkout($yacht_id, $yacht_name, $price, $date_from, $date_to);
+            $event_id = yolo_analytics()->track_begin_checkout($yacht_id, $price, $yacht_name);
         }
         
         wp_send_json_success(array(

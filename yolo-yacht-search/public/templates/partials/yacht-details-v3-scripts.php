@@ -615,7 +615,7 @@ function bookNow() {
     
     // Track AddToCart event (server-side CAPI + client-side Pixel with deduplication)
     jQuery.ajax({
-        url: yoloYSPublic.ajaxurl,
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
         type: 'POST',
         data: {
             action: 'yolo_track_add_to_cart',
@@ -768,7 +768,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         
         // Track InitiateCheckout event (server-side CAPI + client-side Pixel with deduplication)
         jQuery.ajax({
-            url: yoloYSPublic.ajaxurl,
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
             type: 'POST',
             data: {
                 action: 'yolo_track_initiate_checkout',
