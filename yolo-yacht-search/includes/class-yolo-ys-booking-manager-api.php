@@ -414,42 +414,9 @@ class YOLO_YS_Booking_Manager_API {
             );
         }
         
-        // No offers from API - check local database as fallback
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'yolo_yacht_prices';
-        
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
-        
-        if ($table_exists) {
-            $local_price = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$table_name} 
-                 WHERE yacht_id = %s 
-                 AND date_from = %s 
-                 AND date_to = %s
-                 LIMIT 1",
-                $yacht_id,
-                $date_from,
-                $date_to
-            ));
-            
-            if ($local_price) {
-                $price = floatval($local_price->start_price ?? $local_price->price);
-                $final_price = floatval($local_price->price);
-                $discount = floatval($local_price->discount_percentage ?? 0);
-                $currency = $local_price->currency ?? 'EUR';
-                
-                return array(
-                    'success' => true,
-                    'available' => true,
-                    'price' => $price,
-                    'discount' => $discount,
-                    'final_price' => $final_price,
-                    'currency' => $currency,
-                    'source' => 'database',
-                );
-            }
-        }
-        
+        // No offers from API means yacht is not available for these dates
+        // NOTE: Removed database fallback in v65.0 - live availability check should only use API
+        // Database is for cached weekly prices display, not for final availability verification
         return array(
             'success' => true,
             'available' => false,
