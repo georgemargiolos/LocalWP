@@ -1,12 +1,23 @@
 <?php
 /**
  * Yacht Details v3 Scripts - FIXED VERSION
- * Version: 2.6.0
+ * Version: 2.7.0
  * 
  * FIXES:
  * ✓ Added missing toggleDescription() function
  * ✓ Added toggleQuoteForm() function
+ * ✓ v60.6.8: Defensive variable initialization to prevent PHP warnings
  */
+
+// ============================================
+// DEFENSIVE VARIABLE INITIALIZATION
+// Prevents "property of non-object" PHP warnings that corrupt JavaScript
+// ============================================
+$fb_event_id = isset($fb_event_id) && is_string($fb_event_id) ? $fb_event_id : '';
+$yacht_id = isset($yacht_id) ? sanitize_text_field($yacht_id) : '';
+$yacht = isset($yacht) ? $yacht : null;
+$yacht_name_safe = ($yacht && isset($yacht->name)) ? $yacht->name : '';
+$yacht_id_safe = ($yacht && isset($yacht->id)) ? $yacht->id : $yacht_id;
 ?>
 <script>
 // Facebook event_id for deduplication (from server-side CAPI)
@@ -219,7 +230,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 priceFinal.style.opacity = '1';
                 
-                if (data.success && data.data.available) {
+                // FIX: Avoid && which may get HTML-encoded
+                if (data.success) {
+                if (data.data && data.data.available) {
                     const price = data.data.final_price;
                     const startPrice = data.data.price;
                     const discount = data.data.discount;
@@ -286,6 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         bookNowBtn.style.cursor = 'not-allowed';
                     }
                 }
+                } // Close outer data.success check
             })
             .catch(error => {
                 console.error('Error fetching live price:', error);
@@ -610,12 +624,12 @@ function bookNow() {
     
     // Get yacht details
     // CRITICAL: yachtId MUST be string - large IDs lose precision with intval/Number
-    const yachtId = "<?php echo esc_attr($yacht->id ?? ''); ?>";
-    const yachtName = <?php echo json_encode($yacht->name ?? ''); ?>;
+    const yachtId = "<?php echo esc_attr($yacht_id_safe); ?>";
+    const yachtName = <?php echo json_encode($yacht_name_safe); ?>;
     
     // Track AddToCart event (server-side CAPI + client-side Pixel with deduplication)
     jQuery.ajax({
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
         type: 'POST',
         data: {
             action: 'yolo_track_add_to_cart',
@@ -624,15 +638,18 @@ function bookNow() {
             price: totalPrice
         },
         success: function(response) {
-            if (response.success && response.data.event_id) {
-                // Track on client-side with same event_id for deduplication
-                if (typeof YoloAnalytics !== 'undefined') {
-                    YoloAnalytics.trackSelectWeek({
-                        yacht_id: yachtId,
-                        yacht_name: yachtName,
-                        price: totalPrice,
-                        currency: currency
-                    }, response.data.event_id);
+            // FIX: Avoid && which gets HTML-encoded - use nested if instead
+            if (response.success) {
+                if (response.data && response.data.event_id) {
+                    // Track on client-side with same event_id for deduplication
+                    if (typeof YoloAnalytics !== 'undefined') {
+                        YoloAnalytics.trackSelectWeek({
+                            yacht_id: yachtId,
+                            yacht_name: yachtName,
+                            price: totalPrice,
+                            currency: currency
+                        }, response.data.event_id);
+                    }
                 }
             }
         }
@@ -768,7 +785,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         
         // Track InitiateCheckout event (server-side CAPI + client-side Pixel with deduplication)
         jQuery.ajax({
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
             type: 'POST',
             data: {
                 action: 'yolo_track_initiate_checkout',
@@ -779,17 +796,20 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                 date_to: dateTo
             },
             success: function(response) {
-                if (response.success && response.data.event_id) {
-                    // Track on client-side with same event_id for deduplication
-                    if (typeof YoloAnalytics !== 'undefined') {
-                        YoloAnalytics.trackBeginCheckout({
-                            yacht_id: yachtId,
-                            yacht_name: yachtName,
-                            price: totalPrice,
-                            currency: currency,
-                            date_from: dateFrom,
-                            date_to: dateTo
-                        }, response.data.event_id);
+                // FIX: Avoid && which gets HTML-encoded - use nested if instead
+                if (response.success) {
+                    if (response.data && response.data.event_id) {
+                        // Track on client-side with same event_id for deduplication
+                        if (typeof YoloAnalytics !== 'undefined') {
+                            YoloAnalytics.trackBeginCheckout({
+                                yacht_id: yachtId,
+                                yacht_name: yachtName,
+                                price: totalPrice,
+                                currency: currency,
+                                date_from: dateFrom,
+                                date_to: dateTo
+                            }, response.data.event_id);
+                        }
                     }
                 }
             }
@@ -822,7 +842,9 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success && data.data.session_id) {
+            // FIX: Avoid && which may get HTML-encoded
+            if (data.success) {
+            if (data.data && data.data.session_id) {
                 // Redirect to Stripe Checkout
                 const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
                 stripe.redirectToCheckout({
@@ -853,6 +875,7 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
+            } // Close outer data.success check
         })
         .catch(error => {
             console.error('Error:', error);
@@ -996,12 +1019,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Track Lead event on client-side with event_id from server-side for deduplication
-                    if (data.data.event_id && typeof YoloAnalytics !== 'undefined') {
-                        YoloAnalytics.trackLead({
-                            yacht_id: "<?php echo esc_attr($yacht->id ?? ''); ?>",
-                            yacht_name: "<?php echo esc_js($yacht->name ?? ''); ?>",
-                            value: 0
-                        }, data.data.event_id);
+                    // FIX: Avoid && which gets HTML-encoded - use nested if instead
+                    if (data.data && data.data.event_id) {
+                        if (typeof YoloAnalytics !== 'undefined') {
+                            YoloAnalytics.trackLead({
+                                yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
+                                yacht_name: "<?php echo esc_js($yacht_name_safe); ?>",
+                                value: 0
+                            }, data.data.event_id);
+                        }
                     }
                     
                     // Show success message
