@@ -119,12 +119,14 @@ function run_yolo_yacht_search() {
 
 run_yolo_yacht_search();
 
-// Initialize analytics and SEO (v41.19)
-yolo_analytics();
-yolo_meta_tags();
+// Initialize analytics and SEO (v41.19) - Wrapped in plugins_loaded hook to prevent critical errors
+add_action('plugins_loaded', function() {
+    yolo_analytics();
+    yolo_meta_tags();
+}, 10);
 
-// Initialize icons admin
-if (is_admin()) {
+// Initialize icons admin (admin-only) - Wrapped in admin_init hook
+add_action('admin_init', function() {
     $icons_admin = new YOLO_YS_Icons_Admin();
     add_action('admin_menu', array($icons_admin, 'register_menu'));
     add_action('wp_ajax_yolo_save_icon', array($icons_admin, 'ajax_save_icon'));
@@ -132,13 +134,17 @@ if (is_admin()) {
 
     // Initialize admin colors
     new YOLO_YS_Admin_Colors();
-}
+}, 10);
 
-// Initialize warehouse notifications system
-new YOLO_YS_Warehouse_Notifications();
+// Initialize warehouse notifications system - Wrapped in plugins_loaded hook
+add_action('plugins_loaded', function() {
+    new YOLO_YS_Warehouse_Notifications();
+}, 10);
 
-// Initialize auto-sync system (v30.0)
-new YOLO_YS_Auto_Sync();
+// Initialize auto-sync system (v30.0) - Wrapped in plugins_loaded hook
+add_action('plugins_loaded', function() {
+    new YOLO_YS_Auto_Sync();
+}, 10);
 
 /**
  * Check database version and run migrations if needed
