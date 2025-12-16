@@ -195,18 +195,27 @@ function yolo_show_booking_confirmation($booking) {
     </div>
     
     <!-- Purchase Event Tracking (GA4 + Facebook) -->
+    <?php
+    // FIX: Defensive variable initialization to prevent PHP warnings inside JavaScript
+    $booking_id_safe = ($booking && isset($booking->id)) ? $booking->id : '';
+    $booking_yacht_id_safe = ($booking && isset($booking->yacht_id)) ? $booking->yacht_id : '';
+    $booking_yacht_name_safe = ($booking && isset($booking->yacht_name)) ? $booking->yacht_name : '';
+    $booking_currency_safe = ($booking && isset($booking->currency)) ? $booking->currency : 'EUR';
+    $booking_total_price_safe = ($booking && isset($booking->total_price)) ? floatval($booking->total_price) : 0;
+    $booking_stripe_session_safe = ($booking && isset($booking->stripe_session_id)) ? $booking->stripe_session_id : '';
+    ?>
     <script>
     // Track Purchase event for GA4 (via GTM)
     if (typeof window.dataLayer !== 'undefined') {
         window.dataLayer.push({
             event: 'purchase',
-            transaction_id: '<?php echo esc_js($booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id); ?>',
-            currency: '<?php echo esc_js($booking->currency); ?>',
-            value: <?php echo floatval($booking->total_price); ?>,
+            transaction_id: '<?php echo esc_js($booking_stripe_session_safe ? $booking_stripe_session_safe : 'booking-' . $booking_id_safe); ?>',
+            currency: '<?php echo esc_js($booking_currency_safe); ?>',
+            value: <?php echo $booking_total_price_safe; ?>,
             items: [{
-                item_id: '<?php echo esc_js($booking->yacht_id); ?>',
-                item_name: '<?php echo esc_js($booking->yacht_name); ?>',
-                price: <?php echo floatval($booking->total_price); ?>,
+                item_id: '<?php echo esc_js($booking_yacht_id_safe); ?>',
+                item_name: '<?php echo esc_js($booking_yacht_name_safe); ?>',
+                price: <?php echo $booking_total_price_safe; ?>,
                 quantity: 1
             }]
         });
@@ -216,15 +225,15 @@ function yolo_show_booking_confirmation($booking) {
     // Track Purchase event for Facebook Pixel (client-side) with deduplication
     if (typeof fbq !== 'undefined') {
         // Use event_id from server-side CAPI for proper deduplication
-        const eventId = window.fbPurchaseEventId || 'purchase_<?php echo esc_js($booking->id); ?>_<?php echo time(); ?>';
+        const eventId = window.fbPurchaseEventId || 'purchase_<?php echo esc_js($booking_id_safe); ?>_<?php echo time(); ?>';
         
         fbq('track', 'Purchase', {
             content_type: 'product',
-            content_ids: ['<?php echo esc_js($booking->yacht_id); ?>'],
-            content_name: '<?php echo esc_js($booking->yacht_name); ?>',
-            currency: '<?php echo esc_js($booking->currency); ?>',
-            value: <?php echo floatval($booking->total_price); ?>,
-            order_id: '<?php echo esc_js($booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id); ?>'
+            content_ids: ['<?php echo esc_js($booking_yacht_id_safe); ?>'],
+            content_name: '<?php echo esc_js($booking_yacht_name_safe); ?>',
+            currency: '<?php echo esc_js($booking_currency_safe); ?>',
+            value: <?php echo $booking_total_price_safe; ?>,
+            order_id: '<?php echo esc_js($booking_stripe_session_safe ? $booking_stripe_session_safe : 'booking-' . $booking_id_safe); ?>'
         }, {
             eventID: eventId
         });
@@ -340,6 +349,7 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
             }
             
             // Track Purchase event via Facebook CAPI (server-side)
+            // FIX: Output buffering catches any stray PHP warnings
             if (function_exists('yolo_analytics')) {
                 $transaction_id = $booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id;
                 $user_data = array(
@@ -349,13 +359,16 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
                     'ln' => $customer_last_name
                 );
                 
-                $fb_purchase_event_id = yolo_analytics()->track_purchase(
+                ob_start();
+                $fb_purchase_event_id = @yolo_analytics()->track_purchase(
                     $transaction_id,
                     $yacht_id,
                     $total_price,
                     $yacht_name,
                     $user_data
                 );
+                ob_end_clean();
+                if (!is_string($fb_purchase_event_id)) $fb_purchase_event_id = '';
                 
                 error_log('YOLO YS: Purchase event tracked via CAPI for booking #' . $booking_id . ' (event_id: ' . $fb_purchase_event_id . ')');
                 

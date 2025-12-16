@@ -75,9 +75,9 @@ function showCustomDatesModal(dateFrom, dateTo) {
                     <input type="text" name="name" class="form-control mb-2" placeholder="Your Name *" required>
                     <input type="email" name="email" class="form-control mb-2" placeholder="Your Email *" required>
                     <input type="tel" name="phone" class="form-control mb-2" placeholder="Your Phone">
-                    <textarea name="message" rows="4" class="form-control mb-2" placeholder="Message">I would like to charter <?php echo esc_js($yacht->name ?? ''); ?> from ${dateFrom} to ${dateTo}. Please contact me with availability and pricing.</textarea>
-                    <input type="hidden" name="yacht_id" value="<?php echo esc_attr($yacht_id ?? ''); ?>">
-                    <input type="hidden" name="yacht_name" value="<?php echo esc_attr($yacht->name ?? ''); ?>">
+                    <textarea name="message" rows="4" class="form-control mb-2" placeholder="Message">I would like to charter <?php echo esc_js($yacht_name_safe); ?> from ${dateFrom} to ${dateTo}. Please contact me with availability and pricing.</textarea>
+                    <input type="hidden" name="yacht_id" value="<?php echo esc_attr($yacht_id_safe); ?>">
+                    <input type="hidden" name="yacht_name" value="<?php echo esc_attr($yacht_name_safe); ?>">
                     <input type="hidden" name="date_from" value="${dateFrom}">
                     <input type="hidden" name="date_to" value="${dateTo}">
                     <div class="yolo-quote-modal-buttons">
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({
                     action: 'yolo_get_live_price',
-                    yacht_id: "<?php echo esc_attr($yacht_id ?? ''); ?>",
+                    yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
                     date_from: dateFrom,
                     date_to: dateTo,
                 })

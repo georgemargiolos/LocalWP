@@ -50,11 +50,21 @@ if (!$yacht) {
 }
 
 // Track yacht view event (server-side Facebook Conversions API)
+// FIX: Output buffering catches any stray PHP warnings that could corrupt JavaScript
 $fb_event_id = '';
 if (function_exists('yolo_analytics')) {
-    $yacht_price = !empty($yacht->price) ? floatval($yacht->price) : 0;
-    $yacht_name = !empty($yacht->name) ? $yacht->name : '';
-    $fb_event_id = yolo_analytics()->track_yacht_view($yacht_id, $yacht_price, $yacht_name);
+    ob_start();
+    try {
+        $yacht_price = !empty($yacht->price) ? floatval($yacht->price) : 0;
+        $yacht_name_for_tracking = !empty($yacht->name) ? $yacht->name : '';
+        $fb_event_id = @yolo_analytics()->track_yacht_view($yacht_id, $yacht_price, $yacht_name_for_tracking);
+    } catch (Exception $e) {
+        $fb_event_id = '';
+    }
+    ob_end_clean();
+}
+if (!is_string($fb_event_id) || empty($fb_event_id)) {
+    $fb_event_id = '';
 }
 
 // Get images
