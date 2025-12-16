@@ -56,20 +56,30 @@
     
     /**
      * Send event to Facebook Pixel with deduplication
+     * Includes retry logic to wait for fbq to be available (PixelYourSite loads async)
      * @param {string} eventName - Facebook event name (e.g., 'AddToCart', 'InitiateCheckout')
      * @param {object} params - Event parameters
      * @param {string} eventId - Event ID for deduplication (optional, will be generated if not provided)
+     * @param {number} retryCount - Internal retry counter
      */
-    function sendToFacebookPixel(eventName, params = {}, eventId = null) {
-        // Check if Facebook Pixel is loaded
-        if (typeof fbq !== 'function') {
-            debug('Facebook Pixel not loaded, skipping event:', eventName);
-            return;
-        }
-        
-        // Generate event ID if not provided
+    function sendToFacebookPixel(eventName, params = {}, eventId = null, retryCount = 0) {
+        // Generate event ID if not provided (do this first so it's consistent across retries)
         if (!eventId) {
             eventId = generateEventId();
+        }
+        
+        // Check if Facebook Pixel is loaded
+        if (typeof fbq !== 'function') {
+            // Retry up to 10 times (5 seconds total) waiting for PixelYourSite to load
+            if (retryCount < 10) {
+                debug('Facebook Pixel not loaded yet, retrying in 500ms... (attempt ' + (retryCount + 1) + '/10)');
+                setTimeout(function() {
+                    sendToFacebookPixel(eventName, params, eventId, retryCount + 1);
+                }, 500);
+                return;
+            }
+            debug('Facebook Pixel not loaded after 10 retries, skipping event:', eventName);
+            return;
         }
         
         // Send to Facebook Pixel with event ID for deduplication
