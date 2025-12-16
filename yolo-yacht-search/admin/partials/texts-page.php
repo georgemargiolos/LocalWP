@@ -95,6 +95,16 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_per_hour' => sanitize_text_field($_POST['yolo_ys_text_per_hour']),
         'yolo_ys_text_per_person' => sanitize_text_field($_POST['yolo_ys_text_per_person']),
         
+        // Charter Pack Included Items
+        'yolo_ys_text_charter_pack_title' => sanitize_text_field($_POST['yolo_ys_text_charter_pack_title']),
+        'yolo_ys_text_charter_pack_transit_log' => wp_kses_post($_POST['yolo_ys_text_charter_pack_transit_log']),
+        'yolo_ys_text_charter_pack_checkin' => wp_kses_post($_POST['yolo_ys_text_charter_pack_checkin']),
+        'yolo_ys_text_charter_pack_cleaning' => wp_kses_post($_POST['yolo_ys_text_charter_pack_cleaning']),
+        'yolo_ys_text_charter_pack_linen' => wp_kses_post($_POST['yolo_ys_text_charter_pack_linen']),
+        'yolo_ys_text_charter_pack_gas' => wp_kses_post($_POST['yolo_ys_text_charter_pack_gas']),
+        'yolo_ys_text_charter_pack_dinghy' => wp_kses_post($_POST['yolo_ys_text_charter_pack_dinghy']),
+        'yolo_ys_text_charter_pack_sup' => wp_kses_post($_POST['yolo_ys_text_charter_pack_sup']),
+        
         // Additional Technical Specs
         'yolo_ys_text_draught' => sanitize_text_field($_POST['yolo_ys_text_draught']),
         'yolo_ys_text_engine' => sanitize_text_field($_POST['yolo_ys_text_engine']),
@@ -546,6 +556,44 @@ $texts = array(
             <tr>
                 <th scope="row"><label for="yolo_ys_text_per_person"><?php _e('Per Person', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_per_person" name="yolo_ys_text_per_person" value="<?php echo esc_attr(get_option('yolo_ys_text_per_person', 'Per Person')); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Charter Pack Included Items -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Charter Pack Included Items', 'yolo-yacht-search'); ?></h2>
+                <p class="description"><?php _e('Customize the descriptions for items included in the Deluxe Charter Pack. These appear below the Obligatory Extras box.', 'yolo-yacht-search'); ?></p></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_title"><?php _e('Section Title', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_charter_pack_title" name="yolo_ys_text_charter_pack_title" value="<?php echo esc_attr(get_option('yolo_ys_text_charter_pack_title', "What's Included in Your Deluxe Charter Pack")); ?>" class="large-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_transit_log"><?php _e('Transit Log Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_transit_log" name="yolo_ys_text_charter_pack_transit_log" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_transit_log', 'Official cruising permit required for sailing in Greek waters. We handle all the paperwork so you can focus on your adventure.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_checkin"><?php _e('Check-in/Check-out Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_checkin" name="yolo_ys_text_charter_pack_checkin" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_checkin', 'Our experienced staff will guide you through the yacht, explain all systems, and ensure a smooth handover.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_cleaning"><?php _e('Final Cleaning Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_cleaning" name="yolo_ys_text_charter_pack_cleaning" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_cleaning', 'Return the yacht without worrying about cleaning. Our team will take care of everything after your charter.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_linen"><?php _e('Bed Linen & Towels Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_linen" name="yolo_ys_text_charter_pack_linen" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_linen', 'Fresh, high-quality linens and towels for all guests. Everything you need for a comfortable stay onboard.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_gas"><?php _e('Gas Bottle Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_gas" name="yolo_ys_text_charter_pack_gas" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_gas', 'Full gas bottle for cooking. Prepare delicious meals in the galley throughout your charter.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_dinghy"><?php _e('Dinghy with Outboard Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_dinghy" name="yolo_ys_text_charter_pack_dinghy" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_dinghy', 'Explore secluded beaches and coves with the included tender. Perfect for shore excursions and provisioning runs.')); ?></textarea></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_charter_pack_sup"><?php _e('Free SUP Description', 'yolo-yacht-search'); ?></label></th>
+                <td><textarea id="yolo_ys_text_charter_pack_sup" name="yolo_ys_text_charter_pack_sup" rows="2" class="large-text"><?php echo esc_textarea(get_option('yolo_ys_text_charter_pack_sup', 'Glide across crystal-clear Greek waters on our complimentary SUP board. Great for exercise and exploring!')); ?></textarea></td>
             </tr>
             
             <!-- Additional Technical Specs -->

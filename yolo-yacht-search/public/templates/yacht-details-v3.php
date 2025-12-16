@@ -513,6 +513,98 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                         <?php endif; ?>
                     </div>
+                    
+                    <?php 
+                    // Show "What's Included" section for YOLO boats with obligatory extras
+                    $my_company_id = get_option('yolo_ys_my_company_id', '7850');
+                    if (!empty($obligatory_extras) && isset($yacht->companyId) && $yacht->companyId == $my_company_id): 
+                    ?>
+                    <!-- What's Included in Your Deluxe Charter Pack -->
+                    <div class="charter-pack-included mt-4">
+                        <h4 class="charter-pack-title">
+                            <i class="fa-solid fa-gift"></i>
+                            <?php echo esc_html(get_option('yolo_ys_text_charter_pack_title', "What's Included in Your Deluxe Charter Pack")); ?>
+                        </h4>
+                        <div class="row g-3 charter-pack-grid">
+                            <!-- Transit Log -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-file-lines"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Transit Log</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_transit_log', 'Official cruising permit required for sailing in Greek waters. We handle all the paperwork so you can focus on your adventure.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Check-in/Check-out -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Professional Check-in/Check-out</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_checkin', 'Our experienced staff will guide you through the yacht, explain all systems, and ensure a smooth handover.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Final Cleaning -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-broom"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Final Cleaning</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_cleaning', 'Return the yacht without worrying about cleaning. Our team will take care of everything after your charter.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Bed Linen & Towels -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-bed"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Bed Linen & Bath Towels</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_linen', 'Fresh, high-quality linens and towels for all guests. Everything you need for a comfortable stay onboard.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Gas Bottle -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-fire-flame-simple"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Gas Bottle</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_gas', 'Full gas bottle for cooking. Prepare delicious meals in the galley throughout your charter.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Dinghy with Outboard -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-anchor"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Dinghy with Outboard Engine</h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_dinghy', 'Explore secluded beaches and coves with the included tender. Perfect for shore excursions and provisioning runs.')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Free SUP -->
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="charter-pack-item charter-pack-item-free">
+                                    <div class="pack-item-icon"><i class="fa-solid fa-person-swimming"></i></div>
+                                    <div class="pack-item-content">
+                                        <h5>Stand Up Paddle Board (SUP) <span class="free-badge">FREE</span></h5>
+                                        <p><?php echo esc_html(get_option('yolo_ys_text_charter_pack_sup', 'Glide across crystal-clear Greek waters on our complimentary SUP board. Great for exercise and exploring!')); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
             
