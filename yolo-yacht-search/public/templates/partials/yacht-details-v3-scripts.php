@@ -230,9 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 priceFinal.style.opacity = '1';
                 
-                // FIX: Avoid && which may get HTML-encoded
+                // Check response success and availability
                 if (data.success) {
-                if (data.data && data.data.available) {
+                if (data.data) {
+                if (data.data.available) {
                     const price = data.data.final_price;
                     const startPrice = data.data.price;
                     const discount = data.data.discount;
@@ -299,7 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         bookNowBtn.style.cursor = 'not-allowed';
                     }
                 }
-                } // Close outer data.success check
+                } // Close data.data check
+                } // Close data.success check
             })
             .catch(error => {
                 console.error('Error fetching live price:', error);
@@ -638,17 +640,18 @@ function bookNow() {
             price: totalPrice
         },
         success: function(response) {
-            // FIX: Avoid && which gets HTML-encoded - use nested if instead
+            // Track on client-side with same event_id for deduplication
             if (response.success) {
-                if (response.data && response.data.event_id) {
-                    // Track on client-side with same event_id for deduplication
-                    if (typeof YoloAnalytics !== 'undefined') {
-                        YoloAnalytics.trackSelectWeek({
-                            yacht_id: yachtId,
-                            yacht_name: yachtName,
-                            price: totalPrice,
-                            currency: currency
-                        }, response.data.event_id);
+                if (response.data) {
+                    if (response.data.event_id) {
+                        if (typeof YoloAnalytics !== 'undefined') {
+                            YoloAnalytics.trackSelectWeek({
+                                yacht_id: yachtId,
+                                yacht_name: yachtName,
+                                price: totalPrice,
+                                currency: currency
+                            }, response.data.event_id);
+                        }
                     }
                 }
             }
@@ -796,19 +799,20 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                 date_to: dateTo
             },
             success: function(response) {
-                // FIX: Avoid && which gets HTML-encoded - use nested if instead
+                // Track on client-side with same event_id for deduplication
                 if (response.success) {
-                    if (response.data && response.data.event_id) {
-                        // Track on client-side with same event_id for deduplication
-                        if (typeof YoloAnalytics !== 'undefined') {
-                            YoloAnalytics.trackBeginCheckout({
-                                yacht_id: yachtId,
-                                yacht_name: yachtName,
-                                price: totalPrice,
-                                currency: currency,
-                                date_from: dateFrom,
-                                date_to: dateTo
-                            }, response.data.event_id);
+                    if (response.data) {
+                        if (response.data.event_id) {
+                            if (typeof YoloAnalytics !== 'undefined') {
+                                YoloAnalytics.trackBeginCheckout({
+                                    yacht_id: yachtId,
+                                    yacht_name: yachtName,
+                                    price: totalPrice,
+                                    currency: currency,
+                                    date_from: dateFrom,
+                                    date_to: dateTo
+                                }, response.data.event_id);
+                            }
                         }
                     }
                 }
@@ -842,9 +846,10 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         })
         .then(response => response.json())
         .then(data => {
-            // FIX: Avoid && which may get HTML-encoded
+            // Check response success and session_id
             if (data.success) {
-            if (data.data && data.data.session_id) {
+            if (data.data) {
+            if (data.data.session_id) {
                 // Redirect to Stripe Checkout
                 const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
                 stripe.redirectToCheckout({
@@ -875,7 +880,8 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
-            } // Close outer data.success check
+            } // Close data.data check
+            } // Close data.success check
         })
         .catch(error => {
             console.error('Error:', error);
@@ -1019,14 +1025,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Track Lead event on client-side with event_id from server-side for deduplication
-                    // FIX: Avoid && which gets HTML-encoded - use nested if instead
-                    if (data.data && data.data.event_id) {
-                        if (typeof YoloAnalytics !== 'undefined') {
-                            YoloAnalytics.trackLead({
-                                yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
-                                yacht_name: "<?php echo esc_js($yacht_name_safe); ?>",
-                                value: 0
-                            }, data.data.event_id);
+                    if (data.data) {
+                        if (data.data.event_id) {
+                            if (typeof YoloAnalytics !== 'undefined') {
+                                YoloAnalytics.trackLead({
+                                    yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
+                                    yacht_name: "<?php echo esc_js($yacht_name_safe); ?>",
+                                    value: 0
+                                }, data.data.event_id);
+                            }
                         }
                     }
                     
