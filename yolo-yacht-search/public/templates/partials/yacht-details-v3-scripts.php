@@ -16,12 +16,19 @@
 $fb_event_id = isset($fb_event_id) && is_string($fb_event_id) ? $fb_event_id : '';
 $yacht_id = isset($yacht_id) ? sanitize_text_field($yacht_id) : '';
 $yacht = isset($yacht) ? $yacht : null;
-$yacht_name_safe = ($yacht && isset($yacht->name)) ? $yacht->name : '';
+// Clean yacht name - remove newlines and normalize whitespace for safe JavaScript output
+$yacht_name_safe = '';
+if ($yacht && isset($yacht->name)) {
+    $yacht_name_safe = $yacht->name;
+    $yacht_name_safe = preg_replace('/[\r\n]+/', ' ', $yacht_name_safe);
+    $yacht_name_safe = preg_replace('/\s+/', ' ', $yacht_name_safe);
+    $yacht_name_safe = trim($yacht_name_safe);
+}
 $yacht_id_safe = ($yacht && isset($yacht->id)) ? $yacht->id : $yacht_id;
 ?>
 <script>
 // Facebook event_id for deduplication (from server-side CAPI)
-const fbViewContentEventId = '<?php echo esc_js($fb_event_id); ?>';
+const fbViewContentEventId = <?php echo json_encode($fb_event_id); ?>;
 
 // ============================================
 // FIXED: Toggle Description "More..." / "Less"
@@ -62,6 +69,10 @@ function toggleQuoteForm() {
 
 // Show custom dates modal for non-Saturday bookings
 function showCustomDatesModal(dateFrom, dateTo) {
+    // Safe variables for use in template literal (using json_encode for proper escaping)
+    const yachtNameForModal = <?php echo json_encode($yacht_name_safe); ?>;
+    const yachtIdForModal = <?php echo json_encode($yacht_id_safe); ?>;
+    
     // Create modal HTML - Using CSS classes from booking-modal.css
     const modalHTML = `
         <div id="customDatesModal" class="yolo-quote-modal">
@@ -75,9 +86,9 @@ function showCustomDatesModal(dateFrom, dateTo) {
                     <input type="text" name="name" class="form-control mb-2" placeholder="Your Name *" required>
                     <input type="email" name="email" class="form-control mb-2" placeholder="Your Email *" required>
                     <input type="tel" name="phone" class="form-control mb-2" placeholder="Your Phone">
-                    <textarea name="message" rows="4" class="form-control mb-2" placeholder="Message">I would like to charter <?php echo esc_js($yacht_name_safe); ?> from ${dateFrom} to ${dateTo}. Please contact me with availability and pricing.</textarea>
-                    <input type="hidden" name="yacht_id" value="<?php echo esc_attr($yacht_id_safe); ?>">
-                    <input type="hidden" name="yacht_name" value="<?php echo esc_attr($yacht_name_safe); ?>">
+                    <textarea name="message" rows="4" class="form-control mb-2" placeholder="Message">I would like to charter ${yachtNameForModal} from ${dateFrom} to ${dateTo}. Please contact me with availability and pricing.</textarea>
+                    <input type="hidden" name="yacht_id" value="${yachtIdForModal}">
+                    <input type="hidden" name="yacht_name" value="${yachtNameForModal}">
                     <input type="hidden" name="date_from" value="${dateFrom}">
                     <input type="hidden" name="date_to" value="${dateTo}">
                     <div class="yolo-quote-modal-buttons">
@@ -221,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({
                     action: 'yolo_get_live_price',
-                    yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
+                    yacht_id: <?php echo json_encode($yacht_id_safe); ?>,
                     date_from: dateFrom,
                     date_to: dateTo,
                 })
@@ -626,7 +637,7 @@ function bookNow() {
     
     // Get yacht details
     // CRITICAL: yachtId MUST be string - large IDs lose precision with intval/Number
-    const yachtId = "<?php echo esc_attr($yacht_id_safe); ?>";
+    const yachtId = <?php echo json_encode($yacht_id_safe); ?>;
     const yachtName = <?php echo json_encode($yacht_name_safe); ?>;
     
     // Track AddToCart event (server-side CAPI + client-side Pixel with deduplication)
@@ -1029,8 +1040,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (data.data.event_id) {
                             if (typeof YoloAnalytics !== 'undefined') {
                                 YoloAnalytics.trackLead({
-                                    yacht_id: "<?php echo esc_attr($yacht_id_safe); ?>",
-                                    yacht_name: "<?php echo esc_js($yacht_name_safe); ?>",
+                                    yacht_id: <?php echo json_encode($yacht_id_safe); ?>,
+                                    yacht_name: <?php echo json_encode($yacht_name_safe); ?>,
                                     value: 0
                                 }, data.data.event_id);
                             }

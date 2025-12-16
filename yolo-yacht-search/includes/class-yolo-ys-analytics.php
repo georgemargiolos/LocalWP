@@ -26,8 +26,9 @@ class YOLO_YS_Analytics {
     
     private function __construct() {
         $this->debug_mode = get_option('yolo_enable_debug_mode', '0') === '1';
-        $this->fb_pixel_id = get_option('yolo_ys_fb_pixel_id', '1896226957957033');
-        $this->fb_access_token = get_option('yolo_ys_fb_access_token', 'EAAc8FRZAYvDsBQHsMOqpZB8rYcUkxkxesgBMJvchyzzSXEYVAumBX8rZAzQlmic9dTJSDJDMShv3tBhNJa8NcVYuoNMAdyKS5uz6cZBZAYB19SB3CKasDfE7cRTJfKg7PEsZAK1IZAIegNiaNsNjnpdpcf4cjGnal2rVL9DR2RQBybFwAdKi2xJ2TZC2RZBLcHKCffgZDZD');
+        // SECURITY: Tokens should only come from database options, not hardcoded defaults
+        $this->fb_pixel_id = get_option('yolo_ys_fb_pixel_id', '');
+        $this->fb_access_token = get_option('yolo_ys_fb_access_token', '');
         
         // Enqueue client-side analytics script
         add_action('wp_enqueue_scripts', array($this, 'enqueue_analytics_script'));
