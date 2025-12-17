@@ -168,6 +168,13 @@ class YOLO_YS_Admin_Bookings extends WP_List_Table {
             );
         }
         
+        // Delete action with confirmation
+        $actions[] = sprintf(
+            '<a href="#" class="yolo-delete-booking" data-booking-id="%s" data-customer="%s" style="color: #dc3545;">Delete</a>',
+            $item['id'],
+            esc_attr($item['customer_name'])
+        );
+        
         return implode(' | ', $actions);
     }
 

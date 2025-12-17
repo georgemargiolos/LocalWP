@@ -69,7 +69,7 @@ if (isset($_POST['yolo_guest_login_submit'])) {
         
         <?php if ($login_error): ?>
             <div class="yolo-login-error">
-                <p><?php echo esc_html($login_error); ?></p>
+                <p><?php echo wp_kses_post($login_error); ?></p>
             </div>
         <?php endif; ?>
         

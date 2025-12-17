@@ -1,4 +1,21 @@
-## [70.2] - 2025-12-17 (Last Stable Version)
+## [70.3] - 2025-12-17 (Last Stable Version)
+
+### Added
+- **Delete Booking** - Admin can now delete bookings from the Bookings page with confirmation dialog
+
+### Fixed
+- **HTML Tags in Login Error** - Guest login page now properly renders HTML tags in error messages instead of showing raw tags
+
+### Files Modified
+- `admin/class-yolo-ys-admin.php` - Added delete booking AJAX handler
+- `admin/class-yolo-ys-admin-bookings.php` - Added Delete link to Actions column
+- `admin/js/yolo-yacht-search-admin.js` - Added JavaScript for delete confirmation and AJAX
+- `public/partials/yolo-ys-guest-login.php` - Fixed HTML escaping (esc_html → wp_kses_post)
+- `yolo-yacht-search.php` - Version bump to 70.3
+
+---
+
+## [70.2] - 2025-12-17
 
 ### Fixed
 - **CRITICAL: Existing User Password Not Updated** - When a returning customer made a new booking, their password was NOT updated to match the new booking reference shown in the email. Now the password is always updated to match the latest booking.
