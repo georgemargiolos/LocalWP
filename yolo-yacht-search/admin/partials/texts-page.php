@@ -96,14 +96,14 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_per_person' => sanitize_text_field($_POST['yolo_ys_text_per_person']),
         
         // Charter Pack Included Items
-        'yolo_ys_text_charter_pack_title' => sanitize_text_field($_POST['yolo_ys_text_charter_pack_title']),
-        'yolo_ys_text_charter_pack_transit_log' => wp_kses_post($_POST['yolo_ys_text_charter_pack_transit_log']),
-        'yolo_ys_text_charter_pack_checkin' => wp_kses_post($_POST['yolo_ys_text_charter_pack_checkin']),
-        'yolo_ys_text_charter_pack_cleaning' => wp_kses_post($_POST['yolo_ys_text_charter_pack_cleaning']),
-        'yolo_ys_text_charter_pack_linen' => wp_kses_post($_POST['yolo_ys_text_charter_pack_linen']),
-        'yolo_ys_text_charter_pack_gas' => wp_kses_post($_POST['yolo_ys_text_charter_pack_gas']),
-        'yolo_ys_text_charter_pack_dinghy' => wp_kses_post($_POST['yolo_ys_text_charter_pack_dinghy']),
-        'yolo_ys_text_charter_pack_sup' => wp_kses_post($_POST['yolo_ys_text_charter_pack_sup']),
+        'yolo_ys_text_charter_pack_title' => isset($_POST['yolo_ys_text_charter_pack_title']) ? sanitize_text_field($_POST['yolo_ys_text_charter_pack_title']) : '',
+        'yolo_ys_text_charter_pack_transit_log' => isset($_POST['yolo_ys_text_charter_pack_transit_log']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_transit_log']) : '',
+        'yolo_ys_text_charter_pack_checkin' => isset($_POST['yolo_ys_text_charter_pack_checkin']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_checkin']) : '',
+        'yolo_ys_text_charter_pack_cleaning' => isset($_POST['yolo_ys_text_charter_pack_cleaning']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_cleaning']) : '',
+        'yolo_ys_text_charter_pack_linen' => isset($_POST['yolo_ys_text_charter_pack_linen']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_linen']) : '',
+        'yolo_ys_text_charter_pack_gas' => isset($_POST['yolo_ys_text_charter_pack_gas']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_gas']) : '',
+        'yolo_ys_text_charter_pack_dinghy' => isset($_POST['yolo_ys_text_charter_pack_dinghy']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_dinghy']) : '',
+        'yolo_ys_text_charter_pack_sup' => isset($_POST['yolo_ys_text_charter_pack_sup']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_sup']) : '',
         
         // Additional Technical Specs
         'yolo_ys_text_draught' => sanitize_text_field($_POST['yolo_ys_text_draught']),
