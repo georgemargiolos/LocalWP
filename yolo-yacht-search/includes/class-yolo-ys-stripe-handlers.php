@@ -485,8 +485,10 @@ class YOLO_YS_Stripe_Handlers {
                     $first = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
                     $last = isset($name_parts[1]) ? $name_parts[1] : '';
                     
-                    // Use bm_reservation_id directly (it already includes any prefix from BM API)
-                    $booking_reference = $bm_reservation_id;
+                    // Use booking->bm_reservation_id from database to match email template
+                    $booking_reference = !empty($booking->bm_reservation_id) 
+                        ? $booking->bm_reservation_id 
+                        : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
                     
                     $guest_result = $guest_manager->create_guest_user(
                         $booking_id,

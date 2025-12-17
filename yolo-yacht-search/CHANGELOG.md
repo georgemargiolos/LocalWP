@@ -1,4 +1,17 @@
-## [70.1] - 2025-12-17 (Last Stable Version)
+## [70.2] - 2025-12-17 (Last Stable Version)
+
+### Fixed
+- **CRITICAL: Existing User Password Not Updated** - When a returning customer made a new booking, their password was NOT updated to match the new booking reference shown in the email. Now the password is always updated to match the latest booking.
+- **Password Source Mismatch** - Fixed AJAX handler to use `$booking->bm_reservation_id` from database instead of local variable, ensuring consistency with email template.
+
+### Files Modified
+- `includes/class-yolo-ys-guest-users.php` - Now updates password for existing users
+- `includes/class-yolo-ys-stripe-handlers.php` - Fixed booking reference source
+- `yolo-yacht-search.php` - Version bump to 70.2
+
+---
+
+## [70.1] - 2025-12-17
 
 ### Changed
 - **Removed BM- Prefix** - Booking reference now displays the raw `bm_reservation_id` without any prefix.

@@ -100,6 +100,12 @@ class YOLO_YS_Guest_Users {
                     error_log('YOLO YS Guest: Added guest role to existing user');
                 }
                 
+                // UPDATE PASSWORD to match new booking reference
+                // This ensures the password shown in the email always works
+                $password = $confirmation_number . 'YoLo';
+                wp_set_password($password, $user->ID);
+                error_log('YOLO YS Guest: Updated password for existing user to match new booking');
+                
                 // Link booking to existing user
                 global $wpdb;
                 $table_bookings = $wpdb->prefix . 'yolo_bookings';
@@ -116,8 +122,8 @@ class YOLO_YS_Guest_Users {
                     'success' => true,
                     'user_id' => $user->ID,
                     'username' => $user->user_login,
-                    'password' => null, // Don't change existing password
-                    'message' => 'Existing user updated'
+                    'password' => $password, // Return updated password
+                    'message' => 'Existing user updated with new password'
                 );
             }
             
