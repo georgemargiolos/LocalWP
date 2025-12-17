@@ -314,30 +314,213 @@ jQuery(document).ready(function($) {
         });
     });
     
-    // Initialize sortable (will be implemented in Phase 2)
+    // Initialize sortable for drag-drop reordering (v65.15)
     if (typeof $.fn.sortable !== 'undefined') {
         $('#custom-media-grid').sortable({
             items: '.media-item',
             placeholder: 'ui-sortable-placeholder',
+            cursor: 'move',
+            tolerance: 'pointer',
             update: function(event, ui) {
-                // Will save order in Phase 2
+                // Auto-save order after drag
+                saveMediaOrder();
             }
         });
     }
     
-    // Copy synced images button (will be implemented in Phase 2)
+    // Helper function to render media item HTML
+    function renderMediaItem(media) {
+        var isVideo = media.media_type === 'video';
+        var thumbUrl = media.thumbnail_url || (isVideo ? 'https://img.youtube.com/vi/' + media.media_url + '/mqdefault.jpg' : media.media_url);
+        
+        var html = '<div class="media-item" data-id="' + media.id + '" data-type="' + media.media_type + '" ' +
+                   'style="background: #fff; border: 2px solid #ddd; border-radius: 4px; overflow: hidden; cursor: move; position: relative;">';
+        
+        if (isVideo) {
+            html += '<div style="position: relative;">' +
+                    '<img src="' + thumbUrl + '" style="width: 100%; height: 100px; object-fit: cover;">' +
+                    '<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: #fff; padding: 5px 10px; border-radius: 4px;">' +
+                    '<span class="dashicons dashicons-video-alt3"></span></span></div>';
+        } else {
+            html += '<img src="' + thumbUrl + '" style="width: 100%; height: 100px; object-fit: cover;">';
+        }
+        
+        html += '<div style="padding: 5px; font-size: 11px; background: #f8f9fa;">' +
+                '<span class="media-type-badge" style="background: ' + (isVideo ? '#e74c3c' : '#3498db') + '; color: #fff; padding: 1px 5px; border-radius: 2px; font-size: 10px;">' +
+                media.media_type.toUpperCase() + '</span>' +
+                '<button type="button" class="delete-media-btn" data-id="' + media.id + '" ' +
+                'style="float: right; background: none; border: none; color: #dc3545; cursor: pointer; padding: 0;">' +
+                '<span class="dashicons dashicons-trash"></span></button></div></div>';
+        
+        return html;
+    }
+    
+    // Helper function to save media order
+    function saveMediaOrder() {
+        var order = [];
+        $('#custom-media-grid .media-item').each(function() {
+            order.push($(this).data('id'));
+        });
+        
+        $.post(ajaxUrl, {
+            action: 'yolo_save_media_order',
+            yacht_id: yachtId,
+            order: order,
+            nonce: nonce
+        });
+    }
+    
+    // Copy synced images button (v65.15)
     $('#copy-synced-images').on('click', function() {
-        alert('This feature will be implemented in the next version.');
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Copying...');
+        
+        $.post(ajaxUrl, {
+            action: 'yolo_copy_synced_images',
+            yacht_id: yachtId,
+            nonce: nonce
+        }, function(response) {
+            if (response.success) {
+                // Clear grid and add new items
+                $('#custom-media-grid').empty();
+                $.each(response.data.media, function(i, media) {
+                    $('#custom-media-grid').append(renderMediaItem(media));
+                });
+                // Reinitialize sortable
+                $('#custom-media-grid').sortable('refresh');
+                alert(response.data.message);
+            } else {
+                alert('Error: ' + response.data);
+            }
+            $btn.prop('disabled', false).html('<span class="dashicons dashicons-migrate" style="vertical-align: middle;"></span> Copy Synced Images to Custom Media');
+        });
     });
     
-    // Add image button (will be implemented in Phase 2)
+    // Add image button - opens WordPress Media Library (v65.15)
     $('#add-image-btn').on('click', function() {
-        alert('This feature will be implemented in the next version.');
+        // Check if wp.media is available
+        if (typeof wp !== 'undefined' && wp.media) {
+            var mediaUploader = wp.media({
+                title: 'Select or Upload Image',
+                button: { text: 'Add Image' },
+                multiple: true,
+                library: { type: 'image' }
+            });
+            
+            mediaUploader.on('select', function() {
+                var attachments = mediaUploader.state().get('selection').toJSON();
+                $.each(attachments, function(i, attachment) {
+                    addMedia('image', attachment.url, attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url);
+                });
+            });
+            
+            mediaUploader.open();
+        } else {
+            // Fallback to URL prompt
+            var url = prompt('Enter image URL:');
+            if (url) {
+                addMedia('image', url, url);
+            }
+        }
     });
     
-    // Add video button (will be implemented in Phase 2)
+    // Add video button (v65.15)
     $('#add-video-btn').on('click', function() {
-        alert('This feature will be implemented in the next version.');
+        var choice = confirm('Click OK to enter a YouTube URL, or Cancel to upload a video file.');
+        
+        if (choice) {
+            // YouTube URL
+            var url = prompt('Enter YouTube URL (e.g., https://www.youtube.com/watch?v=XXXXX):');
+            if (url) {
+                addMedia('video', url, '');
+            }
+        } else {
+            // Upload video file
+            if (typeof wp !== 'undefined' && wp.media) {
+                var mediaUploader = wp.media({
+                    title: 'Select or Upload Video',
+                    button: { text: 'Add Video' },
+                    multiple: false,
+                    library: { type: 'video' }
+                });
+                
+                mediaUploader.on('select', function() {
+                    var attachment = mediaUploader.state().get('selection').first().toJSON();
+                    addMedia('video', attachment.url, attachment.thumb ? attachment.thumb.src : '');
+                });
+                
+                mediaUploader.open();
+            } else {
+                alert('WordPress Media Library not available. Please enter a YouTube URL instead.');
+            }
+        }
+    });
+    
+    // Helper function to add media via AJAX
+    function addMedia(type, url, thumbnail) {
+        $.post(ajaxUrl, {
+            action: 'yolo_add_custom_media',
+            yacht_id: yachtId,
+            media_type: type,
+            media_url: url,
+            thumbnail_url: thumbnail,
+            nonce: nonce
+        }, function(response) {
+            if (response.success) {
+                // Remove "no media" message if present
+                $('#custom-media-grid .no-media-message').remove();
+                // Add new media item
+                $('#custom-media-grid').append(renderMediaItem(response.data));
+                // Reinitialize sortable
+                $('#custom-media-grid').sortable('refresh');
+            } else {
+                alert('Error: ' + response.data);
+            }
+        });
+    }
+    
+    // Delete media button (v65.15)
+    $(document).on('click', '.delete-media-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!confirm('Are you sure you want to delete this media?')) {
+            return;
+        }
+        
+        var $item = $(this).closest('.media-item');
+        var mediaId = $(this).data('id');
+        
+        $.post(ajaxUrl, {
+            action: 'yolo_delete_custom_media',
+            media_id: mediaId,
+            nonce: nonce
+        }, function(response) {
+            if (response.success) {
+                $item.fadeOut(300, function() {
+                    $(this).remove();
+                    // Show "no media" message if grid is empty
+                    if ($('#custom-media-grid .media-item').length === 0) {
+                        $('#custom-media-grid').html('<p class="no-media-message" style="color: #666; grid-column: 1/-1;">No custom media yet. Use "Copy Synced Images" or add new media below.</p>');
+                    }
+                });
+            } else {
+                alert('Error: ' + response.data);
+            }
+        });
+    });
+    
+    // Save order button (v65.15)
+    $('#save-media-order').on('click', function() {
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Saving...');
+        
+        saveMediaOrder();
+        
+        setTimeout(function() {
+            $btn.prop('disabled', false).html('<span class="dashicons dashicons-saved" style="vertical-align: middle;"></span> Save Order');
+            alert('Order saved!');
+        }, 500);
     });
     
     // Copy synced description (will be implemented in Phase 3)
