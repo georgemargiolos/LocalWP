@@ -68,6 +68,67 @@ function toggleQuoteForm() {
     }
 }
 
+// ============================================
+// YouTube Video Click Handler (v65.16)
+// Opens YouTube video in lightbox when clicking play button in Swiper
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle YouTube video thumbnail clicks
+    document.querySelectorAll('.swiper-slide-video .video-thumbnail-wrapper').forEach(function(wrapper) {
+        wrapper.addEventListener('click', function(e) {
+            e.preventDefault();
+            const slide = wrapper.closest('.swiper-slide-video');
+            const videoId = slide.dataset.videoId;
+            if (videoId) {
+                openYouTubeLightbox(videoId);
+            }
+        });
+    });
+});
+
+// Open YouTube video in lightbox
+function openYouTubeLightbox(videoId) {
+    const lightboxHTML = `
+        <div id="youtube-lightbox" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+             background: rgba(0,0,0,0.9); z-index: 99999; display: flex; align-items: center; justify-content: center;">
+            <button onclick="closeYouTubeLightbox()" style="position: absolute; top: 20px; right: 30px; 
+                    background: none; border: none; color: #fff; font-size: 40px; cursor: pointer; z-index: 100000;">&times;</button>
+            <div style="width: 90%; max-width: 1000px; aspect-ratio: 16/9;">
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+                        style="width: 100%; height: 100%; border: none;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen></iframe>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+    document.body.style.overflow = 'hidden';
+    
+    // Close on escape key
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            closeYouTubeLightbox();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+    
+    // Close on background click
+    document.getElementById('youtube-lightbox').addEventListener('click', function(e) {
+        if (e.target.id === 'youtube-lightbox') {
+            closeYouTubeLightbox();
+        }
+    });
+}
+
+// Close YouTube lightbox
+function closeYouTubeLightbox() {
+    const lightbox = document.getElementById('youtube-lightbox');
+    if (lightbox) {
+        lightbox.remove();
+        document.body.style.overflow = '';
+    }
+}
+
 // Show custom dates modal for non-Saturday bookings
 function showCustomDatesModal(dateFrom, dateTo) {
     // Safe variables for use in template literal (using json_encode for proper escaping)
