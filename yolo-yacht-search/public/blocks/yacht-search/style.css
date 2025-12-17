@@ -218,4 +218,9 @@
     .yolo-ys-search-form {
         gap: 10px;
     }
+
+    /* Fix for icon overlapping text on small mobile screens */
+    .yolo-ys-field-date input {
+        padding: 0 10px 0 45px; /* Keep icon space, reduce right padding */
+    }
 }
