@@ -7,10 +7,12 @@ if (!defined('ABSPATH')) {
  * Booking Confirmation Template
  * Shortcode: [yolo_booking_confirmation]
  * 
- * v65.20 FIX: 
+ * v65.21 FIX: 
  * - Show spinner IMMEDIATELY when returning from Stripe (before processing)
  * - Progressive text updates: 0-10s, 10-35s, 35-45s, 45-60s
  * - Uses output buffering flush to display spinner while PHP processes
+ * - Customizable texts from settings page
+ * - Responsive spinner design for mobile
  */
 
 // ============================================
@@ -403,23 +405,81 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
 
 /**
  * Show loading spinner with progressive text updates
- * v65.20: Now shown IMMEDIATELY when returning from Stripe
+ * v65.21: Now shown IMMEDIATELY when returning from Stripe
+ * Uses customizable texts from settings page
+ * Responsive design for mobile
  */
 if (!function_exists('yolo_show_processing_spinner')) {
 function yolo_show_processing_spinner() {
+    // Get customizable texts from settings with defaults
+    $heading_1 = get_option('yolo_ys_text_spinner_heading_1', 'Confirming Your Payment');
+    $subtext_1 = get_option('yolo_ys_text_spinner_subtext_1', 'Please wait while we verify your payment...');
+    $heading_2 = get_option('yolo_ys_text_spinner_heading_2', 'Processing Your Booking');
+    $subtext_2 = get_option('yolo_ys_text_spinner_subtext_2', "Almost there! Please don't close this window.");
+    $heading_3 = get_option('yolo_ys_text_spinner_heading_3', 'Finalizing Details');
+    $subtext_3 = get_option('yolo_ys_text_spinner_subtext_3', "This is taking a bit longer than usual. Please don't close this window.");
+    $heading_4 = get_option('yolo_ys_text_spinner_heading_4', 'Still Working...');
+    $subtext_4 = get_option('yolo_ys_text_spinner_subtext_4', "Your payment was successful. We're just finishing up the details.");
     ?>
-    <div id="yolo-booking-processing" style="text-align: center; padding: 60px 20px;">
-        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #dc2626; border-radius: 50%; width: 60px; height: 60px; animation: yolo-spin 1s linear infinite; margin: 0 auto 20px;"></div>
-        <h2 id="processing-heading" style="color: #374151; margin-bottom: 10px;">Confirming Your Payment</h2>
-        <p id="processing-status" style="color: #6b7280; font-size: 16px;">Please wait while we verify your payment...</p>
-    </div>
-    
     <style>
+    .yolo-processing-container {
+        text-align: center;
+        padding: 60px 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    .yolo-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #dc2626;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: yolo-spin 1s linear infinite;
+        margin: 0 auto 24px;
+    }
+    .yolo-processing-heading {
+        color: #374151;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+        line-height: 1.3;
+    }
+    .yolo-processing-subtext {
+        color: #6b7280;
+        font-size: 16px;
+        margin: 0;
+        line-height: 1.5;
+    }
     @keyframes yolo-spin { 
         0% { transform: rotate(0deg); } 
         100% { transform: rotate(360deg); } 
     }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 480px) {
+        .yolo-processing-container {
+            padding: 40px 16px;
+        }
+        .yolo-spinner {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+        .yolo-processing-heading {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .yolo-processing-subtext {
+            font-size: 14px;
+        }
+    }
     </style>
+    
+    <div id="yolo-booking-processing" class="yolo-processing-container">
+        <div class="yolo-spinner"></div>
+        <h2 id="processing-heading" class="yolo-processing-heading"><?php echo esc_html($heading_1); ?></h2>
+        <p id="processing-status" class="yolo-processing-subtext"><?php echo esc_html($subtext_1); ?></p>
+    </div>
     
     <script>
     (function() {
@@ -427,18 +487,49 @@ function yolo_show_processing_spinner() {
         var headingEl = document.getElementById('processing-heading');
         var statusEl = document.getElementById('processing-status');
         
+        // Texts from settings (escaped for JavaScript)
+        var texts = {
+            heading1: <?php echo json_encode($heading_1); ?>,
+            subtext1: <?php echo json_encode($subtext_1); ?>,
+            heading2: <?php echo json_encode($heading_2); ?>,
+            subtext2: <?php echo json_encode($subtext_2); ?>,
+            heading3: <?php echo json_encode($heading_3); ?>,
+            subtext3: <?php echo json_encode($subtext_3); ?>,
+            heading4: <?php echo json_encode($heading_4); ?>,
+            subtext4: <?php echo json_encode($subtext_4); ?>
+        };
+        
+        var currentStage = 1;
+        
         function updateText() {
             var elapsed = (Date.now() - startTime) / 1000;
+            var newStage = 1;
             
             if (elapsed >= 45) {
-                headingEl.textContent = 'Still Working...';
-                statusEl.textContent = 'Your payment was successful. We\'re just finishing up the details.';
+                newStage = 4;
             } else if (elapsed >= 35) {
-                headingEl.textContent = 'Finalizing Details';
-                statusEl.textContent = 'This is taking a bit longer than usual. Please don\'t close this window.';
+                newStage = 3;
             } else if (elapsed >= 10) {
-                headingEl.textContent = 'Processing Your Booking';
-                statusEl.textContent = 'Almost there! Please don\'t close this window.';
+                newStage = 2;
+            }
+            
+            // Only update DOM if stage changed
+            if (newStage !== currentStage) {
+                currentStage = newStage;
+                switch(newStage) {
+                    case 2:
+                        headingEl.textContent = texts.heading2;
+                        statusEl.textContent = texts.subtext2;
+                        break;
+                    case 3:
+                        headingEl.textContent = texts.heading3;
+                        statusEl.textContent = texts.subtext3;
+                        break;
+                    case 4:
+                        headingEl.textContent = texts.heading4;
+                        statusEl.textContent = texts.subtext4;
+                        break;
+                }
             }
         }
         
