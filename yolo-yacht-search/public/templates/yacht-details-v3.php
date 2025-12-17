@@ -387,6 +387,29 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             </div>
             
             <!-- Description Section (v65.17 - supports more tag for custom descriptions) -->
+            
+            <!-- DEBUG START - Remove after testing -->
+            <?php if (current_user_can('manage_options')): ?>
+            <div style="background: #ffffcc; border: 2px solid #ff0000; padding: 15px; margin: 20px 0; font-family: monospace; font-size: 12px;">
+                <h4 style="color: red; margin: 0 0 10px 0;">DEBUG: Description Analysis</h4>
+                <p><strong>use_custom_description flag:</strong> <?php echo $use_custom_description ? 'TRUE (1)' : 'FALSE (0)'; ?></p>
+                <p><strong>custom_settings exists:</strong> <?php echo $custom_settings ? 'YES' : 'NO'; ?></p>
+                <?php if ($custom_settings): ?>
+                <p><strong>custom_settings->use_custom_description:</strong> <?php echo var_export($custom_settings->use_custom_description, true); ?></p>
+                <p><strong>custom_description length:</strong> <?php echo strlen($custom_settings->custom_description ?? ''); ?> chars</p>
+                <?php endif; ?>
+                <p><strong>display_description source:</strong> <?php echo $use_custom_description ? 'CUSTOM' : 'SYNCED'; ?></p>
+                <p><strong>display_description length:</strong> <?php echo strlen($display_description); ?> chars</p>
+                <p><strong>Contains &lt;!-- more --&gt; (literal):</strong> <?php echo strpos($display_description, '<!-- more -->') !== false ? 'YES at position ' . strpos($display_description, '<!-- more -->') : 'NO'; ?></p>
+                <p><strong>Contains &amp;lt;!-- more --&amp;gt; (encoded):</strong> <?php echo strpos($display_description, '&lt;!-- more --&gt;') !== false ? 'YES (PROBLEM!)' : 'NO'; ?></p>
+                <p><strong>First 500 chars (escaped):</strong><br><code><?php echo esc_html(substr($display_description, 0, 500)); ?></code></p>
+                <?php if ($custom_settings && !empty($custom_settings->custom_description)): ?>
+                <p><strong>Raw DB value first 500 chars:</strong><br><code><?php echo esc_html(substr($custom_settings->custom_description, 0, 500)); ?></code></p>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+            <!-- DEBUG END -->
+            
             <?php if (!empty($display_description)): ?>
             <?php
                 // Check for <!-- more --> tag in custom descriptions (v65.17)

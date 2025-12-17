@@ -7,10 +7,10 @@ if (!defined('ABSPATH')) {
  * Booking Confirmation Template
  * Shortcode: [yolo_booking_confirmation]
  * 
- * v20.3 FIX: 
- * - Functions defined BEFORE they are called
- * - Removed PHP sleep() blocking - uses AJAX polling
- * - Guest user creation happens for ALL bookings (not just new ones)
+ * v65.20 FIX: 
+ * - Show spinner IMMEDIATELY when returning from Stripe (before processing)
+ * - Progressive text updates: 0-10s, 10-35s, 35-45s, 45-60s
+ * - Uses output buffering flush to display spinner while PHP processes
  */
 
 // ============================================
@@ -402,7 +402,56 @@ function yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings) {
 }
 
 /**
- * Show loading page with AJAX polling
+ * Show loading spinner with progressive text updates
+ * v65.20: Now shown IMMEDIATELY when returning from Stripe
+ */
+if (!function_exists('yolo_show_processing_spinner')) {
+function yolo_show_processing_spinner() {
+    ?>
+    <div id="yolo-booking-processing" style="text-align: center; padding: 60px 20px;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #dc2626; border-radius: 50%; width: 60px; height: 60px; animation: yolo-spin 1s linear infinite; margin: 0 auto 20px;"></div>
+        <h2 id="processing-heading" style="color: #374151; margin-bottom: 10px;">Confirming Your Payment</h2>
+        <p id="processing-status" style="color: #6b7280; font-size: 16px;">Please wait while we verify your payment...</p>
+    </div>
+    
+    <style>
+    @keyframes yolo-spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+    }
+    </style>
+    
+    <script>
+    (function() {
+        var startTime = Date.now();
+        var headingEl = document.getElementById('processing-heading');
+        var statusEl = document.getElementById('processing-status');
+        
+        function updateText() {
+            var elapsed = (Date.now() - startTime) / 1000;
+            
+            if (elapsed >= 45) {
+                headingEl.textContent = 'Still Working...';
+                statusEl.textContent = 'Your payment was successful. We\'re just finishing up the details.';
+            } else if (elapsed >= 35) {
+                headingEl.textContent = 'Finalizing Details';
+                statusEl.textContent = 'This is taking a bit longer than usual. Please don\'t close this window.';
+            } else if (elapsed >= 10) {
+                headingEl.textContent = 'Processing Your Booking';
+                statusEl.textContent = 'Almost there! Please don\'t close this window.';
+            }
+        }
+        
+        // Update text every second
+        setInterval(updateText, 1000);
+    })();
+    </script>
+    <?php
+}
+}
+
+/**
+ * Show error page when booking creation fails after timeout
  */
 if (!function_exists('yolo_show_loading_page')) {
 function yolo_show_loading_page($session_id) {
@@ -410,7 +459,7 @@ function yolo_show_loading_page($session_id) {
     <div id="yolo-booking-loading" style="text-align: center; padding: 60px 20px;">
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #dc2626; border-radius: 50%; width: 60px; height: 60px; animation: yolo-spin 1s linear infinite; margin: 0 auto 20px;"></div>
         <h2 style="color: #374151; margin-bottom: 10px;">Processing Your Booking</h2>
-        <p id="loading-status" style="color: #6b7280; font-size: 16px;">Confirming your payment with Stripe...</p>
+        <p id="loading-status" style="color: #6b7280; font-size: 16px;">Confirming your payment...</p>
         <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">This usually takes just a few seconds.</p>
     </div>
     
@@ -480,22 +529,47 @@ if (empty($session_id)) {
 global $wpdb;
 $table_bookings = $wpdb->prefix . 'yolo_bookings';
 
+// First check if booking already exists (e.g., page refresh)
 $booking = $wpdb->get_row($wpdb->prepare(
     "SELECT * FROM {$table_bookings} WHERE stripe_session_id = %s",
     $session_id
 ));
 
 if ($booking) {
+    // Booking exists - show confirmation immediately
     yolo_ensure_guest_user_exists($booking);
     yolo_show_booking_confirmation($booking);
     return;
 }
 
+// Booking doesn't exist yet - show spinner IMMEDIATELY, then process
+// Use output buffering to flush spinner to browser before processing
+yolo_show_processing_spinner();
+
+// Flush the spinner to the browser immediately
+if (ob_get_level() > 0) {
+    ob_end_flush();
+}
+flush();
+
+// Now process the booking (this takes time but user sees spinner)
 $booking = yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings);
 
 if ($booking) {
+    // Hide spinner and show confirmation via JavaScript
+    ?>
+    <script>
+    document.getElementById('yolo-booking-processing').style.display = 'none';
+    </script>
+    <?php
     yolo_show_booking_confirmation($booking);
     return;
 }
 
+// Booking creation failed - show polling page
+?>
+<script>
+document.getElementById('yolo-booking-processing').style.display = 'none';
+</script>
+<?php
 yolo_show_loading_page($session_id);
