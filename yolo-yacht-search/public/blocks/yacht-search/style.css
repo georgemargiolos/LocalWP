@@ -221,6 +221,6 @@
 
     /* Fix for icon overlapping text on small mobile screens */
     .yolo-ys-field-date input {
-        padding: 0 10px 0 45px; /* Keep icon space, reduce right padding */
+        padding: 0 10px 0 55px; /* Increased left padding to prevent text overlap with icon */
     }
 }
