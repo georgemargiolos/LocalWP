@@ -297,15 +297,31 @@ class YOLO_YS_Guest_Users {
             global $wpdb;
             $table_bookings = $wpdb->prefix . 'yolo_bookings';
             $user = wp_get_current_user();
+            
+            // First, get the booking
             $booking = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$table_bookings} WHERE id = %d AND (user_id = %d OR customer_email = %s)",
-                $booking_id,
-                $user->ID,
-                $user->user_email
+                "SELECT * FROM {$table_bookings} WHERE id = %d",
+                $booking_id
             ));
             
             if (!$booking) {
-                wp_send_json_error(array('message' => 'Booking not found or access denied'));
+                wp_send_json_error(array('message' => 'Booking not found'));
+                return;
+            }
+            
+            // Check access: user_id match, customer_email match, or admin
+            $has_access = false;
+            if ($booking->user_id == $user->ID) {
+                $has_access = true;
+            } elseif (strtolower($booking->customer_email) == strtolower($user->user_email)) {
+                $has_access = true;
+            } elseif (current_user_can('manage_options')) {
+                $has_access = true; // Admins can upload for any booking
+            }
+            
+            if (!$has_access) {
+                error_log('YOLO YS License Upload: Access denied - booking user_id: ' . $booking->user_id . ', current user ID: ' . $user->ID . ', booking email: ' . $booking->customer_email . ', user email: ' . $user->user_email);
+                wp_send_json_error(array('message' => 'Access denied. Please contact support.'));
                 return;
             }
             
@@ -336,9 +352,9 @@ class YOLO_YS_Guest_Users {
             }
             
             // Validate file type
-            $allowed_types = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
+            $allowed_types = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
             if (!in_array($file['type'], $allowed_types)) {
-                wp_send_json_error(array('message' => 'Invalid file type. Only JPG, PNG, and GIF are allowed.'));
+                wp_send_json_error(array('message' => 'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.'));
                 return;
             }
             
