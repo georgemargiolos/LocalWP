@@ -32,7 +32,7 @@ if (!$booking) {
 
 // Get booking reference
 $booking_reference = !empty($booking->bm_reservation_id) 
-    ? 'BM-' . $booking->bm_reservation_id 
+    ? $booking->bm_reservation_id 
     : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
 ?>
 
@@ -94,7 +94,7 @@ $booking_reference = !empty($booking->bm_reservation_id)
                     <?php if (!empty($booking->bm_reservation_id)): ?>
                     <tr>
                         <th>Booking Manager ID:</th>
-                        <td><strong>BM-<?php echo esc_html($booking->bm_reservation_id); ?></strong></td>
+                        <td><strong><?php echo esc_html($booking->bm_reservation_id); ?></strong></td>
                     </tr>
                     <?php endif; ?>
                 </table>

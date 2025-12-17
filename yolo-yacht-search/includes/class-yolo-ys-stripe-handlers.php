@@ -419,7 +419,35 @@ class YOLO_YS_Stripe_Handlers {
                 $customer_name = $session->customer_details->name;
             }
             
-            // Insert booking
+            // STEP 1: Create reservation in Booking Manager FIRST to get bm_reservation_id
+            $api = new YOLO_YS_Booking_Manager_API();
+            $reservation_data = array(
+                'yachtId' => (int)$yacht_id,
+                'dateFrom' => date('Y-m-d\TH:i:s', strtotime($date_from)),
+                'dateTo' => date('Y-m-d\TH:i:s', strtotime($date_to)),
+                'client' => array('name' => $customer_name, 'email' => $customer_email),
+                'status' => 1,
+                'sendNotification' => true,
+                'note' => 'Online booking via YOLO Charters. Stripe: ' . ($session->payment_intent ?? ''),
+            );
+            
+            $bm_result = $api->create_reservation($reservation_data);
+            $bm_reservation_id = null;
+            
+            if ($bm_result['success'] && isset($bm_result['data']['id'])) {
+                $bm_reservation_id = $bm_result['data']['id'];
+                
+                // Create payment record in BM
+                $api->create_payment($bm_reservation_id, array(
+                    'amount' => floatval($deposit_amount),
+                    'currency' => $currency,
+                    'paymentDate' => current_time('Y-m-d\TH:i:s'),
+                    'paymentMethod' => 'Credit Card (Stripe)',
+                    'note' => 'Deposit. Stripe: ' . ($session->payment_intent ?? ''),
+                ));
+            }
+            
+            // STEP 2: Insert WordPress booking WITH bm_reservation_id
             $wpdb->insert($table_bookings, array(
                 'yacht_id' => $yacht_id,
                 'yacht_name' => $yacht_name,
@@ -434,6 +462,7 @@ class YOLO_YS_Stripe_Handlers {
                 'customer_phone' => $customer_phone,
                 'stripe_session_id' => $session_id,
                 'stripe_payment_intent' => isset($session->payment_intent) ? $session->payment_intent : '',
+                'bm_reservation_id' => $bm_reservation_id,
                 'payment_status' => 'deposit_paid',
                 'booking_status' => 'confirmed',
                 'created_at' => current_time('mysql'),
@@ -445,50 +474,19 @@ class YOLO_YS_Stripe_Handlers {
                 return;
             }
             
-            // Create reservation in Booking Manager
-            $api = new YOLO_YS_Booking_Manager_API();
-            $reservation_data = array(
-                'yachtId' => (int)$yacht_id,
-                'dateFrom' => date('Y-m-d\TH:i:s', strtotime($date_from)),
-                'dateTo' => date('Y-m-d\TH:i:s', strtotime($date_to)),
-                'client' => array('name' => $customer_name, 'email' => $customer_email),
-                'status' => 1,
-                'sendNotification' => true,
-                'note' => 'Online booking via YOLO Charters. Stripe: ' . ($session->payment_intent ?? ''),
-            );
-            
-            $result = $api->create_reservation($reservation_data);
-            
-            if ($result['success']) {
-                $bm_reservation_id = isset($result['data']['id']) ? $result['data']['id'] : null;
-                $wpdb->update($table_bookings, array('bm_reservation_id' => $bm_reservation_id), array('id' => $booking_id));
-                
-                if ($bm_reservation_id) {
-                    $api->create_payment($bm_reservation_id, array(
-                        'amount' => floatval($deposit_amount),
-                        'currency' => $currency,
-                        'paymentDate' => current_time('Y-m-d\TH:i:s'),
-                        'paymentMethod' => 'Credit Card (Stripe)',
-                        'note' => 'Deposit. Stripe: ' . ($session->payment_intent ?? ''),
-                    ));
-                }
-            }
-            
             // Get full booking for emails and guest user
             $booking = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_bookings} WHERE id = %d", $booking_id));
             
             if ($booking) {
-                // Create guest user
+                // STEP 3: Create guest user with bm_reservation_id as password base
                 if (class_exists('YOLO_YS_Guest_Users')) {
                     $guest_manager = new YOLO_YS_Guest_Users();
                     $name_parts = explode(' ', trim($customer_name), 2);
                     $first = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
                     $last = isset($name_parts[1]) ? $name_parts[1] : '';
                     
-                    // Generate booking reference for password (must match email template)
-                    $booking_reference = !empty($booking->bm_reservation_id) 
-                        ? 'BM-' . $booking->bm_reservation_id 
-                        : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+                    // Use bm_reservation_id directly (it already includes any prefix from BM API)
+                    $booking_reference = $bm_reservation_id;
                     
                     $guest_result = $guest_manager->create_guest_user(
                         $booking_id,

@@ -1,4 +1,28 @@
-## [70.0] - 2025-12-17 (Last Stable Version)
+## [70.1] - 2025-12-17 (Last Stable Version)
+
+### Changed
+- **Removed BM- Prefix** - Booking reference now displays the raw `bm_reservation_id` without any prefix.
+- **Password Format** - Password is now `{bm_reservation_id}YoLo` (e.g., `7333050630000107850YoLo`).
+- **Booking Flow Refactored** - BM reservation is now created FIRST, before WordPress booking insert.
+- **Version Bump** - Updated plugin version from 70.0 to 70.1.
+
+### Files Modified
+- `yolo-yacht-search.php` - Version bump
+- `includes/class-yolo-ys-email.php` - Removed BM- prefix (4 occurrences)
+- `includes/class-yolo-ys-stripe.php` - Removed BM- prefix
+- `includes/class-yolo-ys-stripe-handlers.php` - Refactored booking flow
+- `public/templates/booking-confirmation.php` - Removed BM- prefix
+- `public/templates/balance-confirmation.php` - Removed BM- prefix
+- `public/templates/balance-payment.php` - Updated lookup logic
+- `admin/class-yolo-ys-admin-bookings.php` - Removed BM- prefix
+- `admin/class-yolo-ys-admin-bookings-manager.php` - Removed BM- prefix
+- `admin/partials/booking-detail.php` - Removed BM- prefix (2 occurrences)
+- `admin/partials/base-manager-checkin.php` - Removed BM- prefix
+- `admin/partials/base-manager-checkout.php` - Removed BM- prefix
+
+---
+
+## [70.0] - 2025-12-17
 
 ### Fixed
 - **CRITICAL: Guest Login Password Mismatch** - Fixed issue where guest users could not log in because the password stored in WordPress did not match the password shown in the booking confirmation email.

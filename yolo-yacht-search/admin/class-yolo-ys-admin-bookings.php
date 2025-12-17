@@ -71,7 +71,7 @@ class YOLO_YS_Admin_Bookings extends WP_List_Table {
      */
     public function column_bm_id($item) {
         if (!empty($item['bm_reservation_id'])) {
-            return '<span class="yolo-bm-id">BM-' . $item['bm_reservation_id'] . '</span>';
+            return '<span class="yolo-bm-id">' . $item['bm_reservation_id'] . '</span>';
         }
         return '<span class="yolo-no-sync" title="Not synced with Booking Manager">—</span>';
     }

@@ -287,7 +287,7 @@ function yolo_show_booking_confirmation_v2($booking) {
                     <span class="detail-label"><?php yolo_ys_text_e('booking_reference', 'Booking Reference'); ?>:</span>
                     <span class="detail-value"><strong><?php 
                         $booking_reference = $booking->bm_reservation_id 
-                            ? 'BM-' . $booking->bm_reservation_id 
+                            ? $booking->bm_reservation_id 
                             : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
                         echo esc_html($booking_reference); 
                     ?></strong></span>

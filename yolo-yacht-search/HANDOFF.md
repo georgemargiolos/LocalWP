@@ -1,12 +1,12 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
 **Date:** December 17, 2025  
-**Version:** v70.0 (Last Stable Version)  
-**Task Goal:** Fix critical guest login password mismatch bug and ensure booking reference consistency.
+**Version:** v70.1 (Last Stable Version)  
+**Task Goal:** Fix guest login password mismatch and remove BM- prefix from booking references.
 
 ---
 
-## 🔴 Summary of Work Completed (v65.23 → v70.0)
+## 🔴 Summary of Work Completed (v65.23 → v70.1)
 
 ### Critical Bug Fixed: Guest Login Password Mismatch
 
@@ -39,10 +39,10 @@
 4. ✅ Retrieve Stripe session and verify payment
 5. ✅ **Create booking in WordPress DB**
 6. ✅ **Create BM reservation** (get `bm_reservation_id`)
-7. ✅ **Create guest user** with password = `BM-{bm_reservation_id}YoLo`
+7. ✅ **Create guest user** with password = `{bm_reservation_id}YoLo`
 8. ✅ Send confirmation emails (with matching password)
 9. ✅ Track Purchase event (FB CAPI + GA4)
-10. ✅ Page reloads with confirmation showing `BM-{id}` format
+10. ✅ Page reloads with confirmation showing `{bm_reservation_id}` format
 
 ---
 
@@ -50,7 +50,7 @@
 
 | Scenario | Booking Reference | Password |
 |----------|------------------|----------|
-| With BM reservation | `BM-7333050630000107850` | `BM-7333050630000107850YoLo` |
+| With BM reservation | `7333050630000107850` | `7333050630000107850YoLo` |
 | Without BM reservation | `YOLO-2025-0123` | `YOLO-2025-0123YoLo` |
 
 ---
@@ -62,7 +62,7 @@ Users who booked BEFORE v70.0 have incorrect passwords.
 ### Option 1: Manual Password Reset
 1. Go to WordPress Admin → Users
 2. Find the guest user by email
-3. Set password to: `BM-{their_bm_reservation_id}YoLo`
+3. Set password to: `{their_bm_reservation_id}YoLo`
 
 ### Option 2: Run Migration Script
 
@@ -81,7 +81,7 @@ $query = "SELECT b.id, b.customer_email, b.bm_reservation_id, u.ID as user_id
           WHERE b.bm_reservation_id IS NOT NULL";
 $bookings = $wpdb->get_results($query);
 foreach ($bookings as $booking) {
-    $password = 'BM-' . $booking->bm_reservation_id . 'YoLo';
+    $password = $booking->bm_reservation_id . 'YoLo';
     wp_set_password($password, $booking->user_id);
     echo "Fixed: {$booking->customer_email}<br>";
 }
@@ -97,8 +97,8 @@ echo "Done! DELETE THIS FILE NOW!";
 
 - [ ] Make a test booking
 - [ ] Complete Stripe payment
-- [ ] Verify confirmation page shows `BM-{id}` format
-- [ ] Verify email shows same `BM-{id}` format
+- [ ] Verify confirmation page shows `{bm_reservation_id}` format (no BM- prefix)
+- [ ] Verify email shows same `{bm_reservation_id}` format
 - [ ] Try to login with password from email
 - [ ] Login should work! ✅
 

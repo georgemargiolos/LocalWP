@@ -70,7 +70,7 @@ try {
 // Get booking for display
 if (isset($booking) && $booking) {
     $booking_reference = !empty($booking->bm_reservation_id) 
-        ? 'BM-' . $booking->bm_reservation_id 
+        ? $booking->bm_reservation_id 
         : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
     ?>
 
