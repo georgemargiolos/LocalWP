@@ -107,6 +107,13 @@
         padding: 12px 16px !important;
     }
     
+    /* Date input needs extra left padding for the calendar icon - v65.11 fix */
+    .yolo-ys-search-widget .yolo-ys-field-date input,
+    .yolo-ys-search-form .yolo-ys-field-date input,
+    .yolo-ys-field-date input[type="text"] {
+        padding: 12px 16px 12px 45px !important; /* 45px left for icon */
+    }
+    
     .yolo-ys-search-widget .yolo-ys-search-button {
         width: 100% !important;
         height: 52px !important;

@@ -102,10 +102,11 @@
     line-height: 1;
 }
 
-.yolo-ys-field-date input {
+.yolo-ys-field-date input,
+#yolo-ys-dates {
     width: 100%;
     height: 56px;
-    padding: 0 20px 0 45px;
+    padding: 0 20px 0 45px !important; /* Left padding for icon - v65.11 fix for overlap */
     font-size: 18px;
     font-weight: 400;
     color: #142942;
