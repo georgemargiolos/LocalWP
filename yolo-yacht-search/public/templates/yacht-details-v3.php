@@ -386,7 +386,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 </div>
             </div>
             
-            <!-- Description Section (v65.17 - supports <!-- more --> tag for custom descriptions) -->
+            <!-- Description Section (v65.17 - supports more tag for custom descriptions) -->
             <?php if (!empty($display_description)): ?>
             <?php
                 // Check for <!-- more --> tag in custom descriptions (v65.17)
