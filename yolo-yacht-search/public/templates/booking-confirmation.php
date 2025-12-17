@@ -487,6 +487,34 @@ $booking = $wpdb->get_row($wpdb->prepare(
 
 if ($booking) {
     yolo_ensure_guest_user_exists($booking);
+    
+    // FIX v65.17: Track CAPI Purchase event for existing bookings too
+    // Previously only tracked in yolo_create_booking_from_stripe() which misses webhook-created bookings
+    if (function_exists('yolo_analytics')) {
+        $transaction_id = $booking->stripe_session_id ? $booking->stripe_session_id : 'booking-' . $booking->id;
+        $user_data = array(
+            'em' => $booking->customer_email,
+            'fn' => explode(' ', trim($booking->customer_name))[0] ?? '',
+            'ln' => explode(' ', trim($booking->customer_name), 2)[1] ?? ''
+        );
+        
+        ob_start();
+        $fb_purchase_event_id = @yolo_analytics()->track_purchase(
+            $transaction_id,
+            $booking->yacht_id,
+            floatval($booking->total_price),
+            $booking->yacht_name,
+            $user_data
+        );
+        ob_end_clean();
+        if (!is_string($fb_purchase_event_id)) $fb_purchase_event_id = '';
+        
+        error_log('YOLO YS: Purchase event tracked via CAPI for existing booking #' . $booking->id . ' (event_id: ' . $fb_purchase_event_id . ')');
+        
+        // Set event ID for client-side deduplication
+        echo '<script>window.fbPurchaseEventId = "' . esc_js($fb_purchase_event_id) . '";</script>';
+    }
+    
     yolo_show_booking_confirmation($booking);
     return;
 }

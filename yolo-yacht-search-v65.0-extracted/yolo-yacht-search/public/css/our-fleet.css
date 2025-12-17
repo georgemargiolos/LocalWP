@@ -1,0 +1,118 @@
+.yolo-ys-our-fleet {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px 40px 20px; /* Removed top padding and margin */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    box-sizing: border-box;
+}
+
+.yolo-ys-fleet-section {
+    margin-bottom: 60px;
+}
+
+.yolo-ys-fleet-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #1e3a8a;
+    text-align: center;
+}
+
+.yolo-ys-fleet-badge {
+    display: inline-block;
+    background: #dc2626;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/* Bootstrap Grid handles layout via .row and .col-* classes */
+.yolo-ys-yacht-grid {
+    /* DO NOT add display: grid here - it breaks Bootstrap Grid! */
+    margin-top: 30px;
+}
+
+.yolo-ys-no-yachts {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f3f4f6;
+    border-radius: 8px;
+}
+
+.yolo-ys-no-yachts p {
+    font-size: 18px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Mobile Responsive Fixes
+ * Note: Global mobile responsive fixes are in global-mobile-responsive.css
+ * These are page-specific enhancements
+ */
+@media (max-width: 768px) {
+    .yolo-ys-our-fleet {
+        padding: 0 15px 30px 15px; /* Removed top padding */
+    }
+    
+    .yolo-ys-fleet-section {
+        margin-bottom: 40px;
+    }
+    
+    .yolo-ys-fleet-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .yolo-ys-fleet-badge {
+        font-size: 14px;
+        padding: 6px 16px;
+        display: block;
+        margin: 0 auto 10px;
+        text-align: center;
+        max-width: 200px;
+    }
+    
+    /* Ensure Bootstrap grid doesn't overflow */
+    .yolo-ys-yacht-grid.row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+    
+    .yolo-ys-yacht-grid.row > [class*='col-'] {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yolo-ys-our-fleet {
+        padding: 0 10px 20px 10px; /* Removed top padding */
+    }
+    
+    .yolo-ys-fleet-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .yolo-ys-fleet-badge {
+        font-size: 12px;
+        padding: 5px 14px;
+    }
+    
+    /* Tighter spacing on very small screens */
+    .yolo-ys-yacht-grid.row {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+    
+    .yolo-ys-yacht-grid.row > [class*='col-'] {
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-bottom: 15px;
+    }
+}

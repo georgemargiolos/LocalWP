@@ -1,0 +1,1054 @@
+/**
+ * YOLO Guest Dashboard - Complete Redesign v2.7.5
+ * Modern, clean, fully responsive
+ */
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+:root {
+    --yolo-primary: #dc2626;
+    --yolo-primary-dark: #b91c1c;
+    --yolo-success: #059669;
+    --yolo-success-light: #d1fae5;
+    --yolo-warning: #f59e0b;
+    --yolo-warning-light: #fef3c7;
+    --yolo-info: #3b82f6;
+    --yolo-info-light: #dbeafe;
+    --yolo-gray-50: #f9fafb;
+    --yolo-gray-100: #f3f4f6;
+    --yolo-gray-200: #e5e7eb;
+    --yolo-gray-300: #d1d5db;
+    --yolo-gray-500: #6b7280;
+    --yolo-gray-700: #374151;
+    --yolo-gray-900: #111827;
+    --yolo-radius: 12px;
+    --yolo-radius-sm: 8px;
+    --yolo-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --yolo-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   Base Layout
+   ============================================ */
+/* Override WordPress theme layout constraints for guest dashboard page */
+.yolo-guest-dashboard,
+.yolo-guest-dashboard .entry-content,
+.entry-content:has(.yolo-guest-dashboard),
+.wp-block-post-content:has(.yolo-guest-dashboard),
+.is-layout-constrained:has(.yolo-guest-dashboard) {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+.yolo-guest-dashboard {
+    max-width: none;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.yolo-guest-header {
+    background: linear-gradient(135deg, var(--yolo-primary) 0%, var(--yolo-primary-dark) 100%);
+    color: white;
+    padding: 32px;
+    border-radius: var(--yolo-radius);
+    margin-bottom: 24px;
+    text-align: center;
+    position: relative;
+}
+
+.yolo-guest-header h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.yolo-guest-subtitle {
+    margin: 0;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.yolo-logout-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.yolo-logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* ============================================
+   No Bookings State
+   ============================================ */
+.yolo-no-bookings {
+    background: var(--yolo-gray-50);
+    padding: 60px 32px;
+    border-radius: var(--yolo-radius);
+    text-align: center;
+}
+
+.yolo-no-bookings h3 {
+    font-size: 22px;
+    color: var(--yolo-gray-900);
+    margin: 0 0 12px 0;
+}
+
+.yolo-no-bookings p {
+    font-size: 15px;
+    color: var(--yolo-gray-500);
+    margin: 0;
+}
+
+.yolo-no-bookings a {
+    color: var(--yolo-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ============================================
+   Booking Cards
+   ============================================ */
+.yolo-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.yolo-booking-card {
+    background: white;
+    border-radius: var(--yolo-radius);
+    box-shadow: var(--yolo-shadow);
+    overflow: hidden;
+}
+
+.yolo-booking-header {
+    background: var(--yolo-gray-900);
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.yolo-booking-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.yolo-booking-status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yolo-status-confirmed {
+    background: var(--yolo-success);
+    color: white;
+}
+
+.yolo-status-pending {
+    background: var(--yolo-warning);
+    color: white;
+}
+
+.yolo-status-cancelled {
+    background: var(--yolo-gray-500);
+    color: white;
+}
+
+/* ============================================
+   Booking Details Grid
+   ============================================ */
+.yolo-booking-details {
+    padding: 24px;
+}
+
+.yolo-booking-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: var(--yolo-gray-50);
+    padding: 20px;
+    border-radius: var(--yolo-radius-sm);
+}
+
+.yolo-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yolo-info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yolo-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yolo-info-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--yolo-gray-900);
+}
+
+.yolo-info-value.highlight {
+    color: var(--yolo-success);
+}
+
+/* ============================================
+   Accordion Sections
+   ============================================ */
+.yolo-accordion-section {
+    border: 1px solid var(--yolo-gray-200);
+    border-radius: var(--yolo-radius-sm);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.yolo-section-toggle {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--yolo-gray-50);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--yolo-gray-900);
+    transition: background 0.2s;
+}
+
+.yolo-section-toggle:hover {
+    background: var(--yolo-gray-100);
+}
+
+.yolo-section-toggle .icon {
+    font-size: 20px;
+    transition: transform 0.3s;
+}
+
+.yolo-accordion-section.open .yolo-section-toggle .icon {
+    transform: rotate(180deg);
+}
+
+.yolo-section-content {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 20px;
+    background: white;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.yolo-accordion-section.open .yolo-section-content {
+    max-height: 5000px; /* Large enough to fit any content */
+    padding: 20px;
+    transition: max-height 0.4s ease-in, padding 0.3s ease-in;
+}
+
+/* ============================================
+   License Upload - Clean Grid
+   ============================================ */
+.yolo-license-section {
+    border-color: var(--yolo-primary);
+}
+
+.yolo-license-section .yolo-section-toggle {
+    background: #fef2f2;
+}
+
+.yolo-license-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.yolo-license-item {
+    background: var(--yolo-gray-50);
+    border: 2px dashed var(--yolo-gray-300);
+    border-radius: var(--yolo-radius-sm);
+    padding: 20px;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+
+.yolo-license-item:hover {
+    border-color: var(--yolo-primary);
+}
+
+.yolo-license-item.uploaded {
+    border-style: solid;
+    border-color: var(--yolo-success);
+    background: var(--yolo-success-light);
+}
+
+.yolo-license-label {
+    display: block;
+    font-weight: 600;
+    color: var(--yolo-gray-700);
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.yolo-license-preview {
+    margin-bottom: 16px;
+}
+
+.yolo-license-preview img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 6px;
+    box-shadow: var(--yolo-shadow);
+}
+
+.yolo-license-uploaded-badge {
+    display: inline-block;
+    background: var(--yolo-success);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.yolo-license-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yolo-file-input-wrapper {
+    position: relative;
+}
+
+.yolo-file-input-wrapper input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--yolo-gray-300);
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+}
+
+.yolo-upload-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--yolo-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.yolo-upload-btn:hover:not(:disabled) {
+    background: var(--yolo-primary-dark);
+}
+
+.yolo-upload-btn:disabled {
+    background: var(--yolo-gray-300);
+    cursor: not-allowed;
+}
+
+.yolo-upload-message {
+    font-size: 13px;
+    min-height: 20px;
+}
+
+.yolo-upload-message .success {
+    color: var(--yolo-success);
+    font-weight: 600;
+}
+
+.yolo-upload-message .error {
+    color: var(--yolo-primary);
+    font-weight: 600;
+}
+
+/* ============================================
+   Skipper 2 Section
+   ============================================ */
+.yolo-skipper2-section {
+    border-color: var(--yolo-info);
+}
+
+.yolo-skipper2-section .yolo-section-toggle {
+    background: var(--yolo-info-light);
+}
+
+/* ============================================
+   Crew List Section
+   ============================================ */
+.yolo-crew-section {
+    border-color: var(--yolo-success);
+}
+
+.yolo-crew-section .yolo-section-toggle {
+    background: var(--yolo-success-light);
+}
+
+.yolo-crew-note {
+    color: var(--yolo-gray-500);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+/* Mobile-First Crew Cards */
+.yolo-crew-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yolo-crew-card {
+    background: var(--yolo-gray-50);
+    border: 1px solid var(--yolo-gray-200);
+    border-radius: var(--yolo-radius-sm);
+    padding: 16px;
+}
+
+.yolo-crew-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--yolo-gray-200);
+}
+
+.yolo-crew-number {
+    background: var(--yolo-gray-700);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.yolo-crew-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.yolo-crew-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yolo-crew-field.full-width {
+}
+
+.yolo-crew-field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--yolo-gray-500);
+    text-transform: uppercase;
+}
+
+.yolo-crew-field input,
+.yolo-crew-field select {
+    padding: 10px 12px;
+    border: 1px solid var(--yolo-gray-300);
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.yolo-crew-field input:focus,
+.yolo-crew-field select:focus {
+    outline: none;
+    border-color: var(--yolo-primary);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.yolo-save-crew-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--yolo-success);
+    color: white;
+    border: none;
+    border-radius: var(--yolo-radius-sm);
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: background 0.2s;
+}
+
+.yolo-save-crew-btn:hover:not(:disabled) {
+    background: #047857;
+}
+
+.yolo-save-crew-btn:disabled {
+    background: var(--yolo-gray-300);
+}
+
+.yolo-crew-message {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.yolo-crew-message .success {
+    color: var(--yolo-success);
+    font-weight: 600;
+}
+
+.yolo-crew-message .error {
+    color: var(--yolo-primary);
+    font-weight: 600;
+}
+
+/* ============================================
+   Loading Spinner
+   ============================================ */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Guest Notice
+   ============================================ */
+.yolo-guest-notice {
+    background: var(--yolo-warning-light);
+    border-left: 4px solid var(--yolo-warning);
+    padding: 20px;
+    border-radius: var(--yolo-radius-sm);
+    margin: 40px 0;
+}
+
+.yolo-guest-notice p {
+    margin: 0;
+    color: #92400e;
+    font-size: 15px;
+}
+
+.yolo-guest-notice a {
+    color: var(--yolo-primary);
+    font-weight: 600;
+}
+
+/* ============================================
+   Mobile Responsive
+   ============================================ */
+@media (max-width: 640px) {
+    .yolo-guest-dashboard {
+        padding: 12px;
+    }
+
+    .yolo-guest-header {
+        padding: 24px 16px;
+        text-align: left;
+    }
+
+    .yolo-guest-header h1 {
+        font-size: 22px;
+        padding-right: 80px;
+    }
+
+    .yolo-logout-btn {
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .yolo-booking-header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .yolo-booking-header h2 {
+        font-size: 18px;
+    }
+
+    .yolo-booking-details {
+        padding: 16px;
+    }
+
+    .yolo-booking-info {
+        padding: 16px;
+    }
+
+    .yolo-license-grid {
+    }
+
+    .yolo-section-toggle {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .yolo-section-content {
+        padding: 16px;
+    }
+
+    .yolo-crew-fields {
+    }
+
+    .yolo-crew-field.full-width {
+    }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 900px) {
+    .yolo-guest-dashboard {
+        padding: 16px;
+    }
+
+    .yolo-booking-info {
+    }
+}
+
+/* ============================================
+   Incoming Documents Section
+   ============================================ */
+.yolo-incoming-docs-section {
+    border-color: var(--yolo-info);
+}
+
+.yolo-incoming-docs-section .yolo-section-toggle {
+    background: var(--yolo-info-light);
+}
+
+.yolo-docs-note {
+    padding: 12px 16px;
+    background: var(--yolo-info-light);
+    border-left: 4px solid var(--yolo-info);
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #1e40af;
+    border-radius: 4px;
+}
+
+.yolo-incoming-docs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yolo-incoming-doc-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--yolo-gray-50);
+    border: 1px solid var(--yolo-gray-200);
+    border-radius: var(--yolo-radius-sm);
+    transition: all 0.3s ease;
+}
+
+.yolo-incoming-doc-item:hover {
+    background: white;
+    box-shadow: var(--yolo-shadow);
+    transform: translateY(-2px);
+}
+
+.yolo-doc-icon {
+    font-size: 40px;
+    flex-shrink: 0;
+}
+
+.yolo-doc-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.yolo-doc-info h4 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    color: var(--yolo-gray-900);
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.yolo-doc-description {
+    margin: 4px 0;
+    font-size: 14px;
+    color: var(--yolo-gray-500);
+    font-style: italic;
+}
+
+.yolo-doc-meta {
+    margin: 6px 0 0 0;
+    font-size: 12px;
+    color: var(--yolo-gray-500);
+}
+
+.yolo-doc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.yolo-view-doc-btn,
+.yolo-download-doc-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.yolo-view-doc-btn {
+    background: var(--yolo-info);
+    color: white;
+}
+
+.yolo-view-doc-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.yolo-download-doc-btn {
+    background: white;
+    color: var(--yolo-info);
+    border: 2px solid var(--yolo-info);
+}
+
+.yolo-download-doc-btn:hover {
+    background: var(--yolo-info);
+    color: white;
+}
+
+.yolo-no-docs-message {
+    padding: 24px;
+    text-align: center;
+    color: var(--yolo-gray-500);
+    font-style: italic;
+    background: var(--yolo-gray-50);
+    border-radius: var(--yolo-radius-sm);
+    border: 1px dashed var(--yolo-gray-300);
+}
+
+/* Responsive for Incoming Documents */
+@media (max-width: 640px) {
+    .yolo-incoming-doc-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .yolo-doc-icon {
+        font-size: 32px;
+    }
+
+    .yolo-doc-actions {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .yolo-view-doc-btn,
+    .yolo-download-doc-btn {
+        flex: 1;
+        font-size: 12px;
+        padding: 10px;
+    }
+}
+
+/* Check-In/Check-Out Document Styles */
+.yolo-checkin-docs-list,
+.yolo-checkout-docs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.yolo-checkin-doc-item,
+.yolo-checkout-doc-item {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.yolo-checkin-doc-item.signed,
+.yolo-checkout-doc-item.signed {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.yolo-checkin-doc-item.pending,
+.yolo-checkout-doc-item.pending {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.yolo-doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.yolo-doc-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e3a8a;
+}
+
+.yolo-doc-status {
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.yolo-doc-status.status-signed {
+    background: #10b981;
+    color: white;
+}
+
+.yolo-doc-status.status-pending {
+    background: #f59e0b;
+    color: white;
+}
+
+.yolo-doc-date {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0.5rem 0;
+}
+
+.yolo-sign-doc-btn {
+    background: #10b981;
+    color: white;
+}
+
+.yolo-sign-doc-btn:hover {
+    background: #059669;
+}
+
+/* Signature Modal Styles */
+.yolo-signature-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.yolo-signature-modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.yolo-signature-modal-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yolo-signature-modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.yolo-signature-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.yolo-signature-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.yolo-signature-modal-body {
+    padding: 2rem;
+}
+
+.yolo-signature-modal-body p {
+    margin-bottom: 1.5rem;
+    color: #4b5563;
+    font-size: 1rem;
+}
+
+.yolo-signature-pad-wrapper {
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.yolo-signature-canvas {
+    width: 100%;
+    height: 250px;
+    border: 2px dashed #9ca3af;
+    border-radius: 6px;
+    background: white;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.yolo-clear-signature-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.yolo-clear-signature-btn:hover {
+    background: #dc2626;
+}
+
+.yolo-signature-modal-footer {
+    padding: 1.5rem 2rem;
+    background: #f9fafb;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.yolo-cancel-signature-btn,
+.yolo-submit-signature-btn {
+    padding: 0.75rem 1.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.yolo-cancel-signature-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.yolo-cancel-signature-btn:hover {
+    background: #d1d5db;
+}
+
+.yolo-submit-signature-btn {
+    background: #10b981;
+    color: white;
+}
+
+.yolo-submit-signature-btn:hover {
+    background: #059669;
+}
+
+.yolo-submit-signature-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yolo-signature-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+
+    .yolo-signature-canvas {
+        height: 200px;
+    }
+
+    .yolo-signature-modal-footer {
+        flex-direction: column;
+    }
+
+    .yolo-cancel-signature-btn,
+    .yolo-submit-signature-btn {
+        width: 100%;
+    }
+}

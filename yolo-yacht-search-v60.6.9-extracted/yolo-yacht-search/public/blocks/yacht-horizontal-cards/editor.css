@@ -1,0 +1,16 @@
+/**
+ * Editor styles for YOLO Horizontal Yacht Cards block
+ */
+
+.yolo-ys-block-placeholder {
+    background: #f0f0f0;
+    border: 2px dashed #ccc;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.yolo-ys-block-placeholder p {
+    margin: 8px 0;
+    font-weight: 600;
+}

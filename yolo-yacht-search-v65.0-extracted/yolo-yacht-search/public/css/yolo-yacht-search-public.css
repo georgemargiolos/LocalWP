@@ -1,0 +1,70 @@
+/* YOLO Yacht Search - Public Styles */
+/* v30.0 - Removed aggressive font wildcards that broke layouts */
+/* Fonts are inherited from WordPress theme automatically */
+/* v41.28 - Removed duplicate .yolo-ys-search-widget styles (already in yacht-search/style.css) */
+
+/* Import block styles */
+@import url('../blocks/yacht-search/style.css');
+@import url('../blocks/yacht-results/style.css');
+
+/* Additional custom styles can be added here */
+
+/* Override Litepicker colors to match theme */
+.litepicker .container__months .month-item-header .button-previous-month,
+.litepicker .container__months .month-item-header .button-next-month {
+    color: #1e3a8a;
+}
+
+.litepicker .container__days .day-item.is-today {
+    color: #dc2626;
+}
+
+.litepicker .container__days .day-item.is-in-range {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.litepicker .container__days .day-item.is-start-date,
+.litepicker .container__days .day-item.is-end-date {
+    background-color: #1e3a8a;
+    color: white;
+}
+
+.litepicker .container__days .day-item:hover {
+    background-color: #f3f4f6;
+    color: #1e3a8a;
+}
+
+/* Smooth transitions */
+.yolo-ys-yacht-card,
+.yolo-ys-search-button,
+.yolo-ys-view-button {
+    transition: all 0.3s ease;
+}
+
+/* Accessibility improvements */
+.yolo-ys-search-button:focus,
+.yolo-ys-view-button:focus,
+.yolo-ys-form-field select:focus,
+.yolo-ys-form-field input:focus {
+    outline: 2px solid #1e3a8a;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .yolo-ys-search-widget {
+        display: none;
+    }
+    
+    .yolo-ys-yacht-card {
+        page-break-inside: avoid;
+    }
+}
+
+/* NOTE: .yolo-ys-search-widget styles are defined in:
+   ../blocks/yacht-search/style.css (imported above)
+   
+   To change the search widget background, edit:
+   public/blocks/yacht-search/style.css lines 3-12
+*/

@@ -1,0 +1,449 @@
+/**
+ * YOLO Horizontal Yacht Cards - Responsive Styles
+ * Bootstrap compatible, mobile-first design
+ */
+
+/* ========================================
+   CONTAINER
+   ======================================== */
+
+.yolo-ys-horizontal-cards-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* ========================================
+   HORIZONTAL CARD
+   ======================================== */
+
+.yolo-ys-horizontal-card {
+    display: flex;
+    flex-direction: row;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.yolo-ys-horizontal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   IMAGE CAROUSEL SECTION (LEFT)
+   ======================================== */
+
+.yolo-ys-horizontal-card-images {
+    flex: 0 0 45%;
+    max-width: 45%;
+    position: relative;
+    background: #f3f4f6;
+    min-height: 400px;
+}
+
+/* Swiper Container */
+.yolo-ys-horizontal-card-images .swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.yolo-ys-horizontal-card-images .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yolo-ys-horizontal-card-images .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Swiper Navigation Buttons */
+.yolo-ys-horizontal-card-images .swiper-button-prev,
+.yolo-ys-horizontal-card-images .swiper-button-next {
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.yolo-ys-horizontal-card-images .swiper-button-prev:after,
+.yolo-ys-horizontal-card-images .swiper-button-next:after {
+    font-size: 18px;
+}
+
+.yolo-ys-horizontal-card-images .swiper-button-prev:hover,
+.yolo-ys-horizontal-card-images .swiper-button-next:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Swiper Pagination */
+.yolo-ys-horizontal-card-images .swiper-pagination {
+    bottom: 15px;
+}
+
+.yolo-ys-horizontal-card-images .swiper-pagination-bullet {
+    background: white;
+    opacity: 0.7;
+}
+
+.yolo-ys-horizontal-card-images .swiper-pagination-bullet-active {
+    background: #dc2626;
+    opacity: 1;
+}
+
+/* YOLO FLEET Badge Overlay */
+.yolo-ys-fleet-badge-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Placeholder for no images */
+.yolo-ys-yacht-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    color: #9ca3af;
+    min-height: 400px;
+}
+
+/* ========================================
+   CONTENT SECTION (RIGHT)
+   ======================================== */
+
+.yolo-ys-horizontal-card-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Location */
+.yolo-ys-yacht-location {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+/* Header (Name + Model) */
+.yolo-ys-yacht-header {
+    margin-bottom: 16px;
+}
+
+.yolo-ys-yacht-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+.yolo-ys-yacht-model {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Description */
+.yolo-ys-yacht-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #4b5563;
+    margin-bottom: 20px;
+}
+
+/* ========================================
+   SPECS GRID (HORIZONTAL)
+   ======================================== */
+
+.yolo-ys-yacht-specs-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yolo-ys-spec-item {
+    text-align: center;
+    min-width: 70px;
+}
+
+.yolo-ys-spec-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.yolo-ys-spec-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   FOOTER (PRICE + BUTTON)
+   ======================================== */
+
+.yolo-ys-horizontal-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: auto;
+}
+
+/* Price */
+.yolo-ys-yacht-price {
+    font-size: 16px;
+    color: #059669;
+    flex: 1;
+}
+
+.yolo-ys-yacht-price strong {
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* Details Button */
+.yolo-ys-details-btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: #b91c1c;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.yolo-ys-details-btn:hover {
+    background: #991b1b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* ========================================
+   NO YACHTS MESSAGE
+   ======================================== */
+
+.yolo-ys-no-yachts {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f3f4f6;
+    border-radius: 8px;
+}
+
+.yolo-ys-no-yachts p {
+    font-size: 18px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
+
+@media (max-width: 992px) {
+    .yolo-ys-horizontal-card-images {
+        flex: 0 0 40%;
+        max-width: 40%;
+        min-height: 350px;
+    }
+    
+    .yolo-ys-horizontal-card-content {
+        padding: 24px;
+    }
+    
+    .yolo-ys-yacht-name {
+        font-size: 24px;
+    }
+    
+    .yolo-ys-yacht-model {
+        font-size: 18px;
+    }
+    
+    .yolo-ys-yacht-specs-horizontal {
+        gap: 15px;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 18px;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE (STACKED LAYOUT)
+   ======================================== */
+
+@media (max-width: 768px) {
+    .yolo-ys-horizontal-cards-container {
+        padding: 15px 10px;
+    }
+    
+    /* Stack vertically on mobile */
+    .yolo-ys-horizontal-card {
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+    
+    .yolo-ys-horizontal-card-images {
+        flex: 0 0 auto;
+        max-width: 100%;
+        min-height: 280px;
+    }
+    
+    .yolo-ys-horizontal-card-content {
+        padding: 20px;
+    }
+    
+    .yolo-ys-yacht-name {
+        font-size: 22px;
+    }
+    
+    .yolo-ys-yacht-model {
+        font-size: 17px;
+    }
+    
+    .yolo-ys-yacht-description {
+        font-size: 14px;
+    }
+    
+    .yolo-ys-yacht-specs-horizontal {
+        gap: 12px;
+        justify-content: space-between;
+    }
+    
+    .yolo-ys-spec-item {
+        min-width: 60px;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 16px;
+    }
+    
+    .yolo-ys-spec-label {
+        font-size: 10px;
+    }
+    
+    /* Stack price and button on mobile */
+    .yolo-ys-horizontal-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .yolo-ys-yacht-price {
+        text-align: center;
+    }
+    
+    .yolo-ys-yacht-price strong {
+        font-size: 20px;
+    }
+    
+    .yolo-ys-details-btn {
+        width: 100%;
+        padding: 16px 24px;
+    }
+    
+    /* Adjust navigation buttons for mobile */
+    .yolo-ys-horizontal-card-images .swiper-button-prev,
+    .yolo-ys-horizontal-card-images .swiper-button-next {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .yolo-ys-horizontal-card-images .swiper-button-prev:after,
+    .yolo-ys-horizontal-card-images .swiper-button-next:after {
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - SMALL MOBILE
+   ======================================== */
+
+@media (max-width: 480px) {
+    .yolo-ys-horizontal-cards-container {
+        padding: 10px 5px;
+    }
+    
+    .yolo-ys-horizontal-card {
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .yolo-ys-horizontal-card-images {
+        min-height: 240px;
+    }
+    
+    .yolo-ys-horizontal-card-content {
+        padding: 16px;
+    }
+    
+    .yolo-ys-yacht-name {
+        font-size: 20px;
+    }
+    
+    .yolo-ys-yacht-model {
+        font-size: 16px;
+    }
+    
+    .yolo-ys-yacht-description {
+        font-size: 13px;
+    }
+    
+    .yolo-ys-yacht-specs-horizontal {
+        gap: 10px;
+    }
+    
+    .yolo-ys-spec-item {
+        min-width: 50px;
+    }
+    
+    .yolo-ys-spec-value {
+        font-size: 15px;
+    }
+    
+    .yolo-ys-fleet-badge-overlay {
+        font-size: 10px;
+        padding: 6px 12px;
+    }
+}
