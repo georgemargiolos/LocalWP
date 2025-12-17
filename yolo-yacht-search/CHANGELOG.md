@@ -1,4 +1,23 @@
-## [65.23] - 2025-12-17 (Last Stable Version)
+## [70.0] - 2025-12-17 (Last Stable Version)
+
+### Fixed
+- **CRITICAL: Guest Login Password Mismatch** - Fixed issue where guest users could not log in because the password stored in WordPress did not match the password shown in the booking confirmation email.
+- **Booking Reference Display Inconsistency** - Fixed confirmation page to show booking reference with `BM-` prefix, matching the email format.
+
+### Changed
+- **Password Generation Logic** - Updated all password generation code to use the correct `$booking_reference` formula (`BM-{bm_reservation_id}YoLo`).
+- **Operation Order** - Reordered webhook handler to create BM reservation BEFORE guest user (so BM ID is available for password).
+- **Version Bump** - Updated plugin version from 65.23 to 70.0.
+
+### Files Modified
+- `yolo-yacht-search.php` - Version bump
+- `includes/class-yolo-ys-stripe-handlers.php` - Fixed AJAX handler password generation
+- `includes/class-yolo-ys-stripe.php` - Reordered operations, fixed webhook handler password generation
+- `public/templates/booking-confirmation.php` - Fixed booking reference display
+
+---
+
+## [65.23] - 2025-12-17
 
 ### Fixed
 - **CRITICAL: Immediate Spinner Display** - Fixed issue where the loading spinner did not show immediately after returning from Stripe due to server-side output buffering.

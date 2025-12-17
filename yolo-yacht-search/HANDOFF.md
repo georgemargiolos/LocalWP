@@ -1,43 +1,121 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
-**Date:** December 17, 2025
-**Version:** v65.23 (Last Stable Version)
-**Task Goal:** Implement a reliable, immediate-display loading spinner on the booking confirmation page and make all related texts customizable.
+**Date:** December 17, 2025  
+**Version:** v70.0 (Last Stable Version)  
+**Task Goal:** Fix critical guest login password mismatch bug and ensure booking reference consistency.
 
-## Summary of Work Completed (v65.21 - v65.23)
+---
 
-The primary issue was that the loading spinner was not showing immediately after the Stripe redirect, causing a poor user experience during the 25+ second booking processing time. This was due to server-side output buffering preventing the HTML from flushing to the browser.
+## 🔴 Summary of Work Completed (v65.23 → v70.0)
 
-### Key Fixes and Features:
+### Critical Bug Fixed: Guest Login Password Mismatch
 
-1.  **Immediate Spinner Display (AJAX-Based):**
-    *   The entire booking confirmation flow was refactored to use an AJAX-based approach (`v65.23`).
-    *   The spinner HTML now loads instantly, and a JavaScript function calls a new AJAX endpoint (`yolo_process_stripe_booking`) to handle the heavy lifting (Stripe retrieval, BM reservation, emails, analytics) in the background.
-    *   This guarantees the spinner is visible immediately, regardless of server caching or buffering.
+**Problem:**
+- Email showed password as: `BM-7333050630000107850YoLo`
+- Actual password in WordPress was: `123YoLo` (using booking ID instead of BM reservation ID)
+- **Result:** Customers could not log in to their guest accounts!
 
-2.  **Customizable Progressive Spinner Texts:**
-    *   All texts for the progressive loading spinner are now customizable via **WordPress Admin → YOLO Yacht Search → Text Settings** under the new "Payment Processing Spinner" section.
-    *   The texts update automatically at **0s, 10s, 35s, and 45s** to keep the user informed.
+**Solution:**
+1. Updated all password generation code to use the same `$booking_reference` formula
+2. Reordered operations so BM reservation is created BEFORE guest user
+3. Fixed confirmation page to show booking reference with `BM-` prefix
 
-3.  **Clean-up:**
-    *   Removed an accidental debug section from `public/templates/yacht-details-v3.php` (`v65.22`).
+### Files Modified in v70.0:
 
-## Next Steps / Pending Items
+| File | Changes |
+|------|--------|
+| `yolo-yacht-search.php` | Version bump from 65.23 to 70.0 |
+| `includes/class-yolo-ys-stripe-handlers.php` | Fixed AJAX handler - password now uses `BM-{bm_reservation_id}YoLo` |
+| `includes/class-yolo-ys-stripe.php` | Reordered operations, fixed webhook handler password generation |
+| `public/templates/booking-confirmation.php` | Fixed booking reference display to include `BM-` prefix |
 
-The current task is complete, and v65.23 is marked as the last stable version.
+---
 
-### Suggested Next Task:
+## Order of Operations After Stripe Payment (v70.0)
 
-1.  **Verify Facebook Purchase Event:** The user previously noted that the Facebook Purchase event was visible in the Meta Pixel Helper but not in Facebook's Test Events.
-    *   **Diagnosis:** This is likely a configuration issue (e.g., Test Event Code not active) or a conflict with the PixelYourSite plugin.
-    *   **Action:** The next session should focus on debugging the Facebook CAPI/Pixel integration to ensure the Purchase event is correctly received by Facebook's servers.
+1. ✅ Stripe payment completes
+2. ✅ Redirect to confirmation page with spinner
+3. ✅ AJAX call to `yolo_process_stripe_booking`
+4. ✅ Retrieve Stripe session and verify payment
+5. ✅ **Create booking in WordPress DB**
+6. ✅ **Create BM reservation** (get `bm_reservation_id`)
+7. ✅ **Create guest user** with password = `BM-{bm_reservation_id}YoLo`
+8. ✅ Send confirmation emails (with matching password)
+9. ✅ Track Purchase event (FB CAPI + GA4)
+10. ✅ Page reloads with confirmation showing `BM-{id}` format
 
-### Files Modified in v65.23:
+---
 
-*   `yolo-yacht-search.php` (Version bump to 65.23)
-*   `admin/partials/texts-page.php` (Added 8 new text fields for spinner)
-*   `public/templates/booking-confirmation.php` (Rewritten for AJAX flow)
-*   `includes/class-yolo-ys-stripe-handlers.php` (Added `ajax_process_stripe_booking` endpoint)
-*   `public/templates/yacht-details-v3.php` (Removed debug code - in v65.22)
-*   `CHANGELOG.md` (Updated)
-*   `HANDOFF.md` (Created)
+## Password Format
+
+| Scenario | Booking Reference | Password |
+|----------|------------------|----------|
+| With BM reservation | `BM-7333050630000107850` | `BM-7333050630000107850YoLo` |
+| Without BM reservation | `YOLO-2025-0123` | `YOLO-2025-0123YoLo` |
+
+---
+
+## ⚠️ Existing Users Need Password Fix
+
+Users who booked BEFORE v70.0 have incorrect passwords.
+
+### Option 1: Manual Password Reset
+1. Go to WordPress Admin → Users
+2. Find the guest user by email
+3. Set password to: `BM-{their_bm_reservation_id}YoLo`
+
+### Option 2: Run Migration Script
+
+Create `fix-guest-passwords.php` in WordPress root:
+
+```php
+<?php
+require_once('wp-load.php');
+if (!is_user_logged_in() || !current_user_can('manage_options')) {
+    die('Access denied.');
+}
+global $wpdb;
+$query = "SELECT b.id, b.customer_email, b.bm_reservation_id, u.ID as user_id
+          FROM {$wpdb->prefix}yolo_bookings b
+          INNER JOIN {$wpdb->users} u ON u.user_email = b.customer_email
+          WHERE b.bm_reservation_id IS NOT NULL";
+$bookings = $wpdb->get_results($query);
+foreach ($bookings as $booking) {
+    $password = 'BM-' . $booking->bm_reservation_id . 'YoLo';
+    wp_set_password($password, $booking->user_id);
+    echo "Fixed: {$booking->customer_email}<br>";
+}
+echo "Done! DELETE THIS FILE NOW!";
+?>
+```
+
+**DELETE the file immediately after running!**
+
+---
+
+## Testing Checklist
+
+- [ ] Make a test booking
+- [ ] Complete Stripe payment
+- [ ] Verify confirmation page shows `BM-{id}` format
+- [ ] Verify email shows same `BM-{id}` format
+- [ ] Try to login with password from email
+- [ ] Login should work! ✅
+
+---
+
+## Suggested Next Steps
+
+1. **Deploy v70.0** to production
+2. **Test with a real booking** to verify fix works
+3. **Run migration script** to fix existing users (if needed)
+4. **Monitor error logs** for 24 hours
+
+---
+
+## Previous Work (v65.21 - v65.23)
+
+The v65.x series implemented:
+- AJAX-based booking confirmation flow with immediate spinner display
+- Customizable progressive spinner texts (0s, 10s, 35s, 45s)
+- Removed debug code from yacht-details-v3.php

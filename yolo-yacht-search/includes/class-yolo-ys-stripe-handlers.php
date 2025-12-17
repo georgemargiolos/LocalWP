@@ -485,12 +485,17 @@ class YOLO_YS_Stripe_Handlers {
                     $first = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
                     $last = isset($name_parts[1]) ? $name_parts[1] : '';
                     
+                    // Generate booking reference for password (must match email template)
+                    $booking_reference = !empty($booking->bm_reservation_id) 
+                        ? 'BM-' . $booking->bm_reservation_id 
+                        : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+                    
                     $guest_result = $guest_manager->create_guest_user(
                         $booking_id,
                         $customer_email,
                         $first,
                         $last,
-                        $booking_id
+                        $booking_reference
                     );
                     
                     if ($guest_result['success'] && !empty($guest_result['password'])) {
