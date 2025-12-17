@@ -67,12 +67,52 @@ if (!is_string($fb_event_id) || empty($fb_event_id)) {
     $fb_event_id = '';
 }
 
-// Get images
-$images_table = $wpdb->prefix . 'yolo_yacht_images';
-$images = $wpdb->get_results($wpdb->prepare(
-    "SELECT * FROM $images_table WHERE yacht_id = %s ORDER BY sort_order ASC",
+// Get images - Check for custom media first (v65.16)
+$custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+$custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+
+$custom_settings = $wpdb->get_row($wpdb->prepare(
+    "SELECT * FROM $custom_settings_table WHERE yacht_id = %s",
     $yacht_id
 ));
+
+$use_custom_media = $custom_settings && $custom_settings->use_custom_media;
+$use_custom_description = $custom_settings && $custom_settings->use_custom_description;
+
+if ($use_custom_media) {
+    // Use custom media (images + videos)
+    $media_items = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM $custom_media_table WHERE yacht_id = %s ORDER BY sort_order ASC",
+        $yacht_id
+    ));
+    $images = array();
+    $videos = array();
+    foreach ($media_items as $item) {
+        if ($item->media_type === 'video') {
+            $videos[] = $item;
+        } else {
+            // Convert to image format for compatibility
+            $img = new stdClass();
+            $img->image_url = $item->media_url;
+            $img->thumbnail_url = $item->thumbnail_url;
+            $images[] = $img;
+        }
+    }
+} else {
+    // Use synced images (default behavior)
+    $images_table = $wpdb->prefix . 'yolo_yacht_images';
+    $images = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM $images_table WHERE yacht_id = %s ORDER BY sort_order ASC",
+        $yacht_id
+    ));
+    $videos = array();
+}
+
+// Get custom description if enabled
+$display_description = $yacht->description;
+if ($use_custom_description && !empty($custom_settings->custom_description)) {
+    $display_description = $custom_settings->custom_description;
+}
 
 // Get weekly offers from database
 $all_prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
@@ -183,19 +223,70 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <div class="col-12 col-lg-8">
                 <div class="yacht-main-content">
             
-            <!-- Image Carousel - Swiper (v30.1) -->
+            <!-- Image & Video Carousel - Swiper (v30.1, updated v65.16 for videos) -->
             <div class="yacht-images-carousel">
-                <?php if (!empty($images)): ?>
+                <?php if (!empty($images) || !empty($videos)): ?>
                     <div class="swiper yacht-image-swiper">
                         <div class="swiper-wrapper">
-                            <?php foreach ($images as $index => $image): ?>
+                            <?php 
+                            // If using custom media, interleave based on sort order
+                            if ($use_custom_media && !empty($media_items)): 
+                                foreach ($media_items as $index => $item): 
+                                    if ($item->media_type === 'video'):
+                                        // Check if it's a YouTube video (short ID) or full URL
+                                        $video_id = $item->media_url;
+                                        if (strlen($video_id) === 11 && !strpos($video_id, '.')) {
+                                            // It's a YouTube video ID
+                            ?>
+                                <div class="swiper-slide swiper-slide-video" data-video-id="<?php echo esc_attr($video_id); ?>">
+                                    <div class="video-thumbnail-wrapper" style="position: relative; cursor: pointer;">
+                                        <img src="https://img.youtube.com/vi/<?php echo esc_attr($video_id); ?>/maxresdefault.jpg" 
+                                             alt="<?php echo esc_attr($yacht->name); ?> Video"
+                                             onerror="this.src='https://img.youtube.com/vi/<?php echo esc_attr($video_id); ?>/hqdefault.jpg'">
+                                        <div class="video-play-button" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                                             background: rgba(0,0,0,0.7); color: #fff; width: 80px; height: 80px; border-radius: 50%; 
+                                             display: flex; align-items: center; justify-content: center; font-size: 30px;">
+                                            <i class="fa-solid fa-play" style="margin-left: 5px;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php 
+                                        } else {
+                                            // It's a direct video URL (uploaded file)
+                            ?>
+                                <div class="swiper-slide swiper-slide-video-file">
+                                    <video controls style="width: 100%; height: 100%; object-fit: cover;">
+                                        <source src="<?php echo esc_url($item->media_url); ?>" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            <?php 
+                                        }
+                                    else: 
+                            ?>
+                                <div class="swiper-slide">
+                                    <img src="<?php echo esc_url($item->media_url); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
+                                </div>
+                            <?php 
+                                    endif;
+                                endforeach; 
+                            else:
+                                // Default behavior - just images
+                                foreach ($images as $index => $image): 
+                            ?>
                                 <div class="swiper-slide">
                                     <img src="<?php echo esc_url($image->image_url); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
                                 </div>
-                            <?php endforeach; ?>
+                            <?php 
+                                endforeach;
+                            endif; 
+                            ?>
                         </div>
                         
-                        <?php if (count($images) > 1): ?>
+                        <?php 
+                        $total_media = $use_custom_media ? count($media_items) : count($images);
+                        if ($total_media > 1): 
+                        ?>
                             <!-- Navigation arrows -->
                             <div class="swiper-button-prev"></div>
                             <div class="swiper-button-next"></div>
@@ -295,10 +386,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 </div>
             </div>
             
-            <!-- Description Section -->
-            <?php if (!empty($yacht->description)): ?>
+            <!-- Description Section (v65.16 - supports custom description) -->
+            <?php if (!empty($display_description)): ?>
             <?php
-                $paragraphs = array_filter(explode("\n", $yacht->description));
+                // Use $display_description which may be custom or synced
+                $paragraphs = array_filter(explode("\n", $display_description));
                 $preview_paragraphs = array_slice($paragraphs, 0, 2);
                 $remaining_paragraphs = array_slice($paragraphs, 2);
                 $has_more = count($remaining_paragraphs) > 0;
@@ -307,11 +399,24 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 <h3><i class="fa-solid fa-info-circle"></i> Description</h3>
                 <div class="yacht-description-content">
                     <div class="description-preview">
-                        <?php echo nl2br(esc_html(implode("\n", $preview_paragraphs))); ?>
+                        <?php 
+                        // If custom description, allow HTML; otherwise escape
+                        if ($use_custom_description) {
+                            echo wp_kses_post(implode("<br>", $preview_paragraphs));
+                        } else {
+                            echo nl2br(esc_html(implode("\n", $preview_paragraphs)));
+                        }
+                        ?>
                     </div>
                     <?php if ($has_more): ?>
                         <div class="description-full" style="display: none;">
-                            <?php echo nl2br(esc_html(implode("\n", $remaining_paragraphs))); ?>
+                            <?php 
+                            if ($use_custom_description) {
+                                echo wp_kses_post(implode("<br>", $remaining_paragraphs));
+                            } else {
+                                echo nl2br(esc_html(implode("\n", $remaining_paragraphs)));
+                            }
+                            ?>
                         </div>
                         <button class="description-toggle" onclick="toggleDescription(this)">
                             <span class="toggle-more"><?php yolo_ys_text_e('read_more', 'More...'); ?></span>

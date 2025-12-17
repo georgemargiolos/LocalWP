@@ -11,124 +11,132 @@ if (!defined('ABSPATH')) {
 
 // Handle form submission
 if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_nonce')) {
-    // Save all text options
+    // Helper function to safely get POST value - v65.13 fix with wp_unslash to prevent slashes accumulation
+    $get_post_text = function($key) {
+        return isset($_POST[$key]) ? sanitize_text_field(wp_unslash($_POST[$key])) : '';
+    };
+    $get_post_html = function($key) {
+        return isset($_POST[$key]) ? wp_kses_post(wp_unslash($_POST[$key])) : '';
+    };
+    
+    // Save all text options with proper isset() checks
     $text_options = array(
         // Booking Section
-        'yolo_ys_text_book_now' => sanitize_text_field($_POST['yolo_ys_text_book_now']),
-        'yolo_ys_text_select_dates' => sanitize_text_field($_POST['yolo_ys_text_select_dates']),
-        'yolo_ys_text_check_availability' => sanitize_text_field($_POST['yolo_ys_text_check_availability']),
-        'yolo_ys_text_request_quote' => sanitize_text_field($_POST['yolo_ys_text_request_quote']),
-        'yolo_ys_text_total_price' => sanitize_text_field($_POST['yolo_ys_text_total_price']),
-        'yolo_ys_text_deposit_required' => sanitize_text_field($_POST['yolo_ys_text_deposit_required']),
-        'yolo_ys_text_remaining_balance' => sanitize_text_field($_POST['yolo_ys_text_remaining_balance']),
-        'yolo_ys_text_remaining' => sanitize_text_field($_POST['yolo_ys_text_remaining']),
+        'yolo_ys_text_book_now' => $get_post_text('yolo_ys_text_book_now'),
+        'yolo_ys_text_select_dates' => $get_post_text('yolo_ys_text_select_dates'),
+        'yolo_ys_text_check_availability' => $get_post_text('yolo_ys_text_check_availability'),
+        'yolo_ys_text_request_quote' => $get_post_text('yolo_ys_text_request_quote'),
+        'yolo_ys_text_total_price' => $get_post_text('yolo_ys_text_total_price'),
+        'yolo_ys_text_deposit_required' => $get_post_text('yolo_ys_text_deposit_required'),
+        'yolo_ys_text_remaining_balance' => $get_post_text('yolo_ys_text_remaining_balance'),
+        'yolo_ys_text_remaining' => $get_post_text('yolo_ys_text_remaining'),
         
         // Quote Form
-        'yolo_ys_text_quote_form_title' => sanitize_text_field($_POST['yolo_ys_text_quote_form_title']),
-        'yolo_ys_text_your_name' => sanitize_text_field($_POST['yolo_ys_text_your_name']),
-        'yolo_ys_text_your_email' => sanitize_text_field($_POST['yolo_ys_text_your_email']),
-        'yolo_ys_text_your_phone' => sanitize_text_field($_POST['yolo_ys_text_your_phone']),
-        'yolo_ys_text_your_message' => sanitize_text_field($_POST['yolo_ys_text_your_message']),
-        'yolo_ys_text_send_request' => sanitize_text_field($_POST['yolo_ys_text_send_request']),
+        'yolo_ys_text_quote_form_title' => $get_post_text('yolo_ys_text_quote_form_title'),
+        'yolo_ys_text_your_name' => $get_post_text('yolo_ys_text_your_name'),
+        'yolo_ys_text_your_email' => $get_post_text('yolo_ys_text_your_email'),
+        'yolo_ys_text_your_phone' => $get_post_text('yolo_ys_text_your_phone'),
+        'yolo_ys_text_your_message' => $get_post_text('yolo_ys_text_your_message'),
+        'yolo_ys_text_send_request' => $get_post_text('yolo_ys_text_send_request'),
         
         // Section Headings
-        'yolo_ys_text_description' => sanitize_text_field($_POST['yolo_ys_text_description']),
-        'yolo_ys_text_equipment' => sanitize_text_field($_POST['yolo_ys_text_equipment']),
-        'yolo_ys_text_technical_specs' => sanitize_text_field($_POST['yolo_ys_text_technical_specs']),
-        'yolo_ys_text_obligatory_extras' => sanitize_text_field($_POST['yolo_ys_text_obligatory_extras']),
-        'yolo_ys_text_optional_extras' => sanitize_text_field($_POST['yolo_ys_text_optional_extras']),
-        'yolo_ys_text_cancellation_policy' => sanitize_text_field($_POST['yolo_ys_text_cancellation_policy']),
-        'yolo_ys_text_security_deposit' => sanitize_text_field($_POST['yolo_ys_text_security_deposit']),
-        'yolo_ys_text_checkin_checkout' => sanitize_text_field($_POST['yolo_ys_text_checkin_checkout']),
+        'yolo_ys_text_description' => $get_post_text('yolo_ys_text_description'),
+        'yolo_ys_text_equipment' => $get_post_text('yolo_ys_text_equipment'),
+        'yolo_ys_text_technical_specs' => $get_post_text('yolo_ys_text_technical_specs'),
+        'yolo_ys_text_obligatory_extras' => $get_post_text('yolo_ys_text_obligatory_extras'),
+        'yolo_ys_text_optional_extras' => $get_post_text('yolo_ys_text_optional_extras'),
+        'yolo_ys_text_cancellation_policy' => $get_post_text('yolo_ys_text_cancellation_policy'),
+        'yolo_ys_text_security_deposit' => $get_post_text('yolo_ys_text_security_deposit'),
+        'yolo_ys_text_checkin_checkout' => $get_post_text('yolo_ys_text_checkin_checkout'),
         
         // Technical Specs Labels
-        'yolo_ys_text_length' => sanitize_text_field($_POST['yolo_ys_text_length']),
-        'yolo_ys_text_beam' => sanitize_text_field($_POST['yolo_ys_text_beam']),
-        'yolo_ys_text_draft' => sanitize_text_field($_POST['yolo_ys_text_draft']),
-        'yolo_ys_text_cabins' => sanitize_text_field($_POST['yolo_ys_text_cabins']),
-        'yolo_ys_text_wc' => sanitize_text_field($_POST['yolo_ys_text_wc']),
-        'yolo_ys_text_berths' => sanitize_text_field($_POST['yolo_ys_text_berths']),
-        'yolo_ys_text_year_built' => sanitize_text_field($_POST['yolo_ys_text_year_built']),
-        'yolo_ys_text_engine_power' => sanitize_text_field($_POST['yolo_ys_text_engine_power']),
-        'yolo_ys_text_fuel_capacity' => sanitize_text_field($_POST['yolo_ys_text_fuel_capacity']),
-        'yolo_ys_text_water_capacity' => sanitize_text_field($_POST['yolo_ys_text_water_capacity']),
+        'yolo_ys_text_length' => $get_post_text('yolo_ys_text_length'),
+        'yolo_ys_text_beam' => $get_post_text('yolo_ys_text_beam'),
+        'yolo_ys_text_draft' => $get_post_text('yolo_ys_text_draft'),
+        'yolo_ys_text_cabins' => $get_post_text('yolo_ys_text_cabins'),
+        'yolo_ys_text_wc' => $get_post_text('yolo_ys_text_wc'),
+        'yolo_ys_text_berths' => $get_post_text('yolo_ys_text_berths'),
+        'yolo_ys_text_year_built' => $get_post_text('yolo_ys_text_year_built'),
+        'yolo_ys_text_engine_power' => $get_post_text('yolo_ys_text_engine_power'),
+        'yolo_ys_text_fuel_capacity' => $get_post_text('yolo_ys_text_fuel_capacity'),
+        'yolo_ys_text_water_capacity' => $get_post_text('yolo_ys_text_water_capacity'),
         
         // Search Widget
-        'yolo_ys_text_search_title' => sanitize_text_field($_POST['yolo_ys_text_search_title']),
-        'yolo_ys_text_date_from' => sanitize_text_field($_POST['yolo_ys_text_date_from']),
-        'yolo_ys_text_date_to' => sanitize_text_field($_POST['yolo_ys_text_date_to']),
-        'yolo_ys_text_boat_type' => sanitize_text_field($_POST['yolo_ys_text_boat_type']),
-        'yolo_ys_text_search_button' => sanitize_text_field($_POST['yolo_ys_text_search_button']),
+        'yolo_ys_text_search_title' => $get_post_text('yolo_ys_text_search_title'),
+        'yolo_ys_text_date_from' => $get_post_text('yolo_ys_text_date_from'),
+        'yolo_ys_text_date_to' => $get_post_text('yolo_ys_text_date_to'),
+        'yolo_ys_text_boat_type' => $get_post_text('yolo_ys_text_boat_type'),
+        'yolo_ys_text_search_button' => $get_post_text('yolo_ys_text_search_button'),
         
         // Search Results
-        'yolo_ys_text_results_title' => sanitize_text_field($_POST['yolo_ys_text_results_title']),
-        'yolo_ys_text_no_results' => sanitize_text_field($_POST['yolo_ys_text_no_results']),
-        'yolo_ys_text_view_details' => sanitize_text_field($_POST['yolo_ys_text_view_details']),
-        'yolo_ys_text_from_price' => sanitize_text_field($_POST['yolo_ys_text_from_price']),
-        'yolo_ys_text_per_week' => sanitize_text_field($_POST['yolo_ys_text_per_week']),
+        'yolo_ys_text_results_title' => $get_post_text('yolo_ys_text_results_title'),
+        'yolo_ys_text_no_results' => $get_post_text('yolo_ys_text_no_results'),
+        'yolo_ys_text_view_details' => $get_post_text('yolo_ys_text_view_details'),
+        'yolo_ys_text_from_price' => $get_post_text('yolo_ys_text_from_price'),
+        'yolo_ys_text_per_week' => $get_post_text('yolo_ys_text_per_week'),
         
         // Booking Confirmation
-        'yolo_ys_text_booking_confirmed' => sanitize_text_field($_POST['yolo_ys_text_booking_confirmed']),
-        'yolo_ys_text_booking_reference' => sanitize_text_field($_POST['yolo_ys_text_booking_reference']),
-        'yolo_ys_text_payment_received' => sanitize_text_field($_POST['yolo_ys_text_payment_received']),
-        'yolo_ys_text_confirmation_email' => sanitize_text_field($_POST['yolo_ys_text_confirmation_email']),
+        'yolo_ys_text_booking_confirmed' => $get_post_text('yolo_ys_text_booking_confirmed'),
+        'yolo_ys_text_booking_reference' => $get_post_text('yolo_ys_text_booking_reference'),
+        'yolo_ys_text_payment_received' => $get_post_text('yolo_ys_text_payment_received'),
+        'yolo_ys_text_confirmation_email' => $get_post_text('yolo_ys_text_confirmation_email'),
         
         // Yacht Details Page Sections
-        'yolo_ys_text_weekly_prices_title' => sanitize_text_field($_POST['yolo_ys_text_weekly_prices_title']),
-        'yolo_ys_text_discount_off' => sanitize_text_field($_POST['yolo_ys_text_discount_off']),
-        'yolo_ys_text_select_week' => sanitize_text_field($_POST['yolo_ys_text_select_week']),
-        'yolo_ys_text_read_more' => sanitize_text_field($_POST['yolo_ys_text_read_more']),
-        'yolo_ys_text_read_less' => sanitize_text_field($_POST['yolo_ys_text_read_less']),
-        'yolo_ys_text_location' => sanitize_text_field($_POST['yolo_ys_text_location']),
-        'yolo_ys_text_availability_pricing' => sanitize_text_field($_POST['yolo_ys_text_availability_pricing']),
-        'yolo_ys_text_no_pricing' => sanitize_text_field($_POST['yolo_ys_text_no_pricing']),
-        'yolo_ys_text_choose_custom_dates' => sanitize_text_field($_POST['yolo_ys_text_choose_custom_dates']),
-        'yolo_ys_text_loading' => sanitize_text_field($_POST['yolo_ys_text_loading']),
-        'yolo_ys_text_checking_availability' => sanitize_text_field($_POST['yolo_ys_text_checking_availability']),
+        'yolo_ys_text_weekly_prices_title' => $get_post_text('yolo_ys_text_weekly_prices_title'),
+        'yolo_ys_text_discount_off' => $get_post_text('yolo_ys_text_discount_off'),
+        'yolo_ys_text_select_week' => $get_post_text('yolo_ys_text_select_week'),
+        'yolo_ys_text_read_more' => $get_post_text('yolo_ys_text_read_more'),
+        'yolo_ys_text_read_less' => $get_post_text('yolo_ys_text_read_less'),
+        'yolo_ys_text_location' => $get_post_text('yolo_ys_text_location'),
+        'yolo_ys_text_availability_pricing' => $get_post_text('yolo_ys_text_availability_pricing'),
+        'yolo_ys_text_no_pricing' => $get_post_text('yolo_ys_text_no_pricing'),
+        'yolo_ys_text_choose_custom_dates' => $get_post_text('yolo_ys_text_choose_custom_dates'),
+        'yolo_ys_text_loading' => $get_post_text('yolo_ys_text_loading'),
+        'yolo_ys_text_checking_availability' => $get_post_text('yolo_ys_text_checking_availability'),
         
         // Extras Section
-        'yolo_ys_text_extras' => sanitize_text_field($_POST['yolo_ys_text_extras']),
-        'yolo_ys_text_payable_at_base' => sanitize_text_field($_POST['yolo_ys_text_payable_at_base']),
-        'yolo_ys_text_per_booking' => sanitize_text_field($_POST['yolo_ys_text_per_booking']),
-        'yolo_ys_text_per_night' => sanitize_text_field($_POST['yolo_ys_text_per_night']),
-        'yolo_ys_text_per_day' => sanitize_text_field($_POST['yolo_ys_text_per_day']),
-        'yolo_ys_text_per_hour' => sanitize_text_field($_POST['yolo_ys_text_per_hour']),
-        'yolo_ys_text_per_person' => sanitize_text_field($_POST['yolo_ys_text_per_person']),
+        'yolo_ys_text_extras' => $get_post_text('yolo_ys_text_extras'),
+        'yolo_ys_text_payable_at_base' => $get_post_text('yolo_ys_text_payable_at_base'),
+        'yolo_ys_text_per_booking' => $get_post_text('yolo_ys_text_per_booking'),
+        'yolo_ys_text_per_night' => $get_post_text('yolo_ys_text_per_night'),
+        'yolo_ys_text_per_day' => $get_post_text('yolo_ys_text_per_day'),
+        'yolo_ys_text_per_hour' => $get_post_text('yolo_ys_text_per_hour'),
+        'yolo_ys_text_per_person' => $get_post_text('yolo_ys_text_per_person'),
         
         // Charter Pack Included Items
-        'yolo_ys_text_charter_pack_title' => isset($_POST['yolo_ys_text_charter_pack_title']) ? sanitize_text_field($_POST['yolo_ys_text_charter_pack_title']) : '',
-        'yolo_ys_text_charter_pack_transit_log' => isset($_POST['yolo_ys_text_charter_pack_transit_log']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_transit_log']) : '',
-        'yolo_ys_text_charter_pack_checkin' => isset($_POST['yolo_ys_text_charter_pack_checkin']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_checkin']) : '',
-        'yolo_ys_text_charter_pack_cleaning' => isset($_POST['yolo_ys_text_charter_pack_cleaning']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_cleaning']) : '',
-        'yolo_ys_text_charter_pack_linen' => isset($_POST['yolo_ys_text_charter_pack_linen']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_linen']) : '',
-        'yolo_ys_text_charter_pack_gas' => isset($_POST['yolo_ys_text_charter_pack_gas']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_gas']) : '',
-        'yolo_ys_text_charter_pack_dinghy' => isset($_POST['yolo_ys_text_charter_pack_dinghy']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_dinghy']) : '',
-        'yolo_ys_text_charter_pack_sup' => isset($_POST['yolo_ys_text_charter_pack_sup']) ? wp_kses_post($_POST['yolo_ys_text_charter_pack_sup']) : '',
+        'yolo_ys_text_charter_pack_title' => $get_post_text('yolo_ys_text_charter_pack_title'),
+        'yolo_ys_text_charter_pack_transit_log' => $get_post_html('yolo_ys_text_charter_pack_transit_log'),
+        'yolo_ys_text_charter_pack_checkin' => $get_post_html('yolo_ys_text_charter_pack_checkin'),
+        'yolo_ys_text_charter_pack_cleaning' => $get_post_html('yolo_ys_text_charter_pack_cleaning'),
+        'yolo_ys_text_charter_pack_linen' => $get_post_html('yolo_ys_text_charter_pack_linen'),
+        'yolo_ys_text_charter_pack_gas' => $get_post_html('yolo_ys_text_charter_pack_gas'),
+        'yolo_ys_text_charter_pack_dinghy' => $get_post_html('yolo_ys_text_charter_pack_dinghy'),
+        'yolo_ys_text_charter_pack_sup' => $get_post_html('yolo_ys_text_charter_pack_sup'),
         
         // Additional Technical Specs
-        'yolo_ys_text_draught' => sanitize_text_field($_POST['yolo_ys_text_draught']),
-        'yolo_ys_text_engine' => sanitize_text_field($_POST['yolo_ys_text_engine']),
-        'yolo_ys_text_refit' => sanitize_text_field($_POST['yolo_ys_text_refit']),
+        'yolo_ys_text_draught' => $get_post_text('yolo_ys_text_draught'),
+        'yolo_ys_text_engine' => $get_post_text('yolo_ys_text_engine'),
+        'yolo_ys_text_refit' => $get_post_text('yolo_ys_text_refit'),
         
         // Fleet Pages
-        'yolo_ys_text_our_fleet_title' => sanitize_text_field($_POST['yolo_ys_text_our_fleet_title']),
-        'yolo_ys_text_partner_title' => sanitize_text_field($_POST['yolo_ys_text_partner_title']),
-        'yolo_ys_text_no_yachts' => sanitize_text_field($_POST['yolo_ys_text_no_yachts']),
-        'yolo_ys_text_details_button' => sanitize_text_field($_POST['yolo_ys_text_details_button']),
+        'yolo_ys_text_our_fleet_title' => $get_post_text('yolo_ys_text_our_fleet_title'),
+        'yolo_ys_text_partner_title' => $get_post_text('yolo_ys_text_partner_title'),
+        'yolo_ys_text_no_yachts' => $get_post_text('yolo_ys_text_no_yachts'),
+        'yolo_ys_text_details_button' => $get_post_text('yolo_ys_text_details_button'),
         
         // Quote Form Additional Fields
-        'yolo_ys_text_quote_tagline' => sanitize_text_field($_POST['yolo_ys_text_quote_tagline']),
-        'yolo_ys_text_first_name' => sanitize_text_field($_POST['yolo_ys_text_first_name']),
-        'yolo_ys_text_last_name' => sanitize_text_field($_POST['yolo_ys_text_last_name']),
-        'yolo_ys_text_special_requests' => sanitize_text_field($_POST['yolo_ys_text_special_requests']),
-        'yolo_ys_text_required_field' => sanitize_text_field($_POST['yolo_ys_text_required_field']),
-        'yolo_ys_text_quote_description' => sanitize_text_field($_POST['yolo_ys_text_quote_description']),
+        'yolo_ys_text_quote_tagline' => $get_post_text('yolo_ys_text_quote_tagline'),
+        'yolo_ys_text_first_name' => $get_post_text('yolo_ys_text_first_name'),
+        'yolo_ys_text_last_name' => $get_post_text('yolo_ys_text_last_name'),
+        'yolo_ys_text_special_requests' => $get_post_text('yolo_ys_text_special_requests'),
+        'yolo_ys_text_required_field' => $get_post_text('yolo_ys_text_required_field'),
+        'yolo_ys_text_quote_description' => $get_post_text('yolo_ys_text_quote_description'),
         
         // Additional UI Elements
-        'yolo_ys_text_cancel' => sanitize_text_field($_POST['yolo_ys_text_cancel']),
-        'yolo_ys_text_free' => sanitize_text_field($_POST['yolo_ys_text_free']),
-        'yolo_ys_text_catamaran' => sanitize_text_field($_POST['yolo_ys_text_catamaran']),
-        'yolo_ys_text_message_placeholder' => sanitize_text_field($_POST['yolo_ys_text_message_placeholder']),
+        'yolo_ys_text_cancel' => $get_post_text('yolo_ys_text_cancel'),
+        'yolo_ys_text_free' => $get_post_text('yolo_ys_text_free'),
+        'yolo_ys_text_catamaran' => $get_post_text('yolo_ys_text_catamaran'),
+        'yolo_ys_text_message_placeholder' => $get_post_text('yolo_ys_text_message_placeholder'),
     );
     
     foreach ($text_options as $key => $value) {

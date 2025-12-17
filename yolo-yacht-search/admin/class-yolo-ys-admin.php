@@ -19,6 +19,16 @@ class YOLO_YS_Admin {
         add_action('wp_ajax_yolo_ys_sync_equipment', array($this, 'ajax_sync_equipment'));
         add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
         add_action('wp_ajax_yolo_ys_sync_prices', array($this, 'ajax_sync_prices'));
+        
+        // Yacht Customization AJAX handlers (v65.14)
+        add_action('wp_ajax_yolo_save_yacht_custom_setting', array($this, 'ajax_save_yacht_custom_setting'));
+        add_action('wp_ajax_yolo_save_yacht_custom_description', array($this, 'ajax_save_yacht_custom_description'));
+        
+        // Yacht Customization Media AJAX handlers (v65.15)
+        add_action('wp_ajax_yolo_copy_synced_images', array($this, 'ajax_copy_synced_images'));
+        add_action('wp_ajax_yolo_add_custom_media', array($this, 'ajax_add_custom_media'));
+        add_action('wp_ajax_yolo_delete_custom_media', array($this, 'ajax_delete_custom_media'));
+        add_action('wp_ajax_yolo_save_media_order', array($this, 'ajax_save_media_order'));
     }
     
     /**
@@ -63,6 +73,13 @@ class YOLO_YS_Admin {
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('yolo_ys_admin_nonce')
         ));
+        
+        // Enqueue jQuery UI Sortable and Media Library for Yacht Customization page (v65.15)
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-yacht-customization') {
+            wp_enqueue_script('jquery-ui-sortable');
+            wp_enqueue_media();
+        }
     }
     
     /**
@@ -138,6 +155,16 @@ class YOLO_YS_Admin {
             'yolo-notification-settings',
             array($this, 'display_notification_settings_page')
         );
+        
+        // Add Yacht Customization submenu (v65.14)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Yacht Customization', 'yolo-yacht-search'),
+            __('Yacht Customization', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-yacht-customization',
+            array($this, 'display_yacht_customization_page')
+        );
     }
     
     /**
@@ -191,6 +218,13 @@ class YOLO_YS_Admin {
      */
     public function display_notification_settings_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-notification-settings.php';
+    }
+    
+    /**
+     * Display yacht customization page (v65.14)
+     */
+    public function display_yacht_customization_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yacht-customization-page.php';
     }
     
     /**
@@ -687,5 +721,309 @@ class YOLO_YS_Admin {
         } else {
             wp_send_json_error($result);
         }
+    }
+    
+    /**
+     * AJAX: Save yacht custom setting (use_custom_media or use_custom_description)
+     * @since 65.14
+     */
+    public function ajax_save_yacht_custom_setting() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $setting = isset($_POST['setting']) ? sanitize_text_field($_POST['setting']) : '';
+        $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
+        
+        if (empty($yacht_id) || !in_array($setting, array('use_custom_media', 'use_custom_description'))) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $wpdb->update(
+                $table,
+                array($setting => $value),
+                array('yacht_id' => $yacht_id),
+                array('%d'),
+                array('%s')
+            );
+        } else {
+            $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    $setting => $value
+                ),
+                array('%s', '%d')
+            );
+        }
+        
+        wp_send_json_success('Setting saved');
+    }
+    
+    /**
+     * AJAX: Save yacht custom description
+     * @since 65.14
+     */
+    public function ajax_save_yacht_custom_description() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $description = isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '';
+        
+        if (empty($yacht_id)) {
+            wp_send_json_error('Invalid yacht ID');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $wpdb->update(
+                $table,
+                array('custom_description' => $description),
+                array('yacht_id' => $yacht_id),
+                array('%s'),
+                array('%s')
+            );
+        } else {
+            $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    'custom_description' => $description
+                ),
+                array('%s', '%s')
+            );
+        }
+        
+        wp_send_json_success('Description saved');
+    }
+    
+    /**
+     * AJAX: Copy synced images to custom media
+     * @since 65.15
+     */
+    public function ajax_copy_synced_images() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        
+        if (empty($yacht_id)) {
+            wp_send_json_error('Invalid yacht ID');
+        }
+        
+        global $wpdb;
+        $images_table = $wpdb->prefix . 'yolo_yacht_images';
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        // Get synced images
+        $synced_images = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$images_table} WHERE yacht_id = %s ORDER BY sort_order ASC",
+            $yacht_id
+        ));
+        
+        if (empty($synced_images)) {
+            wp_send_json_error('No synced images to copy');
+        }
+        
+        // Clear existing custom media for this yacht
+        $wpdb->delete($custom_media_table, array('yacht_id' => $yacht_id), array('%s'));
+        
+        // Copy synced images to custom media
+        $sort_order = 0;
+        foreach ($synced_images as $image) {
+            $wpdb->insert(
+                $custom_media_table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    'media_type' => 'image',
+                    'media_url' => $image->image_url,
+                    'thumbnail_url' => $image->thumbnail_url,
+                    'title' => null,
+                    'sort_order' => $sort_order++
+                ),
+                array('%s', '%s', '%s', '%s', '%s', '%d')
+            );
+        }
+        
+        // Get the newly created custom media to return
+        $custom_media = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$custom_media_table} WHERE yacht_id = %s ORDER BY sort_order ASC",
+            $yacht_id
+        ));
+        
+        wp_send_json_success(array(
+            'message' => count($synced_images) . ' images copied',
+            'media' => $custom_media
+        ));
+    }
+    
+    /**
+     * AJAX: Add custom media (image or video)
+     * @since 65.15
+     */
+    public function ajax_add_custom_media() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $media_type = isset($_POST['media_type']) ? sanitize_text_field($_POST['media_type']) : '';
+        $media_url = isset($_POST['media_url']) ? esc_url_raw($_POST['media_url']) : '';
+        $thumbnail_url = isset($_POST['thumbnail_url']) ? esc_url_raw($_POST['thumbnail_url']) : '';
+        $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
+        
+        if (empty($yacht_id) || empty($media_type) || empty($media_url)) {
+            wp_send_json_error('Missing required fields');
+        }
+        
+        if (!in_array($media_type, array('image', 'video'))) {
+            wp_send_json_error('Invalid media type');
+        }
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        // Get max sort order for this yacht
+        $max_order = $wpdb->get_var($wpdb->prepare(
+            "SELECT MAX(sort_order) FROM {$custom_media_table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        $sort_order = ($max_order !== null) ? $max_order + 1 : 0;
+        
+        // For YouTube videos, extract video ID and generate thumbnail
+        if ($media_type === 'video' && empty($thumbnail_url)) {
+            // Check if it's a YouTube URL
+            if (preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/', $media_url, $matches)) {
+                $video_id = $matches[1];
+                $thumbnail_url = 'https://img.youtube.com/vi/' . $video_id . '/mqdefault.jpg';
+                // Store just the video ID for YouTube
+                $media_url = $video_id;
+            }
+        }
+        
+        $wpdb->insert(
+            $custom_media_table,
+            array(
+                'yacht_id' => $yacht_id,
+                'media_type' => $media_type,
+                'media_url' => $media_url,
+                'thumbnail_url' => $thumbnail_url,
+                'title' => $title ?: null,
+                'sort_order' => $sort_order
+            ),
+            array('%s', '%s', '%s', '%s', '%s', '%d')
+        );
+        
+        $new_id = $wpdb->insert_id;
+        
+        wp_send_json_success(array(
+            'message' => 'Media added',
+            'id' => $new_id,
+            'media_type' => $media_type,
+            'media_url' => $media_url,
+            'thumbnail_url' => $thumbnail_url,
+            'sort_order' => $sort_order
+        ));
+    }
+    
+    /**
+     * AJAX: Delete custom media
+     * @since 65.15
+     */
+    public function ajax_delete_custom_media() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $media_id = isset($_POST['media_id']) ? intval($_POST['media_id']) : 0;
+        
+        if (empty($media_id)) {
+            wp_send_json_error('Invalid media ID');
+        }
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        $deleted = $wpdb->delete(
+            $custom_media_table,
+            array('id' => $media_id),
+            array('%d')
+        );
+        
+        if ($deleted) {
+            wp_send_json_success('Media deleted');
+        } else {
+            wp_send_json_error('Failed to delete media');
+        }
+    }
+    
+    /**
+     * AJAX: Save media order
+     * @since 65.15
+     */
+    public function ajax_save_media_order() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $order = isset($_POST['order']) ? $_POST['order'] : array();
+        
+        if (empty($yacht_id) || empty($order)) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        // Sanitize order array
+        $order = array_map('intval', $order);
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        // Update sort order for each media item
+        foreach ($order as $sort_order => $media_id) {
+            $wpdb->update(
+                $custom_media_table,
+                array('sort_order' => $sort_order),
+                array('id' => $media_id, 'yacht_id' => $yacht_id),
+                array('%d'),
+                array('%d', '%s')
+            );
+        }
+        
+        wp_send_json_success('Order saved');
     }
 }

@@ -250,7 +250,36 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         dbDelta($sql_admin_documents);
         
-        update_option('yolo_ys_db_version', '1.8');
+        // Yacht Custom Media table (v65.14) - for custom images and videos
+        $table_custom_media = $wpdb->prefix . 'yolo_yacht_custom_media';
+        $sql_custom_media = "CREATE TABLE {$table_custom_media} (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            yacht_id varchar(50) NOT NULL,
+            media_type varchar(20) NOT NULL COMMENT 'image or video',
+            media_url varchar(500) NOT NULL COMMENT 'URL or file path',
+            thumbnail_url varchar(500) DEFAULT NULL COMMENT 'For videos: YouTube thumbnail or custom',
+            title varchar(255) DEFAULT NULL,
+            sort_order int(11) DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY yacht_id (yacht_id),
+            KEY sort_order (sort_order)
+        ) $charset_collate;";
+        dbDelta($sql_custom_media);
+        
+        // Yacht Custom Settings table (v65.14) - for custom description and flags
+        $table_custom_settings = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        $sql_custom_settings = "CREATE TABLE {$table_custom_settings} (
+            yacht_id varchar(50) NOT NULL,
+            use_custom_media tinyint(1) DEFAULT 0 COMMENT 'Use local images/videos instead of synced',
+            use_custom_description tinyint(1) DEFAULT 0 COMMENT 'Use custom description instead of synced',
+            custom_description longtext DEFAULT NULL,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (yacht_id)
+        ) $charset_collate;";
+        dbDelta($sql_custom_settings);
+        
+        update_option('yolo_ys_db_version', '1.9');
     }
     
     /**
