@@ -485,7 +485,11 @@ $booking = $wpdb->get_row($wpdb->prepare(
     $session_id
 ));
 
+// DEBUG: Log which code path we're taking
+error_log('YOLO YS Confirmation: session_id=' . $session_id . ', booking_exists=' . ($booking ? 'YES' : 'NO'));
+
 if ($booking) {
+    error_log('YOLO YS: Existing booking found #' . $booking->id . ' - tracking CAPI Purchase');
     yolo_ensure_guest_user_exists($booking);
     
     // FIX v65.17: Track CAPI Purchase event for existing bookings too
@@ -519,9 +523,11 @@ if ($booking) {
     return;
 }
 
+error_log('YOLO YS: No existing booking found, creating from Stripe session...');
 $booking = yolo_create_booking_from_stripe($session_id, $wpdb, $table_bookings);
 
 if ($booking) {
+    error_log('YOLO YS: New booking created #' . $booking->id . ' - CAPI should have fired inside yolo_create_booking_from_stripe()');
     yolo_show_booking_confirmation($booking);
     return;
 }
