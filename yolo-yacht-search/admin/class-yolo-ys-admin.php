@@ -19,6 +19,10 @@ class YOLO_YS_Admin {
         add_action('wp_ajax_yolo_ys_sync_equipment', array($this, 'ajax_sync_equipment'));
         add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
         add_action('wp_ajax_yolo_ys_sync_prices', array($this, 'ajax_sync_prices'));
+        
+        // Yacht Customization AJAX handlers (v65.14)
+        add_action('wp_ajax_yolo_save_yacht_custom_setting', array($this, 'ajax_save_yacht_custom_setting'));
+        add_action('wp_ajax_yolo_save_yacht_custom_description', array($this, 'ajax_save_yacht_custom_description'));
     }
     
     /**
@@ -138,6 +142,16 @@ class YOLO_YS_Admin {
             'yolo-notification-settings',
             array($this, 'display_notification_settings_page')
         );
+        
+        // Add Yacht Customization submenu (v65.14)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Yacht Customization', 'yolo-yacht-search'),
+            __('Yacht Customization', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-yacht-customization',
+            array($this, 'display_yacht_customization_page')
+        );
     }
     
     /**
@@ -191,6 +205,13 @@ class YOLO_YS_Admin {
      */
     public function display_notification_settings_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-notification-settings.php';
+    }
+    
+    /**
+     * Display yacht customization page (v65.14)
+     */
+    public function display_yacht_customization_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yacht-customization-page.php';
     }
     
     /**
@@ -687,5 +708,104 @@ class YOLO_YS_Admin {
         } else {
             wp_send_json_error($result);
         }
+    }
+    
+    /**
+     * AJAX: Save yacht custom setting (use_custom_media or use_custom_description)
+     * @since 65.14
+     */
+    public function ajax_save_yacht_custom_setting() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $setting = isset($_POST['setting']) ? sanitize_text_field($_POST['setting']) : '';
+        $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
+        
+        if (empty($yacht_id) || !in_array($setting, array('use_custom_media', 'use_custom_description'))) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $wpdb->update(
+                $table,
+                array($setting => $value),
+                array('yacht_id' => $yacht_id),
+                array('%d'),
+                array('%s')
+            );
+        } else {
+            $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    $setting => $value
+                ),
+                array('%s', '%d')
+            );
+        }
+        
+        wp_send_json_success('Setting saved');
+    }
+    
+    /**
+     * AJAX: Save yacht custom description
+     * @since 65.14
+     */
+    public function ajax_save_yacht_custom_description() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $description = isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '';
+        
+        if (empty($yacht_id)) {
+            wp_send_json_error('Invalid yacht ID');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $wpdb->update(
+                $table,
+                array('custom_description' => $description),
+                array('yacht_id' => $yacht_id),
+                array('%s'),
+                array('%s')
+            );
+        } else {
+            $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    'custom_description' => $description
+                ),
+                array('%s', '%s')
+            );
+        }
+        
+        wp_send_json_success('Description saved');
     }
 }
