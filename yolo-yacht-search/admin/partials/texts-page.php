@@ -11,12 +11,12 @@ if (!defined('ABSPATH')) {
 
 // Handle form submission
 if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_nonce')) {
-    // Helper function to safely get POST value - v65.11 fix for all text fields
+    // Helper function to safely get POST value - v65.13 fix with wp_unslash to prevent slashes accumulation
     $get_post_text = function($key) {
-        return isset($_POST[$key]) ? sanitize_text_field($_POST[$key]) : '';
+        return isset($_POST[$key]) ? sanitize_text_field(wp_unslash($_POST[$key])) : '';
     };
     $get_post_html = function($key) {
-        return isset($_POST[$key]) ? wp_kses_post($_POST[$key]) : '';
+        return isset($_POST[$key]) ? wp_kses_post(wp_unslash($_POST[$key])) : '';
     };
     
     // Save all text options with proper isset() checks
