@@ -682,6 +682,17 @@ class YOLO_YS_Base_Manager {
             $checkin_id = $wpdb->insert_id;
         }
         
+        // Associate any orphaned photos uploaded during this session
+        $photo_ids = isset($_POST['photo_ids']) ? json_decode(stripslashes($_POST['photo_ids']), true) : array();
+        if (!empty($photo_ids) && is_array($photo_ids)) {
+            $photo_table = $wpdb->prefix . 'yolo_bm_photos';
+            $placeholders = implode(',', array_fill(0, count($photo_ids), '%d'));
+            $wpdb->query($wpdb->prepare(
+                "UPDATE $photo_table SET document_id = %d WHERE id IN ($placeholders) AND document_id = 0",
+                array_merge(array($checkin_id), $photo_ids)
+            ));
+        }
+        
         wp_send_json_success(array('message' => 'Check-in saved successfully', 'checkin_id' => $checkin_id));
     }
 
@@ -763,6 +774,17 @@ class YOLO_YS_Base_Manager {
             $data['created_at'] = current_time('mysql');
             $wpdb->insert($table_name, $data);
             $checkout_id = $wpdb->insert_id;
+        }
+        
+        // Associate any orphaned photos uploaded during this session
+        $photo_ids = isset($_POST['photo_ids']) ? json_decode(stripslashes($_POST['photo_ids']), true) : array();
+        if (!empty($photo_ids) && is_array($photo_ids)) {
+            $photo_table = $wpdb->prefix . 'yolo_bm_photos';
+            $placeholders = implode(',', array_fill(0, count($photo_ids), '%d'));
+            $wpdb->query($wpdb->prepare(
+                "UPDATE $photo_table SET document_id = %d WHERE id IN ($placeholders) AND document_id = 0",
+                array_merge(array($checkout_id), $photo_ids)
+            ));
         }
         
         wp_send_json_success(array('message' => 'Check-out saved successfully', 'checkout_id' => $checkout_id));
@@ -1302,7 +1324,7 @@ class YOLO_YS_Base_Manager {
      * AJAX: Upload photo for check-in/check-out documentation
      */
     public function ajax_upload_photo() {
-        check_ajax_referer('yolo_bm_nonce', 'nonce');
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Permission denied');
@@ -1314,6 +1336,7 @@ class YOLO_YS_Base_Manager {
         
         $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : 'general';
         $document_type = isset($_POST['document_type']) ? sanitize_text_field($_POST['document_type']) : 'checkin';
+        $document_id = isset($_POST['document_id']) ? intval($_POST['document_id']) : 0;
         
         // Validate file type
         $allowed_types = array('image/jpeg', 'image/png', 'image/webp');
@@ -1345,24 +1368,34 @@ class YOLO_YS_Base_Manager {
         $file_url = $upload_dir['baseurl'] . '/yolo-documentation/' . date('Y/m') . '/' . $filename;
         $thumbnail_url = $thumbnail_path ? str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $thumbnail_path) : $file_url;
         
-        // Save to database
+        // Save to database (correct table name and column names)
         global $wpdb;
-        $table = $wpdb->prefix . 'yolo_documentation_photos';
+        $table = $wpdb->prefix . 'yolo_bm_photos';
+        
+        // Get next sort order for this document
+        $sort_order = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(MAX(sort_order), 0) + 1 FROM $table WHERE document_type = %s AND document_id = %d",
+            $document_type, $document_id
+        ));
         
         $wpdb->insert($table, array(
             'document_type' => $document_type,
+            'document_id' => $document_id,
             'category' => $category,
-            'file_path' => $filepath,
             'file_url' => $file_url,
-            'thumbnail_path' => $thumbnail_path ?: $filepath,
             'thumbnail_url' => $thumbnail_url,
             'caption' => '',
             'notes' => '',
+            'sort_order' => $sort_order,
             'uploaded_by' => get_current_user_id(),
             'created_at' => current_time('mysql')
         ));
         
         $photo_id = $wpdb->insert_id;
+        
+        if (!$photo_id) {
+            wp_send_json_error('Failed to save photo to database: ' . $wpdb->last_error);
+        }
         
         wp_send_json_success(array(
             'id' => $photo_id,
@@ -1395,7 +1428,7 @@ class YOLO_YS_Base_Manager {
      * AJAX: Delete photo
      */
     public function ajax_delete_photo() {
-        check_ajax_referer('yolo_bm_nonce', 'nonce');
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Permission denied');
@@ -1407,7 +1440,7 @@ class YOLO_YS_Base_Manager {
         }
         
         global $wpdb;
-        $table = $wpdb->prefix . 'yolo_documentation_photos';
+        $table = $wpdb->prefix . 'yolo_bm_photos';
         
         // Get photo info
         $photo = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $photo_id));
@@ -1415,12 +1448,19 @@ class YOLO_YS_Base_Manager {
             wp_send_json_error('Photo not found');
         }
         
-        // Delete files
-        if (file_exists($photo->file_path)) {
-            unlink($photo->file_path);
+        // Delete files - convert URL to path
+        $upload_dir = wp_upload_dir();
+        if ($photo->file_url) {
+            $file_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $photo->file_url);
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
         }
-        if ($photo->thumbnail_path && file_exists($photo->thumbnail_path)) {
-            unlink($photo->thumbnail_path);
+        if ($photo->thumbnail_url && $photo->thumbnail_url !== $photo->file_url) {
+            $thumb_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $photo->thumbnail_url);
+            if (file_exists($thumb_path)) {
+                unlink($thumb_path);
+            }
         }
         
         // Delete from database
@@ -1433,7 +1473,7 @@ class YOLO_YS_Base_Manager {
      * AJAX: Update photo caption/notes
      */
     public function ajax_update_photo() {
-        check_ajax_referer('yolo_bm_nonce', 'nonce');
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Permission denied');
@@ -1448,7 +1488,7 @@ class YOLO_YS_Base_Manager {
         }
         
         global $wpdb;
-        $table = $wpdb->prefix . 'yolo_documentation_photos';
+        $table = $wpdb->prefix . 'yolo_bm_photos';
         
         $wpdb->update($table, 
             array('caption' => $caption, 'notes' => $notes),
@@ -1462,7 +1502,7 @@ class YOLO_YS_Base_Manager {
      * AJAX: Get photos for a document
      */
     public function ajax_get_photos() {
-        check_ajax_referer('yolo_bm_nonce', 'nonce');
+        check_ajax_referer('yolo_base_manager_nonce', 'nonce');
         
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Permission denied');
@@ -1472,10 +1512,10 @@ class YOLO_YS_Base_Manager {
         $document_id = isset($_POST['document_id']) ? intval($_POST['document_id']) : 0;
         
         global $wpdb;
-        $table = $wpdb->prefix . 'yolo_documentation_photos';
+        $table = $wpdb->prefix . 'yolo_bm_photos';
         
         $photos = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table WHERE document_type = %s AND document_id = %d ORDER BY category, created_at",
+            "SELECT * FROM $table WHERE document_type = %s AND document_id = %d ORDER BY category, sort_order, created_at",
             $document_type, $document_id
         ));
         

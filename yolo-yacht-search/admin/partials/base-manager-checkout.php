@@ -1481,6 +1481,7 @@ jQuery(document).ready(function($) {
         formData.append('photo', blob, filename);
         formData.append('category', category);
         formData.append('document_type', 'checkout');
+        formData.append('document_id', currentCheckoutId || 0);
         
         // Show uploading state
         var tempId = 'temp_' + Date.now();

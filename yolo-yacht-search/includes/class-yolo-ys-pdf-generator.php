@@ -370,7 +370,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         
         // Get photos for this document
         $photos = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}yolo_documentation_photos 
+            "SELECT * FROM {$wpdb->prefix}yolo_bm_photos 
              WHERE document_id = %d AND document_type = %s 
              ORDER BY category, created_at",
             $document_id, $document_type
