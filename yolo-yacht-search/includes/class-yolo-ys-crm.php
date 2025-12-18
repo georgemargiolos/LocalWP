@@ -1131,12 +1131,25 @@ class YOLO_YS_CRM {
     
     /**
      * AJAX: Snooze reminder (authenticated)
+     * Handles both UI requests (with nonce) and email link requests (with token)
      */
     public function ajax_snooze_reminder() {
-        check_ajax_referer('yolo_crm_nonce', 'nonce');
+        // Check if this is from email link (has token) or UI (has nonce)
+        $token = sanitize_text_field($_REQUEST['token'] ?? '');
+        $reminder_id = intval($_REQUEST['reminder_id'] ?? 0);
         
-        if (!current_user_can('edit_posts')) {
-            wp_send_json_error(array('message' => 'Permission denied'));
+        if (!empty($token)) {
+            // Email link - verify token
+            if (!$this->verify_snooze_token($reminder_id, $token)) {
+                wp_send_json_error(array('message' => 'Invalid or expired link'));
+            }
+        } else {
+            // UI action - verify nonce and capability
+            check_ajax_referer('yolo_crm_nonce', 'nonce');
+            
+            if (!current_user_can('edit_posts')) {
+                wp_send_json_error(array('message' => 'Permission denied'));
+            }
         }
         
         $this->snooze_reminder_handler();
@@ -2278,7 +2291,7 @@ class YOLO_YS_CRM {
         
         // Get all users with CRM access
         $users = get_users(array(
-            'role__in' => array('administrator', 'editor', 'yolo_base_manager'),
+            'role__in' => array('administrator', 'editor', 'base_manager'),
             'fields' => array('ID', 'user_email', 'display_name')
         ));
         
