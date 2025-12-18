@@ -105,7 +105,7 @@ if (isset($_POST['yolo_guest_login_submit'])) {
                     placeholder="Enter your password"
                     required
                 />
-                <p class="yolo-form-hint">Your password is: [booking_id]YoLo (e.g., 5YoLo for booking #5)</p>
+                <p class="yolo-form-hint">Your password is your Booking Reference + "YoLo" (check your confirmation email)</p>
             </div>
             
             <div class="yolo-form-group yolo-form-checkbox">

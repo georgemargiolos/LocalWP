@@ -57,12 +57,31 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $this->company_website = get_option('yolo_company_website', 'www.yolocharters.com');
         
         // Logo path - check if custom logo exists
+        // FIX v70.10: Handle both URL and filesystem path for logo
         $custom_logo = get_option('yolo_company_logo');
-        if ($custom_logo && file_exists($custom_logo)) {
-            $this->company_logo_path = $custom_logo;
-        } else {
-            // Default logo path
-            $this->company_logo_path = YOLO_YS_PLUGIN_DIR . 'assets/images/yolo-logo.png';
+        $this->company_logo_path = null;
+        
+        if ($custom_logo) {
+            // Check if it's a URL - convert to filesystem path
+            if (strpos($custom_logo, 'http') === 0) {
+                $upload_dir = wp_upload_dir();
+                // Convert URL to path: replace baseurl with basedir
+                $logo_path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $custom_logo);
+                if (file_exists($logo_path)) {
+                    $this->company_logo_path = $logo_path;
+                }
+            } elseif (file_exists($custom_logo)) {
+                // Already a filesystem path
+                $this->company_logo_path = $custom_logo;
+            }
+        }
+        
+        // Fallback to default logo if custom not found
+        if (!$this->company_logo_path) {
+            $default_logo = YOLO_YS_PLUGIN_DIR . 'assets/images/yolo-logo.png';
+            if (file_exists($default_logo)) {
+                $this->company_logo_path = $default_logo;
+            }
         }
         
         // Set auto page break with margin for footer
@@ -390,7 +409,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->AddPage();
         
         // Yacht Information Section
-        $pdf->SectionTitle('Yacht Information', '⛵');
+        $pdf->SectionTitle('Yacht Information', '[Y]');
         $pdf->InfoRow('Yacht Name', $yacht->yacht_name);
         $pdf->InfoRow('Model', $yacht->yacht_model ?? 'N/A');
         $pdf->InfoRow('Year', $yacht->year_built ?? 'N/A');
@@ -398,7 +417,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Ln(5);
         
         // Booking Information Section
-        $pdf->SectionTitle('Booking Information', '📋');
+        $pdf->SectionTitle('Booking Information', '[B]');
         $pdf->InfoRow('Booking Reference', 'BK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT));
         $pdf->InfoRow('Charter Guest', $booking->customer_name ?? 'N/A');
         $pdf->InfoRow('Email', $booking->customer_email ?? 'N/A');
@@ -409,7 +428,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Ln(5);
         
         // Equipment Checklist Section
-        $pdf->SectionTitle('Equipment Checklist', '🔧');
+        $pdf->SectionTitle('Equipment Checklist', '[E]');
         $checklist_data = json_decode($checkin->checklist_data, true);
         $pdf->EquipmentTable($checklist_data, false);
         $pdf->Ln(10);
@@ -420,7 +439,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $pdf->AddPage();
         }
         
-        $pdf->SectionTitle('Signatures & Confirmation', '✍️');
+        $pdf->SectionTitle('Signatures & Confirmation', '[S]');
         $pdf->Ln(5);
         
         $pdf->SetFont('Arial', '', 9);
@@ -507,7 +526,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->AddPage();
         
         // Yacht Information Section
-        $pdf->SectionTitle('Yacht Information', '⛵');
+        $pdf->SectionTitle('Yacht Information', '[Y]');
         $pdf->InfoRow('Yacht Name', $yacht->yacht_name);
         $pdf->InfoRow('Model', $yacht->yacht_model ?? 'N/A');
         $pdf->InfoRow('Year', $yacht->year_built ?? 'N/A');
@@ -515,7 +534,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Ln(5);
         
         // Booking Information Section
-        $pdf->SectionTitle('Booking Information', '📋');
+        $pdf->SectionTitle('Booking Information', '[B]');
         $pdf->InfoRow('Booking Reference', 'BK-' . str_pad($booking->id, 6, '0', STR_PAD_LEFT));
         $pdf->InfoRow('Charter Guest', $booking->customer_name ?? 'N/A');
         $pdf->InfoRow('Email', $booking->customer_email ?? 'N/A');
@@ -525,13 +544,13 @@ class YOLO_YS_PDF_Generator extends FPDF {
         $pdf->Ln(5);
         
         // Equipment Checklist Section
-        $pdf->SectionTitle('Equipment Return Checklist', '🔧');
+        $pdf->SectionTitle('Equipment Return Checklist', '[E]');
         $checklist_data = json_decode($checkout->checklist_data, true);
         $pdf->EquipmentTable($checklist_data, true);
         $pdf->Ln(10);
         
         // Fuel & Condition Notes
-        $pdf->SectionTitle('Additional Notes', '📝');
+        $pdf->SectionTitle('Additional Notes', '[N]');
         $pdf->SetFont('Arial', '', 10);
         $pdf->MultiCell(0, 6, 'Fuel Level at Return: ______________________', 0, 'L');
         $pdf->Ln(2);
@@ -544,7 +563,7 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $pdf->AddPage();
         }
         
-        $pdf->SectionTitle('Signatures & Confirmation', '✍️');
+        $pdf->SectionTitle('Signatures & Confirmation', '[S]');
         $pdf->Ln(5);
         
         $pdf->SetFont('Arial', '', 9);
