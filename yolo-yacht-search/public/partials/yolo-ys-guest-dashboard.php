@@ -97,10 +97,12 @@ $table_crew = $wpdb->prefix . 'yolo_crew_list';
                                 <span class="yolo-info-label">Balance Due</span>
                                 <span class="yolo-info-value"><?php echo esc_html($booking->currency); ?> <?php echo number_format($booking->remaining_balance, 2); ?></span>
                             </div>
+                            <?php if (!empty($booking->bm_reservation_id)): ?>
                             <div class="yolo-info-item">
                                 <span class="yolo-info-label">Booking #</span>
-                                <span class="yolo-info-value"><?php echo esc_html(!empty($booking->bm_reservation_id) ? $booking->bm_reservation_id : $booking->id); ?></span>
+                                <span class="yolo-info-value"><?php echo esc_html($booking->bm_reservation_id); ?></span>
                             </div>
+                            <?php endif; ?>
                         </div>
                         
                         <!-- Skipper 1 License Section -->

@@ -462,11 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fadeEffect: {
                 crossFade: true
             },
-            autoplay: {
-                delay: 5000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true
-            },
+            // autoplay disabled - manual navigation only (v70.5)
             lazy: {
                 loadPrevNext: true,
                 loadPrevNextAmount: 2

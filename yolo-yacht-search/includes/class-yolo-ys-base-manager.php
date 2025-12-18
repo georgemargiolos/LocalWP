@@ -872,14 +872,15 @@ class YOLO_YS_Base_Manager {
         
         // Prepare email
         $to = $booking->customer_email;
-        $subject = 'YOLO Charters - ' . ucfirst($type) . ' Document for Booking #' . $booking->id;
+        $booking_ref = !empty($booking->bm_reservation_id) ? $booking->bm_reservation_id : $booking->id;
+        $subject = 'YOLO Charters - ' . ucfirst($type) . ' Document for Booking #' . $booking_ref;
         
         $message = '<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
         $message .= '<div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">';
         $message .= '<h2 style="color: #1e3a8a; text-align: center;">YOLO Charters</h2>';
         $message .= '<h3 style="color: #495057;">Yacht ' . ucfirst($type) . ' Document</h3>';
         $message .= '<p>Dear ' . esc_html($booking->customer_name) . ',</p>';
-        $message .= '<p>Your yacht ' . $type . ' document for booking #' . $booking->id . ' is ready for your review and signature.</p>';
+        $message .= '<p>Your yacht ' . $type . ' document for booking #' . $booking_ref . ' is ready for your review and signature.</p>';
         $message .= '<p><strong>Please review the document and sign it in your guest dashboard.</strong></p>';
         $message .= '<div style="text-align: center; margin: 30px 0;">';
         $message .= '<a href="' . esc_url($guest_dashboard_url) . '" style="background-color: #1e3a8a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">View in Dashboard</a>';
