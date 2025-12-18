@@ -126,6 +126,20 @@ class YOLO_YS_Quote_Requests {
         if ($result) {
             $quote_id = $wpdb->insert_id;
             
+            // Trigger CRM integration (v71.0)
+            $crm_data = array(
+                'email' => $data['customer_email'],
+                'first_name' => explode(' ', $data['customer_name'])[0],
+                'last_name' => implode(' ', array_slice(explode(' ', $data['customer_name']), 1)),
+                'phone' => $data['customer_phone'],
+                'yacht_name' => $data['yacht_preference'],
+                'date_from' => $data['checkin_date'],
+                'date_to' => $data['checkout_date'],
+                'guests' => $data['num_guests'],
+                'message' => $data['special_requests']
+            );
+            do_action('yolo_quote_request_submitted', $quote_id, $crm_data);
+            
             // Trigger notifications
             $this->trigger_notifications($quote_id, $data);
             

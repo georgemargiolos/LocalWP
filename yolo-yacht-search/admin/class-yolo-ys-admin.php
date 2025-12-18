@@ -168,6 +168,16 @@ class YOLO_YS_Admin {
             'yolo-yacht-customization',
             array($this, 'display_yacht_customization_page')
         );
+        
+        // Add CRM submenu (v71.0)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('CRM', 'yolo-yacht-search'),
+            __('CRM', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-ys-crm',
+            array($this, 'display_crm_page')
+        );
     }
     
     /**
@@ -228,6 +238,13 @@ class YOLO_YS_Admin {
      */
     public function display_yacht_customization_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yacht-customization-page.php';
+    }
+    
+    /**
+     * Display CRM page (v71.0)
+     */
+    public function display_crm_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/crm-page.php';
     }
     
     /**

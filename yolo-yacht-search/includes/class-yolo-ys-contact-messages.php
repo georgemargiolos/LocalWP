@@ -146,6 +146,17 @@ class YOLO_YS_Contact_Messages {
         
         $message_id = $wpdb->insert_id;
         
+        // Trigger CRM integration (v71.0)
+        $crm_data = array(
+            'email' => $contact_email,
+            'first_name' => explode(' ', $contact_name)[0],
+            'last_name' => implode(' ', array_slice(explode(' ', $contact_name), 1)),
+            'phone' => $contact_phone,
+            'subject' => $contact_subject,
+            'message' => $contact_message
+        );
+        do_action('yolo_contact_message_submitted', $message_id, $crm_data);
+        
         // Trigger notifications
         $this->trigger_notifications($message_id, $contact_name, $contact_subject);
         

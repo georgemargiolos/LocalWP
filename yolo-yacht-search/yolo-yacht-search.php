@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 70.10
+ * Version: 71.0
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '70.10');
+define('YOLO_YS_VERSION', '71.0');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -57,6 +57,9 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-contact-messages.php';
 
 // Load auto-sync system (v30.0)
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-auto-sync.php';
+
+// Load CRM system (v71.0)
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-crm.php';
 
 // Load shortcodes
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-shortcodes.php';
@@ -107,70 +110,19 @@ register_deactivation_hook(__FILE__, 'deactivate_yolo_yacht_search');
 /**
  * The core plugin class
  */
-require YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-yacht-search.php';
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-yacht-search.php';
 
 /**
  * Begins execution of the plugin.
  */
 function run_yolo_yacht_search() {
-    $plugin = new YOLO_YS_Yacht_Search();
+    $plugin = new YOLO_Yacht_Search();
     $plugin->run();
 }
 
 run_yolo_yacht_search();
 
-// Initialize analytics and SEO (v41.19) - Wrapped in plugins_loaded hook to prevent critical errors
+// Initialize CRM
 add_action('plugins_loaded', function() {
-    yolo_analytics();
-    yolo_meta_tags();
-}, 10);
-
-// Initialize icons admin (admin-only) - Wrapped in admin_init hook
-add_action('admin_init', function() {
-    $icons_admin = new YOLO_YS_Icons_Admin();
-    add_action('admin_menu', array($icons_admin, 'register_menu'));
-    add_action('wp_ajax_yolo_save_icon', array($icons_admin, 'ajax_save_icon'));
-    add_action('wp_ajax_yolo_delete_icon', array($icons_admin, 'ajax_delete_icon'));
-
-    // Initialize admin colors
-    new YOLO_YS_Admin_Colors();
-}, 10);
-
-// Initialize warehouse notifications system - Wrapped in plugins_loaded hook
-add_action('plugins_loaded', function() {
-    new YOLO_YS_Warehouse_Notifications();
-}, 10);
-
-// Initialize auto-sync system (v30.0) - Wrapped in plugins_loaded hook
-add_action('plugins_loaded', function() {
-    new YOLO_YS_Auto_Sync();
-}, 10);
-
-/**
- * Check database version and run migrations if needed
- */
-function yolo_ys_check_db_version() {
-    $current_db_version = get_option('yolo_ys_db_version', '1.0');
-    $required_db_version = '1.9'; // Updated for Yacht Customization feature (v65.14)
-
-    if (version_compare($current_db_version, $required_db_version, '<')) {
-        error_log('YOLO YS: Database version outdated. Running migrations...');
-        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-activator.php';
-
-        // Re-run table creation (dbDelta will update existing tables)
-        YOLO_YS_Database::create_tables();
-
-        // Also create Base Manager tables (added in v17.13)
-        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-base-manager-database.php';
-        YOLO_YS_Base_Manager_Database::create_tables();
-
-        // Run migrations
-        $reflection = new ReflectionClass('YOLO_YS_Activator');
-        $method = $reflection->getMethod('run_migrations');
-        $method->setAccessible(true);
-        $method->invoke(null);
-
-        error_log('YOLO YS: Database migrations completed');
-    }
-}
-add_action('plugins_loaded', 'yolo_ys_check_db_version');
+    yolo_crm();
+});

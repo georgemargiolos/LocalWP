@@ -49,6 +49,14 @@ class YOLO_YS_Activator {
         // Create base manager role
         self::create_base_manager_role();
         
+        // Create CRM tables (v71.0)
+        YOLO_YS_CRM::create_tables();
+        
+        // Migrate existing data to CRM (only on first activation)
+        if (!get_option('yolo_crm_migration_completed')) {
+            YOLO_YS_CRM::migrate_existing_data();
+        }
+        
         // Run migrations
         self::run_migrations();
         
