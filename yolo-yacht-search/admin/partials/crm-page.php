@@ -173,7 +173,7 @@ $activity_icons = array(
                     $upcoming_bookings = $wpdb->get_results(
                         "SELECT b.*, c.first_name, c.last_name 
                          FROM $bookings_table b
-                         LEFT JOIN {$tables['customers']} c ON b.guest_email = c.email
+                         LEFT JOIN {$tables['customers']} c ON b.customer_email = c.email
                          WHERE b.date_from >= CURDATE() 
                          AND b.date_from <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
                          AND b.status IN ('confirmed', 'pending')
@@ -196,7 +196,7 @@ $activity_icons = array(
                                         <div class="crm-booking-guest">
                                             <?php 
                                             $guest_name = trim($booking->first_name . ' ' . $booking->last_name);
-                                            echo esc_html($guest_name ?: $booking->guest_name ?: $booking->guest_email);
+                                            echo esc_html($guest_name ?: $booking->customer_name ?: $booking->customer_email);
                                             ?>
                                         </div>
                                         <div class="crm-booking-dates">
