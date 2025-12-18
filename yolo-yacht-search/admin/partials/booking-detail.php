@@ -37,7 +37,7 @@ $booking_reference = !empty($booking->bm_reservation_id)
 ?>
 
 <div class="wrap">
-    <h1>Booking Details #<?php echo $booking->id; ?></h1>
+    <h1>Booking Details <?php echo !empty($booking->bm_reservation_id) ? '#' . esc_html($booking->bm_reservation_id) : ''; ?></h1>
     <a href="?page=yolo-ys-bookings" class="page-title-action">← Back to Bookings</a>
     
     <div class="yolo-booking-detail">

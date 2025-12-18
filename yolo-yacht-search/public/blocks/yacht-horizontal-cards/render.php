@@ -146,10 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php foreach ($yachts as $yacht): ?>
     new Swiper('.yolo-yacht-swiper-<?php echo esc_js($yacht->id); ?>', {
         loop: true,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
+        // autoplay disabled - manual navigation only (v70.5)
         pagination: {
             el: '.swiper-pagination',
             clickable: true,

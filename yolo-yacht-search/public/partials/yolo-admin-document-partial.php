@@ -47,7 +47,7 @@ $has_crew_list = !empty($crew_list);
 ?>
 
 <div class="yolo-document-partial">
-    <h2>Charter Documents for Booking #<?php echo esc_html($booking->id); ?></h2>
+    <h2>Charter Documents for Booking <?php echo !empty($booking->bm_reservation_id) ? '#' . esc_html($booking->bm_reservation_id) : ''; ?></h2>
 
     <div class="yolo-document-info">
         <div>

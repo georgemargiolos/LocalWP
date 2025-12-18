@@ -819,10 +819,5 @@ function selectWeek(button) {
     }).showToast();
 }
 
-// Auto-advance image carousel every 5 seconds
-setInterval(function() {
-    if (yachtCarousel.slides.length > 1) {
-        yachtCarousel.next();
-    }
-}, 5000);
+// Auto-advance disabled - manual navigation only (v70.5)
 </script>

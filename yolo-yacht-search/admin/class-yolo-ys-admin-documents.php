@@ -86,7 +86,7 @@ class YOLO_YS_Admin_Documents {
                     <option value="">-- Select a Booking --</option>
                     <?php foreach ($bookings as $booking): ?>
                         <option value="<?php echo esc_attr($booking->id); ?>">
-                            #<?php echo esc_html($booking->id); ?> - <?php echo esc_html($booking->yacht_name); ?> 
+                            <?php echo !empty($booking->bm_reservation_id) ? '#' . esc_html($booking->bm_reservation_id) : ''; ?> - <?php echo esc_html($booking->yacht_name); ?> 
                             (<?php echo date('M j, Y', strtotime($booking->date_from)); ?> - <?php echo date('M j, Y', strtotime($booking->date_to)); ?>) 
                             - <?php echo esc_html($booking->customer_name); ?>
                         </option>
