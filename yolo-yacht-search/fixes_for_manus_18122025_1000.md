@@ -1,6 +1,6 @@
 # YOLO Yacht Search - Fixes for Manus
 ## Date: December 18, 2025 @ 10:00 AM
-## Version: 70.6
+## Version: 70.7 (updated from 70.6)
 
 ---
 
@@ -191,10 +191,22 @@ wp cron event run yolo_ys_auto_sync_offers
 
 ---
 
+## v70.7 Additional Fix: Timeout Prevention
+
+### Problem
+Auto-sync was calling `sync_all_offers()` twice (current year + next year), which could take 10+ minutes and hit hosting timeouts.
+
+### Fix
+1. **Only sync NEXT year** in auto-sync (current year prices rarely change)
+2. **Explicit timeout extension** with `@set_time_limit(600)` (10 minutes)
+3. Added to both yacht sync and offers sync
+
+---
+
 ## Files Changed
 
-1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls and option keys
-2. `yolo-yacht-search.php` - Version bump to 70.6
+1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls, option keys, and timeout prevention
+2. `yolo-yacht-search.php` - Version bump to 70.7
 
 ---
 
