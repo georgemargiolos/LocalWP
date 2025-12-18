@@ -228,6 +228,40 @@
                     $('.crm-timeline-item[data-type="' + filterType + '"]').show();
                 }
             });
+
+            // Reminder snooze
+            $(document).on('change', '.crm-reminder-snooze', function() {
+                var $select = $(this);
+                var reminderId = $select.data('reminder-id');
+                var duration = $select.val();
+                
+                if (!duration) return;
+                
+                $.ajax({
+                    url: yoloCRM.ajaxUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'yolo_crm_snooze_reminder',
+                        nonce: yoloCRM.nonce,
+                        reminder_id: reminderId,
+                        duration: duration
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.data.message);
+                            location.reload();
+                        } else {
+                            alert(response.data.message || 'Error snoozing reminder');
+                        }
+                    },
+                    error: function() {
+                        alert('Error snoozing reminder');
+                    },
+                    complete: function() {
+                        $select.val('');
+                    }
+                });
+            });
         },
 
         loadCustomers: function() {

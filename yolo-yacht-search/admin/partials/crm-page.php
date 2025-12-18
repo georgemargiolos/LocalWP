@@ -386,7 +386,17 @@ $activity_icons = array(
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
-                                            <button type="button" class="crm-reminder-delete" title="Delete">×</button>
+                                            <div class="crm-reminder-actions">
+                                                <?php if ($reminder->status !== 'completed'): ?>
+                                                <select class="crm-reminder-snooze" data-reminder-id="<?php echo $reminder->id; ?>" title="Snooze reminder">
+                                                    <option value="">Snooze...</option>
+                                                    <option value="1h">1 Hour</option>
+                                                    <option value="1d">1 Day</option>
+                                                    <option value="1w">1 Week</option>
+                                                </select>
+                                                <?php endif; ?>
+                                                <button type="button" class="crm-reminder-delete" title="Delete">×</button>
+                                            </div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>

@@ -114,6 +114,8 @@ class YOLO_YS_CRM {
         add_action('wp_ajax_yolo_crm_add_reminder', array($this, 'ajax_add_reminder'));
         add_action('wp_ajax_yolo_crm_complete_reminder', array($this, 'ajax_complete_reminder'));
         add_action('wp_ajax_yolo_crm_delete_reminder', array($this, 'ajax_delete_reminder'));
+        add_action('wp_ajax_yolo_crm_snooze_reminder', array($this, 'ajax_snooze_reminder'));
+        add_action('wp_ajax_nopriv_yolo_crm_snooze_reminder', array($this, 'ajax_snooze_reminder_public'));
         add_action('wp_ajax_yolo_crm_send_offer', array($this, 'ajax_send_offer'));
         add_action('wp_ajax_yolo_crm_create_manual_booking', array($this, 'ajax_create_manual_booking'));
         add_action('wp_ajax_yolo_crm_send_welcome_email', array($this, 'ajax_send_welcome_email'));
@@ -126,6 +128,14 @@ class YOLO_YS_CRM {
         add_action('yolo_crm_check_reminders', array($this, 'check_due_reminders'));
         if (!wp_next_scheduled('yolo_crm_check_reminders')) {
             wp_schedule_event(time(), 'hourly', 'yolo_crm_check_reminders');
+        }
+        
+        // Daily digest cron
+        add_action('yolo_crm_daily_digest', array($this, 'send_daily_digest'));
+        if (!wp_next_scheduled('yolo_crm_daily_digest')) {
+            // Schedule for 8 AM local time
+            $timestamp = strtotime('tomorrow 08:00:00');
+            wp_schedule_event($timestamp, 'daily', 'yolo_crm_daily_digest');
         }
     }
 
@@ -1114,6 +1124,99 @@ class YOLO_YS_CRM {
     }
     
     /**
+     * AJAX: Snooze reminder (authenticated)
+     */
+    public function ajax_snooze_reminder() {
+        check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
+        $this->snooze_reminder_handler();
+    }
+    
+    /**
+     * AJAX: Snooze reminder (public - from email link)
+     */
+    public function ajax_snooze_reminder_public() {
+        // Verify token instead of nonce for email links
+        $token = sanitize_text_field($_REQUEST['token'] ?? '');
+        $reminder_id = intval($_REQUEST['reminder_id'] ?? 0);
+        
+        if (!$this->verify_snooze_token($reminder_id, $token)) {
+            wp_send_json_error(array('message' => 'Invalid or expired link'));
+        }
+        
+        $this->snooze_reminder_handler();
+    }
+    
+    /**
+     * Handle snooze reminder logic
+     */
+    private function snooze_reminder_handler() {
+        global $wpdb;
+        
+        $reminder_id = intval($_REQUEST['reminder_id']);
+        $duration = sanitize_text_field($_REQUEST['duration'] ?? '1h');
+        
+        // Calculate new due date based on duration
+        switch ($duration) {
+            case '1h':
+                $new_due = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                break;
+            case '1d':
+                $new_due = date('Y-m-d H:i:s', strtotime('+1 day'));
+                break;
+            case '1w':
+                $new_due = date('Y-m-d H:i:s', strtotime('+1 week'));
+                break;
+            default:
+                $new_due = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        }
+        
+        // Update reminder with new due date and reset snoozed_until (so it can be notified again)
+        $result = $wpdb->update(
+            $this->table_reminders,
+            array(
+                'due_date' => $new_due,
+                'snoozed_until' => null
+            ),
+            array('id' => $reminder_id)
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success(array(
+                'message' => 'Reminder snoozed until ' . date('M j, Y g:i A', strtotime($new_due)),
+                'new_due_date' => $new_due
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Failed to snooze reminder'));
+        }
+    }
+    
+    /**
+     * Generate snooze token for email links
+     */
+    private function generate_snooze_token($reminder_id) {
+        $secret = wp_salt('auth');
+        return hash('sha256', $reminder_id . $secret . date('Y-m-d'));
+    }
+    
+    /**
+     * Verify snooze token
+     */
+    private function verify_snooze_token($reminder_id, $token) {
+        // Check today's token
+        if ($token === $this->generate_snooze_token($reminder_id)) {
+            return true;
+        }
+        // Also check yesterday's token (in case email was sent late)
+        $yesterday_token = hash('sha256', $reminder_id . wp_salt('auth') . date('Y-m-d', strtotime('-1 day')));
+        return $token === $yesterday_token;
+    }
+    
+    /**
      * AJAX: Send offer
      */
     public function ajax_send_offer() {
@@ -1709,7 +1812,8 @@ class YOLO_YS_CRM {
                         $customer_name,
                         $reminder->customer_email,
                         date('M j, Y g:i A', strtotime($reminder->due_date)),
-                        $customer_url
+                        $customer_url,
+                        $reminder->id
                     );
                     
                     $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -1729,7 +1833,14 @@ class YOLO_YS_CRM {
     /**
      * Build HTML reminder email
      */
-    private function build_reminder_email($staff_name, $reminder_text, $customer_name, $customer_email, $due_date, $customer_url) {
+    private function build_reminder_email($staff_name, $reminder_text, $customer_name, $customer_email, $due_date, $customer_url, $reminder_id = 0) {
+        // Generate snooze links
+        $token = $this->generate_snooze_token($reminder_id);
+        $snooze_base = admin_url('admin-ajax.php?action=yolo_crm_snooze_reminder&reminder_id=' . $reminder_id . '&token=' . $token);
+        $snooze_1h = $snooze_base . '&duration=1h';
+        $snooze_1d = $snooze_base . '&duration=1d';
+        $snooze_1w = $snooze_base . '&duration=1w';
+        
         return '
         <html>
         <head>
@@ -1751,8 +1862,12 @@ class YOLO_YS_CRM {
                 .btn:hover { background: #135e96; }
                 .btn-secondary { background: #6b7280; }
                 .btn-secondary:hover { background: #4b5563; }
+                .btn-snooze { background: #f59e0b; font-size: 12px; padding: 8px 16px; }
+                .btn-snooze:hover { background: #d97706; }
                 .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; background: #f9fafb; }
                 .actions { text-align: center; margin: 25px 0; }
+                .snooze-section { text-align: center; margin: 20px 0; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+                .snooze-section p { color: #6b7280; margin-bottom: 10px; font-size: 14px; }
             </style>
         </head>
         <body>
@@ -1787,6 +1902,13 @@ class YOLO_YS_CRM {
                     <div class="actions">
                         <a href="' . esc_url($customer_url) . '" class="btn">View Customer</a>
                     </div>
+                    
+                    <div class="snooze-section">
+                        <p>Need more time? Snooze this reminder:</p>
+                        <a href="' . esc_url($snooze_1h) . '" class="btn btn-snooze">⏰ 1 Hour</a>
+                        <a href="' . esc_url($snooze_1d) . '" class="btn btn-snooze">📅 1 Day</a>
+                        <a href="' . esc_url($snooze_1w) . '" class="btn btn-snooze">📆 1 Week</a>
+                    </div>
                 </div>
                 <div class="footer">
                     <p>This is an automated reminder from YOLO CRM</p>
@@ -1795,6 +1917,181 @@ class YOLO_YS_CRM {
             </div>
         </body>
         </html>';
+    }
+    
+    /**
+     * Send daily digest email to staff
+     */
+    public function send_daily_digest() {
+        global $wpdb;
+        
+        // Get all users with CRM access
+        $users = get_users(array(
+            'role__in' => array('administrator', 'editor', 'yolo_base_manager'),
+            'fields' => array('ID', 'user_email', 'display_name')
+        ));
+        
+        foreach ($users as $user) {
+            // Get reminders due today for this user
+            $today_start = date('Y-m-d 00:00:00');
+            $today_end = date('Y-m-d 23:59:59');
+            
+            $reminders_today = $wpdb->get_results($wpdb->prepare(
+                "SELECT r.*, c.email as customer_email, c.first_name, c.last_name 
+                 FROM {$this->table_reminders} r 
+                 JOIN {$this->table_customers} c ON r.customer_id = c.id 
+                 WHERE r.assigned_to = %d 
+                 AND r.status = 'pending' 
+                 AND r.due_date BETWEEN %s AND %s
+                 ORDER BY r.due_date ASC",
+                $user->ID, $today_start, $today_end
+            ));
+            
+            // Get overdue reminders
+            $overdue_reminders = $wpdb->get_results($wpdb->prepare(
+                "SELECT r.*, c.email as customer_email, c.first_name, c.last_name 
+                 FROM {$this->table_reminders} r 
+                 JOIN {$this->table_customers} c ON r.customer_id = c.id 
+                 WHERE r.assigned_to = %d 
+                 AND r.status = 'pending' 
+                 AND r.due_date < %s
+                 ORDER BY r.due_date ASC",
+                $user->ID, $today_start
+            ));
+            
+            // Get new leads assigned to this user
+            $new_leads = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM {$this->table_customers} 
+                 WHERE assigned_to = %d 
+                 AND status = 'new' 
+                 AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+                 ORDER BY created_at DESC",
+                $user->ID
+            ));
+            
+            // Skip if nothing to report
+            if (empty($reminders_today) && empty($overdue_reminders) && empty($new_leads)) {
+                continue;
+            }
+            
+            // Build and send digest email
+            $subject = '[YOLO CRM] Daily Digest - ' . date('M j, Y');
+            $message = $this->build_daily_digest_email(
+                $user->display_name,
+                $reminders_today,
+                $overdue_reminders,
+                $new_leads
+            );
+            
+            $headers = array('Content-Type: text/html; charset=UTF-8');
+            wp_mail($user->user_email, $subject, $message, $headers);
+        }
+    }
+    
+    /**
+     * Build daily digest HTML email
+     */
+    private function build_daily_digest_email($staff_name, $reminders_today, $overdue_reminders, $new_leads) {
+        $html = '
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f5f5f5; }
+                .container { max-width: 600px; margin: 0 auto; background: white; }
+                .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 24px; }
+                .content { padding: 30px; }
+                .section { margin-bottom: 30px; }
+                .section-title { font-size: 18px; font-weight: bold; color: #1e3a8a; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
+                .item { background: #f9fafb; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+                .item-overdue { border-left-color: #ef4444; background: #fef2f2; }
+                .item-new { border-left-color: #22c55e; background: #f0fdf4; }
+                .item-title { font-weight: bold; margin-bottom: 5px; }
+                .item-meta { font-size: 12px; color: #6b7280; }
+                .btn { display: inline-block; background: #2271b1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px; }
+                .empty-state { color: #6b7280; font-style: italic; }
+                .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; background: #f9fafb; }
+                .badge { display: inline-block; background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>📊 Daily Digest</h1>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">' . date('l, F j, Y') . '</p>
+                </div>
+                <div class="content">
+                    <p>Good morning, ' . esc_html($staff_name) . '!</p>
+                    <p>Here\'s your daily summary from YOLO CRM:</p>';
+        
+        // Overdue reminders section
+        if (!empty($overdue_reminders)) {
+            $html .= '
+                    <div class="section">
+                        <div class="section-title">⚠️ Overdue Reminders <span class="badge">' . count($overdue_reminders) . '</span></div>';
+            foreach ($overdue_reminders as $reminder) {
+                $customer_name = trim($reminder->first_name . ' ' . $reminder->last_name);
+                $html .= '
+                        <div class="item item-overdue">
+                            <div class="item-title">' . esc_html($reminder->reminder_text) . '</div>
+                            <div class="item-meta">Customer: ' . esc_html($customer_name) . ' | Due: ' . date('M j, g:i A', strtotime($reminder->due_date)) . '</div>
+                        </div>';
+            }
+            $html .= '
+                    </div>';
+        }
+        
+        // Today's reminders section
+        $html .= '
+                    <div class="section">
+                        <div class="section-title">📅 Today\'s Reminders</div>';
+        if (!empty($reminders_today)) {
+            foreach ($reminders_today as $reminder) {
+                $customer_name = trim($reminder->first_name . ' ' . $reminder->last_name);
+                $html .= '
+                        <div class="item">
+                            <div class="item-title">' . esc_html($reminder->reminder_text) . '</div>
+                            <div class="item-meta">Customer: ' . esc_html($customer_name) . ' | Due: ' . date('g:i A', strtotime($reminder->due_date)) . '</div>
+                        </div>';
+            }
+        } else {
+            $html .= '
+                        <p class="empty-state">No reminders scheduled for today.</p>';
+        }
+        $html .= '
+                    </div>';
+        
+        // New leads section
+        if (!empty($new_leads)) {
+            $html .= '
+                    <div class="section">
+                        <div class="section-title">🌟 New Leads (Last 24h)</div>';
+            foreach ($new_leads as $lead) {
+                $lead_name = trim($lead->first_name . ' ' . $lead->last_name) ?: 'No name';
+                $html .= '
+                        <div class="item item-new">
+                            <div class="item-title">' . esc_html($lead_name) . '</div>
+                            <div class="item-meta">' . esc_html($lead->email) . ' | Source: ' . esc_html(ucwords(str_replace('_', ' ', $lead->source))) . '</div>
+                        </div>';
+            }
+            $html .= '
+                    </div>';
+        }
+        
+        $html .= '
+                    <div style="text-align: center;">
+                        <a href="' . admin_url('admin.php?page=yolo-ys-crm') . '" class="btn">Open CRM Dashboard</a>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>This is your daily digest from YOLO CRM</p>
+                    <p>&copy; ' . date('Y') . ' YOLO Charters. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>';
+        
+        return $html;
     }
 }
 

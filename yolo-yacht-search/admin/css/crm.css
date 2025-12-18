@@ -766,3 +766,40 @@
         flex-direction: column;
     }
 }
+
+/* Reminder snooze dropdown */
+.crm-reminder-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.crm-reminder-snooze {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+    cursor: pointer;
+}
+
+.crm-reminder-snooze:hover {
+    border-color: #2271b1;
+}
+
+/* Quick status dropdown in list */
+.crm-quick-status {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 20px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+}
+
+.crm-quick-status option {
+    background: white;
+    color: #333;
+}
