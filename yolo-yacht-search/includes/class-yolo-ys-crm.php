@@ -135,6 +135,9 @@ class YOLO_YS_CRM {
         
         // Daily digest cron
         add_action('yolo_crm_daily_digest', array($this, 'send_daily_digest'));
+        
+        // Admin bar notifications
+        add_action('admin_bar_menu', array($this, 'add_admin_bar_notifications'), 100);
         if (!wp_next_scheduled('yolo_crm_daily_digest')) {
             // Schedule for 8 AM local time
             $timestamp = strtotime('tomorrow 08:00:00');
@@ -2440,6 +2443,116 @@ class YOLO_YS_CRM {
         </html>';
         
         return $html;
+    }
+    
+    /**
+     * Add admin bar notifications for CRM
+     */
+    public function add_admin_bar_notifications($wp_admin_bar) {
+        if (!is_admin() || !current_user_can('edit_posts')) {
+            return;
+        }
+        
+        global $wpdb;
+        $current_user_id = get_current_user_id();
+        
+        // Count pending reminders for current user
+        $pending_reminders = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_reminders} 
+             WHERE assigned_to = %d 
+             AND status = 'pending' 
+             AND due_date <= NOW()",
+            $current_user_id
+        ));
+        
+        // Count new leads assigned to current user
+        $new_leads = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_customers} 
+             WHERE assigned_to = %d 
+             AND status = 'new'",
+            $current_user_id
+        ));
+        
+        // For admins, also count unassigned new leads
+        $unassigned_leads = 0;
+        if (current_user_can('manage_options')) {
+            $unassigned_leads = $wpdb->get_var(
+                "SELECT COUNT(*) FROM {$this->table_customers} 
+                 WHERE assigned_to IS NULL 
+                 AND status = 'new'"
+            );
+        }
+        
+        $total_notifications = intval($pending_reminders) + intval($new_leads) + intval($unassigned_leads);
+        
+        // Add main CRM menu item
+        $title = '<span class="ab-icon dashicons dashicons-groups" style="font-family: dashicons; font-size: 20px; line-height: 1.3;"></span>';
+        $title .= '<span class="ab-label">CRM</span>';
+        if ($total_notifications > 0) {
+            $title .= '<span class="crm-notification-badge" style="
+                background: #d63638;
+                color: white;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 0 5px;
+                border-radius: 10px;
+                margin-left: 5px;
+                min-width: 16px;
+                text-align: center;
+                display: inline-block;
+            ">' . $total_notifications . '</span>';
+        }
+        
+        $wp_admin_bar->add_node(array(
+            'id' => 'yolo-crm',
+            'title' => $title,
+            'href' => admin_url('admin.php?page=yolo-ys-crm'),
+            'meta' => array(
+                'class' => 'yolo-crm-admin-bar'
+            )
+        ));
+        
+        // Add sub-items
+        if ($pending_reminders > 0) {
+            $wp_admin_bar->add_node(array(
+                'id' => 'yolo-crm-reminders',
+                'parent' => 'yolo-crm',
+                'title' => '<span style="color: #d63638;">⏰ Due Reminders (' . $pending_reminders . ')</span>',
+                'href' => admin_url('admin.php?page=yolo-ys-crm')
+            ));
+        }
+        
+        if ($new_leads > 0) {
+            $wp_admin_bar->add_node(array(
+                'id' => 'yolo-crm-new-leads',
+                'parent' => 'yolo-crm',
+                'title' => '<span style="color: #00a32a;">🆕 New Leads (' . $new_leads . ')</span>',
+                'href' => admin_url('admin.php?page=yolo-ys-crm&status=new')
+            ));
+        }
+        
+        if ($unassigned_leads > 0) {
+            $wp_admin_bar->add_node(array(
+                'id' => 'yolo-crm-unassigned',
+                'parent' => 'yolo-crm',
+                'title' => '<span style="color: #dba617;">⚠️ Unassigned (' . $unassigned_leads . ')</span>',
+                'href' => admin_url('admin.php?page=yolo-ys-crm&assigned=0')
+            ));
+        }
+        
+        $wp_admin_bar->add_node(array(
+            'id' => 'yolo-crm-all',
+            'parent' => 'yolo-crm',
+            'title' => 'View All Customers',
+            'href' => admin_url('admin.php?page=yolo-ys-crm')
+        ));
+        
+        $wp_admin_bar->add_node(array(
+            'id' => 'yolo-crm-add',
+            'parent' => 'yolo-crm',
+            'title' => '+ Add Customer',
+            'href' => admin_url('admin.php?page=yolo-ys-crm&action=add')
+        ));
     }
 }
 

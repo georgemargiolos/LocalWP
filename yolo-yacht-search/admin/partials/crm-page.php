@@ -156,6 +156,63 @@ $activity_icons = array(
                 <?php endforeach; ?>
             </div>
             
+            <!-- Booking Calendar Widget -->
+            <div class="crm-calendar-widget">
+                <div class="crm-calendar-header">
+                    <h3><span class="dashicons dashicons-calendar-alt"></span> Upcoming Bookings</h3>
+                    <div class="crm-calendar-nav">
+                        <button type="button" class="button button-small" id="crm-calendar-prev">&lt;</button>
+                        <span id="crm-calendar-month"><?php echo date('F Y'); ?></span>
+                        <button type="button" class="button button-small" id="crm-calendar-next">&gt;</button>
+                    </div>
+                </div>
+                <div class="crm-calendar-body">
+                    <?php
+                    // Get upcoming bookings for the next 30 days
+                    $bookings_table = $wpdb->prefix . 'yolo_bookings';
+                    $upcoming_bookings = $wpdb->get_results(
+                        "SELECT b.*, c.first_name, c.last_name 
+                         FROM $bookings_table b
+                         LEFT JOIN {$tables['customers']} c ON b.guest_email = c.email
+                         WHERE b.date_from >= CURDATE() 
+                         AND b.date_from <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                         AND b.status IN ('confirmed', 'pending')
+                         ORDER BY b.date_from ASC
+                         LIMIT 10"
+                    );
+                    ?>
+                    <?php if (empty($upcoming_bookings)): ?>
+                        <p class="crm-no-items">No upcoming bookings in the next 30 days</p>
+                    <?php else: ?>
+                        <div class="crm-calendar-bookings">
+                            <?php foreach ($upcoming_bookings as $booking): ?>
+                                <div class="crm-calendar-booking-item">
+                                    <div class="crm-booking-date">
+                                        <span class="crm-booking-day"><?php echo date('d', strtotime($booking->date_from)); ?></span>
+                                        <span class="crm-booking-month"><?php echo date('M', strtotime($booking->date_from)); ?></span>
+                                    </div>
+                                    <div class="crm-booking-info">
+                                        <strong><?php echo esc_html($booking->yacht_name ?: 'Unknown Yacht'); ?></strong>
+                                        <div class="crm-booking-guest">
+                                            <?php 
+                                            $guest_name = trim($booking->first_name . ' ' . $booking->last_name);
+                                            echo esc_html($guest_name ?: $booking->guest_name ?: $booking->guest_email);
+                                            ?>
+                                        </div>
+                                        <div class="crm-booking-dates">
+                                            <?php echo date('M j', strtotime($booking->date_from)); ?> - <?php echo date('M j', strtotime($booking->date_to)); ?>
+                                        </div>
+                                    </div>
+                                    <div class="crm-booking-status <?php echo esc_attr($booking->status); ?>">
+                                        <?php echo esc_html(ucfirst($booking->status)); ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
             <!-- Customer Table -->
             <div class="crm-table-container">
                 <table class="wp-list-table widefat fixed striped crm-customers-table">
