@@ -163,6 +163,71 @@
                     $(this).hide();
                 }
             });
+
+            // Quick status change from list view
+            $(document).on('change', '.crm-quick-status', function() {
+                var $select = $(this);
+                var customerId = $select.data('customer-id');
+                var newStatus = $select.val();
+                var oldStatus = $select.data('current');
+                
+                if (newStatus === oldStatus) return;
+                
+                $.ajax({
+                    url: yoloCRM.ajaxUrl,
+                    type: 'POST',
+                    data: {
+                        action: 'yolo_crm_update_status',
+                        nonce: yoloCRM.nonce,
+                        customer_id: customerId,
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $select.data('current', newStatus);
+                            // Update background color
+                            var statusColors = {
+                                'new': '#3b82f6',
+                                'contacted': '#8b5cf6',
+                                'qualified': '#f59e0b',
+                                'proposal_sent': '#ec4899',
+                                'negotiating': '#14b8a6',
+                                'booked': '#22c55e',
+                                'lost': '#ef4444'
+                            };
+                            $select.css('background-color', statusColors[newStatus] || '#6c757d');
+                        } else {
+                            alert(response.data.message || 'Error updating status');
+                            $select.val(oldStatus);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating status');
+                        $select.val(oldStatus);
+                    }
+                });
+            });
+
+            // Floating quick note button
+            $(document).on('click', '#crm-floating-note-btn', function() {
+                $('#crm-quick-note-modal').show();
+                $('#crm-quick-note-text').focus();
+            });
+
+            $(document).on('click', '#crm-save-quick-note-btn', function() {
+                self.saveQuickNote();
+            });
+
+            // Activity type filter
+            $(document).on('change', '#crm-activity-filter', function() {
+                var filterType = $(this).val();
+                if (filterType === '') {
+                    $('.crm-timeline-item').show();
+                } else {
+                    $('.crm-timeline-item').hide();
+                    $('.crm-timeline-item[data-type="' + filterType + '"]').show();
+                }
+            });
         },
 
         loadCustomers: function() {
@@ -247,7 +312,14 @@
                 }
                 html += '</td>';
                 html += '<td class="column-source"><span class="crm-source-badge">' + sourceLabel + '</span></td>';
-                html += '<td class="column-status"><span class="crm-status-badge" style="background-color: ' + statusColor + '">' + statusLabel + '</span></td>';
+                html += '<td class="column-status">';
+                html += '<select class="crm-quick-status" data-customer-id="' + customer.id + '" data-current="' + customer.status + '" style="background-color: ' + statusColor + '; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;">';
+                for (var statusKey in statuses) {
+                    var selected = statusKey === customer.status ? ' selected' : '';
+                    html += '<option value="' + statusKey + '"' + selected + '>' + statuses[statusKey] + '</option>';
+                }
+                html += '</select>';
+                html += '</td>';
                 html += '<td class="column-assigned">' + assignee + '</td>';
                 html += '<td class="column-value">' + value + '</td>';
                 html += '<td class="column-activity">' + lastActivity + '</td>';
@@ -782,6 +854,48 @@
                 },
                 error: function() {
                     alert('Error removing tag');
+                }
+            });
+        },
+
+        saveQuickNote: function() {
+            var self = this;
+            var $modal = $('#crm-quick-note-modal');
+            var $btn = $('#crm-save-quick-note-btn');
+            var noteText = $('#crm-quick-note-text').val().trim();
+
+            if (!noteText) {
+                alert('Please enter a note');
+                return;
+            }
+
+            $btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: yoloCRM.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'yolo_crm_log_activity',
+                    nonce: yoloCRM.nonce,
+                    customer_id: crmCustomerId,
+                    activity_type: 'note',
+                    subject: 'Quick Note',
+                    content: noteText
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $modal.hide();
+                        $('#crm-quick-note-text').val('');
+                        location.reload();
+                    } else {
+                        alert(response.data.message || 'Error saving note');
+                    }
+                },
+                error: function() {
+                    alert('Error saving note');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text('Save Note');
                 }
             });
         }

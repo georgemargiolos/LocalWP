@@ -1700,21 +1700,20 @@ class YOLO_YS_CRM {
                 if ($user) {
                     $customer_name = trim($reminder->first_name . ' ' . $reminder->last_name);
                     $subject = '[YOLO CRM] Reminder Due: ' . $reminder->reminder_text;
+                    $customer_url = admin_url('admin.php?page=yolo-ys-crm&view=detail&customer=' . $reminder->customer_id);
                     
-                    $message = sprintf(
-                        "A reminder is now due:\n\n" .
-                        "Reminder: %s\n" .
-                        "Customer: %s (%s)\n" .
-                        "Due: %s\n\n" .
-                        "View Customer: %s",
+                    // Build HTML email
+                    $message = $this->build_reminder_email(
+                        $user->display_name,
                         $reminder->reminder_text,
                         $customer_name,
                         $reminder->customer_email,
                         date('M j, Y g:i A', strtotime($reminder->due_date)),
-                        admin_url('admin.php?page=yolo-ys-crm&view=detail&customer=' . $reminder->customer_id)
+                        $customer_url
                     );
                     
-                    wp_mail($user->user_email, $subject, $message);
+                    $headers = array('Content-Type: text/html; charset=UTF-8');
+                    wp_mail($user->user_email, $subject, $message, $headers);
                 }
             }
             
@@ -1725,6 +1724,77 @@ class YOLO_YS_CRM {
                 array('id' => $reminder->id)
             );
         }
+    }
+    
+    /**
+     * Build HTML reminder email
+     */
+    private function build_reminder_email($staff_name, $reminder_text, $customer_name, $customer_email, $due_date, $customer_url) {
+        return '
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f5f5f5; }
+                .container { max-width: 600px; margin: 0 auto; background: white; }
+                .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 24px; }
+                .header .bell { font-size: 48px; margin-bottom: 10px; }
+                .content { padding: 30px; }
+                .reminder-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 4px; }
+                .reminder-text { font-size: 18px; font-weight: bold; color: #92400e; margin: 0; }
+                .details { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                .details-row { display: flex; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+                .details-row:last-child { border-bottom: none; }
+                .details-label { font-weight: bold; color: #6b7280; width: 100px; }
+                .details-value { color: #111827; }
+                .btn { display: inline-block; background: #2271b1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 10px 5px 10px 0; }
+                .btn:hover { background: #135e96; }
+                .btn-secondary { background: #6b7280; }
+                .btn-secondary:hover { background: #4b5563; }
+                .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; background: #f9fafb; }
+                .actions { text-align: center; margin: 25px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="bell">🔔</div>
+                    <h1>Reminder Due</h1>
+                </div>
+                <div class="content">
+                    <p>Hi ' . esc_html($staff_name) . ',</p>
+                    <p>A reminder you set is now due:</p>
+                    
+                    <div class="reminder-box">
+                        <p class="reminder-text">' . esc_html($reminder_text) . '</p>
+                    </div>
+                    
+                    <div class="details">
+                        <div class="details-row">
+                            <span class="details-label">Customer:</span>
+                            <span class="details-value">' . esc_html($customer_name) . '</span>
+                        </div>
+                        <div class="details-row">
+                            <span class="details-label">Email:</span>
+                            <span class="details-value">' . esc_html($customer_email) . '</span>
+                        </div>
+                        <div class="details-row">
+                            <span class="details-label">Due:</span>
+                            <span class="details-value">' . esc_html($due_date) . '</span>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <a href="' . esc_url($customer_url) . '" class="btn">View Customer</a>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>This is an automated reminder from YOLO CRM</p>
+                    <p>&copy; ' . date('Y') . ' YOLO Charters. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>';
     }
 }
 

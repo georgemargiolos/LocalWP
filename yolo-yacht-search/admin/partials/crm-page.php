@@ -454,8 +454,14 @@ $activity_icons = array(
                 <!-- Right Column: Activity Timeline -->
                 <div class="crm-detail-right">
                     <div class="crm-card crm-timeline-card">
-                        <div class="crm-card-header">
+                        <div class="crm-card-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <h3>Activity Timeline</h3>
+                            <select id="crm-activity-filter" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;">
+                                <option value="">All Activities</option>
+                                <?php foreach ($activity_types as $type_key => $type_label): ?>
+                                    <option value="<?php echo esc_attr($type_key); ?>"><?php echo esc_html($type_label); ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="crm-card-body">
                             <div class="crm-timeline" id="crm-timeline">
@@ -765,6 +771,57 @@ $activity_icons = array(
         </div>
     </div>
 </div>
+
+<!-- Quick Note Modal -->
+<div id="crm-quick-note-modal" class="crm-modal" style="display: none;">
+    <div class="crm-modal-content" style="max-width: 500px;">
+        <div class="crm-modal-header">
+            <h2>Quick Note</h2>
+            <button type="button" class="crm-modal-close">×</button>
+        </div>
+        <div class="crm-modal-body">
+            <div class="crm-form-group">
+                <label>Note *</label>
+                <textarea id="crm-quick-note-text" rows="4" placeholder="Type your note here..." style="width: 100%;"></textarea>
+            </div>
+        </div>
+        <div class="crm-modal-footer">
+            <button type="button" class="button crm-modal-cancel">Cancel</button>
+            <button type="button" class="button button-primary" id="crm-save-quick-note-btn">Save Note</button>
+        </div>
+    </div>
+</div>
+
+<?php if ($view === 'detail' && $customer): ?>
+<!-- Floating Quick Note Button -->
+<button type="button" id="crm-floating-note-btn" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #2271b1;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: transform 0.2s, background 0.2s;
+" title="Add Quick Note">
+    <span class="dashicons dashicons-edit" style="font-size: 24px; width: 24px; height: 24px;"></span>
+</button>
+<style>
+#crm-floating-note-btn:hover {
+    transform: scale(1.1);
+    background: #135e96;
+}
+</style>
+<?php endif; ?>
 
 <script>
 // Store customer ID for modals
