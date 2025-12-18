@@ -205,8 +205,8 @@ class YOLO_YS_Auto_Sync {
         $frequency = sanitize_text_field($_POST['frequency']);
         $time = sanitize_text_field($_POST['time']);
         
-        // Validate frequency
-        $valid_frequencies = array('disabled', 'twice_daily', 'daily', 'weekly');
+        // Validate frequency (use WordPress standard cron names: twicedaily NOT twice_daily)
+        $valid_frequencies = array('disabled', 'twicedaily', 'daily', 'weekly');
         if (!in_array($frequency, $valid_frequencies)) {
             wp_send_json_error('Invalid frequency');
             return;

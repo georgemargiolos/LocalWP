@@ -73,7 +73,7 @@ $sync_status = $sync->get_sync_status();
                 <label for="yolo-ys-auto-sync-yachts" style="font-weight: 600; color: #dc2626;">🔄 Auto-Sync:</label>
                 <select id="yolo-ys-auto-sync-yachts" style="padding: 8px 12px; font-size: 14px; border: 2px solid #dc2626; border-radius: 6px;">
                     <option value="disabled" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'disabled'); ?>>Disabled</option>
-                    <option value="twice_daily" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'twice_daily'); ?>>Twice Daily</option>
+                    <option value="twicedaily" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'twicedaily'); ?>>Twice Daily</option>
                     <option value="daily" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'daily'); ?>>Daily</option>
                     <option value="weekly" <?php selected(get_option('yolo_ys_auto_sync_yachts_frequency', 'disabled'), 'weekly'); ?>>Weekly</option>
                 </select>
@@ -144,7 +144,7 @@ $sync_status = $sync->get_sync_status();
                 <label for="yolo-ys-auto-sync-offers" style="font-weight: 600; color: #2563eb;">🔄 Auto-Sync:</label>
                 <select id="yolo-ys-auto-sync-offers" style="padding: 8px 12px; font-size: 14px; border: 2px solid #2563eb; border-radius: 6px;">
                     <option value="disabled" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'disabled'); ?>>Disabled</option>
-                    <option value="twice_daily" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'twice_daily'); ?>>Twice Daily</option>
+                    <option value="twicedaily" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'twicedaily'); ?>>Twice Daily</option>
                     <option value="daily" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'daily'); ?>>Daily</option>
                     <option value="weekly" <?php selected(get_option('yolo_ys_auto_sync_offers_frequency', 'disabled'), 'weekly'); ?>>Weekly</option>
                 </select>

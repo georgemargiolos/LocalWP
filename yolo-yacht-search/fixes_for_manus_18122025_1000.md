@@ -1,6 +1,6 @@
 # YOLO Yacht Search - Fixes for Manus
 ## Date: December 18, 2025 @ 10:00 AM
-## Version: 70.7 (updated from 70.6)
+## Version: 70.8 (updated from 70.6 → 70.7 → 70.8)
 
 ---
 
@@ -203,10 +203,29 @@ Auto-sync was calling `sync_all_offers()` twice (current year + next year), whic
 
 ---
 
+## v70.8 Additional Fix: "Not scheduled" Bug
+
+### Problem
+When selecting "Twice Daily" in the auto-sync dropdown, WordPress cron showed "Next: Not scheduled".
+
+### Root Cause
+WordPress cron uses `twicedaily` (no underscore), but the code used `twice_daily` (with underscore).
+
+When `wp_schedule_event($next_run, 'twice_daily', $hook)` was called, WordPress didn't recognize the schedule and **silently failed**.
+
+### Fix
+Changed all occurrences from `twice_daily` to `twicedaily`:
+
+1. `admin/partials/yolo-yacht-search-admin-display.php` - Both dropdown option values
+2. `includes/class-yolo-ys-auto-sync.php` - Validation array
+
+---
+
 ## Files Changed
 
-1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls, option keys, and timeout prevention
-2. `yolo-yacht-search.php` - Version bump to 70.7
+1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls, option keys, timeout prevention, and cron schedule name
+2. `admin/partials/yolo-yacht-search-admin-display.php` - Fixed dropdown values (twice_daily → twicedaily)
+3. `yolo-yacht-search.php` - Version bump to 70.8
 
 ---
 
