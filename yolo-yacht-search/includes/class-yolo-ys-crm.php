@@ -1126,6 +1126,8 @@ class YOLO_YS_CRM {
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
+        $from_email = sanitize_email($_POST['from_email'] ?? get_option('admin_email'));
+        $from_name = sanitize_text_field($_POST['from_name'] ?? 'YOLO Charters');
         $subject = sanitize_text_field($_POST['subject']);
         $yacht_name = sanitize_text_field($_POST['yacht_name'] ?? '');
         $offer_amount = floatval($_POST['offer_amount'] ?? 0);
@@ -1141,18 +1143,67 @@ class YOLO_YS_CRM {
         // Build email
         $email_body = $this->build_offer_email($customer_name, $message);
         
-        $headers = array('Content-Type: text/html; charset=UTF-8');
-        $sent = wp_mail($customer->email, $subject, $email_body, $headers);
+        // Build headers with From email and name
+        $headers = array(
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $from_name . ' <' . $from_email . '>',
+            'Reply-To: ' . $from_email
+        );
+        
+        // Handle file attachment
+        $attachments = array();
+        $attachment_name = '';
+        if (!empty($_FILES['offer_attachment']) && $_FILES['offer_attachment']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['offer_attachment'];
+            
+            // Validate file type
+            $allowed_types = array('application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            $file_type = wp_check_filetype($file['name']);
+            $mime_type = $file['type'];
+            
+            if (!in_array($mime_type, $allowed_types)) {
+                wp_send_json_error(array('message' => 'Invalid file type. Only PDF and Word documents are allowed.'));
+            }
+            
+            // Check file size (10MB max)
+            if ($file['size'] > 10 * 1024 * 1024) {
+                wp_send_json_error(array('message' => 'File too large. Maximum size is 10MB.'));
+            }
+            
+            // Upload file to WordPress uploads directory
+            $upload = wp_handle_upload($file, array('test_form' => false));
+            
+            if (isset($upload['error'])) {
+                wp_send_json_error(array('message' => 'File upload failed: ' . $upload['error']));
+            }
+            
+            $attachments[] = $upload['file'];
+            $attachment_name = $file['name'];
+        }
+        
+        $sent = wp_mail($customer->email, $subject, $email_body, $headers, $attachments);
+        
+        // Clean up uploaded file after sending
+        if (!empty($attachments) && file_exists($attachments[0])) {
+            @unlink($attachments[0]);
+        }
         
         if ($sent) {
             // Log activity
+            $activity_metadata = array(
+                'yacht_name' => $yacht_name,
+                'offer_amount' => $offer_amount,
+                'from_email' => $from_email,
+                'from_name' => $from_name
+            );
+            if ($attachment_name) {
+                $activity_metadata['attachment'] = $attachment_name;
+            }
+            
             $this->log_activity($customer_id, 'offer_sent', array(
                 'subject' => 'Offer sent: ' . $subject,
                 'content' => $message,
-                'metadata' => json_encode(array(
-                    'yacht_name' => $yacht_name,
-                    'offer_amount' => $offer_amount
-                ))
+                'metadata' => json_encode($activity_metadata)
             ));
             
             // Update status if in early stage
@@ -1179,6 +1230,7 @@ class YOLO_YS_CRM {
      * Build offer email HTML
      */
     private function build_offer_email($customer_name, $message) {
+        // Message already contains HTML from TinyMCE, so we use it directly
         return '
         <html>
         <head>
@@ -1197,8 +1249,7 @@ class YOLO_YS_CRM {
                 </div>
                 <div class="content">
                     <p>Dear ' . esc_html($customer_name) . ',</p>
-                    ' . nl2br(esc_html($message)) . '
-                    <p>Best regards,<br>The YOLO Charters Team</p>
+                    ' . $message . '
                 </div>
                 <div class="footer">
                     <p>&copy; ' . date('Y') . ' YOLO Charters. All rights reserved.</p>

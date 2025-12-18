@@ -613,20 +613,45 @@
             var $form = $('#crm-send-offer-form');
             var $btn = $('#crm-send-offer-submit-btn');
 
+            // Get TinyMCE content if available, otherwise fallback to textarea
+            var messageContent = '';
+            if (typeof tinyMCE !== 'undefined' && tinyMCE.get('crm_offer_message')) {
+                messageContent = tinyMCE.get('crm_offer_message').getContent();
+            } else {
+                messageContent = $('#crm_offer_message').val();
+            }
+
+            if (!messageContent || messageContent.trim() === '') {
+                alert('Please enter a message');
+                return;
+            }
+
             $btn.prop('disabled', true).text('Sending...');
+
+            // Use FormData for file upload support
+            var formData = new FormData();
+            formData.append('action', 'yolo_crm_send_offer');
+            formData.append('nonce', yoloCRM.nonce);
+            formData.append('customer_id', crmCustomerId);
+            formData.append('from_email', $form.find('input[name="from_email"]').val());
+            formData.append('from_name', $form.find('input[name="from_name"]').val());
+            formData.append('subject', $form.find('input[name="subject"]').val());
+            formData.append('yacht_name', $form.find('input[name="yacht_name"]').val());
+            formData.append('offer_amount', $form.find('input[name="offer_amount"]').val());
+            formData.append('message', messageContent);
+
+            // Add file attachment if selected
+            var fileInput = document.getElementById('crm-offer-attachment');
+            if (fileInput && fileInput.files.length > 0) {
+                formData.append('offer_attachment', fileInput.files[0]);
+            }
 
             $.ajax({
                 url: yoloCRM.ajaxUrl,
                 type: 'POST',
-                data: {
-                    action: 'yolo_crm_send_offer',
-                    nonce: yoloCRM.nonce,
-                    customer_id: crmCustomerId,
-                    subject: $form.find('input[name="subject"]').val(),
-                    yacht_name: $form.find('input[name="yacht_name"]').val(),
-                    offer_amount: $form.find('input[name="offer_amount"]').val(),
-                    message: $form.find('textarea[name="message"]').val()
-                },
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function(response) {
                     if (response.success) {
                         alert('Offer sent successfully!');

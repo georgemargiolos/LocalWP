@@ -663,7 +663,17 @@ $activity_icons = array(
             <button type="button" class="crm-modal-close">×</button>
         </div>
         <div class="crm-modal-body">
-            <form id="crm-send-offer-form">
+            <form id="crm-send-offer-form" enctype="multipart/form-data">
+                <div class="crm-form-row">
+                    <div class="crm-form-group">
+                        <label>From Email *</label>
+                        <input type="email" name="from_email" required value="<?php echo esc_attr(get_option('admin_email')); ?>" placeholder="sender@example.com">
+                    </div>
+                    <div class="crm-form-group">
+                        <label>From Name</label>
+                        <input type="text" name="from_name" value="YOLO Charters" placeholder="Sender Name">
+                    </div>
+                </div>
                 <div class="crm-form-group">
                     <label>Subject *</label>
                     <input type="text" name="subject" required value="Charter Offer from YOLO Charters">
@@ -680,16 +690,25 @@ $activity_icons = array(
                 </div>
                 <div class="crm-form-group">
                     <label>Message *</label>
-                    <textarea name="message" rows="10" required placeholder="Write your offer message here...">Thank you for your interest in chartering with YOLO Charters.
-
-Based on your requirements, we are pleased to offer you the following:
-
-[Add your offer details here]
-
-This offer is valid for 7 days. Please let us know if you have any questions.
-
-Best regards,
-YOLO Charters Team</textarea>
+                    <?php
+                    $default_content = 'Thank you for your interest in chartering with YOLO Charters.<br><br>Based on your requirements, we are pleased to offer you the following:<br><br>[Add your offer details here]<br><br>This offer is valid for 7 days. Please let us know if you have any questions.<br><br>Best regards,<br>YOLO Charters Team';
+                    wp_editor($default_content, 'crm_offer_message', array(
+                        'textarea_name' => 'message',
+                        'textarea_rows' => 12,
+                        'media_buttons' => false,
+                        'teeny' => false,
+                        'quicktags' => true,
+                        'tinymce' => array(
+                            'toolbar1' => 'formatselect,bold,italic,underline,|,bullist,numlist,|,link,unlink,|,undo,redo',
+                            'toolbar2' => '',
+                        ),
+                    ));
+                    ?>
+                </div>
+                <div class="crm-form-group">
+                    <label>Attach PDF Offer Document (optional)</label>
+                    <input type="file" name="offer_attachment" accept=".pdf,.doc,.docx" id="crm-offer-attachment">
+                    <p class="description">Attach a PDF or Word document with your detailed offer. Max size: 10MB</p>
                 </div>
             </form>
         </div>
