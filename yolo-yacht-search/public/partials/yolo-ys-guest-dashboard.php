@@ -99,7 +99,7 @@ $table_crew = $wpdb->prefix . 'yolo_crew_list';
                             </div>
                             <div class="yolo-info-item">
                                 <span class="yolo-info-label">Booking #</span>
-                                <span class="yolo-info-value"><?php echo esc_html($booking->id); ?></span>
+                                <span class="yolo-info-value"><?php echo esc_html(!empty($booking->bm_reservation_id) ? $booking->bm_reservation_id : $booking->id); ?></span>
                             </div>
                         </div>
                         

@@ -137,6 +137,16 @@ if (isset($_POST['yolo_ys_save_texts']) && check_admin_referer('yolo_ys_texts_no
         'yolo_ys_text_free' => $get_post_text('yolo_ys_text_free'),
         'yolo_ys_text_catamaran' => $get_post_text('yolo_ys_text_catamaran'),
         'yolo_ys_text_message_placeholder' => $get_post_text('yolo_ys_text_message_placeholder'),
+        
+        // Payment Processing Spinner (v65.21)
+        'yolo_ys_text_spinner_heading_1' => $get_post_text('yolo_ys_text_spinner_heading_1'),
+        'yolo_ys_text_spinner_subtext_1' => $get_post_text('yolo_ys_text_spinner_subtext_1'),
+        'yolo_ys_text_spinner_heading_2' => $get_post_text('yolo_ys_text_spinner_heading_2'),
+        'yolo_ys_text_spinner_subtext_2' => $get_post_text('yolo_ys_text_spinner_subtext_2'),
+        'yolo_ys_text_spinner_heading_3' => $get_post_text('yolo_ys_text_spinner_heading_3'),
+        'yolo_ys_text_spinner_subtext_3' => $get_post_text('yolo_ys_text_spinner_subtext_3'),
+        'yolo_ys_text_spinner_heading_4' => $get_post_text('yolo_ys_text_spinner_heading_4'),
+        'yolo_ys_text_spinner_subtext_4' => $get_post_text('yolo_ys_text_spinner_subtext_4'),
     );
     
     foreach ($text_options as $key => $value) {
@@ -254,6 +264,16 @@ $texts = array(
     'free' => get_option('yolo_ys_text_free', 'Free'),
     'catamaran' => get_option('yolo_ys_text_catamaran', 'Catamaran'),
     'message_placeholder' => get_option('yolo_ys_text_message_placeholder', 'Message'),
+    
+    // Payment Processing Spinner (v65.21)
+    'spinner_heading_1' => get_option('yolo_ys_text_spinner_heading_1', 'Confirming Your Payment'),
+    'spinner_subtext_1' => get_option('yolo_ys_text_spinner_subtext_1', 'Please wait while we verify your payment...'),
+    'spinner_heading_2' => get_option('yolo_ys_text_spinner_heading_2', 'Processing Your Booking'),
+    'spinner_subtext_2' => get_option('yolo_ys_text_spinner_subtext_2', 'Almost there! Please don\'t close this window.'),
+    'spinner_heading_3' => get_option('yolo_ys_text_spinner_heading_3', 'Finalizing Details'),
+    'spinner_subtext_3' => get_option('yolo_ys_text_spinner_subtext_3', 'This is taking a bit longer than usual. Please don\'t close this window.'),
+    'spinner_heading_4' => get_option('yolo_ys_text_spinner_heading_4', 'Still Working...'),
+    'spinner_subtext_4' => get_option('yolo_ys_text_spinner_subtext_4', 'Your payment was successful. We\'re just finishing up the details.'),
 );
 ?>
 
@@ -690,6 +710,44 @@ $texts = array(
             <tr>
                 <th scope="row"><label for="yolo_ys_text_message_placeholder"><?php _e('Message Placeholder', 'yolo-yacht-search'); ?></label></th>
                 <td><input type="text" id="yolo_ys_text_message_placeholder" name="yolo_ys_text_message_placeholder" value="<?php echo esc_attr($texts['message_placeholder']); ?>" class="regular-text"></td>
+            </tr>
+            
+            <!-- Payment Processing Spinner -->
+            <tr>
+                <th colspan="2"><h2><?php _e('Payment Processing Spinner', 'yolo-yacht-search'); ?></h2>
+                <p style="font-weight: normal; font-size: 13px; color: #666;">These texts appear while processing a booking after payment. They update progressively at 0s, 10s, 35s, and 45s.</p></th>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_heading_1"><?php _e('Stage 1 Heading (0-10s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_heading_1" name="yolo_ys_text_spinner_heading_1" value="<?php echo esc_attr($texts['spinner_heading_1']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_subtext_1"><?php _e('Stage 1 Subtext (0-10s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_subtext_1" name="yolo_ys_text_spinner_subtext_1" value="<?php echo esc_attr($texts['spinner_subtext_1']); ?>" class="large-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_heading_2"><?php _e('Stage 2 Heading (10-35s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_heading_2" name="yolo_ys_text_spinner_heading_2" value="<?php echo esc_attr($texts['spinner_heading_2']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_subtext_2"><?php _e('Stage 2 Subtext (10-35s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_subtext_2" name="yolo_ys_text_spinner_subtext_2" value="<?php echo esc_attr($texts['spinner_subtext_2']); ?>" class="large-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_heading_3"><?php _e('Stage 3 Heading (35-45s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_heading_3" name="yolo_ys_text_spinner_heading_3" value="<?php echo esc_attr($texts['spinner_heading_3']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_subtext_3"><?php _e('Stage 3 Subtext (35-45s)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_subtext_3" name="yolo_ys_text_spinner_subtext_3" value="<?php echo esc_attr($texts['spinner_subtext_3']); ?>" class="large-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_heading_4"><?php _e('Stage 4 Heading (45s+)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_heading_4" name="yolo_ys_text_spinner_heading_4" value="<?php echo esc_attr($texts['spinner_heading_4']); ?>" class="regular-text"></td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="yolo_ys_text_spinner_subtext_4"><?php _e('Stage 4 Subtext (45s+)', 'yolo-yacht-search'); ?></label></th>
+                <td><input type="text" id="yolo_ys_text_spinner_subtext_4" name="yolo_ys_text_spinner_subtext_4" value="<?php echo esc_attr($texts['spinner_subtext_4']); ?>" class="large-text"></td>
             </tr>
         </table>
         

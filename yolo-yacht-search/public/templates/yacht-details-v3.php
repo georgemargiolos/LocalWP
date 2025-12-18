@@ -386,25 +386,44 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 </div>
             </div>
             
-            <!-- Description Section (v65.16 - supports custom description) -->
+            <!-- Description Section (v65.17 - supports more tag for custom descriptions) -->
+            
             <?php if (!empty($display_description)): ?>
             <?php
-                // Use $display_description which may be custom or synced
-                $paragraphs = array_filter(explode("\n", $display_description));
-                $preview_paragraphs = array_slice($paragraphs, 0, 2);
-                $remaining_paragraphs = array_slice($paragraphs, 2);
-                $has_more = count($remaining_paragraphs) > 0;
+                // Check for <!-- more --> tag in custom descriptions (v65.17)
+                $has_more = false;
+                $preview_content = '';
+                $full_content = '';
+                
+                if ($use_custom_description && strpos($display_description, '<!-- more -->') !== false) {
+                    // Split by <!-- more --> tag
+                    $parts = explode('<!-- more -->', $display_description, 2);
+                    $preview_content = trim($parts[0]);
+                    $full_content = isset($parts[1]) ? trim($parts[1]) : '';
+                    $has_more = !empty($full_content);
+                } elseif ($use_custom_description) {
+                    // Custom description without <!-- more --> tag - show all
+                    $preview_content = $display_description;
+                    $has_more = false;
+                } else {
+                    // Synced description - use paragraph-based split
+                    $paragraphs = array_filter(explode("\n", $display_description));
+                    $preview_paragraphs = array_slice($paragraphs, 0, 2);
+                    $remaining_paragraphs = array_slice($paragraphs, 2);
+                    $preview_content = implode("\n", $preview_paragraphs);
+                    $full_content = implode("\n", $remaining_paragraphs);
+                    $has_more = count($remaining_paragraphs) > 0;
+                }
             ?>
             <div class="yacht-description-section">
                 <h3><i class="fa-solid fa-info-circle"></i> Description</h3>
                 <div class="yacht-description-content">
                     <div class="description-preview">
                         <?php 
-                        // If custom description, allow HTML; otherwise escape
                         if ($use_custom_description) {
-                            echo wp_kses_post(implode("<br>", $preview_paragraphs));
+                            echo wp_kses_post($preview_content);
                         } else {
-                            echo nl2br(esc_html(implode("\n", $preview_paragraphs)));
+                            echo nl2br(esc_html($preview_content));
                         }
                         ?>
                     </div>
@@ -412,9 +431,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         <div class="description-full" style="display: none;">
                             <?php 
                             if ($use_custom_description) {
-                                echo wp_kses_post(implode("<br>", $remaining_paragraphs));
+                                echo wp_kses_post($full_content);
                             } else {
-                                echo nl2br(esc_html(implode("\n", $remaining_paragraphs)));
+                                echo nl2br(esc_html($full_content));
                             }
                             ?>
                         </div>

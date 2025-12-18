@@ -71,7 +71,7 @@ class YOLO_YS_Admin_Bookings extends WP_List_Table {
      */
     public function column_bm_id($item) {
         if (!empty($item['bm_reservation_id'])) {
-            return '<span class="yolo-bm-id">BM-' . $item['bm_reservation_id'] . '</span>';
+            return '<span class="yolo-bm-id">' . $item['bm_reservation_id'] . '</span>';
         }
         return '<span class="yolo-no-sync" title="Not synced with Booking Manager">—</span>';
     }
@@ -167,6 +167,13 @@ class YOLO_YS_Admin_Bookings extends WP_List_Table {
                 $item['id']
             );
         }
+        
+        // Delete action with confirmation
+        $actions[] = sprintf(
+            '<a href="#" class="yolo-delete-booking" data-booking-id="%s" data-customer="%s" style="color: #dc3545;">Delete</a>',
+            $item['id'],
+            esc_attr($item['customer_name'])
+        );
         
         return implode(' | ', $actions);
     }

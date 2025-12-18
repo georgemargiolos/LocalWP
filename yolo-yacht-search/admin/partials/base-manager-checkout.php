@@ -801,7 +801,7 @@ jQuery(document).ready(function($) {
                         let options = '<option value="">Choose booking...</option>';
                         response.data.forEach(function(booking) {
                             console.log('Check-Out: Processing booking:', booking);
-                            options += `<option value="${booking.id}">BM-${booking.id} - ${booking.customer_name}${booking.yacht_name ? ' (' + booking.yacht_name + ')' : ''}</option>`;
+                            options += `<option value="${booking.id}">${booking.id} - ${booking.customer_name}${booking.yacht_name ? ' (' + booking.yacht_name + ')' : ''}</option>`;
                         });
                         $('#checkout-booking-select').html(options);
                         console.log('Check-Out: Successfully loaded ' + response.data.length + ' bookings into dropdown');

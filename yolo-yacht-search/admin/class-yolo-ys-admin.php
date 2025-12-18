@@ -29,6 +29,9 @@ class YOLO_YS_Admin {
         add_action('wp_ajax_yolo_add_custom_media', array($this, 'ajax_add_custom_media'));
         add_action('wp_ajax_yolo_delete_custom_media', array($this, 'ajax_delete_custom_media'));
         add_action('wp_ajax_yolo_save_media_order', array($this, 'ajax_save_media_order'));
+        
+        // Booking management AJAX handlers (v70.3)
+        add_action('wp_ajax_yolo_delete_booking', array($this, 'ajax_delete_booking'));
     }
     
     /**
@@ -1025,5 +1028,51 @@ class YOLO_YS_Admin {
         }
         
         wp_send_json_success('Order saved');
+    }
+    
+    /**
+     * AJAX: Delete booking
+     * @since 70.3
+     */
+    public function ajax_delete_booking() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
+        
+        if (!$booking_id) {
+            wp_send_json_error('Invalid booking ID');
+        }
+        
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        // Get booking details before deletion for logging
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table_bookings} WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking) {
+            wp_send_json_error('Booking not found');
+        }
+        
+        // Delete the booking
+        $deleted = $wpdb->delete(
+            $table_bookings,
+            array('id' => $booking_id),
+            array('%d')
+        );
+        
+        if ($deleted) {
+            // Log the deletion
+            error_log('YOLO YS: Booking #' . $booking_id . ' deleted by user ' . get_current_user_id() . ' - Customer: ' . $booking->customer_name);
+            wp_send_json_success('Booking deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete booking');
+        }
     }
 }

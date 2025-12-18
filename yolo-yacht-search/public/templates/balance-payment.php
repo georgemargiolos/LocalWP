@@ -28,18 +28,19 @@ $table_bookings = $wpdb->prefix . 'yolo_bookings';
 
 // Try to find by BM reservation ID or booking ID
 $booking = null;
-if (strpos($booking_ref, 'BM-') === 0) {
-    $bm_id = str_replace('BM-', '', $booking_ref);
-    $booking = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM {$table_bookings} WHERE bm_reservation_id = %s",
-        $bm_id
-    ));
-} else if (strpos($booking_ref, 'YOLO-') === 0) {
+if (strpos($booking_ref, 'YOLO-') === 0) {
+    // Fallback format: YOLO-YYYY-XXXX
     $parts = explode('-', $booking_ref);
     $booking_id = isset($parts[2]) ? intval($parts[2]) : 0;
     $booking = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$table_bookings} WHERE id = %d",
         $booking_id
+    ));
+} else {
+    // Primary: raw bm_reservation_id (no prefix)
+    $booking = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$table_bookings} WHERE bm_reservation_id = %s",
+        $booking_ref
     ));
 }
 

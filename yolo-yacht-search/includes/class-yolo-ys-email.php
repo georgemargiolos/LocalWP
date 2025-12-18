@@ -16,7 +16,7 @@ class YOLO_YS_Email {
     public static function send_booking_confirmation($booking) {
         // Prepare variables
         $booking_reference = !empty($booking->bm_reservation_id) 
-            ? 'BM-' . $booking->bm_reservation_id 
+            ? $booking->bm_reservation_id 
             : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
         
         $balance_payment_url = home_url('/balance-payment?ref=' . urlencode($booking_reference));
@@ -67,7 +67,7 @@ class YOLO_YS_Email {
         
         // Prepare variables
         $booking_reference = !empty($booking->bm_reservation_id) 
-            ? 'BM-' . $booking->bm_reservation_id 
+            ? $booking->bm_reservation_id 
             : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
         
         $balance_payment_url = home_url('/balance-payment?ref=' . urlencode($booking_reference));
@@ -104,7 +104,7 @@ class YOLO_YS_Email {
     public static function send_payment_received($booking) {
         // Prepare variables
         $booking_reference = !empty($booking->bm_reservation_id) 
-            ? 'BM-' . $booking->bm_reservation_id 
+            ? $booking->bm_reservation_id 
             : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
         
         $variables = array(
@@ -188,7 +188,7 @@ class YOLO_YS_Email {
         $admin_email = get_option('admin_email');
         
         $booking_reference = !empty($booking->bm_reservation_id) 
-            ? 'BM-' . $booking->bm_reservation_id 
+            ? $booking->bm_reservation_id 
             : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
         
         $subject = 'New Booking - ' . $booking->yacht_name;

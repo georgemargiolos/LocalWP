@@ -332,11 +332,11 @@ class YOLO_YS_Stripe {
             );
         }
         
-        // Create guest user account
-        $this->create_guest_user($booking_id, $customer_email, $customer_name, $session['id']);
-        
-        // Create reservation in Booking Manager API
+        // Create reservation in Booking Manager API first (to get the BM reservation ID)
         $this->create_booking_manager_reservation($booking_id, $yacht_id, $date_from, $date_to, $customer_email, $customer_name);
+        
+        // Create guest user account (after BM reservation so we have the correct reference)
+        $this->create_guest_user($booking_id, $customer_email, $customer_name, $session['id']);
         
         // Send confirmation email
         $this->send_confirmation_email($booking_id);
@@ -476,6 +476,8 @@ class YOLO_YS_Stripe {
      * @param string $confirmation_number Stripe session ID used as confirmation
      */
     private function create_guest_user($booking_id, $customer_email, $customer_name, $confirmation_number) {
+        global $wpdb;
+        
         error_log('YOLO YS: Starting guest user creation for booking ID: ' . $booking_id . ', email: ' . $customer_email);
         
         // Split customer name into first and last name
@@ -491,6 +493,17 @@ class YOLO_YS_Stripe {
             return;
         }
         
+        // Fetch the booking to get the BM reservation ID
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        $booking = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_bookings} WHERE id = %d", $booking_id));
+        
+        // Generate booking reference (must match email template)
+        $booking_reference = !empty($booking->bm_reservation_id) 
+            ? $booking->bm_reservation_id 
+            : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+        
+        error_log('YOLO YS: Using booking reference for password: ' . $booking_reference);
+        
         // Create guest user
         $guest_manager = new YOLO_YS_Guest_Users();
         error_log('YOLO YS: Guest manager instantiated, calling create_guest_user()');
@@ -500,7 +513,7 @@ class YOLO_YS_Stripe {
             $customer_email,
             $customer_first_name,
             $customer_last_name,
-            $booking_id // Use booking ID as confirmation number
+            $booking_reference
         );
         
         error_log('YOLO YS: Guest user creation result: ' . print_r($result, true));

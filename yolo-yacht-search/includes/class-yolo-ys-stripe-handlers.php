@@ -26,6 +26,10 @@ class YOLO_YS_Stripe_Handlers {
         add_action('wp_ajax_yolo_check_booking_status', array($this, 'ajax_check_booking_status'));
         add_action('wp_ajax_nopriv_yolo_check_booking_status', array($this, 'ajax_check_booking_status'));
         
+        // AJAX handler for creating booking from Stripe session (v65.23)
+        add_action('wp_ajax_yolo_process_stripe_booking', array($this, 'ajax_process_stripe_booking'));
+        add_action('wp_ajax_nopriv_yolo_process_stripe_booking', array($this, 'ajax_process_stripe_booking'));
+        
         // Register REST API endpoint for webhook
         add_action('rest_api_init', array($this, 'register_webhook_endpoint'));
     }
@@ -344,5 +348,208 @@ class YOLO_YS_Stripe_Handlers {
         $stripe->handle_webhook();
         
         return new WP_REST_Response(array('status' => 'success'), 200);
+    }
+    
+    /**
+     * AJAX handler to process booking from Stripe session (v65.23)
+     * Called via AJAX after spinner is shown to user
+     */
+    public function ajax_process_stripe_booking() {
+        $session_id = isset($_POST['session_id']) ? sanitize_text_field($_POST['session_id']) : '';
+        
+        if (empty($session_id)) {
+            wp_send_json_error(array('message' => 'No session ID provided'));
+            return;
+        }
+        
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        // Check if booking already exists
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table_bookings} WHERE stripe_session_id = %s",
+            $session_id
+        ));
+        
+        if ($existing) {
+            wp_send_json_success(array(
+                'status' => 'exists',
+                'booking_id' => $existing->id,
+                'message' => 'Booking already exists'
+            ));
+            return;
+        }
+        
+        // Create booking from Stripe session
+        try {
+            $secret_key = get_option('yolo_ys_stripe_secret_key', '');
+            if (empty($secret_key)) {
+                wp_send_json_error(array('message' => 'Stripe not configured'));
+                return;
+            }
+            
+            \Stripe\Stripe::setApiKey($secret_key);
+            $session = \Stripe\Checkout\Session::retrieve($session_id);
+            
+            if ($session->payment_status !== 'paid') {
+                wp_send_json_error(array('message' => 'Payment not completed', 'status' => 'pending'));
+                return;
+            }
+            
+            // Extract metadata
+            $yacht_id = $session->metadata->yacht_id;
+            $yacht_name = $session->metadata->yacht_name;
+            $date_from = $session->metadata->date_from;
+            $date_to = $session->metadata->date_to;
+            $total_price = $session->metadata->total_price;
+            $deposit_amount = $session->metadata->deposit_amount;
+            $remaining_balance = $session->metadata->remaining_balance;
+            $currency = isset($session->metadata->currency) ? $session->metadata->currency : 'EUR';
+            
+            $customer_first_name = isset($session->metadata->customer_first_name) ? $session->metadata->customer_first_name : '';
+            $customer_last_name = isset($session->metadata->customer_last_name) ? $session->metadata->customer_last_name : '';
+            $customer_name = isset($session->metadata->customer_name) ? $session->metadata->customer_name : '';
+            $customer_email = isset($session->metadata->customer_email) ? $session->metadata->customer_email : '';
+            $customer_phone = isset($session->metadata->customer_phone) ? $session->metadata->customer_phone : '';
+            
+            if (empty($customer_email) && isset($session->customer_details->email)) {
+                $customer_email = $session->customer_details->email;
+            }
+            if (empty($customer_name) && isset($session->customer_details->name)) {
+                $customer_name = $session->customer_details->name;
+            }
+            
+            // STEP 1: Create reservation in Booking Manager FIRST to get bm_reservation_id
+            $api = new YOLO_YS_Booking_Manager_API();
+            $reservation_data = array(
+                'yachtId' => (int)$yacht_id,
+                'dateFrom' => date('Y-m-d\TH:i:s', strtotime($date_from)),
+                'dateTo' => date('Y-m-d\TH:i:s', strtotime($date_to)),
+                'client' => array('name' => $customer_name, 'email' => $customer_email),
+                'status' => 1,
+                'sendNotification' => true,
+                'note' => 'Online booking via YOLO Charters. Stripe: ' . ($session->payment_intent ?? ''),
+            );
+            
+            $bm_result = $api->create_reservation($reservation_data);
+            $bm_reservation_id = null;
+            
+            if ($bm_result['success'] && isset($bm_result['data']['id'])) {
+                $bm_reservation_id = $bm_result['data']['id'];
+                
+                // Create payment record in BM
+                $api->create_payment($bm_reservation_id, array(
+                    'amount' => floatval($deposit_amount),
+                    'currency' => $currency,
+                    'paymentDate' => current_time('Y-m-d\TH:i:s'),
+                    'paymentMethod' => 'Credit Card (Stripe)',
+                    'note' => 'Deposit. Stripe: ' . ($session->payment_intent ?? ''),
+                ));
+            }
+            
+            // STEP 2: Insert WordPress booking WITH bm_reservation_id
+            $wpdb->insert($table_bookings, array(
+                'yacht_id' => $yacht_id,
+                'yacht_name' => $yacht_name,
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'total_price' => $total_price,
+                'deposit_paid' => $deposit_amount,
+                'remaining_balance' => $remaining_balance,
+                'currency' => $currency,
+                'customer_name' => $customer_name,
+                'customer_email' => $customer_email,
+                'customer_phone' => $customer_phone,
+                'stripe_session_id' => $session_id,
+                'stripe_payment_intent' => isset($session->payment_intent) ? $session->payment_intent : '',
+                'bm_reservation_id' => $bm_reservation_id,
+                'payment_status' => 'deposit_paid',
+                'booking_status' => 'confirmed',
+                'created_at' => current_time('mysql'),
+            ));
+            
+            $booking_id = $wpdb->insert_id;
+            if (!$booking_id) {
+                wp_send_json_error(array('message' => 'Failed to create booking'));
+                return;
+            }
+            
+            // Get full booking for emails and guest user
+            $booking = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table_bookings} WHERE id = %d", $booking_id));
+            
+            if ($booking) {
+                // STEP 3: Create guest user with bm_reservation_id as password base
+                if (class_exists('YOLO_YS_Guest_Users')) {
+                    $guest_manager = new YOLO_YS_Guest_Users();
+                    $name_parts = explode(' ', trim($customer_name), 2);
+                    $first = isset($name_parts[0]) ? $name_parts[0] : $customer_name;
+                    $last = isset($name_parts[1]) ? $name_parts[1] : '';
+                    
+                    // Use booking->bm_reservation_id from database to match email template
+                    $booking_reference = !empty($booking->bm_reservation_id) 
+                        ? $booking->bm_reservation_id 
+                        : 'YOLO-' . date('Y') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
+                    
+                    $guest_result = $guest_manager->create_guest_user(
+                        $booking_id,
+                        $customer_email,
+                        $first,
+                        $last,
+                        $booking_reference
+                    );
+                    
+                    if ($guest_result['success'] && !empty($guest_result['password'])) {
+                        $login_url = wp_login_url(home_url('/guest-dashboard'));
+                        $credentials_subject = 'Your Guest Account - YOLO Charters';
+                        $credentials_message = sprintf(
+                            "Your guest account has been created!\n\nUsername: %s\nPassword: %s\n\nLogin here: %s",
+                            $guest_result['username'],
+                            $guest_result['password'],
+                            $login_url
+                        );
+                        wp_mail($customer_email, $credentials_subject, $credentials_message);
+                    }
+                }
+                
+                // Send emails
+                try {
+                    YOLO_YS_Email::send_booking_confirmation($booking);
+                    YOLO_YS_Email::send_admin_notification($booking);
+                } catch (Exception $e) {
+                    // Log but don't fail
+                }
+                
+                // Track Purchase event via Facebook CAPI
+                $fb_event_id = '';
+                if (function_exists('yolo_analytics')) {
+                    $transaction_id = $session_id ? $session_id : 'booking-' . $booking_id;
+                    $user_data = array(
+                        'em' => $customer_email,
+                        'ph' => $customer_phone,
+                        'fn' => $customer_first_name,
+                        'ln' => $customer_last_name
+                    );
+                    
+                    $fb_event_id = @yolo_analytics()->track_purchase(
+                        $transaction_id,
+                        $yacht_id,
+                        $total_price,
+                        $yacht_name,
+                        $user_data
+                    );
+                    if (!is_string($fb_event_id)) $fb_event_id = '';
+                }
+            }
+            
+            wp_send_json_success(array(
+                'status' => 'created',
+                'booking_id' => $booking_id,
+                'fb_event_id' => $fb_event_id ?? '',
+                'message' => 'Booking created successfully'
+            ));
+            
+        } catch (Exception $e) {
+            wp_send_json_error(array('message' => $e->getMessage()));
+        }
     }
 }
