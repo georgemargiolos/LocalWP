@@ -540,7 +540,7 @@ class YOLO_YS_Admin {
         echo '<option value="">' . __('Select a page...', 'yolo-yacht-search') . '</option>';
         foreach ($pages as $page) {
             $selected = ($value == $page->ID) ? 'selected' : '';
-            echo '<option value="' . esc_attr($page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
+            echo '<option value="' . esc_attr((string) $page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
         }
         echo '</select>';
         echo '<p class="description">' . __('Select the page where search results will be displayed (must contain [yolo_search_results] shortcode)', 'yolo-yacht-search') . '</p>';
@@ -554,7 +554,7 @@ class YOLO_YS_Admin {
         echo '<option value="">' . __('Select a page...', 'yolo-yacht-search') . '</option>';
         foreach ($pages as $page) {
             $selected = ($value == $page->ID) ? 'selected' : '';
-            echo '<option value="' . esc_attr($page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
+            echo '<option value="' . esc_attr((string) $page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
         }
         echo '</select>';
         echo '<p class="description">' . __('Select the page where yacht details will be displayed (must contain [yolo_yacht_details] shortcode)', 'yolo-yacht-search') . '</p>';
