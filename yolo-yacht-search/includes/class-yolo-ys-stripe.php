@@ -341,6 +341,22 @@ class YOLO_YS_Stripe {
         // Send confirmation email
         $this->send_confirmation_email($booking_id);
         
+        // Trigger CRM integration (v71.2)
+        $name_parts = explode(' ', $customer_name, 2);
+        $crm_booking_data = array(
+            'customer_email' => $customer_email,
+            'first_name' => isset($name_parts[0]) ? $name_parts[0] : '',
+            'last_name' => isset($name_parts[1]) ? $name_parts[1] : '',
+            'customer_phone' => isset($session['metadata']['customer_phone']) ? $session['metadata']['customer_phone'] : '',
+            'yacht_name' => $yacht_name,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'total_price' => $total_price,
+            'currency' => isset($session['metadata']['currency']) ? $session['metadata']['currency'] : 'EUR',
+            'bm_reservation_id' => null // Will be updated by create_booking_manager_reservation
+        );
+        do_action('yolo_booking_created', $booking_id, $crm_booking_data);
+        
         error_log('YOLO YS: Booking created successfully - ID: ' . $booking_id);
     }
     

@@ -181,7 +181,7 @@
             $tbody.html('<tr class="crm-loading-row"><td colspan="8" style="text-align: center; padding: 40px;"><span class="spinner is-active" style="float: none;"></span> Loading customers...</td></tr>');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_get_customers',
@@ -209,6 +209,7 @@
         },
 
         renderCustomers: function(customers) {
+            var self = this; // Fix: add self reference for this method
             var $tbody = $('#crm-customers-tbody');
             var statuses = yoloCRM.statuses;
             var sources = yoloCRM.sources;
@@ -230,7 +231,8 @@
             var html = '';
             customers.forEach(function(customer) {
                 var name = (customer.first_name + ' ' + customer.last_name).trim() || '<em>No name</em>';
-                var statusLabel = statuses[customer.status] ? statuses[customer.status].label : customer.status;
+                // Fix: statuses are strings, not objects with .label property
+                var statusLabel = statuses[customer.status] || customer.status;
                 var statusColor = statusColors[customer.status] || '#6c757d';
                 var sourceLabel = sources[customer.source] || customer.source;
                 var lastActivity = customer.last_activity_at ? self.formatDate(customer.last_activity_at) : '-';
@@ -291,7 +293,7 @@
             $btn.prop('disabled', true).text('Saving...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_create_customer',
@@ -328,7 +330,7 @@
             $btn.text('Exporting...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_export_customers',
@@ -363,7 +365,7 @@
             $btn.text('Migrating...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_run_migration',
@@ -388,7 +390,7 @@
 
         updateStatus: function(customerId, status) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_update_status',
@@ -409,8 +411,9 @@
                             'lost': '#ef4444'
                         };
                         var statuses = yoloCRM.statuses;
+                        // Fix: statuses are strings, not objects with .label property
                         $('.crm-customer-card .crm-status-badge')
-                            .text(statuses[status].label)
+                            .text(statuses[status] || status)
                             .css('background-color', statusColors[status]);
                         
                         // Reload page to show updated timeline
@@ -427,7 +430,7 @@
 
         assignCustomer: function(customerId, userId) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_assign_customer',
@@ -456,7 +459,7 @@
             $btn.prop('disabled', true).text('Saving...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_log_activity',
@@ -493,7 +496,7 @@
             $btn.prop('disabled', true).text('Saving...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_log_activity',
@@ -532,7 +535,7 @@
             $btn.prop('disabled', true).text('Saving...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_add_reminder',
@@ -562,7 +565,7 @@
 
         completeReminder: function(reminderId, completed) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_complete_reminder',
@@ -585,7 +588,7 @@
 
         deleteReminder: function(reminderId) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_delete_reminder',
@@ -613,7 +616,7 @@
             $btn.prop('disabled', true).text('Sending...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_send_offer',
@@ -650,7 +653,7 @@
             $btn.prop('disabled', true).text('Creating...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_create_manual_booking',
@@ -689,7 +692,7 @@
             $btn.prop('disabled', true).text('Sending...');
 
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_send_welcome_email',
@@ -714,7 +717,7 @@
 
         addTag: function(tagId) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_add_tag',
@@ -737,7 +740,7 @@
 
         removeTag: function(tagId) {
             $.ajax({
-                url: ajaxurl,
+                url: yoloCRM.ajaxUrl,
                 type: 'POST',
                 data: {
                     action: 'yolo_crm_remove_tag',

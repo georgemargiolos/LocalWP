@@ -539,6 +539,21 @@ class YOLO_YS_Stripe_Handlers {
                     );
                     if (!is_string($fb_event_id)) $fb_event_id = '';
                 }
+                
+                // Trigger CRM integration (v71.2)
+                $crm_booking_data = array(
+                    'customer_email' => $customer_email,
+                    'first_name' => $customer_first_name,
+                    'last_name' => $customer_last_name,
+                    'customer_phone' => $customer_phone,
+                    'yacht_name' => $yacht_name,
+                    'date_from' => $date_from,
+                    'date_to' => $date_to,
+                    'total_price' => $total_price,
+                    'currency' => $currency,
+                    'bm_reservation_id' => $bm_reservation_id
+                );
+                do_action('yolo_booking_created', $booking_id, $crm_booking_data);
             }
             
             wp_send_json_success(array(

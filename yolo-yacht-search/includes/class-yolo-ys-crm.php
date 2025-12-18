@@ -769,6 +769,10 @@ class YOLO_YS_CRM {
     public function ajax_get_customers() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
@@ -840,6 +844,10 @@ class YOLO_YS_CRM {
     public function ajax_create_customer() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         $email = sanitize_email($_POST['email']);
         if (empty($email) || !is_email($email)) {
             wp_send_json_error(array('message' => 'Valid email is required'));
@@ -885,6 +893,10 @@ class YOLO_YS_CRM {
     public function ajax_update_status() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
@@ -928,6 +940,10 @@ class YOLO_YS_CRM {
     public function ajax_assign_customer() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
@@ -966,6 +982,10 @@ class YOLO_YS_CRM {
     public function ajax_log_activity() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         $customer_id = intval($_POST['customer_id']);
         $activity_type = sanitize_text_field($_POST['activity_type']);
         $subject = sanitize_text_field($_POST['subject']);
@@ -995,6 +1015,10 @@ class YOLO_YS_CRM {
      */
     public function ajax_add_reminder() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
         
         global $wpdb;
         
@@ -1034,6 +1058,10 @@ class YOLO_YS_CRM {
     public function ajax_complete_reminder() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $reminder_id = intval($_POST['reminder_id']);
@@ -1072,6 +1100,10 @@ class YOLO_YS_CRM {
     public function ajax_delete_reminder() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $reminder_id = intval($_POST['reminder_id']);
@@ -1086,6 +1118,10 @@ class YOLO_YS_CRM {
      */
     public function ajax_send_offer() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
         
         global $wpdb;
         
@@ -1178,6 +1214,10 @@ class YOLO_YS_CRM {
     public function ajax_create_manual_booking() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
@@ -1198,12 +1238,25 @@ class YOLO_YS_CRM {
         $last_name = $customer->last_name;
         $password = $bm_reservation_id . 'YoLo';
         
+        // Ensure guest role exists (v71.2 fix)
+        if (!get_role('guest')) {
+            add_role('guest', 'Guest', array(
+                'read' => true,
+                'upload_files' => true
+            ));
+        }
+        
         // Check if user already exists
         $existing_user = get_user_by('email', $email);
         
         if ($existing_user) {
             $user_id = $existing_user->ID;
             wp_set_password($password, $user_id);
+            // Ensure user has guest role
+            $user = new WP_User($user_id);
+            if (!in_array('guest', (array) $user->roles)) {
+                $user->add_role('guest');
+            }
         } else {
             $username = sanitize_user(strtolower($first_name . '.' . $last_name));
             $username = $this->generate_unique_username($username);
@@ -1309,6 +1362,10 @@ class YOLO_YS_CRM {
     public function ajax_send_welcome_email() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $booking_id = intval($_POST['booking_id']);
@@ -1410,6 +1467,10 @@ class YOLO_YS_CRM {
     public function ajax_add_tag() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
@@ -1440,6 +1501,10 @@ class YOLO_YS_CRM {
     public function ajax_remove_tag() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
         
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
         global $wpdb;
         
         $customer_id = intval($_POST['customer_id']);
@@ -1458,6 +1523,10 @@ class YOLO_YS_CRM {
      */
     public function ajax_export_customers() {
         check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
         
         global $wpdb;
         
@@ -1563,12 +1632,14 @@ class YOLO_YS_CRM {
         global $wpdb;
         
         // Get due reminders that haven't been notified
+        // Note: snoozed_until is used as "notified_at" to prevent duplicate emails
         $due_reminders = $wpdb->get_results(
             "SELECT r.*, c.email as customer_email, c.first_name, c.last_name 
              FROM {$this->table_reminders} r 
              JOIN {$this->table_customers} c ON r.customer_id = c.id 
              WHERE r.status = 'pending' 
-             AND r.due_date <= NOW()"
+             AND r.due_date <= NOW()
+             AND r.snoozed_until IS NULL"
         );
         
         foreach ($due_reminders as $reminder) {
