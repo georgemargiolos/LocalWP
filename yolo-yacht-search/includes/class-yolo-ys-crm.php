@@ -1607,6 +1607,8 @@ class YOLO_YS_CRM {
 }
 
 // Initialize CRM
-function yolo_crm() {
-    return YOLO_YS_CRM::get_instance();
+if (!function_exists('yolo_crm')) {
+    function yolo_crm() {
+        return YOLO_YS_CRM::get_instance();
+    }
 }

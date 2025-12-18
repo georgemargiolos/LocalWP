@@ -122,7 +122,5 @@ function run_yolo_yacht_search() {
 
 run_yolo_yacht_search();
 
-// Initialize CRM
-add_action('plugins_loaded', function() {
-    yolo_crm();
-});
+// CRM is initialized via the yolo_crm() function call in the main plugin class or on demand.
+// No need for a separate plugins_loaded hook here.
