@@ -1,6 +1,6 @@
 # YOLO Yacht Search - Fixes for Manus
 ## Date: December 18, 2025 @ 10:00 AM
-## Version: 70.8 (updated from 70.6 → 70.7 → 70.8)
+## Version: 70.9 (updated from 70.6 → 70.7 → 70.8 → 70.9)
 
 ---
 
@@ -221,11 +221,24 @@ Changed all occurrences from `twice_daily` to `twicedaily`:
 
 ---
 
+## v70.9 Final Fix: Sync Both Years
+
+### Change
+Reverted to syncing **BOTH current year AND next year** as per user requirement.
+
+### Improvements
+1. **Timeout:** Increased to 15 minutes (`set_time_limit(900)`)
+2. **Memory:** Increased to 512M (`memory_limit = 512M`)
+3. **Logging:** Detailed per-year logging for debugging
+4. **Resilience:** Continues to next year even if current year fails
+
+---
+
 ## Files Changed
 
-1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls, option keys, timeout prevention, and cron schedule name
+1. `includes/class-yolo-ys-auto-sync.php` - Fixed method calls, option keys, cron schedule name, syncs both years
 2. `admin/partials/yolo-yacht-search-admin-display.php` - Fixed dropdown values (twice_daily → twicedaily)
-3. `yolo-yacht-search.php` - Version bump to 70.8
+3. `yolo-yacht-search.php` - Version bump to 70.9
 
 ---
 

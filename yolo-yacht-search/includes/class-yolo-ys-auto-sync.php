@@ -49,12 +49,13 @@ class YOLO_YS_Auto_Sync {
     /**
      * Run yacht synchronization
      * FIX v70.6: Call correct method sync_all_yachts() and use correct option key
-     * FIX v70.7: Add explicit time limit for hosting environments
+     * FIX v70.9: Improved timeout and memory handling
      */
     public function run_yacht_sync() {
-        // Increase time limit for auto-sync (hosting may have lower defaults)
-        @set_time_limit(600); // 10 minutes
-        @ini_set('max_execution_time', 600);
+        // Increase time limit for auto-sync (can take 5-10 minutes for all yachts + images)
+        @set_time_limit(900); // 15 minutes
+        @ini_set('max_execution_time', 900);
+        @ini_set('memory_limit', '512M'); // Increase memory for image processing
         
         error_log('[YOLO Auto-Sync] Starting yacht sync at ' . current_time('mysql'));
         
@@ -82,35 +83,53 @@ class YOLO_YS_Auto_Sync {
     /**
      * Run offers synchronization
      * FIX v70.6: Call correct method sync_all_offers() and use correct option key
-     * FIX v70.7: Only sync NEXT year to avoid timeout (current year rarely changes)
+     * FIX v70.9: Sync BOTH current year AND next year (user requirement)
      */
     public function run_offers_sync() {
-        // Increase time limit for auto-sync (hosting may have lower defaults)
-        @set_time_limit(600); // 10 minutes
-        @ini_set('max_execution_time', 600);
+        // Increase time limit significantly for syncing 2 years (can take 10-15 minutes)
+        @set_time_limit(900); // 15 minutes
+        @ini_set('max_execution_time', 900);
+        @ini_set('memory_limit', '512M'); // Increase memory for large offer sets
         
         error_log('[YOLO Auto-Sync] Starting offers sync at ' . current_time('mysql'));
+        
+        $current_year = (int) date('Y');
+        $next_year = $current_year + 1;
+        $total_offers = 0;
+        $success_count = 0;
         
         try {
             $sync = new YOLO_YS_Sync();
             
-            // Only sync NEXT year for auto-sync to avoid timeout
-            // Current year prices rarely change and can be synced manually if needed
-            $next_year = (int) date('Y') + 1;
+            // Sync CURRENT year
+            error_log('[YOLO Auto-Sync] Syncing offers for CURRENT year ' . $current_year . '...');
+            $result1 = $sync->sync_all_offers($current_year);
+            if (isset($result1['success']) && $result1['success']) {
+                $total_offers += $result1['offers_synced'];
+                $success_count++;
+                error_log('[YOLO Auto-Sync] Current year sync complete: ' . $result1['offers_synced'] . ' offers');
+            } else {
+                error_log('[YOLO Auto-Sync] Current year sync issues: ' . json_encode($result1));
+            }
             
-            error_log('[YOLO Auto-Sync] Syncing offers for year ' . $next_year);
+            // Sync NEXT year
+            error_log('[YOLO Auto-Sync] Syncing offers for NEXT year ' . $next_year . '...');
+            $result2 = $sync->sync_all_offers($next_year);
+            if (isset($result2['success']) && $result2['success']) {
+                $total_offers += $result2['offers_synced'];
+                $success_count++;
+                error_log('[YOLO Auto-Sync] Next year sync complete: ' . $result2['offers_synced'] . ' offers');
+            } else {
+                error_log('[YOLO Auto-Sync] Next year sync issues: ' . json_encode($result2));
+            }
             
-            // FIX: Was sync_weekly_offers() which doesn't exist!
-            $result = $sync->sync_all_offers($next_year);
-            
-            // Log result
-            if (isset($result['success']) && $result['success']) {
-                error_log('[YOLO Auto-Sync] Offers sync completed: ' . $result['offers_synced'] . ' offers for ' . $next_year);
-                // FIX: Use same option key as manual sync so display shows correctly
+            // Log final result
+            if ($success_count > 0) {
+                error_log('[YOLO Auto-Sync] Offers sync completed: ' . $total_offers . ' total offers for ' . $current_year . ' and ' . $next_year);
                 update_option('yolo_ys_last_offer_sync', current_time('mysql'));
                 update_option('yolo_ys_last_offers_sync_status', 'success');
             } else {
-                error_log('[YOLO Auto-Sync] Offers sync completed with issues: ' . json_encode($result));
+                error_log('[YOLO Auto-Sync] Offers sync failed for both years');
                 update_option('yolo_ys_last_offers_sync_status', 'warning');
             }
         } catch (Exception $e) {
