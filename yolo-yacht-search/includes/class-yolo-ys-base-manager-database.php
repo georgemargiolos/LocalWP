@@ -98,6 +98,26 @@ class YOLO_YS_Base_Manager_Database {
         ) $charset_collate;";
         dbDelta($sql_checkouts);
 
+        // Photos table for check-in/check-out documentation
+        $table_photos = $wpdb->prefix . 'yolo_bm_photos';
+        $sql_photos = "CREATE TABLE $table_photos (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            document_type varchar(20) NOT NULL,
+            document_id bigint(20) NOT NULL,
+            category varchar(100) NOT NULL,
+            file_url varchar(500) NOT NULL,
+            thumbnail_url varchar(500) DEFAULT NULL,
+            caption text DEFAULT NULL,
+            notes text DEFAULT NULL,
+            sort_order int(11) NOT NULL DEFAULT 0,
+            uploaded_by bigint(20) NOT NULL,
+            created_at datetime NOT NULL,
+            PRIMARY KEY  (id),
+            KEY document_type_id (document_type, document_id),
+            KEY category (category)
+        ) $charset_collate;";
+        dbDelta($sql_photos);
+
         // Warehouse table
         $table_warehouse = $wpdb->prefix . 'yolo_bm_warehouse';
         $sql_warehouse = "CREATE TABLE $table_warehouse (

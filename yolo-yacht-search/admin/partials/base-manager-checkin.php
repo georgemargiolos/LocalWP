@@ -68,6 +68,109 @@ if (!current_user_can('edit_posts')) {
                     <div id="equipment-checklist-container" class="yolo-bm-equipment-checklist"></div>
                 </div>
                 
+                <!-- Photo Documentation Section -->
+                <div id="photo-documentation-section" class="yolo-bm-form-section">
+                    <h3><i class="dashicons dashicons-camera"></i> Photo Documentation</h3>
+                    <p class="yolo-bm-section-description">Take photos of the yacht condition for documentation. Tap a category to add photos.</p>
+                    
+                    <div class="yolo-bm-photo-categories">
+                        <!-- Exterior -->
+                        <div class="yolo-bm-photo-category" data-category="exterior">
+                            <div class="yolo-bm-category-header-photo">
+                                <span class="dashicons dashicons-admin-site-alt3"></span>
+                                <span>Exterior</span>
+                                <span class="yolo-bm-photo-count" data-category="exterior">0</span>
+                            </div>
+                            <p class="yolo-bm-category-hint">Hull, deck, cockpit, rails</p>
+                            <div class="yolo-bm-photo-grid" data-category="exterior"></div>
+                            <div class="yolo-bm-photo-upload-zone" data-category="exterior">
+                                <input type="file" class="yolo-bm-photo-input" data-category="exterior" accept="image/*" multiple capture="environment">
+                                <div class="yolo-bm-upload-placeholder">
+                                    <span class="dashicons dashicons-camera"></span>
+                                    <span>Tap to add photos or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interior -->
+                        <div class="yolo-bm-photo-category" data-category="interior">
+                            <div class="yolo-bm-category-header-photo">
+                                <span class="dashicons dashicons-admin-home"></span>
+                                <span>Interior</span>
+                                <span class="yolo-bm-photo-count" data-category="interior">0</span>
+                            </div>
+                            <p class="yolo-bm-category-hint">Cabin, galley, heads, saloon</p>
+                            <div class="yolo-bm-photo-grid" data-category="interior"></div>
+                            <div class="yolo-bm-photo-upload-zone" data-category="interior">
+                                <input type="file" class="yolo-bm-photo-input" data-category="interior" accept="image/*" multiple capture="environment">
+                                <div class="yolo-bm-upload-placeholder">
+                                    <span class="dashicons dashicons-camera"></span>
+                                    <span>Tap to add photos or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Equipment -->
+                        <div class="yolo-bm-photo-category" data-category="equipment">
+                            <div class="yolo-bm-category-header-photo">
+                                <span class="dashicons dashicons-admin-tools"></span>
+                                <span>Equipment</span>
+                                <span class="yolo-bm-photo-count" data-category="equipment">0</span>
+                            </div>
+                            <p class="yolo-bm-category-hint">Sails, engine, electronics, safety gear</p>
+                            <div class="yolo-bm-photo-grid" data-category="equipment"></div>
+                            <div class="yolo-bm-photo-upload-zone" data-category="equipment">
+                                <input type="file" class="yolo-bm-photo-input" data-category="equipment" accept="image/*" multiple capture="environment">
+                                <div class="yolo-bm-upload-placeholder">
+                                    <span class="dashicons dashicons-camera"></span>
+                                    <span>Tap to add photos or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Existing Damage -->
+                        <div class="yolo-bm-photo-category" data-category="damage">
+                            <div class="yolo-bm-category-header-photo yolo-bm-damage-header">
+                                <span class="dashicons dashicons-warning"></span>
+                                <span>Existing Damage</span>
+                                <span class="yolo-bm-photo-count" data-category="damage">0</span>
+                            </div>
+                            <p class="yolo-bm-category-hint">Document any pre-existing damage</p>
+                            <div class="yolo-bm-photo-grid" data-category="damage"></div>
+                            <div class="yolo-bm-photo-upload-zone" data-category="damage">
+                                <input type="file" class="yolo-bm-photo-input" data-category="damage" accept="image/*" multiple capture="environment">
+                                <div class="yolo-bm-upload-placeholder">
+                                    <span class="dashicons dashicons-camera"></span>
+                                    <span>Tap to add photos or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fuel/Engine Readings -->
+                        <div class="yolo-bm-photo-category" data-category="readings">
+                            <div class="yolo-bm-category-header-photo">
+                                <span class="dashicons dashicons-dashboard"></span>
+                                <span>Fuel & Engine</span>
+                                <span class="yolo-bm-photo-count" data-category="readings">0</span>
+                            </div>
+                            <p class="yolo-bm-category-hint">Fuel gauge, engine hours, water tank</p>
+                            <div class="yolo-bm-photo-grid" data-category="readings"></div>
+                            <div class="yolo-bm-photo-upload-zone" data-category="readings">
+                                <input type="file" class="yolo-bm-photo-input" data-category="readings" accept="image/*" multiple capture="environment">
+                                <div class="yolo-bm-upload-placeholder">
+                                    <span class="dashicons dashicons-camera"></span>
+                                    <span>Tap to add photos or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="yolo-bm-photo-summary">
+                        <span class="dashicons dashicons-images-alt2"></span>
+                        <span>Total Photos: <strong id="total-photo-count">0</strong> / 20</span>
+                    </div>
+                </div>
+                
                 <!-- Signature Section -->
                 <div class="yolo-bm-form-section">
                     <h3><i class="dashicons dashicons-edit"></i> Base Manager Signature</h3>
@@ -104,6 +207,33 @@ if (!current_user_can('edit_posts')) {
                 <span class="spinner is-active"></span>
                 <p>Loading check-ins...</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Photo Annotation Modal -->
+<div id="annotation-modal" class="yolo-bm-modal" style="display: none;">
+    <div class="yolo-bm-modal-content yolo-bm-annotation-modal">
+        <button type="button" class="yolo-bm-modal-close">&times;</button>
+        <h3><i class="dashicons dashicons-edit"></i> Photo Details</h3>
+        <div class="yolo-bm-annotation-body">
+            <div class="yolo-bm-annotation-preview">
+                <img id="annotation-photo-img" src="" alt="Photo preview">
+            </div>
+            <div class="yolo-bm-annotation-form">
+                <div class="yolo-bm-form-group">
+                    <label for="annotation-caption">Caption</label>
+                    <input type="text" id="annotation-caption" placeholder="Brief description (e.g., Starboard hull)" maxlength="100">
+                </div>
+                <div class="yolo-bm-form-group">
+                    <label for="annotation-notes">Notes</label>
+                    <textarea id="annotation-notes" rows="3" placeholder="Additional notes about this photo..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="yolo-bm-modal-actions">
+            <button type="button" class="button" id="cancel-annotation-btn">Cancel</button>
+            <button type="button" class="button button-primary" id="save-annotation-btn">Save</button>
         </div>
     </div>
 </div>
@@ -458,6 +588,292 @@ if (!current_user_can('edit_posts')) {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 }
+
+/* Photo Documentation Styles */
+.yolo-bm-photo-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.yolo-bm-photo-category {
+    background: #f8f9fa;
+    border: 1px solid #e1e5eb;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.yolo-bm-category-header-photo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #1e3a5f;
+    margin-bottom: 5px;
+}
+
+.yolo-bm-category-header-photo .dashicons {
+    color: #10b981;
+}
+
+.yolo-bm-damage-header .dashicons {
+    color: #ef4444 !important;
+}
+
+.yolo-bm-photo-count {
+    background: #10b981;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: auto;
+}
+
+.yolo-bm-category-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0 0 10px 0;
+}
+
+.yolo-bm-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.yolo-bm-photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.yolo-bm-photo-item:hover {
+    border-color: #10b981;
+}
+
+.yolo-bm-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.yolo-bm-photo-item.uploading {
+    opacity: 0.6;
+}
+
+.yolo-bm-photo-uploading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yolo-bm-photo-delete {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.yolo-bm-photo-item:hover .yolo-bm-photo-delete {
+    opacity: 1;
+}
+
+.yolo-bm-photo-delete .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.yolo-bm-photo-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 10px;
+    padding: 3px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.yolo-bm-photo-upload-zone {
+    position: relative;
+    border: 2px dashed #d1d5db;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.yolo-bm-photo-upload-zone:hover,
+.yolo-bm-photo-upload-zone.drag-over {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.yolo-bm-photo-upload-zone input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.yolo-bm-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.yolo-bm-upload-placeholder .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #9ca3af;
+}
+
+.yolo-bm-photo-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #e0f2fe;
+    border-radius: 6px;
+    color: #0369a1;
+    font-size: 14px;
+}
+
+/* Annotation Modal */
+.yolo-bm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    padding: 20px;
+}
+
+.yolo-bm-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.yolo-bm-modal-content h3 {
+    margin: 0;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yolo-bm-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.yolo-bm-annotation-body {
+    padding: 20px;
+}
+
+.yolo-bm-annotation-preview {
+    margin-bottom: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.yolo-bm-annotation-preview img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    background: #f3f4f6;
+}
+
+.yolo-bm-annotation-form .yolo-bm-form-group {
+    margin-bottom: 15px;
+}
+
+.yolo-bm-annotation-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #374151;
+}
+
+.yolo-bm-annotation-form input,
+.yolo-bm-annotation-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.yolo-bm-modal-actions {
+    padding: 15px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Mobile adjustments for photos */
+@media (max-width: 480px) {
+    .yolo-bm-photo-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .yolo-bm-photo-delete {
+        opacity: 1;
+    }
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
@@ -556,6 +972,7 @@ jQuery(document).ready(function($) {
             yacht_id: yachtId,
             checklist_data: JSON.stringify(equipmentData),
             signature: checkinSignaturePad.toDataURL(),
+            photo_ids: JSON.stringify(getPhotoIds()),
             status: 'completed'
         };
         
@@ -855,6 +1272,299 @@ jQuery(document).ready(function($) {
             $(this).closest('.yolo-bm-equipment-item').toggleClass('checked');
         });
     }
+    
+    // Photo Documentation Variables
+    var uploadedPhotos = {
+        exterior: [],
+        interior: [],
+        equipment: [],
+        damage: [],
+        readings: []
+    };
+    var maxPhotos = 20;
+    
+    // Initialize photo upload handlers
+    function initPhotoUpload() {
+        // File input change handler
+        $('.yolo-bm-photo-input').on('change', function(e) {
+            var category = $(this).data('category');
+            handlePhotoFiles(e.target.files, category);
+            $(this).val(''); // Reset input
+        });
+        
+        // Drag and drop handlers
+        $('.yolo-bm-photo-upload-zone').on('dragover', function(e) {
+            e.preventDefault();
+            $(this).addClass('drag-over');
+        }).on('dragleave drop', function(e) {
+            e.preventDefault();
+            $(this).removeClass('drag-over');
+        }).on('drop', function(e) {
+            var category = $(this).data('category');
+            var files = e.originalEvent.dataTransfer.files;
+            handlePhotoFiles(files, category);
+        });
+        
+        // Delete photo handler
+        $(document).on('click', '.yolo-bm-photo-delete', function(e) {
+            e.stopPropagation();
+            var $item = $(this).closest('.yolo-bm-photo-item');
+            var category = $item.data('category');
+            var index = $item.data('index');
+            deletePhoto(category, index);
+        });
+        
+        // Photo click for annotation
+        $(document).on('click', '.yolo-bm-photo-item', function(e) {
+            if (!$(e.target).hasClass('yolo-bm-photo-delete') && !$(e.target).closest('.yolo-bm-photo-delete').length) {
+                var category = $(this).data('category');
+                var index = $(this).data('index');
+                openPhotoAnnotation(category, index);
+            }
+        });
+    }
+    
+    // Handle photo files
+    function handlePhotoFiles(files, category) {
+        var totalPhotos = getTotalPhotoCount();
+        
+        for (var i = 0; i < files.length; i++) {
+            if (totalPhotos >= maxPhotos) {
+                alert('Maximum ' + maxPhotos + ' photos allowed.');
+                break;
+            }
+            
+            var file = files[i];
+            if (!file.type.startsWith('image/')) {
+                continue;
+            }
+            
+            // Compress and upload
+            compressAndUploadPhoto(file, category);
+            totalPhotos++;
+        }
+    }
+    
+    // Compress image before upload
+    function compressAndUploadPhoto(file, category) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                var maxWidth = 1920;
+                var maxHeight = 1080;
+                var width = img.width;
+                var height = img.height;
+                
+                if (width > maxWidth || height > maxHeight) {
+                    var ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width *= ratio;
+                    height *= ratio;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob(function(blob) {
+                    uploadPhoto(blob, file.name, category);
+                }, 'image/jpeg', 0.8);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Upload photo to server
+    function uploadPhoto(blob, filename, category) {
+        var formData = new FormData();
+        formData.append('action', 'yolo_bm_upload_photo');
+        formData.append('nonce', yoloBaseManager.nonce);
+        formData.append('photo', blob, filename);
+        formData.append('category', category);
+        formData.append('document_type', 'checkin');
+        
+        // Show uploading state
+        var tempId = 'temp_' + Date.now();
+        addPhotoToGrid(category, {
+            id: tempId,
+            thumbnail_url: URL.createObjectURL(blob),
+            caption: '',
+            uploading: true
+        });
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Remove temp photo
+                removePhotoFromGrid(category, tempId);
+                
+                if (response.success) {
+                    uploadedPhotos[category].push(response.data);
+                    addPhotoToGrid(category, response.data);
+                    updatePhotoCounts();
+                } else {
+                    alert('Failed to upload photo: ' + (response.data || 'Unknown error'));
+                }
+            },
+            error: function() {
+                removePhotoFromGrid(category, tempId);
+                alert('Failed to upload photo. Please try again.');
+            }
+        });
+    }
+    
+    // Add photo to grid
+    function addPhotoToGrid(category, photo) {
+        var index = uploadedPhotos[category].length - 1;
+        if (photo.uploading) {
+            index = photo.id;
+        }
+        
+        var html = '<div class="yolo-bm-photo-item' + (photo.uploading ? ' uploading' : '') + '" data-category="' + category + '" data-index="' + index + '" data-id="' + photo.id + '">';
+        html += '<img src="' + photo.thumbnail_url + '" alt="">';
+        if (photo.uploading) {
+            html += '<div class="yolo-bm-photo-uploading"><span class="spinner is-active"></span></div>';
+        } else {
+            html += '<button type="button" class="yolo-bm-photo-delete" title="Delete"><span class="dashicons dashicons-no-alt"></span></button>';
+            if (photo.caption) {
+                html += '<div class="yolo-bm-photo-caption">' + photo.caption + '</div>';
+            }
+        }
+        html += '</div>';
+        
+        $('.yolo-bm-photo-grid[data-category="' + category + '"]').append(html);
+    }
+    
+    // Remove photo from grid
+    function removePhotoFromGrid(category, id) {
+        $('.yolo-bm-photo-item[data-category="' + category + '"][data-id="' + id + '"]').remove();
+    }
+    
+    // Delete photo
+    function deletePhoto(category, index) {
+        if (!confirm('Delete this photo?')) return;
+        
+        var photo = uploadedPhotos[category][index];
+        if (!photo) return;
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_delete_photo',
+                nonce: yoloBaseManager.nonce,
+                photo_id: photo.id
+            },
+            success: function(response) {
+                if (response.success) {
+                    uploadedPhotos[category].splice(index, 1);
+                    rebuildPhotoGrid(category);
+                    updatePhotoCounts();
+                }
+            }
+        });
+    }
+    
+    // Rebuild photo grid
+    function rebuildPhotoGrid(category) {
+        var $grid = $('.yolo-bm-photo-grid[data-category="' + category + '"]');
+        $grid.empty();
+        uploadedPhotos[category].forEach(function(photo, index) {
+            photo.index = index;
+            var html = '<div class="yolo-bm-photo-item" data-category="' + category + '" data-index="' + index + '" data-id="' + photo.id + '">';
+            html += '<img src="' + photo.thumbnail_url + '" alt="">';
+            html += '<button type="button" class="yolo-bm-photo-delete" title="Delete"><span class="dashicons dashicons-no-alt"></span></button>';
+            if (photo.caption) {
+                html += '<div class="yolo-bm-photo-caption">' + photo.caption + '</div>';
+            }
+            html += '</div>';
+            $grid.append(html);
+        });
+    }
+    
+    // Open photo annotation modal
+    function openPhotoAnnotation(category, index) {
+        var photo = uploadedPhotos[category][index];
+        if (!photo) return;
+        
+        $('#annotation-photo-img').attr('src', photo.file_url || photo.thumbnail_url);
+        $('#annotation-caption').val(photo.caption || '');
+        $('#annotation-notes').val(photo.notes || '');
+        $('#annotation-modal').data('category', category).data('index', index).show();
+    }
+    
+    // Save photo annotation
+    $(document).on('click', '#save-annotation-btn', function() {
+        var category = $('#annotation-modal').data('category');
+        var index = $('#annotation-modal').data('index');
+        var photo = uploadedPhotos[category][index];
+        
+        var caption = $('#annotation-caption').val();
+        var notes = $('#annotation-notes').val();
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'yolo_bm_update_photo',
+                nonce: yoloBaseManager.nonce,
+                photo_id: photo.id,
+                caption: caption,
+                notes: notes
+            },
+            success: function(response) {
+                if (response.success) {
+                    uploadedPhotos[category][index].caption = caption;
+                    uploadedPhotos[category][index].notes = notes;
+                    rebuildPhotoGrid(category);
+                    $('#annotation-modal').hide();
+                }
+            }
+        });
+    });
+    
+    // Close annotation modal
+    $(document).on('click', '#annotation-modal .yolo-bm-modal-close, #cancel-annotation-btn', function() {
+        $('#annotation-modal').hide();
+    });
+    
+    // Get total photo count
+    function getTotalPhotoCount() {
+        var total = 0;
+        for (var cat in uploadedPhotos) {
+            total += uploadedPhotos[cat].length;
+        }
+        return total;
+    }
+    
+    // Update photo counts
+    function updatePhotoCounts() {
+        for (var cat in uploadedPhotos) {
+            $('.yolo-bm-photo-count[data-category="' + cat + '"]').text(uploadedPhotos[cat].length);
+        }
+        $('#total-photo-count').text(getTotalPhotoCount());
+    }
+    
+    // Get photo IDs for form submission
+    function getPhotoIds() {
+        var ids = [];
+        for (var cat in uploadedPhotos) {
+            uploadedPhotos[cat].forEach(function(photo) {
+                ids.push(photo.id);
+            });
+        }
+        return ids;
+    }
+    
+    // Initialize photo upload on page load
+    initPhotoUpload();
     
     // Load check-ins
     function loadCheckins() {

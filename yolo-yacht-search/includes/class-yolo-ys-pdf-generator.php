@@ -361,6 +361,149 @@ class YOLO_YS_PDF_Generator extends FPDF {
         
         $this->SetTextColor(0, 0, 0);
     }
+    
+    /**
+     * Photo Documentation Appendix
+     */
+    private function PhotoAppendix($document_id, $document_type) {
+        global $wpdb;
+        
+        // Get photos for this document
+        $photos = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}yolo_documentation_photos 
+             WHERE document_id = %d AND document_type = %s 
+             ORDER BY category, created_at",
+            $document_id, $document_type
+        ));
+        
+        if (empty($photos)) {
+            return; // No photos to display
+        }
+        
+        // Start new page for photo appendix
+        $this->AddPage();
+        $this->SectionTitle('Photo Documentation Appendix', '[P]');
+        
+        $this->SetFont('Arial', '', 9);
+        $this->SetTextColor($this->dark_gray[0], $this->dark_gray[1], $this->dark_gray[2]);
+        $this->MultiCell(0, 5, 'The following photos document the condition of the yacht at ' . ($document_type == 'checkin' ? 'check-in' : 'check-out') . '.', 0, 'L');
+        $this->Ln(5);
+        
+        // Category labels
+        $category_labels = array(
+            'exterior' => 'Exterior (Hull, Deck, Cockpit)',
+            'interior' => 'Interior (Cabin, Galley, Heads)',
+            'equipment' => 'Equipment (Sails, Engine, Electronics)',
+            'damage' => 'Existing Damage',
+            'readings' => 'Fuel & Engine Readings'
+        );
+        
+        $current_category = '';
+        $photo_count = 0;
+        $x_offset = 10;
+        $y_start = $this->GetY();
+        
+        foreach ($photos as $photo) {
+            // Category header
+            if ($photo->category !== $current_category) {
+                // Move to new row if we were in the middle of one
+                if ($photo_count % 3 !== 0) {
+                    $this->Ln(55);
+                }
+                
+                // Check for page break
+                if ($this->GetY() > 230) {
+                    $this->AddPage();
+                }
+                
+                $current_category = $photo->category;
+                $this->SetFont('Arial', 'B', 10);
+                $this->SetTextColor($this->primary_color[0], $this->primary_color[1], $this->primary_color[2]);
+                $this->Cell(0, 8, $category_labels[$current_category] ?? ucfirst($current_category), 0, 1, 'L');
+                $this->SetFont('Arial', '', 9);
+                $this->SetTextColor(0, 0, 0);
+                
+                $photo_count = 0;
+                $y_start = $this->GetY();
+            }
+            
+            // Check for page break
+            if ($this->GetY() > 230) {
+                $this->AddPage();
+                $y_start = $this->GetY();
+                $photo_count = 0;
+            }
+            
+            // Calculate position (3 photos per row)
+            $col = $photo_count % 3;
+            $x_offset = 10 + ($col * 65);
+            
+            if ($col === 0 && $photo_count > 0) {
+                $this->Ln(55);
+                $y_start = $this->GetY();
+            }
+            
+            // Draw photo thumbnail
+            $this->SetXY($x_offset, $y_start);
+            
+            // Try to add image
+            $image_path = $photo->file_path;
+            if (file_exists($image_path)) {
+                try {
+                    // Draw border
+                    $this->Rect($x_offset, $y_start, 60, 45, 'D');
+                    
+                    // Add image (scaled to fit)
+                    $this->Image($image_path, $x_offset + 2, $y_start + 2, 56, 35);
+                    
+                    // Caption below image
+                    $this->SetXY($x_offset, $y_start + 38);
+                    $this->SetFont('Arial', '', 7);
+                    $caption = $photo->caption ? $photo->caption : 'Photo ' . ($photo_count + 1);
+                    $this->Cell(60, 4, substr($caption, 0, 30), 0, 0, 'C');
+                    
+                    // Timestamp
+                    $this->SetXY($x_offset, $y_start + 42);
+                    $this->SetTextColor(128, 128, 128);
+                    $this->Cell(60, 3, date('d/m/Y H:i', strtotime($photo->created_at)), 0, 0, 'C');
+                    $this->SetTextColor(0, 0, 0);
+                    
+                } catch (Exception $e) {
+                    // If image fails, show placeholder
+                    $this->Rect($x_offset, $y_start, 60, 45, 'D');
+                    $this->SetXY($x_offset, $y_start + 20);
+                    $this->Cell(60, 5, 'Image unavailable', 0, 0, 'C');
+                }
+            }
+            
+            $photo_count++;
+        }
+        
+        // Photo notes section
+        $photos_with_notes = array_filter($photos, function($p) { return !empty($p->notes); });
+        if (!empty($photos_with_notes)) {
+            $this->Ln(60);
+            
+            if ($this->GetY() > 230) {
+                $this->AddPage();
+            }
+            
+            $this->SetFont('Arial', 'B', 10);
+            $this->Cell(0, 8, 'Photo Notes', 0, 1, 'L');
+            $this->SetFont('Arial', '', 9);
+            
+            foreach ($photos_with_notes as $photo) {
+                $this->SetFont('Arial', 'B', 9);
+                $caption = $photo->caption ? $photo->caption : 'Photo';
+                $this->Cell(0, 5, $caption . ':', 0, 1, 'L');
+                $this->SetFont('Arial', '', 9);
+                $this->MultiCell(0, 4, $photo->notes, 0, 'L');
+                $this->Ln(2);
+            }
+        }
+        
+        $this->SetTextColor(0, 0, 0);
+    }
 
     /**
      * Generate check-in PDF
@@ -454,6 +597,9 @@ class YOLO_YS_PDF_Generator extends FPDF {
         
         // Terms & Conditions on new page
         $pdf->TermsSection(false);
+        
+        // Photo Documentation Appendix
+        $pdf->PhotoAppendix($checkin_id, 'checkin');
         
         // Save PDF
         $upload_dir = wp_upload_dir();
@@ -578,6 +724,9 @@ class YOLO_YS_PDF_Generator extends FPDF {
         
         // Terms & Conditions
         $pdf->TermsSection(true);
+        
+        // Photo Documentation Appendix
+        $pdf->PhotoAppendix($checkout_id, 'checkout');
         
         // Save PDF
         $upload_dir = wp_upload_dir();
