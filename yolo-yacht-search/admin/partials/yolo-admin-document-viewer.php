@@ -13,6 +13,25 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Initialize variables if not set (prevents undefined variable warnings)
+if (!isset($licenses)) {
+    $licenses = array();
+}
+if (!isset($booking)) {
+    $booking = (object) array(
+        'bm_reservation_id' => '',
+        'yacht_name' => '',
+        'customer_name' => '',
+        'customer_email' => '',
+        'date_from' => '',
+        'date_to' => '',
+        'booking_status' => ''
+    );
+}
+if (!isset($crew_list)) {
+    $crew_list = array();
+}
+
 // --- License Processing ---
 $s1_front_license = null;
 $s1_back_license = null;

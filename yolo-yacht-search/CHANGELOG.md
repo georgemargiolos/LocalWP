@@ -1,4 +1,31 @@
-## [70.3] - 2025-12-17 (Last Stable Version)
+## [72.4] - 2025-12-18
+
+### Added
+- **Equipment Notes Feature** - Added ability to add notes to individual equipment items in Check-In/Check-Out forms
+  - Notes icon button next to each equipment checkbox
+  - Expandable textarea for notes input
+  - Notes saved with equipment checklist data
+  - Notes displayed in PDF documents with highlighted styling
+
+### Fixed
+- **Undefined Variable: $email_match** - Fixed potential undefined variable in CRM duplicate detection (class-yolo-ys-crm.php)
+- **Undefined Variables in Document Viewer** - Added initialization for $licenses, $booking, $crew_list variables (yolo-admin-document-viewer.php)
+- **Undefined Variable: $customer** - Added initialization in CRM page to prevent warnings (crm-page.php)
+
+### Files Modified
+- `yolo-yacht-search.php` - Version bump to 72.4
+- `admin/partials/base-manager-checkin.php` - Added equipment notes UI
+- `admin/partials/base-manager-checkout.php` - Added equipment notes UI
+- `admin/css/base-manager.css` - Added equipment notes styling
+- `admin/js/base-manager.js` - Added equipment notes JavaScript functionality
+- `includes/class-yolo-ys-pdf-generator.php` - Added equipment notes display in PDF
+- `includes/class-yolo-ys-crm.php` - Fixed undefined $email_match variable
+- `admin/partials/crm-page.php` - Fixed undefined $customer variable
+- `admin/partials/yolo-admin-document-viewer.php` - Fixed undefined variables
+
+---
+
+## [70.3] - 2025-12-17
 
 ### Added
 - **Delete Booking** - Admin can now delete bookings from the Bookings page with confirmation dialog

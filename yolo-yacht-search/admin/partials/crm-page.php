@@ -17,6 +17,9 @@ if (!defined('ABSPATH')) {
 $crm = YOLO_YS_CRM::get_instance();
 $tables = $crm->get_table_names();
 
+// Initialize customer variable (will be set in detail view)
+$customer = null;
+
 // Get current view
 $view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'list';
 $customer_id = isset($_GET['customer']) ? intval($_GET['customer']) : 0;

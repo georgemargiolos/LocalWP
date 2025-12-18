@@ -446,6 +446,58 @@ if (!current_user_can('edit_posts')) {
     font-weight: 500;
 }
 
+.yolo-bm-equipment-note-btn {
+    background: #f3f4f6;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yolo-bm-equipment-note-btn:hover,
+.yolo-bm-equipment-note-btn.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+}
+
+.yolo-bm-equipment-note-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.yolo-bm-equipment-note-btn.has-note {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.yolo-bm-equipment-note-field {
+    padding: 0 16px 16px 64px;
+}
+
+.yolo-bm-equipment-note {
+    width: 100%;
+    min-height: 60px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.yolo-bm-equipment-note:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
 /* Signature Pad - Mobile Optimized - CRITICAL FIX! */
 .yolo-bm-signature-container {
     background: #f9fafb;
@@ -994,17 +1046,20 @@ jQuery(document).ready(function($) {
             return;
         }
         
-        // Collect equipment checklist data
+        // Collect equipment checklist data including notes
         const equipmentData = [];
         $('.yolo-bm-equipment-checkbox').each(function() {
             const categoryName = $(this).closest('.yolo-bm-equipment-category').find('.yolo-bm-category-header').text().trim();
             const itemName = $(this).siblings('.yolo-bm-equipment-label').text();
             const isChecked = $(this).hasClass('checked');
+            const safeItemName = $(this).data('item').replace(/[^a-zA-Z0-9]/g, '_');
+            const itemNote = $('.yolo-bm-equipment-note[data-item="' + safeItemName + '"]').val() || '';
             
             equipmentData.push({
                 category: categoryName,
                 item: itemName,
-                checked: isChecked
+                checked: isChecked,
+                note: itemNote
             });
         });
         
@@ -1291,11 +1346,18 @@ jQuery(document).ready(function($) {
                     const itemName = typeof item === 'string' ? item : item.name;
                     const itemQuantity = typeof item === 'string' ? '' : (item.quantity || '');
                     const itemLabel = itemQuantity ? `${itemName} (${itemQuantity})` : itemName;
+                    const safeItemName = itemName.replace(/[^a-zA-Z0-9]/g, '_');
                     
                     html += `
                         <div class="yolo-bm-equipment-item">
                             <div class="yolo-bm-equipment-checkbox" data-item="${itemName}"></div>
                             <div class="yolo-bm-equipment-label">${itemLabel}</div>
+                            <button type="button" class="yolo-bm-equipment-note-btn" data-item="${safeItemName}" title="Add note">
+                                <span class="dashicons dashicons-edit"></span>
+                            </button>
+                        </div>
+                        <div class="yolo-bm-equipment-note-field" data-item="${safeItemName}" style="display: none;">
+                            <textarea class="yolo-bm-equipment-note" data-item="${safeItemName}" placeholder="Add notes about this item (e.g., condition, missing, damaged)..."></textarea>
                         </div>
                     `;
                 });
@@ -1313,6 +1375,14 @@ jQuery(document).ready(function($) {
         $('.yolo-bm-equipment-checkbox').on('click', function() {
             $(this).toggleClass('checked');
             $(this).closest('.yolo-bm-equipment-item').toggleClass('checked');
+        });
+        
+        // Equipment note button click
+        $('.yolo-bm-equipment-note-btn').on('click', function() {
+            var itemName = $(this).data('item');
+            var $noteField = $('.yolo-bm-equipment-note-field[data-item="' + itemName + '"]');
+            $noteField.slideToggle(200);
+            $(this).toggleClass('active');
         });
     }
     

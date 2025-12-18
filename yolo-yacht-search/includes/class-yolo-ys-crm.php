@@ -1815,6 +1815,7 @@ class YOLO_YS_CRM {
         $exclude_id = intval($_POST['exclude_id'] ?? 0);
         
         $duplicates = array();
+        $email_match = null;
         
         // Check by email
         if (!empty($email)) {

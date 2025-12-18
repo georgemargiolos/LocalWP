@@ -264,6 +264,18 @@ class YOLO_YS_PDF_Generator extends FPDF {
             $this->Cell(35, 7, $status, 1, 1, 'C', $fill);
             $this->SetTextColor(0, 0, 0);
             
+            // Display note if present
+            $itemNote = isset($item['note']) ? trim($item['note']) : '';
+            if (!empty($itemNote)) {
+                $this->SetFont('Arial', 'I', 8);
+                $this->SetTextColor(100, 100, 100);
+                $this->SetFillColor(255, 251, 235); // Light yellow background
+                $this->Cell(10, 6, '', 0, 0); // Indent
+                $this->MultiCell(180, 5, 'Note: ' . $itemNote, 0, 'L', true);
+                $this->SetFont('Arial', '', 9);
+                $this->SetTextColor(0, 0, 0);
+            }
+            
             $fill = !$fill;
         }
     }
