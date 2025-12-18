@@ -123,6 +123,9 @@ class YOLO_YS_CRM {
         add_action('wp_ajax_yolo_crm_remove_tag', array($this, 'ajax_remove_tag'));
         add_action('wp_ajax_yolo_crm_export_customers', array($this, 'ajax_export_customers'));
         add_action('wp_ajax_yolo_crm_run_migration', array($this, 'ajax_run_migration'));
+        add_action('wp_ajax_yolo_crm_check_duplicate', array($this, 'ajax_check_duplicate'));
+        add_action('wp_ajax_yolo_crm_merge_customers', array($this, 'ajax_merge_customers'));
+        add_action('wp_ajax_yolo_crm_export_customer_pdf', array($this, 'ajax_export_customer_pdf'));
         
         // Reminder cron
         add_action('yolo_crm_check_reminders', array($this, 'check_due_reminders'));
@@ -1777,6 +1780,351 @@ class YOLO_YS_CRM {
         wp_send_json_success(array(
             'message' => sprintf('Migration completed. Imported %d records.', $migrated)
         ));
+    }
+    
+    /**
+     * AJAX: Check for duplicate customer
+     */
+    public function ajax_check_duplicate() {
+        check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
+        global $wpdb;
+        
+        $email = sanitize_email($_POST['email'] ?? '');
+        $phone = sanitize_text_field($_POST['phone'] ?? '');
+        $exclude_id = intval($_POST['exclude_id'] ?? 0);
+        
+        $duplicates = array();
+        
+        // Check by email
+        if (!empty($email)) {
+            $email_match = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, email, first_name, last_name, phone FROM {$this->table_customers} WHERE email = %s AND id != %d",
+                $email, $exclude_id
+            ));
+            if ($email_match) {
+                $duplicates[] = array(
+                    'id' => $email_match->id,
+                    'name' => trim($email_match->first_name . ' ' . $email_match->last_name),
+                    'email' => $email_match->email,
+                    'phone' => $email_match->phone,
+                    'match_type' => 'email'
+                );
+            }
+        }
+        
+        // Check by phone
+        if (!empty($phone)) {
+            $phone_match = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, email, first_name, last_name, phone FROM {$this->table_customers} WHERE phone = %s AND id != %d AND phone != ''",
+                $phone, $exclude_id
+            ));
+            if ($phone_match && (!$email_match || $phone_match->id !== $email_match->id)) {
+                $duplicates[] = array(
+                    'id' => $phone_match->id,
+                    'name' => trim($phone_match->first_name . ' ' . $phone_match->last_name),
+                    'email' => $phone_match->email,
+                    'phone' => $phone_match->phone,
+                    'match_type' => 'phone'
+                );
+            }
+        }
+        
+        wp_send_json_success(array(
+            'has_duplicates' => !empty($duplicates),
+            'duplicates' => $duplicates
+        ));
+    }
+    
+    /**
+     * AJAX: Merge two customers
+     */
+    public function ajax_merge_customers() {
+        check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Permission denied - Admin only'));
+        }
+        
+        global $wpdb;
+        
+        $keep_id = intval($_POST['keep_id']);
+        $merge_id = intval($_POST['merge_id']);
+        
+        if (!$keep_id || !$merge_id || $keep_id === $merge_id) {
+            wp_send_json_error(array('message' => 'Invalid customer IDs'));
+        }
+        
+        // Get both customers
+        $keep_customer = $this->get_customer($keep_id);
+        $merge_customer = $this->get_customer($merge_id);
+        
+        if (!$keep_customer || !$merge_customer) {
+            wp_send_json_error(array('message' => 'Customer not found'));
+        }
+        
+        // Move activities from merge to keep
+        $wpdb->update(
+            $this->table_activities,
+            array('customer_id' => $keep_id),
+            array('customer_id' => $merge_id)
+        );
+        
+        // Move reminders from merge to keep
+        $wpdb->update(
+            $this->table_reminders,
+            array('customer_id' => $keep_id),
+            array('customer_id' => $merge_id)
+        );
+        
+        // Move tags from merge to keep (avoid duplicates)
+        $existing_tags = $wpdb->get_col($wpdb->prepare(
+            "SELECT tag_id FROM {$this->table_customer_tags} WHERE customer_id = %d",
+            $keep_id
+        ));
+        $merge_tags = $wpdb->get_col($wpdb->prepare(
+            "SELECT tag_id FROM {$this->table_customer_tags} WHERE customer_id = %d",
+            $merge_id
+        ));
+        foreach ($merge_tags as $tag_id) {
+            if (!in_array($tag_id, $existing_tags)) {
+                $wpdb->insert($this->table_customer_tags, array(
+                    'customer_id' => $keep_id,
+                    'tag_id' => $tag_id
+                ));
+            }
+        }
+        $wpdb->delete($this->table_customer_tags, array('customer_id' => $merge_id));
+        
+        // Update bookings to point to keep customer
+        $bookings_table = $wpdb->prefix . 'yolo_bookings';
+        $wpdb->query($wpdb->prepare(
+            "UPDATE $bookings_table SET guest_email = %s WHERE guest_email = %s",
+            $keep_customer->email, $merge_customer->email
+        ));
+        
+        // Merge data - fill in blanks from merge customer
+        $update_data = array();
+        if (empty($keep_customer->phone) && !empty($merge_customer->phone)) {
+            $update_data['phone'] = $merge_customer->phone;
+        }
+        if (empty($keep_customer->company) && !empty($merge_customer->company)) {
+            $update_data['company'] = $merge_customer->company;
+        }
+        if (empty($keep_customer->first_name) && !empty($merge_customer->first_name)) {
+            $update_data['first_name'] = $merge_customer->first_name;
+        }
+        if (empty($keep_customer->last_name) && !empty($merge_customer->last_name)) {
+            $update_data['last_name'] = $merge_customer->last_name;
+        }
+        
+        // Update totals
+        $update_data['total_revenue'] = floatval($keep_customer->total_revenue) + floatval($merge_customer->total_revenue);
+        $update_data['bookings_count'] = intval($keep_customer->bookings_count) + intval($merge_customer->bookings_count);
+        $update_data['notes_count'] = intval($keep_customer->notes_count) + intval($merge_customer->notes_count);
+        
+        if (!empty($update_data)) {
+            $wpdb->update($this->table_customers, $update_data, array('id' => $keep_id));
+        }
+        
+        // Log the merge activity
+        $this->log_activity($keep_id, 'note', null, null, 'Merged with customer: ' . $merge_customer->email);
+        
+        // Delete the merged customer
+        $wpdb->delete($this->table_customers, array('id' => $merge_id));
+        
+        wp_send_json_success(array(
+            'message' => 'Customers merged successfully',
+            'keep_id' => $keep_id
+        ));
+    }
+    
+    /**
+     * AJAX: Export customer profile to PDF
+     */
+    public function ajax_export_customer_pdf() {
+        check_ajax_referer('yolo_crm_nonce', 'nonce');
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Permission denied'));
+        }
+        
+        global $wpdb;
+        
+        $customer_id = intval($_POST['customer_id']);
+        $customer = $this->get_customer($customer_id);
+        
+        if (!$customer) {
+            wp_send_json_error(array('message' => 'Customer not found'));
+        }
+        
+        // Get activities
+        $activities = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$this->table_activities} WHERE customer_id = %d ORDER BY created_at DESC LIMIT 50",
+            $customer_id
+        ));
+        
+        // Get reminders
+        $reminders = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$this->table_reminders} WHERE customer_id = %d ORDER BY due_date DESC",
+            $customer_id
+        ));
+        
+        // Get tags
+        $tags = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.* FROM {$this->table_tags} t 
+             JOIN {$this->table_customer_tags} ct ON t.id = ct.tag_id 
+             WHERE ct.customer_id = %d",
+            $customer_id
+        ));
+        
+        // Get bookings
+        $bookings_table = $wpdb->prefix . 'yolo_bookings';
+        $bookings = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $bookings_table WHERE guest_email = %s ORDER BY created_at DESC",
+            $customer->email
+        ));
+        
+        // Build HTML for PDF
+        $html = $this->build_customer_pdf_html($customer, $activities, $reminders, $tags, $bookings);
+        
+        // Return HTML for client-side PDF generation
+        wp_send_json_success(array(
+            'html' => $html,
+            'filename' => 'customer-' . $customer_id . '-' . sanitize_title($customer->first_name . '-' . $customer->last_name) . '.pdf'
+        ));
+    }
+    
+    /**
+     * Build customer profile HTML for PDF export
+     */
+    private function build_customer_pdf_html($customer, $activities, $reminders, $tags, $bookings) {
+        $customer_name = trim($customer->first_name . ' ' . $customer->last_name) ?: 'No Name';
+        $statuses = $this->get_statuses();
+        $status_label = $statuses[$customer->status] ?? $customer->status;
+        
+        $html = '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #333; }
+                h1 { color: #1e3a8a; font-size: 24px; margin-bottom: 5px; }
+                h2 { color: #1e3a8a; font-size: 16px; margin-top: 25px; margin-bottom: 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+                .header { margin-bottom: 20px; }
+                .subtitle { color: #6b7280; font-size: 14px; }
+                .info-grid { display: table; width: 100%; margin-bottom: 20px; }
+                .info-row { display: table-row; }
+                .info-label { display: table-cell; width: 120px; font-weight: bold; padding: 5px 0; color: #6b7280; }
+                .info-value { display: table-cell; padding: 5px 0; }
+                .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white; margin-right: 5px; }
+                .activity-item { padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+                .activity-type { font-weight: bold; color: #1e3a8a; }
+                .activity-date { color: #6b7280; font-size: 11px; }
+                .activity-description { margin-top: 5px; }
+                .booking-item { background: #f9fafb; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+                .stats { display: table; width: 100%; margin-bottom: 20px; }
+                .stat { display: table-cell; text-align: center; padding: 15px; background: #f9fafb; }
+                .stat-value { font-size: 24px; font-weight: bold; color: #1e3a8a; }
+                .stat-label { font-size: 11px; color: #6b7280; text-transform: uppercase; }
+                .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 10px; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>' . esc_html($customer_name) . '</h1>
+                <div class="subtitle">' . esc_html($customer->email) . ' | Status: ' . esc_html($status_label) . '</div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">' . intval($customer->bookings_count) . '</div>
+                    <div class="stat-label">Bookings</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">€' . number_format($customer->total_revenue, 0) . '</div>
+                    <div class="stat-label">Revenue</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">' . intval($customer->notes_count) . '</div>
+                    <div class="stat-label">Notes</div>
+                </div>
+            </div>
+            
+            <h2>Contact Information</h2>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value">' . esc_html($customer->email) . '</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value">' . esc_html($customer->phone ?: 'Not provided') . '</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Company:</div>
+                    <div class="info-value">' . esc_html($customer->company ?: 'Not provided') . '</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Source:</div>
+                    <div class="info-value">' . esc_html(ucwords(str_replace('_', ' ', $customer->source))) . '</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Created:</div>
+                    <div class="info-value">' . date('M j, Y', strtotime($customer->created_at)) . '</div>
+                </div>
+            </div>';
+        
+        // Tags
+        if (!empty($tags)) {
+            $html .= '<h2>Tags</h2><div>';
+            foreach ($tags as $tag) {
+                $html .= '<span class="tag" style="background:' . esc_attr($tag->color) . ';">' . esc_html($tag->name) . '</span>';
+            }
+            $html .= '</div>';
+        }
+        
+        // Bookings
+        if (!empty($bookings)) {
+            $html .= '<h2>Bookings</h2>';
+            foreach ($bookings as $booking) {
+                $html .= '<div class="booking-item">
+                    <strong>' . esc_html($booking->yacht_name ?: 'Unknown Yacht') . '</strong><br>
+                    ' . date('M j', strtotime($booking->date_from)) . ' - ' . date('M j, Y', strtotime($booking->date_to)) . '<br>
+                    Ref: ' . esc_html($booking->booking_reference) . ' | €' . number_format($booking->total_price, 0) . '
+                </div>';
+            }
+        }
+        
+        // Recent Activities
+        $html .= '<h2>Recent Activity</h2>';
+        if (!empty($activities)) {
+            foreach (array_slice($activities, 0, 20) as $activity) {
+                $html .= '<div class="activity-item">
+                    <span class="activity-type">' . esc_html(ucwords(str_replace('_', ' ', $activity->activity_type))) . '</span>
+                    <span class="activity-date"> - ' . date('M j, Y g:i A', strtotime($activity->created_at)) . '</span>';
+                if (!empty($activity->description)) {
+                    $html .= '<div class="activity-description">' . esc_html($activity->description) . '</div>';
+                }
+                $html .= '</div>';
+            }
+        } else {
+            $html .= '<p>No activity recorded.</p>';
+        }
+        
+        $html .= '
+            <div class="footer">
+                Generated on ' . date('M j, Y g:i A') . ' | YOLO CRM
+            </div>
+        </body>
+        </html>';
+        
+        return $html;
     }
     
     /**

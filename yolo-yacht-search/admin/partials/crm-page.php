@@ -456,6 +456,12 @@ $activity_icons = array(
                                 <button type="button" class="button" id="crm-manual-booking-btn">
                                     <span class="dashicons dashicons-calendar-alt"></span> Manual Booking
                                 </button>
+                                <button type="button" class="button" id="crm-export-pdf-btn" data-customer-id="<?php echo $customer_id; ?>">
+                                    <span class="dashicons dashicons-pdf"></span> Export PDF
+                                </button>
+                                <button type="button" class="button" id="crm-merge-customer-btn" data-customer-id="<?php echo $customer_id; ?>">
+                                    <span class="dashicons dashicons-randomize"></span> Merge
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -545,11 +551,22 @@ $activity_icons = array(
                 </div>
                 <div class="crm-form-group">
                     <label>Email *</label>
-                    <input type="email" name="email" required>
+                    <input type="email" name="email" id="crm-new-customer-email" required>
                 </div>
                 <div class="crm-form-group">
                     <label>Phone</label>
-                    <input type="text" name="phone">
+                    <input type="text" name="phone" id="crm-new-customer-phone">
+                </div>
+                <div id="crm-duplicate-warning" class="crm-duplicate-warning" style="display: none;">
+                    <div class="crm-duplicate-warning-header">
+                        <span class="dashicons dashicons-warning"></span>
+                        <strong>Potential Duplicate Found</strong>
+                    </div>
+                    <div id="crm-duplicate-list"></div>
+                    <div class="crm-duplicate-actions">
+                        <button type="button" class="button" id="crm-view-duplicate-btn">View Existing</button>
+                        <button type="button" class="button" id="crm-ignore-duplicate-btn">Create Anyway</button>
+                    </div>
                 </div>
                 <div class="crm-form-group">
                     <label>Company</label>
@@ -798,6 +815,36 @@ $activity_icons = array(
         <div class="crm-modal-footer">
             <button type="button" class="button crm-modal-cancel">Cancel</button>
             <button type="button" class="button button-primary" id="crm-save-quick-note-btn">Save Note</button>
+        </div>
+    </div>
+</div>
+
+<!-- Merge Customer Modal -->
+<div id="crm-merge-modal" class="crm-modal" style="display: none;">
+    <div class="crm-modal-content">
+        <div class="crm-modal-header">
+            <h2>Merge Customer</h2>
+            <button type="button" class="crm-modal-close">×</button>
+        </div>
+        <div class="crm-modal-body">
+            <p>Merge this customer with another customer record. All activities, reminders, tags, and bookings will be transferred to the selected customer.</p>
+            <div class="crm-form-group">
+                <label>Search Customer to Merge With</label>
+                <input type="text" id="crm-merge-search" placeholder="Search by email or name...">
+            </div>
+            <div id="crm-merge-results" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+            <div id="crm-merge-selection" style="display: none; background: #f0f0f1; padding: 15px; border-radius: 4px;">
+                <strong>Selected Customer:</strong>
+                <div id="crm-merge-selected-info"></div>
+                <input type="hidden" id="crm-merge-selected-id">
+            </div>
+            <div class="crm-merge-warning" style="margin-top: 15px; padding: 10px; background: #fcf0f1; border-left: 4px solid #dc3232; display: none;" id="crm-merge-warning">
+                <strong>Warning:</strong> This action cannot be undone. The current customer record will be deleted after merging.
+            </div>
+        </div>
+        <div class="crm-modal-footer">
+            <button type="button" class="button crm-modal-cancel">Cancel</button>
+            <button type="button" class="button button-primary" id="crm-merge-confirm-btn" disabled>Merge Customers</button>
         </div>
     </div>
 </div>

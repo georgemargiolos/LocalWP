@@ -229,6 +229,77 @@
                 }
             });
 
+            // Duplicate detection on email/phone change
+            var duplicateCheckTimer;
+            $(document).on('blur', '#crm-new-customer-email, #crm-new-customer-phone', function() {
+                clearTimeout(duplicateCheckTimer);
+                duplicateCheckTimer = setTimeout(function() {
+                    self.checkDuplicate();
+                }, 300);
+            });
+            
+            // Ignore duplicate button
+            $(document).on('click', '#crm-ignore-duplicate-btn', function() {
+                $('#crm-duplicate-warning').hide();
+            });
+            
+            // View duplicate button
+            $(document).on('click', '#crm-view-duplicate-btn', function() {
+                var duplicateId = $(this).data('duplicate-id');
+                if (duplicateId) {
+                    window.location.href = yoloCRM.adminUrl + 'admin.php?page=yolo-ys-crm&view=detail&customer=' + duplicateId;
+                }
+            });
+            
+            // Export PDF button
+            $(document).on('click', '#crm-export-pdf-btn', function() {
+                self.exportCustomerPDF($(this).data('customer-id'));
+            });
+            
+            // Merge customer button
+            $(document).on('click', '#crm-merge-customer-btn', function() {
+                $('#crm-merge-modal').show();
+                $('#crm-merge-search').val('').focus();
+                $('#crm-merge-results').empty();
+                $('#crm-merge-selection').hide();
+                $('#crm-merge-warning').hide();
+                $('#crm-merge-confirm-btn').prop('disabled', true);
+            });
+            
+            // Merge search
+            var mergeSearchTimer;
+            $(document).on('input', '#crm-merge-search', function() {
+                var query = $(this).val();
+                clearTimeout(mergeSearchTimer);
+                if (query.length >= 2) {
+                    mergeSearchTimer = setTimeout(function() {
+                        self.searchForMerge(query);
+                    }, 300);
+                } else {
+                    $('#crm-merge-results').empty();
+                }
+            });
+            
+            // Select merge customer
+            $(document).on('click', '.crm-merge-result-item', function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                var email = $(this).data('email');
+                
+                $('#crm-merge-selected-id').val(id);
+                $('#crm-merge-selected-info').html('<strong>' + name + '</strong><br>' + email);
+                $('#crm-merge-selection').show();
+                $('#crm-merge-warning').show();
+                $('#crm-merge-confirm-btn').prop('disabled', false);
+                $('#crm-merge-results').empty();
+                $('#crm-merge-search').val('');
+            });
+            
+            // Confirm merge
+            $(document).on('click', '#crm-merge-confirm-btn', function() {
+                self.mergeCustomers();
+            });
+
             // Reminder snooze
             $(document).on('change', '.crm-reminder-snooze', function() {
                 var $select = $(this);
@@ -930,6 +1001,150 @@
                 },
                 complete: function() {
                     $btn.prop('disabled', false).text('Save Note');
+                }
+            });
+        },
+        
+        checkDuplicate: function() {
+            var email = $('#crm-new-customer-email').val();
+            var phone = $('#crm-new-customer-phone').val();
+            
+            if (!email && !phone) {
+                $('#crm-duplicate-warning').hide();
+                return;
+            }
+            
+            $.ajax({
+                url: yoloCRM.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'yolo_crm_check_duplicate',
+                    nonce: yoloCRM.nonce,
+                    email: email,
+                    phone: phone,
+                    exclude_id: 0
+                },
+                success: function(response) {
+                    if (response.success && response.data.has_duplicates) {
+                        var html = '';
+                        response.data.duplicates.forEach(function(dup) {
+                            html += '<div class="crm-duplicate-item" style="padding: 8px 0; border-bottom: 1px solid #eee;">';
+                            html += '<strong>' + (dup.name || 'No name') + '</strong><br>';
+                            html += '<small>' + dup.email + (dup.phone ? ' | ' + dup.phone : '') + '</small><br>';
+                            html += '<small style="color: #666;">Matched by: ' + dup.match_type + '</small>';
+                            html += '</div>';
+                        });
+                        $('#crm-duplicate-list').html(html);
+                        $('#crm-view-duplicate-btn').data('duplicate-id', response.data.duplicates[0].id);
+                        $('#crm-duplicate-warning').show();
+                    } else {
+                        $('#crm-duplicate-warning').hide();
+                    }
+                }
+            });
+        },
+        
+        exportCustomerPDF: function(customerId) {
+            var $btn = $('#crm-export-pdf-btn');
+            $btn.prop('disabled', true).html('<span class="spinner is-active" style="float: none; margin: 0;"></span> Generating...');
+            
+            $.ajax({
+                url: yoloCRM.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'yolo_crm_export_customer_pdf',
+                    nonce: yoloCRM.nonce,
+                    customer_id: customerId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Open HTML in new window for printing/saving as PDF
+                        var printWindow = window.open('', '_blank');
+                        printWindow.document.write(response.data.html);
+                        printWindow.document.close();
+                        printWindow.onload = function() {
+                            printWindow.print();
+                        };
+                    } else {
+                        alert(response.data.message || 'Error generating PDF');
+                    }
+                },
+                error: function() {
+                    alert('Error generating PDF');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).html('<span class="dashicons dashicons-pdf"></span> Export PDF');
+                }
+            });
+        },
+        
+        searchForMerge: function(query) {
+            var currentCustomerId = $('#crm-merge-customer-btn').data('customer-id');
+            
+            $.ajax({
+                url: yoloCRM.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'yolo_crm_get_customers',
+                    nonce: yoloCRM.nonce,
+                    search: query,
+                    limit: 10
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var html = '';
+                        response.data.customers.forEach(function(customer) {
+                            // Exclude current customer
+                            if (customer.id != currentCustomerId) {
+                                var name = (customer.first_name + ' ' + customer.last_name).trim() || 'No name';
+                                html += '<div class="crm-merge-result-item" data-id="' + customer.id + '" data-name="' + name + '" data-email="' + customer.email + '" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;">';
+                                html += '<strong>' + name + '</strong><br>';
+                                html += '<small>' + customer.email + '</small>';
+                                html += '</div>';
+                            }
+                        });
+                        if (!html) {
+                            html = '<p style="padding: 10px; color: #666;">No matching customers found</p>';
+                        }
+                        $('#crm-merge-results').html(html);
+                    }
+                }
+            });
+        },
+        
+        mergeCustomers: function() {
+            var keepId = $('#crm-merge-selected-id').val();
+            var mergeId = $('#crm-merge-customer-btn').data('customer-id');
+            var $btn = $('#crm-merge-confirm-btn');
+            
+            if (!confirm('Are you sure you want to merge these customers? This action cannot be undone.')) {
+                return;
+            }
+            
+            $btn.prop('disabled', true).text('Merging...');
+            
+            $.ajax({
+                url: yoloCRM.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'yolo_crm_merge_customers',
+                    nonce: yoloCRM.nonce,
+                    keep_id: keepId,
+                    merge_id: mergeId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Customers merged successfully!');
+                        window.location.href = yoloCRM.adminUrl + 'admin.php?page=yolo-ys-crm&view=detail&customer=' + keepId;
+                    } else {
+                        alert(response.data.message || 'Error merging customers');
+                    }
+                },
+                error: function() {
+                    alert('Error merging customers');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false).text('Merge Customers');
                 }
             });
         }

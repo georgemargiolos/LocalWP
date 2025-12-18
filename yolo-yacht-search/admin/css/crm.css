@@ -803,3 +803,35 @@
     background: white;
     color: #333;
 }
+
+/* Duplicate warning */
+.crm-duplicate-warning {
+    background: #fcf0f1;
+    border: 1px solid #dc3232;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.crm-duplicate-warning-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #dc3232;
+}
+
+.crm-duplicate-warning-header .dashicons {
+    font-size: 20px;
+}
+
+.crm-duplicate-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Merge results */
+.crm-merge-result-item:hover {
+    background: #f0f0f1;
+}
