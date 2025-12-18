@@ -48,21 +48,23 @@ class YOLO_YS_Auto_Sync {
 
     /**
      * Run yacht synchronization
+     * FIX v70.6: Call correct method sync_all_yachts() and use correct option key
      */
     public function run_yacht_sync() {
         error_log('[YOLO Auto-Sync] Starting yacht sync at ' . current_time('mysql'));
         
         try {
             $sync = new YOLO_YS_Sync();
-            $result = $sync->sync_yachts();
+            $result = $sync->sync_all_yachts(); // FIX: Was sync_yachts() which doesn't exist!
             
             // Log result
-            if ($result) {
+            if ($result && isset($result['success']) && $result['success']) {
                 error_log('[YOLO Auto-Sync] Yacht sync completed successfully');
-                update_option('yolo_ys_last_yacht_sync', current_time('mysql'));
+                // FIX: Use same option key as manual sync so display shows correctly
+                update_option('yolo_ys_last_sync', current_time('mysql'));
                 update_option('yolo_ys_last_yacht_sync_status', 'success');
             } else {
-                error_log('[YOLO Auto-Sync] Yacht sync completed with issues');
+                error_log('[YOLO Auto-Sync] Yacht sync completed with issues: ' . json_encode($result));
                 update_option('yolo_ys_last_yacht_sync_status', 'warning');
             }
         } catch (Exception $e) {
@@ -74,21 +76,30 @@ class YOLO_YS_Auto_Sync {
 
     /**
      * Run offers synchronization
+     * FIX v70.6: Call correct method sync_all_offers() and use correct option key
      */
     public function run_offers_sync() {
         error_log('[YOLO Auto-Sync] Starting offers sync at ' . current_time('mysql'));
         
         try {
             $sync = new YOLO_YS_Sync();
-            $result = $sync->sync_weekly_offers();
+            // Sync current year and next year offers
+            $current_year = (int) date('Y');
+            $next_year = $current_year + 1;
+            
+            // FIX: Was sync_weekly_offers() which doesn't exist!
+            $result1 = $sync->sync_all_offers($current_year);
+            $result2 = $sync->sync_all_offers($next_year);
             
             // Log result
-            if ($result) {
-                error_log('[YOLO Auto-Sync] Offers sync completed successfully');
-                update_option('yolo_ys_last_offers_sync', current_time('mysql'));
+            $success = (isset($result1['success']) && $result1['success']) || (isset($result2['success']) && $result2['success']);
+            if ($success) {
+                error_log('[YOLO Auto-Sync] Offers sync completed successfully for ' . $current_year . ' and ' . $next_year);
+                // FIX: Use same option key as manual sync so display shows correctly
+                update_option('yolo_ys_last_offer_sync', current_time('mysql'));
                 update_option('yolo_ys_last_offers_sync_status', 'success');
             } else {
-                error_log('[YOLO Auto-Sync] Offers sync completed with issues');
+                error_log('[YOLO Auto-Sync] Offers sync completed with issues: ' . json_encode($result1) . ' / ' . json_encode($result2));
                 update_option('yolo_ys_last_offers_sync_status', 'warning');
             }
         } catch (Exception $e) {
