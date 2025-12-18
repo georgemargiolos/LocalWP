@@ -1919,7 +1919,7 @@ class YOLO_YS_CRM {
         // Update bookings to point to keep customer
         $bookings_table = $wpdb->prefix . 'yolo_bookings';
         $wpdb->query($wpdb->prepare(
-            "UPDATE $bookings_table SET guest_email = %s WHERE guest_email = %s",
+            "UPDATE $bookings_table SET customer_email = %s WHERE customer_email = %s",
             $keep_customer->email, $merge_customer->email
         ));
         
@@ -1948,7 +1948,10 @@ class YOLO_YS_CRM {
         }
         
         // Log the merge activity
-        $this->log_activity($keep_id, 'note', null, null, 'Merged with customer: ' . $merge_customer->email);
+        $this->log_activity($keep_id, 'note', array(
+            'subject' => 'Customer Merge',
+            'content' => 'Merged with customer: ' . $merge_customer->email
+        ));
         
         // Delete the merged customer
         $wpdb->delete($this->table_customers, array('id' => $merge_id));
@@ -2001,7 +2004,7 @@ class YOLO_YS_CRM {
         // Get bookings
         $bookings_table = $wpdb->prefix . 'yolo_bookings';
         $bookings = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $bookings_table WHERE guest_email = %s ORDER BY created_at DESC",
+            "SELECT * FROM $bookings_table WHERE customer_email = %s ORDER BY created_at DESC",
             $customer->email
         ));
         
@@ -2020,7 +2023,7 @@ class YOLO_YS_CRM {
      */
     private function build_customer_pdf_html($customer, $activities, $reminders, $tags, $bookings) {
         $customer_name = trim($customer->first_name . ' ' . $customer->last_name) ?: 'No Name';
-        $statuses = $this->get_statuses();
+        $statuses = self::$statuses;
         $status_label = $statuses[$customer->status] ?? $customer->status;
         
         $html = '
