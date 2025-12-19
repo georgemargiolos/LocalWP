@@ -1,90 +1,155 @@
 <?php
-/**
- * YOLO Yacht Search - Sync Handler
- *
- * Handles synchronization of yacht data from Booking Manager API.
- *
- * @package    YOLO_Yacht_Search
- * @subpackage Includes
- * @since      1.0.0
- */
-
 if (!defined('ABSPATH')) {
     exit;
 }
 
 /**
- * Class YOLO_YS_Sync
- *
- * Manages yacht data synchronization from Booking Manager API.
+ * Yacht sync functionality
  */
 class YOLO_YS_Sync {
-
-    /**
-     * API instance
-     *
-     * @var YOLO_YS_Booking_Manager_API
-     */
+    
     private $api;
-
-    /**
-     * Constructor
-     */
+    private $db;
+    
     public function __construct() {
-        $this->api = new YOLO_YS_Booking_Manager_API();
+        if (class_exists('YOLO_YS_Booking_Manager_API')) {
+            $this->api = new YOLO_YS_Booking_Manager_API();
+        } else {
+            error_log('YOLO YS: YOLO_YS_Booking_Manager_API class not found');
+        }
+        
+        if (class_exists('YOLO_YS_Database')) {
+            $this->db = new YOLO_YS_Database();
+        } else {
+            error_log('YOLO YS: YOLO_YS_Database class not found');
+        }
     }
-
+    
     /**
-     * Sync all yachts from configured companies
-     *
-     * @return array Results of the sync operation
+     * Sync equipment catalog from API
+     */
+    public function sync_equipment_catalog() {
+        $results = array(
+            'success' => false,
+            'message' => '',
+            'equipment_synced' => 0,
+            'errors' => array()
+        );
+        
+        try {
+            // Fetch equipment catalog from API
+            $equipment = $this->api->get_equipment_catalog();
+            
+            if (!is_array($equipment)) {
+                $results['errors'][] = 'Unexpected response format (not an array)';
+                $results['message'] = 'Failed to sync equipment catalog';
+                return $results;
+            }
+            
+            // Store in database
+            $this->db->store_equipment_catalog($equipment);
+            $results['equipment_synced'] = count($equipment);
+            
+            $results['success'] = true;
+            $results['message'] = sprintf(
+                'Successfully synced %d equipment items',
+                $results['equipment_synced']
+            );
+            
+            // Update last sync time
+            update_option('yolo_ys_last_equipment_sync', current_time('mysql'));
+            
+        } catch (Exception $e) {
+            $results['errors'][] = $e->getMessage();
+            $results['message'] = 'Failed to sync equipment catalog: ' . $e->getMessage();
+            error_log('YOLO YS: Equipment catalog sync failed - ' . $e->getMessage());
+        }
+        
+        return $results;
+    }
+    
+    /**
+     * Sync all yachts from all companies (WITHOUT prices)
+     */
+    /**
+     * Sync all yachts (with details, images, extras, equipment) from all companies
+     * 
+     * CRITICAL: API returns data wrapped in 'value' property!
+     * The get_yachts_by_company() method must extract the 'value' array
+     * 
+     * Bug history:
+     * - v2.3.5 and earlier: API returned {"value": [...], "Count": N} but code
+     *   tried to iterate over the whole object, causing yacht sync to fail
+     * - v2.3.6: Fixed get_yachts_by_company() to extract 'value' array
+     * 
+     * PROCESS:
+     * 1. Fetch yachts for each company from API
+     * 2. For each yacht, store: basic info, products, images, extras, equipment
+     * 3. Old data is deleted before storing new data (prevents duplicates)
+     * 
+     * IMPORTANT:
+     * - Can take 2-3 minutes for all companies (20+ yachts)
+     * - Each yacht has 10-20 images, 5-15 extras, 10-20 equipment items
+     * - WordPress admin may timeout, but CLI works fine
+     * 
+     * @return array Result with success status, counts, and errors
      */
     public function sync_all_yachts() {
-        // Increase time limit for sync
-        set_time_limit(300);
+        // Increase time limit for sync (can take 2-3 minutes)
+        set_time_limit(300); // 5 minutes
         ini_set('max_execution_time', 300);
         
         $results = array(
             'success' => false,
             'message' => '',
+            'companies_synced' => 0,
             'yachts_synced' => 0,
             'errors' => array()
         );
         
-        // Get company IDs from settings
+        // Get company IDs
         $my_company_id = get_option('yolo_ys_my_company_id', 7850);
         $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
         $friend_ids = array_map('trim', explode(',', $friend_companies));
         
         // Combine all companies
         $all_companies = array_merge(array($my_company_id), $friend_ids);
-        $all_companies = array_filter($all_companies); // Remove empty values
         
-        if (empty($all_companies)) {
-            $results['message'] = 'No companies configured. Please check plugin settings.';
-            return $results;
-        }
-        
-        // Sync yachts for each company
         foreach ($all_companies as $company_id) {
             if (empty($company_id)) continue;
             
+            error_log('YOLO YS: Starting sync for company ID: ' . $company_id);
+            
             try {
+                // Fetch yachts for this company
+                error_log('YOLO YS: Fetching yachts from API for company ' . $company_id);
                 $yachts = $this->api->get_yachts_by_company($company_id);
+                error_log('YOLO YS: Received ' . (is_array($yachts) ? count($yachts) : 'invalid') . ' yachts from API');
                 
+                // Validate response is an array
                 if (!is_array($yachts)) {
-                    $results['errors'][] = "Company $company_id: Invalid response format";
+                    $results['errors'][] = "Company $company_id: Unexpected response format (not an array)";
+                    error_log('YOLO YS: Unexpected yacht response for company ' . $company_id);
                     continue;
                 }
                 
-                foreach ($yachts as $yacht) {
-                    YOLO_YS_Database::store_yacht($yacht, $company_id);
-                    $results['yachts_synced']++;
+                if (count($yachts) > 0) {
+                    foreach ($yachts as $yacht) {
+                        error_log('YOLO YS: Processing yacht: ' . $yacht['name'] . ' (ID: ' . $yacht['id'] . ')');
+                        $this->db->store_yacht($yacht, $company_id);
+                        $results['yachts_synced']++;
+                        error_log('YOLO YS: Yacht stored successfully. Total synced: ' . $results['yachts_synced']);
+                    }
+                    $results['companies_synced']++;
+                    error_log('YOLO YS: Completed sync for company ' . $company_id);
+                } else {
+                    $results['errors'][] = "Company $company_id: No yachts returned";
                 }
                 
             } catch (Exception $e) {
-                $results['errors'][] = 'Company ' . $company_id . ': ' . $e->getMessage();
-                error_log('YOLO YS: Failed to sync yachts - ' . $e->getMessage());
+                $results['errors'][] = "Company $company_id: " . $e->getMessage();
+                error_log('YOLO YS: EXCEPTION - Failed to sync yachts for company ' . $company_id . ': ' . $e->getMessage());
+                error_log('YOLO YS: Exception trace: ' . $e->getTraceAsString());
             }
         }
         
@@ -93,105 +158,46 @@ class YOLO_YS_Sync {
             $results['message'] = sprintf(
                 'Successfully synced %d yachts from %d companies',
                 $results['yachts_synced'],
-                count($all_companies)
+                $results['companies_synced']
             );
         } else {
             $results['message'] = 'No yachts were synced. Check errors.';
         }
         
         // Update last sync time
-        if ($results['success']) {
-            update_option('yolo_ys_last_yacht_sync', current_time('mysql'));
-        }
+        update_option('yolo_ys_last_sync', current_time('mysql'));
         
         return $results;
     }
-
+    
     /**
-     * Sync yacht by ID
-     *
-     * @param int $yacht_id The yacht ID to sync
-     * @return array Results of the sync operation
-     */
-    public function sync_yacht_by_id($yacht_id) {
-        $results = array(
-            'success' => false,
-            'message' => '',
-            'yacht' => null
-        );
-        
-        try {
-            $yacht = $this->api->get_yacht($yacht_id);
-            
-            if (!$yacht) {
-                $results['message'] = 'Yacht not found in API';
-                return $results;
-            }
-            
-            // Get company ID from yacht data
-            $company_id = isset($yacht['companyId']) ? $yacht['companyId'] : null;
-            
-            YOLO_YS_Database::store_yacht($yacht, $company_id);
-            
-            $results['success'] = true;
-            $results['message'] = 'Yacht synced successfully';
-            $results['yacht'] = $yacht;
-            
-        } catch (Exception $e) {
-            $results['message'] = 'Failed to sync yacht: ' . $e->getMessage();
-            error_log('YOLO YS: Failed to sync yacht - ' . $e->getMessage());
-        }
-        
-        return $results;
-    }
-
-    /**
-     * Sync equipment catalog
-     *
-     * @return array Results of the sync operation
-     */
-    public function sync_equipment() {
-        $results = array(
-            'success' => false,
-            'message' => '',
-            'equipment_synced' => 0
-        );
-        
-        try {
-            $equipment = $this->api->get_equipment_catalog();
-            
-            if (!is_array($equipment)) {
-                $results['message'] = 'Invalid equipment response format';
-                return $results;
-            }
-            
-            foreach ($equipment as $item) {
-                YOLO_YS_Database::store_equipment($item);
-                $results['equipment_synced']++;
-            }
-            
-            $results['success'] = true;
-            $results['message'] = sprintf(
-                'Successfully synced %d equipment items',
-                $results['equipment_synced']
-            );
-            
-        } catch (Exception $e) {
-            $results['message'] = 'Failed to sync equipment: ' . $e->getMessage();
-            error_log('YOLO YS: Failed to sync equipment - ' . $e->getMessage());
-        }
-        
-        return $results;
-    }
-
-    /**
-     * Sync all offers for a given year
+     * Sync weekly offers (availability + prices) for all companies
+     * Uses /offers endpoint with flexibility=6 to get all Saturday departures for entire year
+     * This replaces the old sync_all_prices() method
      * 
-     * v72.9 FIX: Fetch all offers FIRST, only delete old prices if fetch succeeds.
-     * This prevents data loss when API fails.
-     *
-     * @param int|null $year The year to sync offers for (defaults to next year)
-     * @return array Results of the sync operation
+     * @param int $year Year to sync (e.g., 2026)
+     * @return array Results with success status, message, and statistics
+     */
+    /**
+     * Sync weekly charter offers (prices) for all yachts from all companies
+     * 
+     * CRITICAL PROCESS - DO NOT MODIFY WITHOUT UNDERSTANDING:
+     * 1. DELETE all old prices for the year (prevents price accumulation bug)
+     * 2. Fetch offers from API for each company separately
+     * 3. Store offers in database in batches (fast REPLACE INTO)
+     * 
+     * Bug history:
+     * - v2.3.3 and earlier: DELETE was not working, prices accumulated
+     * - v2.3.4: Fixed DELETE to properly clear old prices before sync
+     * 
+     * IMPORTANT NOTES:
+     * - Must DELETE before INSERT to avoid wrong/duplicate prices
+     * - API called once per company (multiple companies in one call causes 500 error)
+     * - Date format must be yyyy-MM-ddTHH:mm:ss (API requirement)
+     * - Batch insert is much faster than individual inserts
+     * 
+     * @param int|null $year Year to sync (defaults to next year)
+     * @return array Result with success status, counts, and errors
      */
     public function sync_all_offers($year = null) {
         // Increase time limit for sync (can take 2-3 minutes for all companies)
@@ -230,12 +236,15 @@ class YOLO_YS_Sync {
         $dateFrom = "{$year}-01-01T00:00:00";
         $dateTo = "{$year}-12-31T23:59:59";
         
+        // Get yacht-to-company mapping from database
         global $wpdb;
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
         
         // Track unique yachts with offers
         $yachtOffersMap = array();
         
         // v72.9 FIX: Collect ALL offers in memory FIRST before deleting anything
+        // This prevents data loss when API fails
         $all_offers = array();
         
         error_log("YOLO YS: ===== FETCHING OFFERS FOR YEAR {$year} (fetch-first pattern) =====");
@@ -360,50 +369,21 @@ class YOLO_YS_Sync {
     }
     
     /**
-     * Sync bases from API
-     *
-     * @return array Results of the sync operation
+     * Get sync status
      */
-    public function sync_bases() {
-        $results = array(
-            'success' => false,
-            'message' => '',
-            'bases_synced' => 0
+    public function get_sync_status() {
+        $stats = $this->db->get_sync_stats();
+        $last_sync = get_option('yolo_ys_last_sync', null);
+        $last_offer_sync = get_option('yolo_ys_last_offer_sync', null);
+        
+        return array(
+            'total_yachts' => $stats['total_yachts'],
+            'yolo_yachts' => $stats['yolo_yachts'],
+            'partner_yachts' => $stats['total_yachts'] - $stats['yolo_yachts'],
+            'last_sync' => $last_sync,
+            'last_sync_human' => $last_sync ? human_time_diff(strtotime($last_sync), current_time('timestamp')) . ' ago' : 'Never',
+            'last_price_sync' => $last_offer_sync,
+            'last_price_sync_human' => $last_offer_sync ? human_time_diff(strtotime($last_offer_sync), current_time('timestamp')) . ' ago' : 'Never'
         );
-        
-        try {
-            $bases = $this->api->get_bases();
-            
-            if (!is_array($bases)) {
-                $results['message'] = 'Invalid bases response format';
-                return $results;
-            }
-            
-            foreach ($bases as $base) {
-                YOLO_YS_Database::store_base($base);
-                $results['bases_synced']++;
-            }
-            
-            $results['success'] = true;
-            $results['message'] = sprintf(
-                'Successfully synced %d bases',
-                $results['bases_synced']
-            );
-            
-        } catch (Exception $e) {
-            $results['message'] = 'Failed to sync bases: ' . $e->getMessage();
-            error_log('YOLO YS: Failed to sync bases - ' . $e->getMessage());
-        }
-        
-        return $results;
-    }
-
-    /**
-     * Get API instance
-     *
-     * @return YOLO_YS_Booking_Manager_API
-     */
-    public function get_api() {
-        return $this->api;
     }
 }
