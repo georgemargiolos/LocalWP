@@ -101,6 +101,11 @@ class YOLO_YS_Booking_Manager_API {
             $query_params['product'] = $params['product'];
         }
         
+        // v72.9: Add productName parameter support (correct API parameter name per Swagger docs)
+        if (isset($params['productName'])) {
+            $query_params['productName'] = $params['productName'];
+        }
+        
         $result = $this->make_request($endpoint, $query_params);
         
         if ($result['success']) {

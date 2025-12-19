@@ -1,3 +1,26 @@
+# YOLO Yacht Search Changelog
+
+## [72.9] - 2025-12-19
+
+### Fixed
+- **CRITICAL: Sync Delete-Before-Fetch Pattern** - The `sync_all_offers()` method was deleting all prices BEFORE fetching new data from the API. If the API call failed, all prices were lost!
+  - Now fetches ALL offers into memory first
+  - Only deletes old prices if fetch was successful
+  - If API fails, existing prices are preserved (no data loss)
+
+### Added
+- **productName Parameter Support** - Added support for the `productName` parameter in `get_offers()` API method per Swagger documentation
+
+### Reverted
+- **Auto-Sync Instantiation** - Reverted the v72.6/v72.8 auto-sync instantiation changes that caused fatal errors. The auto-sync hooks are now registered via the existing mechanism.
+
+### Files Modified
+- `includes/class-yolo-ys-sync.php` - Rewrote `sync_all_offers()` with fetch-first pattern
+- `includes/class-yolo-ys-booking-manager-api.php` - Added `productName` parameter support
+- `yolo-yacht-search.php` - Version bump to 72.9, reverted auto-sync changes
+
+---
+
 ## [72.8] - 2025-12-19
 
 ### Fixed
