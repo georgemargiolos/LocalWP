@@ -1,3 +1,15 @@
+## [72.8] - 2025-12-19
+
+### Fixed
+- **CRITICAL: Fatal Error on Plugin Load** - v72.6 instantiated `YOLO_YS_Auto_Sync` too early before WordPress was fully loaded
+  - Moved instantiation to `plugins_loaded` hook with priority 5
+  - This ensures `add_action()` and `add_filter()` functions are available
+
+### Files Modified
+- `yolo-yacht-search.php` - Wrapped auto-sync instantiation in `plugins_loaded` hook
+
+---
+
 ## [72.7] - 2025-12-19
 
 ### Improved
