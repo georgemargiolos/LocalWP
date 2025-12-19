@@ -133,14 +133,12 @@ if (!empty($all_prices)) {
     $prices = array_slice($prices, 0, 20);
 }
 
-// Default to first available July week if no dates provided
+// Default to first available future week if no dates provided (v72.7: changed from July-only)
 if (empty($requested_date_from) || empty($requested_date_to)) {
-    foreach ($prices as $price) {
-        if (date('m', strtotime($price->date_from)) == '07') {
-            $requested_date_from = substr($price->date_from, 0, 10);
-            $requested_date_to = substr($price->date_to, 0, 10);
-            break;
-        }
+    if (!empty($prices)) {
+        // Simply use the first available price (already sorted by date)
+        $requested_date_from = substr($prices[0]->date_from, 0, 10);
+        $requested_date_to = substr($prices[0]->date_to, 0, 10);
     }
 }
 

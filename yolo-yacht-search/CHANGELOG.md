@@ -1,3 +1,17 @@
+## [72.7] - 2025-12-19
+
+### Improved
+- **Yacht Details Default Date Selection** - When visiting a yacht from "Our Yachts" page (without search dates), the date picker now defaults to the **first available future week** instead of specifically looking for a July week
+  - Previous behavior: Only pre-selected dates if a July week was available (problematic in Dec-June)
+  - New behavior: Pre-selects the earliest available week regardless of month
+  - If no prices exist, shows "Select dates" placeholder as before
+
+### Files Modified
+- `yolo-yacht-search.php` - Version bump to 72.7
+- `public/templates/yacht-details-v3.php` - Updated date selection logic
+
+---
+
 ## [72.6] - 2025-12-18
 
 ### Fixed
