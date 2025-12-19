@@ -1,4 +1,18 @@
 # YOLO Yacht Search Changelog
+## [72.10] - 2025-12-19
+
+### Fixed
+- **CRITICAL: Restored Original Sync Class** - v72.9 accidentally rewrote the entire `class-yolo-ys-sync.php` file, removing essential code:
+  - Restored `$this->db` property and constructor initialization
+  - Restored `sync_equipment_catalog()` method
+  - Restored detailed comments and error logging
+  - Applied fetch-first pattern ONLY to `sync_all_offers()` method
+
+### Files Modified
+- `includes/class-yolo-ys-sync.php` - Restored from git, applied targeted fix
+- `yolo-yacht-search.php` - Version bump to 72.10
+
+---
 
 ## [72.9] - 2025-12-19
 
