@@ -57,6 +57,10 @@ class YOLO_YS_Activator {
             YOLO_YS_CRM::migrate_existing_data();
         }
         
+        // Schedule auto-sync cron events (v72.6 - was missing!)
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-auto-sync.php';
+        YOLO_YS_Auto_Sync::schedule_events();
+        
         // Run migrations
         self::run_migrations();
         

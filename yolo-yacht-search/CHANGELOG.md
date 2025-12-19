@@ -1,3 +1,22 @@
+## [72.6] - 2025-12-18
+
+### Fixed
+- **CRITICAL: Auto-Sync Never Running** - The `YOLO_YS_Auto_Sync` class was loaded but never instantiated, meaning the WordPress cron hooks were never registered. Auto-sync was completely broken since v30.0!
+  - Added class instantiation in main plugin file
+  - Added `schedule_events()` call on plugin activation
+  - This explains why yachts showed "No pricing available" until manual sync was run
+
+### Technical Details
+- The class constructor registers `add_action()` hooks for cron events
+- Without instantiation, `run_yacht_sync()` and `run_offers_sync()` were never called by WordPress cron
+- Users must deactivate and reactivate the plugin (or save auto-sync settings) to schedule the cron events
+
+### Files Modified
+- `yolo-yacht-search.php` - Added `new YOLO_YS_Auto_Sync()` instantiation, version bump to 72.6
+- `includes/class-yolo-ys-activator.php` - Added `YOLO_YS_Auto_Sync::schedule_events()` call
+
+---
+
 ## [72.5] - 2025-12-18
 
 ### Fixed
