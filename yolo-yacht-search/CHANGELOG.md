@@ -1,4 +1,18 @@
 # YOLO Yacht Search Changelog
+
+## [72.11] - 2025-12-19
+
+### Fixed
+- **Auto-Sync Settings Save Failed** - The AJAX handler for saving auto-sync settings was never registered because the `YOLO_YS_Auto_Sync` class was not instantiated
+  - Added class instantiation via `init` hook (priority 20)
+  - Uses `class_exists()` check for safety
+  - Now auto-sync settings can be saved/disabled properly
+
+### Files Modified
+- `yolo-yacht-search.php` - Added auto-sync class instantiation, version bump to 72.11
+
+---
+
 ## [72.10] - 2025-12-19
 
 ### Fixed
