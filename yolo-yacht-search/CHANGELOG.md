@@ -1,5 +1,17 @@
 # YOLO Yacht Search Changelog
 
+## [75.7] - 2025-12-21
+
+### Fixed
+- **Meta Tags Not Initializing** - The `yolo_meta_tags()` singleton was defined but never called
+  - Added initialization call after requiring the meta-tags class file
+  - This enables all SEO meta tags including canonical URL, Open Graph, Twitter Card, and JSON-LD
+
+### Files Modified
+- `yolo-yacht-search.php` - Added `yolo_meta_tags()` call to initialize the singleton
+
+---
+
 ## [75.6] - 2025-12-21
 
 ### Fixed
