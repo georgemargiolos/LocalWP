@@ -1,5 +1,18 @@
 # YOLO Yacht Search Changelog
 
+## [75.4] - 2025-12-21
+
+### Fixed
+- **CRITICAL: Rewrite Rules Not Being Flushed** - The `flush_rewrite_rules()` was called in `plugins_loaded` hook BEFORE the rewrite rules were registered in `init` hook
+  - Moved flush to `init` hook with priority 999 (runs after rules are registered)
+  - Uses option flag `yolo_ys_flush_rewrite_rules` to trigger flush once
+  - Forces flush on update to v75.4
+
+### Files Modified
+- `yolo-yacht-search.php` - Fixed rewrite rules flush timing
+
+---
+
 ## [75.3] - 2025-12-21
 
 ### Fixed

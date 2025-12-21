@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 75.3
+ * Version: 75.4
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '75.3');
+define('YOLO_YS_VERSION', '75.4');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -143,6 +143,12 @@ add_action('init', function() {
 add_action('plugins_loaded', function() {
     $installed_version = get_option('yolo_ys_db_version', '0');
     
+    // If version is less than 75.4, run migrations
+    if (version_compare($installed_version, '75.4', '<')) {
+        // Always flush rewrite rules when updating to 75.4+
+        update_option('yolo_ys_flush_rewrite_rules', true);
+    }
+    
     // If version is less than 75.0, run the slug migration
     if (version_compare($installed_version, '75.0', '<')) {
         require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-activator.php';
@@ -180,11 +186,22 @@ add_action('plugins_loaded', function() {
             error_log('YOLO YS v75.0: Generated slugs for ' . $updated . ' yachts');
         }
         
-        // Flush rewrite rules for pretty URLs
-        flush_rewrite_rules();
-        
-        // Update version
-        update_option('yolo_ys_db_version', '75.0');
-        error_log('YOLO YS: Database migrated to v75.0');
+        // Mark that we need to flush rewrite rules (will be done in init hook)
+        update_option('yolo_ys_flush_rewrite_rules', true);
+    }
+    
+    // Update version to current
+    if (version_compare($installed_version, '75.4', '<')) {
+        update_option('yolo_ys_db_version', '75.4');
+        error_log('YOLO YS: Database migrated to v75.4');
     }
 }, 5);
+
+// v75.4: Flush rewrite rules AFTER they are registered (in init hook)
+add_action('init', function() {
+    if (get_option('yolo_ys_flush_rewrite_rules', false)) {
+        flush_rewrite_rules();
+        delete_option('yolo_ys_flush_rewrite_rules');
+        error_log('YOLO YS: Flushed rewrite rules for pretty URLs');
+    }
+}, 999); // High priority to run after rewrite rules are registered
