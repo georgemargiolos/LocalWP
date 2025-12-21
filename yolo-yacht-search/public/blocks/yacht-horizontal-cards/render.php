@@ -31,8 +31,12 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
         // Get all images for this yacht
         $images = !empty($yacht->images) ? $yacht->images : array();
         
-        // Get details URL
-        $details_url = $details_page_id ? add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id)) : '#';
+        // Get details URL - use pretty URL if slug exists
+        if (!empty($yacht->slug)) {
+            $details_url = home_url('/yacht/' . $yacht->slug . '/');
+        } else {
+            $details_url = $details_page_id ? add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id)) : '#';
+        }
         
         // Convert meters to feet
         $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;

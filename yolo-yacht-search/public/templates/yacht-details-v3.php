@@ -21,8 +21,21 @@ if (defined('YOLO_YS_PLUGIN_DIR')) {
     require_once dirname(__DIR__, 2) . '/includes/equipment-icons.php';
 }
 
-// Get yacht ID from URL
+// Get yacht from URL - support both slug (pretty URL) and legacy yacht_id
+$yacht_slug = get_query_var('yacht_slug', '');
 $yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : '';
+
+// If we have a slug, look up the yacht ID
+if (!empty($yacht_slug) && empty($yacht_id)) {
+    global $wpdb;
+    $yacht_row = $wpdb->get_row($wpdb->prepare(
+        "SELECT id FROM {$wpdb->prefix}yolo_yachts WHERE slug = %s",
+        $yacht_slug
+    ));
+    if ($yacht_row) {
+        $yacht_id = $yacht_row->id;
+    }
+}
 
 // Get search dates from URL (passed from search results)
 $requested_date_from = isset($_GET['dateFrom']) ? sanitize_text_field($_GET['dateFrom']) : '';

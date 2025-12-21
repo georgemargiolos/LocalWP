@@ -142,8 +142,8 @@ class YOLO_YS_Public {
             }
             
             // Yacht details page CSS (v30.5 FIX)
-            // Load when shortcode is present OR when yacht_id URL parameter is present
-            if (has_shortcode($post->post_content, 'yolo_yacht_details') || isset($_GET['yacht_id'])) {
+            // Load when shortcode is present OR when yacht_id/yacht_slug URL parameter is present
+            if (has_shortcode($post->post_content, 'yolo_yacht_details') || isset($_GET['yacht_id']) || get_query_var('yacht_slug', '')) {
                 wp_enqueue_style(
                     'yolo-ys-yacht-details-v3',
                     YOLO_YS_PLUGIN_URL . 'public/css/yacht-details-v3.css',

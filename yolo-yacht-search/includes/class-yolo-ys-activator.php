@@ -153,5 +153,31 @@ class YOLO_YS_Activator {
                 error_log('YOLO YS: Fixed extras table primary key to composite (id, yacht_id)');
             }
         }
+        
+        // Migration 4: Add slug column for pretty URLs (v75.0)
+        $slug_column_exists = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$yachts_table} LIKE 'slug'"
+        );
+        
+        if (empty($slug_column_exists)) {
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD COLUMN slug varchar(255) DEFAULT NULL 
+                 AFTER model"
+            );
+            
+            // Add unique index on slug
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD UNIQUE KEY slug (slug)"
+            );
+            
+            error_log('YOLO YS: Added slug column to yachts table for pretty URLs');
+            
+            // Generate slugs for existing yachts
+            require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database.php';
+            $updated = YOLO_YS_Database::generate_all_slugs();
+            error_log('YOLO YS: Generated slugs for ' . $updated . ' existing yachts');
+        }
     }
 }

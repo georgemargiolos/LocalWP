@@ -1,0 +1,348 @@
+> **Note**
+> This README file is for the YOLO Yacht Search & Booking Plugin, a comprehensive solution for yacht charter businesses. This document provides a detailed overview of the plugin's features, installation instructions, and usage guidelines.
+
+# YOLO Yacht Search & Booking Plugin
+
+**Version:** 72.11
+**WordPress Version:** 5.8 or higher
+**PHP Version:** 7.4 or higher
+**License:** Proprietary
+**Status:** Production Ready ✅
+
+## Overview
+
+The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
+
+## 🚀 Latest Updates (v72.11)
+
+### v72.11 - Auto-Sync Settings Fix (December 19, 2025)
+
+**Fix:** The AJAX handler for saving auto-sync settings was not registered, causing "Save failed" errors. The class is now safely instantiated via the `init` hook.
+
+### v72.4 - Equipment Notes Feature (December 18, 2025)
+
+**Feature:** Added ability to add notes to individual equipment items in Check-In/Check-Out forms. Notes are saved and displayed in PDF documents.
+
+### v72.7 - Yacht Details Default Date Selection (December 19, 2025)
+
+**Improvement:** When viewing a yacht from the "Our Yachts" page, the date picker now defaults to the **first available future week** instead of only looking for a July week.
+
+### v72.9 - Critical Sync Data Loss Fix (December 19, 2025)
+
+**Fix:** The `sync_all_offers()` method was deleting all prices BEFORE fetching new data. This was fixed to **fetch first, then delete only if successful**, preventing data loss upon API failure.
+
+### v72.6 - Auto-Sync Instantiation Fix (December 18, 2025)
+
+**Fix:** The `YOLO_YS_Auto_Sync` class was not instantiated, meaning cron jobs were never scheduled. This was fixed to ensure automatic syncs run. (Note: This fix was refined in v72.11 after causing fatal errors in v72.8/v72.9 attempts.)
+
+### v60.2 - Search Results Layout Fix (WORKING) (December 12, 2025)
+
+**Critical Fix - v60.1 Was Broken**
+
+**Issue:** v60.1 CSS fix didn't actually work - missing `width: 100%` property.
+
+**Fix Applied:**
+- ✅ **Complete CSS Solution** - Added all three required properties
+- ✅ **Tested & Verified** - Manually tested on test server
+- ✅ **Full Width Display** - Single yachts now take 100% width on large screens
+- ✅ **Grid Preserved** - Multiple yachts still display in 3-column layout
+
+**Technical Details:**
+```css
+/* Location: public/css/search-results.css, lines 484-488 */
+@media (min-width: 992px) {
+    .yolo-ys-section-header + .container-fluid .row.g-4 .col-lg-4:first-child:last-child {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;  /* ← THIS WAS MISSING IN v60.1 */
+    }
+}
+```
+
+**Why v60.1 Failed:**
+- Bootstrap's flex system requires all three properties to override
+- Without `width: 100%`, card stayed at 33.33% width
+- Fix was tested in console but not verified on actual server
+
+**Files Modified:** 2 files (yolo-yacht-search.php, search-results.css)  
+**Backward Compatible:** Yes  
+**Breaking Changes:** None  
+**Production Ready:** ✅ (Tested & Verified)
+
+---
+
+### v60.1 - Search Results Layout Fix (BROKEN - DO NOT USE)
+
+**Status:** ❌ **BROKEN** - Use v60.2 instead
+
+**Issue:** CSS fix incomplete, missing `width: 100%` property
+
+---
+
+### v60.0 - Automatic Image Optimization (December 12, 2025)
+
+**Performance Enhancement - Massive Storage & Speed Improvements**
+
+**Feature:** Images downloaded from Booking Manager API are now automatically optimized during yacht sync.
+
+**Implementation:**
+- ✅ **Automatic Optimization** - Every downloaded image is resized and compressed
+- ✅ **WordPress Native** - Uses `wp_get_image_editor()` for reliable processing
+- ✅ **Smart Resizing** - Max 1920x1080px (retina-ready, maintains aspect ratio)
+- ✅ **Quality Compression** - 85% JPEG quality (excellent visual quality)
+- ✅ **Zero Dependencies** - No external services or API costs
+
+**Performance Impact:**
+- 📉 **85-90% storage reduction** - 3 MB images → 400 KB
+- ⚡ **97% faster page loads** - Fleet page: 27 MB → 720 KB
+- 📱 **Mobile optimized** - Load time: 54s → 1.4s on 4G
+- 💰 **Lower bandwidth costs** - Significant savings on hosting
+
+**Technical Details:**
+```php
+// Location: includes/class-yolo-ys-database.php
+// Line 379: Optimization call after image download
+$this->optimize_yacht_image($local_path);
+
+// Lines 572-643: New optimization method
+private function optimize_yacht_image($image_path)
+```
+
+**Files Modified:** 1 file (class-yolo-ys-database.php)  
+**Backward Compatible:** Yes  
+**Breaking Changes:** None  
+**Production Ready:** ✅
+
+See [CHANGELOG-v60.0.md](CHANGELOG-v60.0.md), [IMAGE-OPTIMIZATION-PROPOSAL.md](IMAGE-OPTIMIZATION-PROPOSAL.md), and [IMAGE-OPTIMIZATION-TESTING.md](IMAGE-OPTIMIZATION-TESTING.md) for complete details.
+
+---
+
+### v41.28 - Purchase Event Tracking Fix (December 9, 2024)
+
+**Critical Analytics Fix - Complete Conversion Tracking Now Operational**
+
+**Problem Solved:** Purchase event was missing from the booking confirmation flow, preventing conversion tracking in GA4 and Facebook.
+
+**Solution Implemented:**
+- ✅ **Client-Side GA4 Tracking** - Added dataLayer.push() for GTM on confirmation page
+- ✅ **Client-Side Facebook Pixel** - Added fbq() Purchase event with deduplication
+- ✅ **Server-Side Facebook CAPI** - Added Purchase tracking with user data for attribution
+- ✅ **No Webhook Dependency** - Works with Stripe redirect flow
+
+**All 7 Booking Funnel Events Now Working:**
+1. search - User searches for yachts (GA4 + Facebook)
+2. view_item - User views yacht details (GA4 + Facebook)
+3. add_to_cart - User selects week/price (GA4 + Facebook)
+4. begin_checkout - User clicks "Book Now" (GA4 + Facebook)
+5. add_payment_info - User submits booking form (GA4 + Facebook)
+6. generate_lead - User requests quote (Facebook only)
+7. **purchase** - Booking completed (GA4 + Facebook) **← FIXED**
+
+**Impact:**
+- ✅ Complete booking funnel tracked from search to purchase
+- ✅ Revenue data flows to GA4 and Facebook
+- ✅ ROAS (Return on Ad Spend) measurement enabled
+- ✅ Server-side tracking bypasses ad blockers
+- ✅ Event deduplication prevents double-counting
+
+**Files Modified:** 2 files (booking-confirmation.php, yolo-yacht-search.php)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+
+See [CHANGELOG-v41.28.md](CHANGELOG-v41.28.md) and [HANDOFF-v41.28.md](HANDOFF-v41.28.md) for complete details.
+
+---
+
+### v20.0 - Search Results Performance & Code Quality Improvements (December 3, 2025)
+
+**4 Major Improvements:**
+
+1. **N+1 Query Problem Fixed** - Optimized search results to use single query with subquery for images
+2. **POST Parameter Validation** - Added proper validation and error handling for AJAX search
+3. **European Price Formatting** - Changed from US format (1,234.56) to European format (1.234,56)
+4. **Dead Code Removal** - Removed unused Handlebars template code from search results
+
+**Files Modified:** 3 files
+**Performance Impact:** Significantly faster search results with many yachts
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+
+See [CHANGELOG_v20.0.md](CHANGELOG_v20.0.md) for complete details.
+
+---
+
+### v17.13 - Critical Plugin Activation Fixes (December 3, 2025)
+
+**9 Critical Issues Fixed:**
+
+1. **Missing ABSPATH Security Checks** - Added to 30 class files (plugin activation fix)
+2. **Missing PHP Opening Tag** - Fixed email class file structure
+3. **Invalid CSS Selector** - Fixed yacht details location scroll
+4. **Equipment Quantity Tracking** - Added ability to log quantities for equipment items
+5. **Missing Email Class Include** - Fixed "Send Reminder" critical error
+6. **Wrong Table Name** - Fixed public search functionality
+7. **Missing Checkout CSS** - Added 350+ lines of CSS including signature pad styles
+8. **Search Box Styling** - Added minimal, clean border design
+9. **Red Border Removed** - Removed unwanted red border from YOLO Fleet yachts
+
+**Files Modified:** 35 files, ~558 lines changed  
+**Backward Compatible:** Yes  
+**Breaking Changes:** None  
+**Deployment Package:** Correct folder structure (yolo-yacht-search/)  
+
+See [FIXES_APPLIED_v17.13.md](FIXES_APPLIED_v17.13.md) for complete details.
+
+---
+
+## 🚀 What's New in v17.0
+
+**Major Feature: Complete Base Manager System - December 3, 2025**
+
+Version 17.0 introduces a comprehensive **Base Manager System** for yacht charter operations management. This is the largest feature addition to the plugin, providing professional tools for base operations, yacht management, and guest interaction.
+
+### Key Features
+
+*   **Base Manager Dashboard:** Dedicated dashboard with Bootstrap 5 layout accessible via `[base_manager]` shortcode
+*   **Yacht Management:** Create and manage yachts with equipment categories, logos, and owner information
+*   **Digital Check-In/Check-Out:** Complete check-in and check-out processes with equipment checklists
+*   **Digital Signatures:** Canvas-based signature capture for both base managers and guests
+*   **PDF Generation:** Professional PDF documents with company logos and signatures (FPDF library)
+*   **Guest Integration:** Guests can view, download, and sign documents from their dashboard
+*   **Warehouse Management:** Track inventory by yacht with expiry dates and locations
+*   **Bookings Calendar:** View all bookings in calendar format
+*   **Email Notifications:** Automatic emails when documents are sent to guests
+
+### New User Role
+
+*   **Base Manager:** Custom WordPress role with dedicated permissions for base operations
+*   Automatic redirect from wp-admin to base manager dashboard
+*   Role-based access control for all features
+
+### Database Changes
+
+*   Database version updated to **1.6**
+*   5 new tables: `wp_yolo_bm_yachts`, `wp_yolo_bm_equipment_categories`, `wp_yolo_bm_checkins`, `wp_yolo_bm_checkouts`, `wp_yolo_bm_warehouse`
+
+### Documentation
+
+See comprehensive documentation:
+*   [CHANGELOG_v17.0.md](CHANGELOG_v17.0.md) - Detailed changelog
+*   [HANDOFF_v17.0.md](HANDOFF_v17.0.md) - Technical specifications and deployment guide
+*   [VERSION-HISTORY.md](VERSION-HISTORY.md) - Complete version history
+
+---
+
+## Previous Updates
+
+### v16.4 - Critical Bug Fixes (December 2, 2025)
+
+*   Fixed guest license upload for National ID/Passport documents
+*   Removed guest dashboard width restriction
+*   Fixed security check errors
+
+See [CHANGELOG-v16.4.md](CHANGELOG-v16.4.md) for details.
+
+## Previous Major Features (v3.0.0)
+
+*   **Bootstrap 5 Integration:** The plugin uses the Bootstrap 5.3.2 grid system for a fully responsive layout.
+*   **Comprehensive Security Hardening:** All AJAX endpoints and forms secured with WordPress nonces.
+*   **Dynamic Text Customization:** Admin page to customize all user-facing labels and messages.
+*   **Numerous Bug Fixes:** Improved stability and reliability.
+
+## Features Overview
+
+| Category | Feature |
+| --- | --- |
+| **Core Features** | Search widget, search results, "Our Fleet" display, yacht details pages, local database storage, Booking Manager API integration, live pricing, and FontAwesome equipment icons. |
+| **Booking Features** | Customer information form, Stripe integration for 50% deposits, booking confirmation page, balance payment via email link, admin booking dashboard, payment reminders, CSV export, and Booking Manager sync. |
+| **Guest User System** | Automatic guest account creation, custom login page, guest dashboard for viewing bookings and uploading licenses, admin license manager, and secure role-based permissions. |
+| **Base Manager System** | ⭐ **NEW** Yacht management, digital check-in/check-out with signatures, PDF generation, warehouse inventory, bookings calendar, and guest document signing. |
+| **Email System** | HTML email templates for booking confirmations, guest credentials, payment reminders, and payment receipts, as well as admin notifications for new bookings. |
+
+## Quick Start Guide
+
+1.  **Installation:**
+    *   Upload the `yolo-yacht-search-v3.0.0-FINAL.zip` file to your WordPress site.
+    *   Activate the plugin.
+2.  **Initial Configuration:**
+    *   Go to **YOLO Yacht Search → Settings** and sync the equipment catalog, yachts, and weekly offers.
+    *   Configure your Booking Manager API key, company ID, and Stripe API keys.
+3.  **Create Required Pages:**
+    *   Create pages for search results, yacht details, "Our Fleet", booking confirmation, balance payment, balance confirmation, guest login, and guest dashboard, and add the corresponding shortcodes.
+4.  **Configure Page Settings:**
+    *   Go to **YOLO Yacht Search → Settings** and select the pages you created.
+
+## Shortcodes Reference
+
+| Shortcode | Description |
+| --- | --- |
+| `[yolo_search_widget]` | Displays the yacht search form. |
+| `[yolo_search_results]` | Displays the search results. |
+| `[yolo_our_fleet]` | Displays a grid of all your yachts. |
+| `[yolo_yacht_details]` | Displays the details for a single yacht. |
+| `[yolo_booking_confirmation]` | The booking confirmation page. |
+| `[yolo_balance_payment]` | The balance payment page. |
+| `[yolo_balance_confirmation]` | The balance confirmation page. |
+| `[yolo_guest_login]` | The guest login page. |
+| `[yolo_guest_dashboard]` | The guest dashboard page. |
+| `[base_manager]` | ⭐ **NEW** The base manager dashboard page. |
+
+## Database Schema
+
+The plugin uses a number of custom database tables to store its data. The database version in v17.0 is **1.6**.
+
+### New Tables in v17.0
+
+*   `wp_yolo_bm_yachts` - Yacht information for base manager system
+*   `wp_yolo_bm_equipment_categories` - Equipment categories and items per yacht
+*   `wp_yolo_bm_checkins` - Check-in records with signatures and PDFs
+*   `wp_yolo_bm_checkouts` - Check-out records with signatures and PDFs
+*   `wp_yolo_bm_warehouse` - Warehouse inventory by yacht
+
+See [HANDOFF_v17.0.md](HANDOFF_v17.0.md) for complete database schema documentation.
+
+## API Integration
+
+The plugin integrates with the following APIs:
+
+*   **Booking Manager API v2:** For real-time yacht availability and pricing.
+*   **Stripe API:** For secure online payments.
+
+## Troubleshooting
+
+If you encounter any issues with the plugin, please refer to the `TROUBLESHOOTING.md` file for detailed troubleshooting steps.
+
+## Credits
+
+**Developed for:** YOLO Charters
+**Version:** 20.0
+**Database Version:** 1.6
+**Status:** Ready for Production Testing ✅
+**Last Updated:** December 3, 2025 at 20:59 UTC
+
+## Base Manager System Setup
+
+### Quick Setup Guide
+
+1.  **Create Base Manager Page:**
+    *   Create a new WordPress page
+    *   Add the `[base_manager]` shortcode
+    *   Publish the page
+
+2.  **Assign Base Manager Role:**
+    *   Go to WordPress Users
+    *   Edit a user or create a new one
+    *   Change role to "Base Manager"
+    *   Save changes
+
+3.  **Login as Base Manager:**
+    *   Base managers are automatically redirected from wp-admin to their dashboard
+    *   Access the base manager dashboard page directly
+
+4.  **Start Using:**
+    *   Create yachts with equipment categories
+    *   Perform check-ins and check-outs
+    *   Manage warehouse inventory
+    *   View bookings calendar
+
+For detailed setup and usage instructions, see [HANDOFF_v17.0.md](HANDOFF_v17.0.md).

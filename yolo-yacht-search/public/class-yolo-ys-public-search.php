@@ -44,6 +44,7 @@ function yolo_ys_ajax_search_yachts() {
                 y.id as yacht_id,
                 y.name as yacht,
                 y.model,
+                y.slug,
                 y.company_id,
                 y.home_base as startBase,
                 y.length,
@@ -119,11 +120,20 @@ function yolo_ys_ajax_search_yachts() {
         $search_week_from = date('Y-m-d', strtotime($row->date_from));
         $search_week_to   = date('Y-m-d', strtotime($row->date_to));
         
-        $yacht_url = add_query_arg(array(
-            'yacht_id' => $row->yacht_id,
-            'dateFrom' => $search_week_from,
-            'dateTo'   => $search_week_to,
-        ), $details_page_url);
+        // Build URL - use pretty URL if slug exists, otherwise fallback
+        if (!empty($row->slug)) {
+            $yacht_url = home_url('/yacht/' . $row->slug . '/');
+            $yacht_url = add_query_arg(array(
+                'dateFrom' => $search_week_from,
+                'dateTo'   => $search_week_to,
+            ), $yacht_url);
+        } else {
+            $yacht_url = add_query_arg(array(
+                'yacht_id' => $row->yacht_id,
+                'dateFrom' => $search_week_from,
+                'dateTo'   => $search_week_to,
+            ), $details_page_url);
+        }
         
         $boat = array(
             'yacht_id' => $row->yacht_id,

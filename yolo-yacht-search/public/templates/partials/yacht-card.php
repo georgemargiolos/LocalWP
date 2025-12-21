@@ -9,7 +9,13 @@
 
 $is_yolo = ($yacht->company_id == get_option('yolo_ys_my_company_id', 7850));
 $details_page_id = get_option('yolo_ys_yacht_details_page', '');
-$details_url = $details_page_id ? add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id)) : '#';
+
+// Use pretty URL if yacht has slug
+if (!empty($yacht->slug)) {
+    $details_url = home_url('/yacht/' . $yacht->slug . '/');
+} else {
+    $details_url = $details_page_id ? add_query_arg('yacht_id', $yacht->id, get_permalink($details_page_id)) : '#';
+}
 
 // Get primary image
 $primary_image = '';

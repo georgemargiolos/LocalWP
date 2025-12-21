@@ -49,6 +49,7 @@ class YOLO_YS_Database {
             company_id bigint(20) NOT NULL,
             name varchar(255) NOT NULL,
             model varchar(255) DEFAULT NULL,
+            slug varchar(255) DEFAULT NULL,
             type varchar(100) DEFAULT NULL,
             shipyard_id bigint(20) DEFAULT NULL,
             year_of_build int(11) DEFAULT NULL,
@@ -74,7 +75,8 @@ class YOLO_YS_Database {
             last_synced datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             KEY company_id (company_id),
-            KEY name (name)
+            KEY name (name),
+            UNIQUE KEY slug (slug)
         ) $charset_collate;";
         
         // Products table (charter types)
@@ -288,7 +290,20 @@ class YOLO_YS_Database {
     public function store_yacht($yacht_data, $company_id) {
         global $wpdb;
         
-
+        // Generate slug from yacht name and model
+        $yacht_name = $yacht_data['name'];
+        $yacht_model = isset($yacht_data['model']) ? $yacht_data['model'] : '';
+        $base_slug = sanitize_title($yacht_name . '-' . $yacht_model);
+        
+        // Check if slug already exists for a different yacht
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$this->table_yachts} WHERE slug = %s AND id != %s",
+            $base_slug,
+            $yacht_data['id']
+        ));
+        
+        // If slug exists for different yacht, append company ID to make unique
+        $slug = $existing ? $base_slug . '-' . $company_id : $base_slug;
         
         // Prepare yacht data
         $yacht_insert = array(
@@ -296,6 +311,7 @@ class YOLO_YS_Database {
             'company_id' => $company_id,
             'name' => $yacht_data['name'],
             'model' => isset($yacht_data['model']) ? $yacht_data['model'] : null,
+            'slug' => $slug,
             'type' => isset($yacht_data['kind']) ? $yacht_data['kind'] : null,
             'shipyard_id' => isset($yacht_data['shipyardId']) ? $yacht_data['shipyardId'] : null,
             'year_of_build' => isset($yacht_data['year']) ? $yacht_data['year'] : null,
@@ -669,5 +685,83 @@ class YOLO_YS_Database {
         ));
         
         return true;
+    }
+    
+    /**
+     * Get yacht by slug
+     * 
+     * @param string $slug The yacht slug
+     * @return object|null Yacht data or null if not found
+     */
+    public function get_yacht_by_slug($slug) {
+        global $wpdb;
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->table_yachts} WHERE slug = %s",
+            $slug
+        ));
+    }
+    
+    /**
+     * Get yacht URL by ID (returns pretty URL if slug exists)
+     * 
+     * @param string|int $yacht_id The yacht ID
+     * @return string The yacht URL
+     */
+    public function get_yacht_url($yacht_id) {
+        global $wpdb;
+        
+        $yacht = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$this->table_yachts} WHERE id = %s",
+            $yacht_id
+        ));
+        
+        if ($yacht && !empty($yacht->slug)) {
+            return home_url('/yacht/' . $yacht->slug . '/');
+        }
+        
+        // Fallback to old URL format
+        $details_page_id = get_option('yolo_ys_yacht_details_page', 0);
+        if ($details_page_id) {
+            return add_query_arg('yacht_id', $yacht_id, get_permalink($details_page_id));
+        }
+        
+        return home_url('/yacht-details-page/?yacht_id=' . $yacht_id);
+    }
+    
+    /**
+     * Generate slugs for all existing yachts (one-time migration)
+     * 
+     * @return int Number of yachts updated
+     */
+    public static function generate_all_slugs() {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Get all yachts without slugs
+        $yachts = $wpdb->get_results("SELECT id, name, model, company_id FROM {$table} WHERE slug IS NULL OR slug = ''");
+        
+        $updated = 0;
+        foreach ($yachts as $yacht) {
+            $base_slug = sanitize_title($yacht->name . '-' . $yacht->model);
+            
+            // Check for duplicates
+            $existing = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$table} WHERE slug = %s AND id != %s",
+                $base_slug,
+                $yacht->id
+            ));
+            
+            $slug = $existing ? $base_slug . '-' . $yacht->company_id : $base_slug;
+            
+            $wpdb->update(
+                $table,
+                array('slug' => $slug),
+                array('id' => $yacht->id)
+            );
+            $updated++;
+        }
+        
+        return $updated;
     }
 }

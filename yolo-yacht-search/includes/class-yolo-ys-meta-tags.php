@@ -42,7 +42,7 @@ class YOLO_YS_Meta_Tags {
     }
     
     private function is_yacht_page() {
-        return isset($_GET['yacht_id']) || isset($_GET['yacht']);
+        return isset($_GET['yacht_id']) || isset($_GET['yacht']) || get_query_var('yacht_slug', '');
     }
     
     /**
@@ -52,14 +52,38 @@ class YOLO_YS_Meta_Tags {
     private function get_current_yacht() {
         if ($this->current_yacht !== null) return $this->current_yacht;
         
-        // Get yacht_id as STRING (not intval - loses precision for large IDs)
+        global $wpdb;
+        $yacht_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Check for pretty URL slug first
+        $yacht_slug = get_query_var('yacht_slug', '');
+        if (!empty($yacht_slug)) {
+            $yacht = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM $yacht_table WHERE slug = %s",
+                $yacht_slug
+            ), ARRAY_A);
+            
+            if ($yacht) {
+                $this->current_yacht = $yacht;
+                $yacht_id = $yacht['id'];
+                
+                // Get images
+                $images_table = $wpdb->prefix . 'yolo_yacht_images';
+                $this->current_images = $wpdb->get_results($wpdb->prepare(
+                    "SELECT * FROM $images_table WHERE yacht_id = %s ORDER BY sort_order ASC LIMIT 10",
+                    $yacht_id
+                ), ARRAY_A);
+                
+                return $this->current_yacht;
+            }
+        }
+        
+        // Fallback to yacht_id parameter
         $yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : 
                     (isset($_GET['yacht']) ? sanitize_text_field($_GET['yacht']) : '');
         if (empty($yacht_id)) return null;
         
         // Get yacht from database (same method as yacht-details-v3.php)
-        global $wpdb;
-        $yacht_table = $wpdb->prefix . 'yolo_yachts';
         $yacht = $wpdb->get_row($wpdb->prepare("SELECT * FROM $yacht_table WHERE id = %s", $yacht_id), ARRAY_A);
         
         if (!$yacht) return null;

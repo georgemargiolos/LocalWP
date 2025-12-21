@@ -1,50 +1,5 @@
 # YOLO Yacht Search Changelog
 
-## [75.0] - 2025-12-21
-
-### Added
-- **Pretty URLs for Yacht Details** - SEO-friendly URLs like `/yacht/lemon-lagoon-450/` instead of `?yacht_id=123456`
-  - Added `slug` column to `wp_yolo_yachts` table with unique index
-  - Slug auto-generated from yacht name + model on sync
-  - Duplicate slugs resolved by appending company ID
-  - WordPress rewrite rules for `/yacht/{slug}/` pattern
-  - 301 redirects from old URLs to new pretty URLs (preserves SEO)
-  - Full backward compatibility with legacy `?yacht_id=` URLs
-
-- **Google XML Sitemap Generator Integration** - Yacht pages now included in sitemap
-  - Hooks into `sm_buildmap` action from Google XML Sitemap Generator plugin
-  - YOLO boats get priority 0.8, partner boats get priority 0.6
-  - Uses `last_synced` timestamp for `<lastmod>`
-  - Change frequency set to `weekly`
-
-### Changed
-- Search results now link to pretty URLs when slug exists
-- Our Fleet page yacht cards now use pretty URLs
-- Horizontal cards block now uses pretty URLs
-- Meta tags class updated to detect yacht pages via slug query var
-- CSS loading updated to detect yacht pages via slug query var
-
-### Database
-- New column: `wp_yolo_yachts.slug` (varchar 255, unique index)
-- Migration auto-generates slugs for existing yachts on plugin update
-
-### Files Added
-- `includes/class-yolo-ys-sitemap.php` - Sitemap integration class
-
-### Files Modified
-- `yolo-yacht-search.php` - Version bump, added sitemap class include
-- `includes/class-yolo-ys-database.php` - Added slug column, slug generation, helper methods
-- `includes/class-yolo-ys-activator.php` - Added slug column migration
-- `includes/class-yolo-ys-yacht-search.php` - Added rewrite rules and redirect handling
-- `includes/class-yolo-ys-meta-tags.php` - Updated yacht page detection for slugs
-- `public/class-yolo-ys-public.php` - Updated CSS loading condition
-- `public/class-yolo-ys-public-search.php` - Updated URL building with slug support
-- `public/templates/yacht-details-v3.php` - Support both slug and legacy yacht_id
-- `public/templates/partials/yacht-card.php` - Use pretty URLs
-- `public/blocks/yacht-horizontal-cards/render.php` - Use pretty URLs
-
----
-
 ## [72.11] - 2025-12-19
 
 ### Fixed

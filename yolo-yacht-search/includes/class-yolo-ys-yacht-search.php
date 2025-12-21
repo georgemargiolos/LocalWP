@@ -19,6 +19,7 @@ class YOLO_YS_Yacht_Search {
         $this->load_dependencies();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->define_rewrite_rules();
     }
     
     private function load_dependencies() {
@@ -99,5 +100,65 @@ class YOLO_YS_Yacht_Search {
     
     public function get_version() {
         return $this->version;
+    }
+    
+    /**
+     * Define rewrite rules for pretty yacht URLs
+     */
+    private function define_rewrite_rules() {
+        add_action('init', array($this, 'add_yacht_rewrite_rules'));
+        add_filter('query_vars', array($this, 'add_yacht_query_vars'));
+        add_action('template_redirect', array($this, 'handle_yacht_redirect'));
+    }
+    
+    /**
+     * Add rewrite rules for pretty yacht URLs
+     */
+    public function add_yacht_rewrite_rules() {
+        // Match /yacht/yacht-slug/
+        add_rewrite_rule(
+            '^yacht/([^/]+)/?$',
+            'index.php?pagename=yacht-details-page&yacht_slug=$matches[1]',
+            'top'
+        );
+    }
+    
+    /**
+     * Add custom query vars
+     */
+    public function add_yacht_query_vars($vars) {
+        $vars[] = 'yacht_slug';
+        return $vars;
+    }
+    
+    /**
+     * Handle redirect from old URLs to new URLs (301 redirect for SEO)
+     */
+    public function handle_yacht_redirect() {
+        // Redirect old ?yacht_id= URLs to new /yacht/slug/ URLs
+        if (isset($_GET['yacht_id']) && !get_query_var('yacht_slug', '')) {
+            global $wpdb;
+            $yacht_id = sanitize_text_field($_GET['yacht_id']);
+            
+            $yacht = $wpdb->get_row($wpdb->prepare(
+                "SELECT slug FROM {$wpdb->prefix}yolo_yachts WHERE id = %s",
+                $yacht_id
+            ));
+            
+            if ($yacht && !empty($yacht->slug)) {
+                $new_url = home_url('/yacht/' . $yacht->slug . '/');
+                
+                // Preserve date parameters
+                if (isset($_GET['dateFrom'])) {
+                    $new_url = add_query_arg('dateFrom', sanitize_text_field($_GET['dateFrom']), $new_url);
+                }
+                if (isset($_GET['dateTo'])) {
+                    $new_url = add_query_arg('dateTo', sanitize_text_field($_GET['dateTo']), $new_url);
+                }
+                
+                wp_redirect($new_url, 301);
+                exit;
+            }
+        }
     }
 }
