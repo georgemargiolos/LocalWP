@@ -1,5 +1,32 @@
 # YOLO Yacht Search Changelog
 
+## [75.3] - 2025-12-21
+
+### Fixed
+- **CRITICAL: 404 Error on Pretty URLs (Take 2)** - The `template_include` approach runs too late in WordPress lifecycle
+  - Now uses `pre_get_posts` hook to intercept request early
+  - Transforms `yacht_slug` query into proper page query before WordPress decides it's 404
+  - Rewrite rule now only sets `yacht_slug` query var
+  - `pre_get_posts` handler adds `page_id` and sets proper query flags
+
+### Files Modified
+- `includes/class-yolo-ys-yacht-search.php` - Replaced `template_include` with `pre_get_posts` approach
+
+---
+
+## [75.2] - 2025-12-21
+
+### Fixed
+- **CRITICAL: 404 Error on Pretty URLs** - Rewrite rule was using `pagename` which doesn't work reliably
+  - Changed rewrite rule to use `page_id` from plugin settings
+  - Added `template_include` filter to properly load the yacht details page template
+  - Sets up proper WordPress query vars to avoid 404
+
+### Files Modified
+- `includes/class-yolo-ys-yacht-search.php` - Fixed rewrite rule and added template loader
+
+---
+
 ## [75.1] - 2025-12-21
 
 ### Fixed

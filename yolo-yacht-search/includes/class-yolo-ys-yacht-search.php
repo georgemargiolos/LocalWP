@@ -109,18 +109,46 @@ class YOLO_YS_Yacht_Search {
         add_action('init', array($this, 'add_yacht_rewrite_rules'));
         add_filter('query_vars', array($this, 'add_yacht_query_vars'));
         add_action('template_redirect', array($this, 'handle_yacht_redirect'));
+        add_action('pre_get_posts', array($this, 'handle_yacht_query'), 1);
     }
     
     /**
      * Add rewrite rules for pretty yacht URLs
      */
     public function add_yacht_rewrite_rules() {
-        // Match /yacht/yacht-slug/
+        // Match /yacht/yacht-slug/ and set yacht_slug query var
         add_rewrite_rule(
             '^yacht/([^/]+)/?$',
-            'index.php?pagename=yacht-details-page&yacht_slug=$matches[1]',
+            'index.php?yacht_slug=$matches[1]',
             'top'
         );
+    }
+    
+    /**
+     * Handle yacht query - transform yacht_slug request into page request
+     */
+    public function handle_yacht_query($query) {
+        // Only run on main query
+        if (!$query->is_main_query()) {
+            return;
+        }
+        
+        $yacht_slug = $query->get('yacht_slug');
+        
+        if (!empty($yacht_slug)) {
+            // Get the yacht details page ID from settings
+            $page_id = get_option('yolo_ys_yacht_details_page', 0);
+            
+            if ($page_id) {
+                // Transform this into a page query
+                $query->set('page_id', $page_id);
+                $query->set('post_type', 'page');
+                $query->is_page = true;
+                $query->is_singular = true;
+                $query->is_home = false;
+                $query->is_archive = false;
+            }
+        }
     }
     
     /**
