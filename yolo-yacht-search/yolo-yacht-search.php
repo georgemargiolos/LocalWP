@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 75.0
+ * Version: 75.1
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '75.0');
+define('YOLO_YS_VERSION', '75.1');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -138,3 +138,53 @@ add_action('init', function() {
         new YOLO_YS_Auto_Sync();
     }
 }, 20);
+
+// v75.0: Run migrations on plugin update (activation hook doesn't run on updates)
+add_action('plugins_loaded', function() {
+    $installed_version = get_option('yolo_ys_db_version', '0');
+    
+    // If version is less than 75.0, run the slug migration
+    if (version_compare($installed_version, '75.0', '<')) {
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-activator.php';
+        
+        // Run migrations (this will add slug column if missing)
+        global $wpdb;
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Check if slug column exists
+        $slug_column_exists = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$yachts_table} LIKE 'slug'"
+        );
+        
+        if (empty($slug_column_exists)) {
+            // Add slug column
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD COLUMN slug varchar(255) DEFAULT NULL 
+                 AFTER model"
+            );
+            
+            // Add unique index on slug (ignore if already exists)
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD UNIQUE KEY slug (slug)"
+            );
+            
+            error_log('YOLO YS v75.0: Added slug column to yachts table');
+        }
+        
+        // Generate slugs for existing yachts without slugs
+        require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database.php';
+        $updated = YOLO_YS_Database::generate_all_slugs();
+        if ($updated > 0) {
+            error_log('YOLO YS v75.0: Generated slugs for ' . $updated . ' yachts');
+        }
+        
+        // Flush rewrite rules for pretty URLs
+        flush_rewrite_rules();
+        
+        // Update version
+        update_option('yolo_ys_db_version', '75.0');
+        error_log('YOLO YS: Database migrated to v75.0');
+    }
+}, 5);

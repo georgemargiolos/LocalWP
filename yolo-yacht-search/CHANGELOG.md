@@ -1,5 +1,20 @@
 # YOLO Yacht Search Changelog
 
+## [75.1] - 2025-12-21
+
+### Fixed
+- **CRITICAL: Migration Not Running on Plugin Update** - The slug column migration only ran on plugin activation, not on updates
+  - Added `plugins_loaded` hook to check database version and run migrations automatically
+  - Migration now runs on first page load after plugin update
+  - Stores `yolo_ys_db_version` option to track migration state
+  - Automatically generates slugs for all existing yachts
+  - Flushes rewrite rules after migration
+
+### Files Modified
+- `yolo-yacht-search.php` - Added version-based migration on `plugins_loaded` hook
+
+---
+
 ## [75.0] - 2025-12-21
 
 ### Added
