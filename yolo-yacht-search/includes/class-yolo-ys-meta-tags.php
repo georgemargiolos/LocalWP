@@ -77,6 +77,9 @@ class YOLO_YS_Meta_Tags {
                     $yacht_id
                 ), ARRAY_A);
                 
+                // Get prices (for Offer schema) - v75.8 fix: was missing for pretty URLs
+                $this->current_prices = YOLO_YS_Database_Prices::get_yacht_prices($yacht_id, 52);
+                
                 return $this->current_yacht;
             }
         }

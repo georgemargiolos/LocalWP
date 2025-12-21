@@ -1,5 +1,18 @@
 # YOLO Yacht Search Changelog
 
+## [75.8] - 2025-12-21
+
+### Fixed
+- **Prices Not Loading for Pretty URLs** - The `current_prices` array was not populated when using pretty URLs (`/yacht/slug/`)
+  - JSON-LD Product schema now includes `offers` for pretty URL pages
+  - Open Graph `product:price:amount` meta tag now works for pretty URLs
+  - Bug found by Cursor AI during code review
+
+### Files Modified
+- `includes/class-yolo-ys-meta-tags.php` - Added prices loading in yacht_slug code path
+
+---
+
 ## [75.7] - 2025-12-21
 
 ### Fixed
