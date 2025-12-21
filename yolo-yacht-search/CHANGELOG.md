@@ -1,5 +1,29 @@
 # YOLO Yacht Search Changelog
 
+## [75.6] - 2025-12-21
+
+### Fixed
+- **Canonical URL Removal Timing** - Changed hook from `wp` to `template_redirect` to ensure WordPress default canonical is removed before `wp_head` runs
+
+### Files Modified
+- `includes/class-yolo-ys-meta-tags.php` - Fixed hook timing for `remove_default_canonical()`
+
+---
+
+## [75.5] - 2025-12-21
+
+### Added
+- **Canonical URL for Yacht Pages** - Outputs correct canonical URL using pretty URL format
+  - Removes WordPress default canonical for yacht pages
+  - Uses `/yacht/slug/` format when slug exists
+  - Falls back to `?yacht_id=` URL for yachts without slugs
+  - Prevents duplicate content issues in search engines
+
+### Files Modified
+- `includes/class-yolo-ys-meta-tags.php` - Added `output_canonical_url()` and `remove_default_canonical()` methods
+
+---
+
 ## [75.4] - 2025-12-21
 
 ### Fixed

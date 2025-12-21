@@ -35,10 +35,13 @@ class YOLO_YS_Meta_Tags {
     
     private function __construct() {
         add_action('wp_head', array($this, 'output_meta_description'), 1);
+        add_action('wp_head', array($this, 'output_canonical_url'), 2);
         add_action('wp_head', array($this, 'output_meta_tags'), 5);
         add_action('wp_head', array($this, 'output_schema_json_ld'), 6);
         add_filter('pre_get_document_title', array($this, 'filter_yacht_page_title'), 10);
         add_filter('wp_title', array($this, 'filter_yacht_page_title'), 10, 2);
+        // Remove WordPress default canonical for yacht pages (must run before wp_head)
+        add_action('template_redirect', array($this, 'remove_default_canonical'));
     }
     
     private function is_yacht_page() {
@@ -402,6 +405,43 @@ class YOLO_YS_Meta_Tags {
         $new_title .= ' – Yolo Charters';
         
         return $new_title;
+    }
+    
+    /**
+     * Remove WordPress default canonical URL for yacht pages
+     * v75.5: Prevents duplicate/wrong canonical URLs
+     */
+    public function remove_default_canonical() {
+        if ($this->is_yacht_page()) {
+            remove_action('wp_head', 'rel_canonical');
+        }
+    }
+    
+    /**
+     * Output correct canonical URL for yacht pages
+     * v75.5: Uses pretty URL when available, falls back to yacht_id URL
+     */
+    public function output_canonical_url() {
+        if (!$this->is_yacht_page()) return;
+        $yacht = $this->get_current_yacht();
+        if (!$yacht) return;
+        
+        $canonical_url = '';
+        
+        // Use pretty URL if slug exists
+        if (!empty($yacht['slug'])) {
+            $canonical_url = home_url('/yacht/' . $yacht['slug'] . '/');
+        } else {
+            // Fallback to yacht_id URL
+            $details_page_id = get_option('yolo_ys_yacht_details_page', '');
+            if ($details_page_id) {
+                $canonical_url = add_query_arg('yacht_id', $yacht['id'], get_permalink($details_page_id));
+            }
+        }
+        
+        if ($canonical_url) {
+            echo '<link rel="canonical" href="' . esc_url($canonical_url) . '" />' . "\n";
+        }
     }
 }
 
