@@ -1,5 +1,14 @@
 # Changelog
 
+## [75.14] - 2025-12-22
+
+### Fixed
+- **CSS Not Loading** - Moved accordion and sticky bar CSS from disabled `yacht-details-responsive-fixes.css` to `yacht-details-v3-styles.php`
+  - The responsive-fixes.css file was commented out due to Bootstrap conflicts
+  - CSS is now inline in the styles PHP file which is always loaded on yacht detail pages
+
+---
+
 ## [75.13] - 2025-12-22
 
 ### Added
