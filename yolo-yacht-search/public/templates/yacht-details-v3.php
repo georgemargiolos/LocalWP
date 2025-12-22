@@ -875,6 +875,83 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     <span class="btn-sub-text" id="depositText">Loading...</span>
                 </button>
                 
+                <?php
+                // Payment Icons Box (v75.18)
+                $show_payment_icons = get_option('yolo_ys_payment_icons_show_box', '1');
+                if ($show_payment_icons === '1') {
+                    $payment_icons_title = get_option('yolo_ys_payment_icons_title', 'We accept');
+                    $enabled_icons = get_option('yolo_ys_payment_icons_enabled', array('visa', 'mastercard', 'amex', 'paypal', 'apple-pay', 'google-pay', 'klarna', 'revolut'));
+                    $icon_order = get_option('yolo_ys_payment_icons_order', '');
+                    $visible_count = intval(get_option('yolo_ys_payment_icons_visible_count', 8));
+                    $show_more_text = get_option('yolo_ys_payment_icons_show_more_text', '+ %d more payment methods');
+                    $show_less_text = get_option('yolo_ys_payment_icons_show_less_text', 'Show less');
+                    
+                    // Define available icons
+                    $available_icons = array(
+                        'visa' => 'visa.svg', 'mastercard' => 'mastercard.svg', 'amex' => 'amex.svg',
+                        'discover' => 'discover.svg', 'paypal' => 'paypal.svg', 'apple-pay' => 'apple-pay.svg',
+                        'google-pay' => 'google-pay.svg', 'klarna' => 'klarna.svg', 'revolut' => 'revolut.svg',
+                        'samsung-pay' => 'samsung-pay.svg', 'link' => 'link.svg', 'bancontact' => 'bancontact.svg',
+                        'blik' => 'blik.svg', 'eps' => 'eps.svg', 'mbway' => 'mbway.svg',
+                        'mobilepay' => 'mobilepay.svg', 'kakaopay' => 'kakaopay.svg', 'naverpay' => 'naverpay.svg',
+                        'payco' => 'payco.svg', 'satispay' => 'satispay.svg', 'stripe' => 'stripe.svg'
+                    );
+                    
+                    // Sort by order
+                    $ordered_icons = array();
+                    if (!empty($icon_order)) {
+                        foreach (explode(',', $icon_order) as $icon_id) {
+                            if (isset($available_icons[$icon_id]) && in_array($icon_id, $enabled_icons)) {
+                                $ordered_icons[$icon_id] = $available_icons[$icon_id];
+                            }
+                        }
+                    }
+                    // Add any enabled icons not in order
+                    foreach ($enabled_icons as $icon_id) {
+                        if (isset($available_icons[$icon_id]) && !isset($ordered_icons[$icon_id])) {
+                            $ordered_icons[$icon_id] = $available_icons[$icon_id];
+                        }
+                    }
+                    
+                    $total_icons = count($ordered_icons);
+                    $remaining = $total_icons - $visible_count;
+                    $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE__)));
+                    
+                    if ($total_icons > 0):
+                ?>
+                <!-- Payment Icons Box (v75.18) -->
+                <div class="payment-icons-box">
+                    <div class="payment-icons-title"><?php echo esc_html($payment_icons_title); ?></div>
+                    <div class="payment-icons-grid" id="paymentIconsGrid">
+                        <?php 
+                        $count = 0;
+                        foreach ($ordered_icons as $icon_id => $icon_file):
+                            $hidden_class = ($count >= $visible_count) ? 'payment-icon-hidden' : '';
+                        ?>
+                            <img src="<?php echo esc_url($icons_url . $icon_file); ?>" 
+                                 alt="<?php echo esc_attr($icon_id); ?>" 
+                                 class="payment-icon <?php echo $hidden_class; ?>"
+                                 loading="lazy">
+                        <?php 
+                            $count++;
+                        endforeach; 
+                        ?>
+                    </div>
+                    <?php if ($remaining > 0): ?>
+                    <div class="payment-icons-toggle">
+                        <a href="#" id="paymentIconsToggle" 
+                           data-show-text="<?php echo esc_attr(sprintf($show_more_text, $remaining)); ?>"
+                           data-hide-text="<?php echo esc_attr($show_less_text); ?>">
+                            <?php echo esc_html(sprintf($show_more_text, $remaining)); ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php 
+                    endif;
+                }
+                ?>
+                
                 <!-- Request Quote Section -->
                 <div class="quote-section">
                     <p class="quote-label"><?php yolo_ys_text_e('quote_tagline', 'Need something special?'); ?></p>

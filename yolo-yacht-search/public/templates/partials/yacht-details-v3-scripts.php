@@ -168,6 +168,29 @@ function toggleAccordion(header) {
 }
 
 // ============================================
+// PAYMENT ICONS TOGGLE (v75.18)
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    var toggleLink = document.getElementById('paymentIconsToggle');
+    var iconsGrid = document.getElementById('paymentIconsGrid');
+    
+    if (toggleLink && iconsGrid) {
+        toggleLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            var isExpanded = iconsGrid.classList.contains('expanded');
+            
+            if (isExpanded) {
+                iconsGrid.classList.remove('expanded');
+                toggleLink.textContent = toggleLink.getAttribute('data-show-text');
+            } else {
+                iconsGrid.classList.add('expanded');
+                toggleLink.textContent = toggleLink.getAttribute('data-hide-text');
+            }
+        });
+    }
+});
+
+// ============================================
 // YouTube Video Click Handler (v65.16)
 // Opens YouTube video in lightbox when clicking play button in Swiper
 // ============================================

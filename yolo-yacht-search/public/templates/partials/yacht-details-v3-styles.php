@@ -223,4 +223,82 @@ $color_bg_light = get_option('yolo_ys_color_bg_light', '#f9fafb');
         margin-top: 8px;
     }
 }
+
+/* ==========================================================================
+   PAYMENT ICONS BOX (v75.18)
+   ========================================================================== */
+.payment-icons-box {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--yolo-bg-light);
+    border-radius: var(--yolo-radius-md);
+    text-align: center;
+}
+
+.payment-icons-title {
+    font-size: 12px;
+    color: var(--yolo-text-light);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-icons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    justify-items: center;
+    align-items: center;
+}
+
+.payment-icon {
+    width: 50px;
+    height: 32px;
+    object-fit: contain;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.payment-icon:hover {
+    transform: scale(1.1);
+}
+
+.payment-icon-hidden {
+    display: none;
+}
+
+.payment-icons-grid.expanded .payment-icon-hidden {
+    display: block;
+}
+
+.payment-icons-toggle {
+    margin-top: 12px;
+}
+
+.payment-icons-toggle a {
+    font-size: 12px;
+    color: var(--yolo-primary);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.payment-icons-toggle a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .payment-icons-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    
+    .payment-icon {
+        width: 42px;
+        height: 28px;
+    }
+    
+    .payment-icons-box {
+        padding: 12px;
+    }
+}
 </style>

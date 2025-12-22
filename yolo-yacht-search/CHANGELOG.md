@@ -1,5 +1,32 @@
 # Changelog
 
+## [75.18] - 2025-12-22
+
+### Added
+- **Payment Icons Box** - Display payment method icons under Book Now button
+  - Shows 8 icons initially (2 rows of 4) with "Show more" to expand
+  - Supports 21 payment methods: Visa, Mastercard, Amex, Discover, PayPal, Apple Pay, Google Pay, Klarna, Revolut, Samsung Pay, Link, Bancontact, BLIK, EPS, MB Way, MobilePay, Kakao Pay, Naver Pay, PAYCO, Satispay, Stripe
+  - All icons are SVG for crisp display at any size
+- **Payment Icons Admin Page** - New admin page under YOLO Yacht Search menu
+  - Enable/disable individual payment icons
+  - Drag-and-drop reorder icons
+  - Customizable texts: title, "show more", "show less"
+  - Configure number of initially visible icons
+  - Live preview of the payment icons box
+
+### Files Added
+- `admin/partials/payment-icons-page.php` - Admin settings page
+- `public/images/payment-icons/*.svg` - 21 payment method SVG icons
+
+### Files Modified
+- `yolo-yacht-search.php` - Version bump to 75.18
+- `admin/class-yolo-ys-admin.php` - Added Payment Icons submenu
+- `public/templates/yacht-details-v3.php` - Added payment icons box HTML
+- `public/templates/partials/yacht-details-v3-styles.php` - Added payment icons CSS
+- `public/templates/partials/yacht-details-v3-scripts.php` - Added toggle JS
+
+---
+
 ## [75.17] - 2025-12-22
 
 ### Fixed

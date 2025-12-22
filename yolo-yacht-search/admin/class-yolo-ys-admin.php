@@ -178,6 +178,16 @@ class YOLO_YS_Admin {
             'yolo-ys-crm',
             array($this, 'display_crm_page')
         );
+        
+        // Add Payment Icons submenu (v75.18)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Payment Icons', 'yolo-yacht-search'),
+            __('Payment Icons', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-payment-icons',
+            array($this, 'display_payment_icons_page')
+        );
     }
     
     /**
@@ -245,6 +255,13 @@ class YOLO_YS_Admin {
      */
     public function display_crm_page() {
         include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/crm-page.php';
+    }
+    
+    /**
+     * Display Payment Icons page (v75.18)
+     */
+    public function display_payment_icons_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/payment-icons-page.php';
     }
     
     /**
