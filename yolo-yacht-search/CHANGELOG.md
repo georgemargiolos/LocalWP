@@ -1,5 +1,15 @@
 # Changelog
 
+## [80.0] - 2025-12-22
+
+### Changed
+- **Sticky Booking Section Position** - Adjusted the top offset for the sticky booking section
+  - Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
+  - The booking sidebar now sticks closer to the top of the viewport
+  - File modified: `public/css/yacht-details-v3.css`
+
+---
+
 ## [75.31] - 2025-12-22
 
 ### Fixed

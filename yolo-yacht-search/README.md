@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 75.31
+**Version:** 80.0
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -14,6 +14,24 @@
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v80.0 - Sticky Booking Section Position Adjustment (December 22, 2025)
+
+**CSS Adjustment - Booking Sidebar Position**
+
+**Change:** Adjusted the top offset for the sticky booking section on the yacht details page.
+
+**Fix Applied:**
+- ✅ **Top Offset Reduced** - Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
+- ✅ **Closer to Viewport Top** - The booking sidebar now sticks closer to the top of the viewport for better visibility
+- ✅ **Sticky Behavior Maintained** - The `position: sticky` property continues to work as expected
+
+**Files Modified:** 1 file (public/css/yacht-details-v3.css)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅
+
+---
 
 ### v75.31 - Availability Box Scrollbar Fix (December 22, 2025)
 
