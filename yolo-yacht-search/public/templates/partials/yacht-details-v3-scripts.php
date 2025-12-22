@@ -110,49 +110,30 @@ function scrollToBookingSection() {
     }
 }
 
-// Hide sticky bar when booking section is visible OR when scrolled past it (v75.14)
+// Hide sticky bar when booking section is visible or scrolled past (v75.15)
 (function() {
-    // Only run on mobile
     if (window.innerWidth > 991) return;
     
-    const stickyBar = document.getElementById('mobileStickBar');
-    const bookingSection = document.getElementById('yacht-booking-section');
-    const yachtDetails = document.querySelector('.yolo-yacht-details-v3');
+    var stickyBar = document.getElementById('mobileStickBar');
+    var bookingSection = document.getElementById('yacht-booking-section');
     
     if (!stickyBar || !bookingSection) return;
     
-    // Function to check if we should show the sticky bar
-    function updateStickyBarVisibility() {
-        const bookingRect = bookingSection.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
+    function checkVisibility() {
+        var rect = bookingSection.getBoundingClientRect();
+        var viewHeight = window.innerHeight;
+        var inView = rect.top < viewHeight && rect.bottom > 0;
+        var pastIt = rect.top < 0;
         
-        // Hide if:
-        // 1. Booking section is in view (top is visible)
-        // 2. OR we've scrolled past the booking section (top is above viewport)
-        const bookingSectionInView = bookingRect.top < viewportHeight && bookingRect.bottom > 0;
-        const scrolledPastBooking = bookingRect.top < 0;
-        
-        if (bookingSectionInView || scrolledPastBooking) {
+        if (inView || pastIt) {
             stickyBar.classList.add('hidden');
         } else {
             stickyBar.classList.remove('hidden');
         }
     }
     
-    // Check on scroll
-    let ticking = false;
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                updateStickyBarVisibility();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
-    
-    // Initial check
-    updateStickyBarVisibility();
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    checkVisibility();
 })();
 
 // ============================================

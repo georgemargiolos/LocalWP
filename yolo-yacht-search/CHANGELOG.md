@@ -1,5 +1,14 @@
 # Changelog
 
+## [75.16] - 2025-12-22
+
+### Fixed
+- **JavaScript Syntax Error** - Simplified sticky bar visibility code to fix "Invalid or unexpected token" error
+  - Rewrote using simpler var declarations and function structure
+  - Removed nested functions that may have caused parsing issues
+
+---
+
 ## [75.15] - 2025-12-22
 
 ### Fixed
