@@ -1,5 +1,16 @@
 # Changelog
 
+## [75.28] - 2025-12-22
+
+### Fixed
+- **Stripe PHP Library Updated** - Upgraded from v13.16.0 to v16.2.0
+  - Old library didn't support `automatic_payment_methods` for Checkout Sessions
+  - Error was: `Received unknown parameter: automatic_payment_methods`
+  - New library uses API version `2024-10-28.acacia` (was `2023-10-16`)
+  - Now supports all modern Stripe features including automatic payment methods
+
+---
+
 ## [75.27] - 2025-12-22
 
 ### Fixed

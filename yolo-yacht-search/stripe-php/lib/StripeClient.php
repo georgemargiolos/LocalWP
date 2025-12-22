@@ -27,6 +27,7 @@ namespace Stripe;
  * @property \Stripe\Service\CustomerService $customers
  * @property \Stripe\Service\CustomerSessionService $customerSessions
  * @property \Stripe\Service\DisputeService $disputes
+ * @property \Stripe\Service\Entitlements\EntitlementsServiceFactory $entitlements
  * @property \Stripe\Service\EphemeralKeyService $ephemeralKeys
  * @property \Stripe\Service\EventService $events
  * @property \Stripe\Service\ExchangeRateService $exchangeRates
@@ -36,6 +37,7 @@ namespace Stripe;
  * @property \Stripe\Service\Forwarding\ForwardingServiceFactory $forwarding
  * @property \Stripe\Service\Identity\IdentityServiceFactory $identity
  * @property \Stripe\Service\InvoiceItemService $invoiceItems
+ * @property \Stripe\Service\InvoiceRenderingTemplateService $invoiceRenderingTemplates
  * @property \Stripe\Service\InvoiceService $invoices
  * @property \Stripe\Service\Issuing\IssuingServiceFactory $issuing
  * @property \Stripe\Service\MandateService $mandates
@@ -72,6 +74,7 @@ namespace Stripe;
  * @property \Stripe\Service\TopupService $topups
  * @property \Stripe\Service\TransferService $transfers
  * @property \Stripe\Service\Treasury\TreasuryServiceFactory $treasury
+ * @property \Stripe\Service\V2\V2ServiceFactory $v2
  * @property \Stripe\Service\WebhookEndpointService $webhookEndpoints
  * // The end of the section generated from our OpenAPI spec
  */
