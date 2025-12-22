@@ -81,7 +81,7 @@ class YOLO_YS_Stripe {
             
             // Create Checkout Session
             $session = \Stripe\Checkout\Session::create([
-                'automatic_payment_methods' => ['enabled' => true], // v75.19: Enable all payment methods
+                'payment_method_types' => ['card'], // Reverted from automatic_payment_methods due to API compatibility issues
                 'line_items' => [[
                     'price_data' => [
                         'currency' => strtolower($currency),
@@ -142,7 +142,7 @@ class YOLO_YS_Stripe {
             
             // Create Checkout Session
             $session = \Stripe\Checkout\Session::create([
-                'automatic_payment_methods' => ['enabled' => true], // v75.19: Enable all payment methods
+                'payment_method_types' => ['card'], // Reverted from automatic_payment_methods due to API compatibility issues
                 'line_items' => [[
                     'price_data' => [
                         'currency' => strtolower($currency),

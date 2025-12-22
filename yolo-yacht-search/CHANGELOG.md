@@ -1,5 +1,16 @@
 # Changelog
 
+## [75.26] - 2025-12-22
+
+### Fixed
+- **Stripe Checkout Stuck on Processing** - Reverted from `automatic_payment_methods` to `payment_method_types`
+  - The `automatic_payment_methods` API option was causing 500 errors on checkout
+  - Reverted to explicit `payment_method_types: ['card']` for compatibility
+  - Stripe Checkout now works correctly again
+  - Note: To enable additional payment methods, configure them directly in your Stripe Dashboard
+
+---
+
 ## [75.25] - 2025-12-22
 
 ### Fixed
