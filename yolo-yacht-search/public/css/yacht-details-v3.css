@@ -128,13 +128,10 @@
 }
 
 /* Booking Sidebar - Sticky positioning */
+/* v75.31: Removed max-height and overflow-y - let the box be as tall as needed */
 .yolo-yacht-details-v3 .yacht-booking-section {
     position: sticky;
     top: 100px;                          /* Stick 100px from top of viewport */
-    max-height: calc(100vh - 120px);     /* Constrain height to viewport */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--yolo-primary) var(--yolo-bg-light);
 }
 
 /* Disable sticky on mobile/tablet (not needed when columns stack) */
@@ -142,23 +139,7 @@
     .yolo-yacht-details-v3 .yacht-booking-section {
         position: static !important;
         align-self: auto;
-        max-height: none;
-        overflow-y: visible;
     }
-}
-
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar {
-    width: 6px;
-}
-
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar-track {
-    background: var(--yolo-bg-light);
-    border-radius: 3px;
-}
-
-.yolo-yacht-details-v3 .yacht-booking-section::-webkit-scrollbar-thumb {
-    background: var(--yolo-primary);
-    border-radius: 3px;
 }
 
 /* ============================================

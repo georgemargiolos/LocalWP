@@ -1,5 +1,16 @@
 # Changelog
 
+## [75.31] - 2025-12-22
+
+### Fixed
+- **Availability Box Scrollbar Removed** - The sidebar was showing an unwanted scrollbar
+  - Removed `max-height: calc(100vh - 120px)` constraint
+  - Removed `overflow-y: auto` 
+  - The availability box now grows to fit all content (including new payment icons)
+  - Sticky positioning still works on desktop
+
+---
+
 ## [75.30] - 2025-12-22
 
 ### Fixed
