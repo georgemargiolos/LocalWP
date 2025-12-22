@@ -1093,10 +1093,10 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
         })
         .then(response => response.json())
         .then(data => {
-            // Check response success and session_id
-            if (data.success) {
-            if (data.data) {
-            if (data.data.session_id) {
+            console.log('Checkout response:', data); // Debug logging
+            
+            // v75.27 FIX: Handle ALL error cases properly
+            if (data.success && data.data && data.data.session_id) {
                 // Redirect to Stripe Checkout
                 const stripe = Stripe('<?php echo get_option('yolo_ys_stripe_publishable_key', ''); ?>');
                 stripe.redirectToCheckout({
@@ -1116,19 +1116,25 @@ function showBookingFormModal(yachtId, yachtName, dateFrom, dateTo, totalPrice, 
                     }
                 });
             } else {
+                // v75.27 FIX: Handle ALL error cases - show error message and reset button
+                const errorMessage = (data.data && data.data.message) 
+                    ? data.data.message 
+                    : (data.message || 'Failed to create checkout session. Please try again.');
+                
+                console.error('Checkout session error:', data);
+                
                 Toastify({
-                    text: 'Error creating checkout session: ' + (data.data.message || 'Unknown error'),
-                    duration: 6000,
+                    text: errorMessage,
+                    duration: 8000,
                     gravity: 'top',
                     position: 'right',
                     backgroundColor: '#dc2626',
                     stopOnFocus: true
                 }).showToast();
+                
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
-            } // Close data.data check
-            } // Close data.success check
         })
         .catch(error => {
             console.error('Error:', error);

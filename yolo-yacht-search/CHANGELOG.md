@@ -1,5 +1,22 @@
 # Changelog
 
+## [75.27] - 2025-12-22
+
+### Fixed
+- **Stripe Checkout Stuck on Processing** - PROPER FIX for automatic payment methods
+  - Removed `payment_method_types` parameter entirely (was conflicting with Stripe Dashboard settings)
+  - Added `automatic_payment_methods: { enabled: true }` at the END of the session create array
+  - When Stripe Dashboard has "Automatic payment methods" enabled, you CANNOT use `payment_method_types`
+  - Checkout now supports Apple Pay, Google Pay, Klarna, and all other methods enabled in Stripe Dashboard
+
+- **JavaScript Error Handling** - Button no longer gets stuck on "Processing..."
+  - Added proper error handling for ALL checkout failure cases
+  - Shows red toast notification with error message
+  - Resets button text and enables it again on any error
+  - Added console logging for debugging
+
+---
+
 ## [75.26] - 2025-12-22
 
 ### Fixed

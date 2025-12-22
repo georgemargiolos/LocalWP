@@ -80,8 +80,9 @@ class YOLO_YS_Stripe {
             }
             
             // Create Checkout Session
+            // v75.27: Use automatic_payment_methods (supports Apple Pay, Google Pay, Klarna, etc.)
+            // Do NOT use payment_method_types - it conflicts with Stripe Dashboard "Automatic payment methods" setting
             $session = \Stripe\Checkout\Session::create([
-                'payment_method_types' => ['card'], // Reverted from automatic_payment_methods due to API compatibility issues
                 'line_items' => [[
                     'price_data' => [
                         'currency' => strtolower($currency),
@@ -115,6 +116,9 @@ class YOLO_YS_Stripe {
                     'included_extras' => $included_extras,
                     'extras_at_base' => $extras_at_base,
                 ],
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                ],
             ]);
             
             return array(
@@ -141,8 +145,9 @@ class YOLO_YS_Stripe {
             $this->init_stripe();
             
             // Create Checkout Session
+            // v75.27: Use automatic_payment_methods (supports Apple Pay, Google Pay, Klarna, etc.)
+            // Do NOT use payment_method_types - it conflicts with Stripe Dashboard "Automatic payment methods" setting
             $session = \Stripe\Checkout\Session::create([
-                'payment_method_types' => ['card'], // Reverted from automatic_payment_methods due to API compatibility issues
                 'line_items' => [[
                     'price_data' => [
                         'currency' => strtolower($currency),
@@ -170,6 +175,9 @@ class YOLO_YS_Stripe {
                     'customer_email' => $customer_email,
                     'customer_phone' => $customer_phone,
                     'payment_type' => 'balance',
+                ],
+                'automatic_payment_methods' => [
+                    'enabled' => true,
                 ],
             ]);
             
