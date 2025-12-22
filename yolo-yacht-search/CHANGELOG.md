@@ -1,5 +1,15 @@
 # Changelog
 
+## [75.15] - 2025-12-22
+
+### Fixed
+- **Sticky Bar Visible in Footer** - Now hides when scrolled past booking section (not just when booking section is in view)
+  - Replaced Intersection Observer with scroll-based detection
+  - Sticky bar only shows when user is above the booking section
+- **Sticky Bar Color** - Changed from primary (blue) to secondary (red) to match "Book Now" button
+
+---
+
 ## [75.14] - 2025-12-22
 
 ### Fixed

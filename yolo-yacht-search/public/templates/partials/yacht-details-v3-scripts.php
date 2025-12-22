@@ -110,34 +110,49 @@ function scrollToBookingSection() {
     }
 }
 
-// Hide sticky bar when booking section is visible (v75.13)
+// Hide sticky bar when booking section is visible OR when scrolled past it (v75.14)
 (function() {
     // Only run on mobile
     if (window.innerWidth > 991) return;
     
     const stickyBar = document.getElementById('mobileStickBar');
     const bookingSection = document.getElementById('yacht-booking-section');
+    const yachtDetails = document.querySelector('.yolo-yacht-details-v3');
     
     if (!stickyBar || !bookingSection) return;
     
-    // Use Intersection Observer to detect when booking section is visible
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Booking section is visible - hide sticky bar
-                stickyBar.classList.add('hidden');
-            } else {
-                // Booking section not visible - show sticky bar
-                stickyBar.classList.remove('hidden');
-            }
-        });
-    }, {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1 // Trigger when 10% of booking section is visible
-    });
+    // Function to check if we should show the sticky bar
+    function updateStickyBarVisibility() {
+        const bookingRect = bookingSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Hide if:
+        // 1. Booking section is in view (top is visible)
+        // 2. OR we've scrolled past the booking section (top is above viewport)
+        const bookingSectionInView = bookingRect.top < viewportHeight && bookingRect.bottom > 0;
+        const scrolledPastBooking = bookingRect.top < 0;
+        
+        if (bookingSectionInView || scrolledPastBooking) {
+            stickyBar.classList.add('hidden');
+        } else {
+            stickyBar.classList.remove('hidden');
+        }
+    }
     
-    observer.observe(bookingSection);
+    // Check on scroll
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateStickyBarVisibility();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+    
+    // Initial check
+    updateStickyBarVisibility();
 })();
 
 // ============================================

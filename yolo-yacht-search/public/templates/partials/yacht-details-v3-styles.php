@@ -92,7 +92,7 @@ $color_bg_light = get_option('yolo_ys_color_bg_light', '#f9fafb');
         gap: 10px;
         width: 100%;
         padding: 16px 24px;
-        background: var(--yolo-primary, #1e3a5f);
+        background: var(--yolo-secondary, #b91c1c);
         color: #fff;
         border: none;
         border-radius: 8px;
@@ -106,7 +106,7 @@ $color_bg_light = get_option('yolo_ys_color_bg_light', '#f9fafb');
     }
     
     .yolo-sticky-cta-btn:hover {
-        background: var(--yolo-primary-hover, #152a47);
+        background: var(--yolo-secondary-hover, #991b1b);
     }
     
     .yolo-sticky-cta-btn:active {
