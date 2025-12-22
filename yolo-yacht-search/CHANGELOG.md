@@ -1,5 +1,17 @@
 # Changelog
 
+## [75.30] - 2025-12-22
+
+### Fixed
+- **Stripe Checkout - FINAL FIX** - Removed ALL payment method parameters
+  - `automatic_payment_methods` is NOT supported for Checkout Sessions (only PaymentIntents/SetupIntents)
+  - Per Stripe docs: "Don't specify payment_method_types - let Dashboard control payment methods"
+  - Now the code simply creates a Checkout Session without any payment method parameters
+  - Stripe Dashboard settings will automatically control which payment methods appear
+  - This is the recommended approach per official Stripe documentation
+
+---
+
 ## [75.29] - 2025-12-22
 
 ### Fixed

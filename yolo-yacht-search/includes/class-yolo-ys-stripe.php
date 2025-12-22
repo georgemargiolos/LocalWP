@@ -19,8 +19,6 @@ class YOLO_YS_Stripe {
         }
         
         \Stripe\Stripe::setApiKey($secret_key);
-        // v75.29: Explicitly set API version to support automatic_payment_methods for Checkout Sessions
-        \Stripe\Stripe::setApiVersion('2024-10-28.acacia');
     }
     
     /**
@@ -82,8 +80,9 @@ class YOLO_YS_Stripe {
             }
             
             // Create Checkout Session
-            // v75.27: Use automatic_payment_methods (supports Apple Pay, Google Pay, Klarna, etc.)
-            // Do NOT use payment_method_types - it conflicts with Stripe Dashboard "Automatic payment methods" setting
+            // v75.30: Don't specify payment_method_types OR automatic_payment_methods
+            // Let Stripe Dashboard control which payment methods are shown
+            // This is the recommended approach per Stripe docs
             $session = \Stripe\Checkout\Session::create([
                 'line_items' => [[
                     'price_data' => [
@@ -118,9 +117,6 @@ class YOLO_YS_Stripe {
                     'included_extras' => $included_extras,
                     'extras_at_base' => $extras_at_base,
                 ],
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                ],
             ]);
             
             return array(
@@ -147,8 +143,8 @@ class YOLO_YS_Stripe {
             $this->init_stripe();
             
             // Create Checkout Session
-            // v75.27: Use automatic_payment_methods (supports Apple Pay, Google Pay, Klarna, etc.)
-            // Do NOT use payment_method_types - it conflicts with Stripe Dashboard "Automatic payment methods" setting
+            // v75.30: Don't specify payment_method_types OR automatic_payment_methods
+            // Let Stripe Dashboard control which payment methods are shown
             $session = \Stripe\Checkout\Session::create([
                 'line_items' => [[
                     'price_data' => [
@@ -177,9 +173,6 @@ class YOLO_YS_Stripe {
                     'customer_email' => $customer_email,
                     'customer_phone' => $customer_phone,
                     'payment_type' => 'balance',
-                ],
-                'automatic_payment_methods' => [
-                    'enabled' => true,
                 ],
             ]);
             
