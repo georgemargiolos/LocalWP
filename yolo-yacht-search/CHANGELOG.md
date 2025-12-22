@@ -1,5 +1,14 @@
 # Changelog
 
+## [75.20] - 2025-12-22
+
+### Fixed
+- **Payment Icons Drag-and-Drop** - jQuery UI Sortable was not loaded on the Payment Icons admin page
+  - Added `wp_enqueue_script('jquery-ui-sortable')` for the payment icons page
+  - Icons can now be dragged to reorder them
+
+---
+
 ## [75.19] - 2025-12-22
 
 ### Added

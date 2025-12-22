@@ -83,6 +83,11 @@ class YOLO_YS_Admin {
             wp_enqueue_script('jquery-ui-sortable');
             wp_enqueue_media();
         }
+        
+        // Enqueue jQuery UI Sortable for Payment Icons page (v75.20)
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-payment-icons') {
+            wp_enqueue_script('jquery-ui-sortable');
+        }
     }
     
     /**
