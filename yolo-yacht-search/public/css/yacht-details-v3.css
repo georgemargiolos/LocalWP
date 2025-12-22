@@ -131,7 +131,7 @@
 /* v75.31: Removed max-height and overflow-y - let the box be as tall as needed */
 .yolo-yacht-details-v3 .yacht-booking-section {
     position: sticky;
-    top: 100px;                          /* Stick 100px from top of viewport */
+    top: 50px;                          /* Stick 100px from top of viewport */
 }
 
 /* Disable sticky on mobile/tablet (not needed when columns stack) */
