@@ -247,6 +247,35 @@ $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
             </div>
         </div>
         
+        <!-- Starting From Price Section (all boats) -->
+        <div class="customization-section pricing-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; margin-bottom: 20px; border-radius: 4px;">
+            <h3><span class="dashicons dashicons-money-alt"></span> Starting From Price (for Facebook/Google Ads)</h3>
+            <p class="description">This price is used for Facebook Pixel ViewContent events and Google Analytics view_item events. Set this to your lowest weekly charter rate.</p>
+            
+            <div style="margin-top: 15px;">
+                <label for="starting_from_price" style="font-weight: 600; display: block; margin-bottom: 5px;">Starting From Price (EUR):</label>
+                <input type="number" id="starting_from_price" name="starting_from_price" 
+                       value="<?php 
+                           // v75.11: Load starting_from_price from column (not key-value)
+                           $starting_price = $yacht_settings && isset($yacht_settings->starting_from_price) ? $yacht_settings->starting_from_price : '';
+                           // Only show if > 0
+                           echo esc_attr($starting_price > 0 ? $starting_price : '');
+                       ?>"
+                       placeholder="e.g., 2500"
+                       style="width: 150px; padding: 8px;" min="0" step="1">
+                <span style="color: #666; margin-left: 10px;">EUR</span>
+                
+                <button type="button" id="save-starting-price" class="button button-primary" style="margin-left: 15px;">
+                    <span class="dashicons dashicons-saved" style="vertical-align: middle;"></span>
+                    Save Price
+                </button>
+                
+                <p class="description" style="margin-top: 10px;">
+                    <strong>Tip:</strong> This should match the price you set in your Facebook Product Catalog for this yacht.
+                </p>
+            </div>
+        </div>
+        
     <?php else: ?>
         <!-- No yacht selected message -->
         <div style="background: #fff; padding: 40px; text-align: center; border: 1px solid #ccd0d4; border-radius: 4px;">
@@ -531,6 +560,32 @@ jQuery(document).ready(function($) {
         } else {
             $('#custom_description_editor').val(syncedDesc);
         }
+    });
+    
+    // Save starting from price (v75.11)
+    $('#save-starting-price').on('click', function() {
+        var $btn = $(this);
+        var price = $('#starting_from_price').val();
+        
+        $btn.prop('disabled', true).html('<span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Saving...');
+        
+        $.post(ajaxUrl, {
+            action: 'yolo_save_yacht_custom_setting',
+            yacht_id: yachtId,
+            setting: 'starting_from_price',
+            value: price,
+            nonce: nonce
+        }, function(response) {
+            if (response.success) {
+                $btn.html('<span class="dashicons dashicons-yes" style="vertical-align: middle;"></span> Saved!');
+                setTimeout(function() {
+                    $btn.prop('disabled', false).html('<span class="dashicons dashicons-saved" style="vertical-align: middle;"></span> Save Price');
+                }, 1500);
+            } else {
+                alert('Error saving price: ' + response.data);
+                $btn.prop('disabled', false).html('<span class="dashicons dashicons-saved" style="vertical-align: middle;"></span> Save Price');
+            }
+        });
     });
     
     // Save description (will be fully implemented in Phase 3)

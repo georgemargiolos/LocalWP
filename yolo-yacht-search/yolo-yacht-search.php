@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 75.10
+ * Version: 75.11
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '75.10');
+define('YOLO_YS_VERSION', '75.11');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -191,10 +191,37 @@ add_action('plugins_loaded', function() {
         update_option('yolo_ys_flush_rewrite_rules', true);
     }
     
+    // v75.11: Add starting_from_price column to custom settings table
+    if (version_compare($installed_version, '75.11', '<')) {
+        global $wpdb;
+        $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if table exists first
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$custom_settings_table}'");
+        
+        if ($table_exists) {
+            // Check if starting_from_price column exists
+            $column_exists = $wpdb->get_results(
+                "SHOW COLUMNS FROM {$custom_settings_table} LIKE 'starting_from_price'"
+            );
+            
+            if (empty($column_exists)) {
+                // Add starting_from_price column
+                $wpdb->query(
+                    "ALTER TABLE {$custom_settings_table} 
+                     ADD COLUMN starting_from_price decimal(10,2) DEFAULT 0 
+                     COMMENT 'Starting from price for Facebook/Google Ads tracking (v75.11)'
+                     AFTER custom_description"
+                );
+                error_log('YOLO YS v75.11: Added starting_from_price column to custom settings table');
+            }
+        }
+    }
+    
     // Update version to current
-    if (version_compare($installed_version, '75.4', '<')) {
-        update_option('yolo_ys_db_version', '75.4');
-        error_log('YOLO YS: Database migrated to v75.4');
+    if (version_compare($installed_version, '75.11', '<')) {
+        update_option('yolo_ys_db_version', '75.11');
+        error_log('YOLO YS: Database migrated to v75.11');
     }
 }, 5);
 

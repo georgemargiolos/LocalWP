@@ -1,5 +1,33 @@
 # YOLO Yacht Search Changelog
 
+## [75.11] - 2025-12-22
+
+### Added
+- **Starting From Price Field in Yacht Customization** - New field for all boats to set the "starting from" price for Facebook/Google Ads tracking
+  - Available for all yachts in the system (not just YOLO boats)
+  - Price is stored as `starting_from_price` column in `wp_yolo_yacht_custom_settings` table
+  - Used by Facebook Pixel ViewContent and Google Analytics view_item events
+  - User can manually set prices to match their Facebook Product Catalog
+
+### Fixed
+- **Database Migration for Starting From Price** - Added automatic migration to add `starting_from_price` column
+  - Migration runs automatically on plugin update (via `plugins_loaded` hook)
+  - Column is `DECIMAL(10,2)` with default value of 0
+  - AJAX handler updated to support saving the new column
+- **ViewContent/view_item Events Now Send Correct Price** - Both Facebook Pixel and Google Analytics were receiving `value: 0` and `price: 0` for yacht view events
+  - Server-side Facebook CAPI now uses custom `starting_from_price` setting
+  - Client-side `window.yoloYachtData.price` now populated from custom settings
+  - This fixes ROAS reporting and value-based optimization in both Facebook and Google Ads
+  - Price is manually configured per yacht (all boats)
+
+### Files Modified
+- `yolo-yacht-search.php` - Added v75.11 database migration for `starting_from_price` column
+- `admin/class-yolo-ys-admin.php` - Updated AJAX handler to accept `starting_from_price` setting
+- `admin/partials/yacht-customization-page.php` - Added Starting From Price section with save handler
+- `public/templates/partials/yacht-details-v3-scripts.php` - Client-side yoloYachtData uses custom starting price
+
+---
+
 ## [75.10] - 2025-12-22
 
 ### Fixed

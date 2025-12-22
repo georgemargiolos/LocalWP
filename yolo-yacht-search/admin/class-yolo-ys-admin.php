@@ -744,8 +744,9 @@ class YOLO_YS_Admin {
     }
     
     /**
-     * AJAX: Save yacht custom setting (use_custom_media or use_custom_description)
+     * AJAX: Save yacht custom setting (use_custom_media, use_custom_description, or starting_from_price)
      * @since 65.14
+     * @updated 75.11 - Added starting_from_price support
      */
     public function ajax_save_yacht_custom_setting() {
         check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
@@ -756,10 +757,21 @@ class YOLO_YS_Admin {
         
         $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
         $setting = isset($_POST['setting']) ? sanitize_text_field($_POST['setting']) : '';
-        $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
         
-        if (empty($yacht_id) || !in_array($setting, array('use_custom_media', 'use_custom_description'))) {
+        // v75.11: Support starting_from_price as decimal, others as int
+        $allowed_settings = array('use_custom_media', 'use_custom_description', 'starting_from_price');
+        
+        if (empty($yacht_id) || !in_array($setting, $allowed_settings)) {
             wp_send_json_error('Invalid parameters');
+        }
+        
+        // Handle value type based on setting
+        if ($setting === 'starting_from_price') {
+            $value = isset($_POST['value']) ? floatval($_POST['value']) : 0;
+            $format = '%f';
+        } else {
+            $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
+            $format = '%d';
         }
         
         global $wpdb;
@@ -776,7 +788,7 @@ class YOLO_YS_Admin {
                 $table,
                 array($setting => $value),
                 array('yacht_id' => $yacht_id),
-                array('%d'),
+                array($format),
                 array('%s')
             );
         } else {
@@ -786,7 +798,7 @@ class YOLO_YS_Admin {
                     'yacht_id' => $yacht_id,
                     $setting => $value
                 ),
-                array('%s', '%d')
+                array('%s', $format)
             );
         }
         

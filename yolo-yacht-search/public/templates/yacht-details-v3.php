@@ -68,7 +68,15 @@ $fb_event_id = '';
 if (function_exists('yolo_analytics')) {
     ob_start();
     try {
-        $yacht_price = !empty($yacht->price) ? floatval($yacht->price) : 0;
+        // v75.11: Get starting_from_price from yacht custom settings (all boats)
+        $yacht_price = 0;
+        global $wpdb;
+        $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        $starting_price = $wpdb->get_var($wpdb->prepare(
+            "SELECT starting_from_price FROM $custom_settings_table WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        $yacht_price = $starting_price ? floatval($starting_price) : 0;
         $yacht_name_for_tracking = !empty($yacht->name) ? $yacht->name : '';
         $fb_event_id = @yolo_analytics()->track_yacht_view($yacht_id, $yacht_price, $yacht_name_for_tracking);
     } catch (Exception $e) {

@@ -269,13 +269,14 @@ class YOLO_YS_Database {
         ) $charset_collate;";
         dbDelta($sql_custom_media);
         
-        // Yacht Custom Settings table (v65.14) - for custom description and flags
+        // Yacht Custom Settings table (v65.14, updated v75.11) - for custom description, flags, and pricing
         $table_custom_settings = $wpdb->prefix . 'yolo_yacht_custom_settings';
         $sql_custom_settings = "CREATE TABLE {$table_custom_settings} (
             yacht_id varchar(50) NOT NULL,
             use_custom_media tinyint(1) DEFAULT 0 COMMENT 'Use local images/videos instead of synced',
             use_custom_description tinyint(1) DEFAULT 0 COMMENT 'Use custom description instead of synced',
             custom_description longtext DEFAULT NULL,
+            starting_from_price decimal(10,2) DEFAULT 0 COMMENT 'Starting from price for Facebook/Google Ads tracking (v75.11)',
             updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (yacht_id)
         ) $charset_collate;";
