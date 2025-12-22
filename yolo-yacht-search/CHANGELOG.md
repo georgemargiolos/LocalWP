@@ -1,5 +1,15 @@
 # Changelog
 
+## [75.25] - 2025-12-22
+
+### Fixed
+- **Payment Icons Nonce Expiration** - Fixed "The link you followed has expired" error
+  - Changed hide/restore/delete actions from GET links to POST forms
+  - Now uses fresh nonces generated when the page loads
+  - No more expiration issues when page is open for a while
+
+---
+
 ## [75.24] - 2025-12-22
 
 ### Fixed

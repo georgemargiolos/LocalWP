@@ -41,9 +41,9 @@ $custom_icons = get_option('yolo_ys_payment_icons_custom', array());
 // Get hidden built-in icons
 $hidden_builtin_icons = get_option('yolo_ys_payment_icons_hidden', array());
 
-// Handle built-in icon hide/delete
-if (isset($_GET['hide_builtin_icon']) && check_admin_referer('hide_builtin_icon_' . $_GET['hide_builtin_icon'])) {
-    $icon_to_hide = sanitize_text_field($_GET['hide_builtin_icon']);
+// Handle built-in icon hide/delete (POST method for fresh nonce)
+if (isset($_POST['hide_builtin_icon']) && wp_verify_nonce($_POST['_wpnonce'], 'yolo_ys_payment_icons_nonce')) {
+    $icon_to_hide = sanitize_text_field($_POST['hide_builtin_icon']);
     if (isset($builtin_icons[$icon_to_hide]) && !in_array($icon_to_hide, $hidden_builtin_icons)) {
         $hidden_builtin_icons[] = $icon_to_hide;
         update_option('yolo_ys_payment_icons_hidden', $hidden_builtin_icons);
@@ -57,9 +57,9 @@ if (isset($_GET['hide_builtin_icon']) && check_admin_referer('hide_builtin_icon_
     }
 }
 
-// Handle built-in icon restore
-if (isset($_GET['restore_builtin_icon']) && check_admin_referer('restore_builtin_icon_' . $_GET['restore_builtin_icon'])) {
-    $icon_to_restore = sanitize_text_field($_GET['restore_builtin_icon']);
+// Handle built-in icon restore (POST method for fresh nonce)
+if (isset($_POST['restore_builtin_icon']) && wp_verify_nonce($_POST['_wpnonce'], 'yolo_ys_payment_icons_nonce')) {
+    $icon_to_restore = sanitize_text_field($_POST['restore_builtin_icon']);
     $hidden_builtin_icons = array_diff($hidden_builtin_icons, array($icon_to_restore));
     update_option('yolo_ys_payment_icons_hidden', array_values($hidden_builtin_icons));
     echo '<div class="notice notice-success"><p>Icon "' . esc_html($builtin_icons[$icon_to_restore]['name']) . '" has been restored.</p></div>';
@@ -68,9 +68,9 @@ if (isset($_GET['restore_builtin_icon']) && check_admin_referer('restore_builtin
     $hidden_builtin_icons = get_option('yolo_ys_payment_icons_hidden', array());
 }
 
-// Handle custom icon deletion
-if (isset($_GET['delete_custom_icon']) && check_admin_referer('delete_custom_icon_' . $_GET['delete_custom_icon'])) {
-    $icon_to_delete = sanitize_text_field($_GET['delete_custom_icon']);
+// Handle custom icon deletion (POST method for fresh nonce)
+if (isset($_POST['delete_custom_icon']) && wp_verify_nonce($_POST['_wpnonce'], 'yolo_ys_payment_icons_nonce')) {
+    $icon_to_delete = sanitize_text_field($_POST['delete_custom_icon']);
     if (isset($custom_icons[$icon_to_delete])) {
         // Delete the file from media library
         if (isset($custom_icons[$icon_to_delete]['attachment_id'])) {
@@ -264,21 +264,21 @@ $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE_
                     <img src="<?php echo esc_url($icon_src); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; margin-right: 10px; object-fit: contain;">
                     <span style="flex: 1;"><?php echo esc_html($icon_data['name']); ?></span>
                     <?php if ($is_custom): ?>
-                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=yolo-payment-icons&delete_custom_icon=' . $icon_id), 'delete_custom_icon_' . $icon_id); ?>" 
-                           class="delete-custom-icon" 
+                        <button type="submit" name="delete_custom_icon" value="<?php echo esc_attr($icon_id); ?>" 
+                           class="button-link delete-custom-icon" 
                            onclick="return confirm('Are you sure you want to delete this custom icon?');"
                            title="Delete custom icon"
-                           style="color: #dc2626; margin-right: 8px;">
+                           style="color: #dc2626; margin-right: 8px; border: none; background: none; cursor: pointer; padding: 0;">
                             <span class="dashicons dashicons-trash"></span>
-                        </a>
+                        </button>
                     <?php else: ?>
-                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=yolo-payment-icons&hide_builtin_icon=' . $icon_id), 'hide_builtin_icon_' . $icon_id); ?>" 
-                           class="hide-builtin-icon" 
+                        <button type="submit" name="hide_builtin_icon" value="<?php echo esc_attr($icon_id); ?>" 
+                           class="button-link hide-builtin-icon" 
                            onclick="return confirm('Hide this icon? You can restore it later.');"
                            title="Hide this icon"
-                           style="color: #dc2626; margin-right: 8px;">
+                           style="color: #dc2626; margin-right: 8px; border: none; background: none; cursor: pointer; padding: 0;">
                             <span class="dashicons dashicons-hidden"></span>
-                        </a>
+                        </button>
                     <?php endif; ?>
                     <span class="dashicons dashicons-menu" style="color: #999;"></span>
                 </div>
@@ -407,21 +407,24 @@ $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE_
     <?php if (!empty($hidden_builtin_icons)): ?>
     <h3><?php _e('Hidden Built-in Icons', 'yolo-yacht-search'); ?></h3>
     <p style="color: #666;"><?php _e('These icons have been hidden. Click "Restore" to add them back to the list.', 'yolo-yacht-search'); ?></p>
-    <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
-        <?php foreach ($hidden_builtin_icons as $icon_id): 
-            if (isset($all_builtin_icons[$icon_id])):
-                $icon_data = $all_builtin_icons[$icon_id];
-        ?>
-            <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 16px; text-align: center; width: 120px; opacity: 0.7;">
-                <img src="<?php echo esc_url($icons_url . $icon_data['file']); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; object-fit: contain; margin-bottom: 8px; filter: grayscale(50%);">
-                <div style="font-size: 12px; font-weight: 600; color: #666;"><?php echo esc_html($icon_data['name']); ?></div>
-                <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=yolo-payment-icons&restore_builtin_icon=' . $icon_id), 'restore_builtin_icon_' . $icon_id); ?>" 
-                   style="font-size: 11px; color: #2271b1;">
-                    <?php _e('Restore', 'yolo-yacht-search'); ?>
-                </a>
-            </div>
-        <?php endif; endforeach; ?>
-    </div>
+    <form method="post" action="">
+        <?php wp_nonce_field('yolo_ys_payment_icons_nonce'); ?>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;">
+            <?php foreach ($hidden_builtin_icons as $icon_id): 
+                if (isset($all_builtin_icons[$icon_id])):
+                    $icon_data = $all_builtin_icons[$icon_id];
+            ?>
+                <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 16px; text-align: center; width: 120px; opacity: 0.7;">
+                    <img src="<?php echo esc_url($icons_url . $icon_data['file']); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; object-fit: contain; margin-bottom: 8px; filter: grayscale(50%);">
+                    <div style="font-size: 12px; font-weight: 600; color: #666;"><?php echo esc_html($icon_data['name']); ?></div>
+                    <button type="submit" name="restore_builtin_icon" value="<?php echo esc_attr($icon_id); ?>" 
+                       style="font-size: 11px; color: #2271b1; background: none; border: none; cursor: pointer; text-decoration: underline;">
+                        <?php _e('Restore', 'yolo-yacht-search'); ?>
+                    </button>
+                </div>
+            <?php endif; endforeach; ?>
+        </div>
+    </form>
     <?php endif; ?>
     
     <?php if (!empty($custom_icons)): ?>
