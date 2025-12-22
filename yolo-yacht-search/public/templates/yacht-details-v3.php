@@ -914,6 +914,12 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     // Get custom uploaded icons
                     $custom_icons = get_option('yolo_ys_payment_icons_custom', array());
                     
+                    // Filter out hidden built-in icons
+                    $hidden_icons = get_option('yolo_ys_payment_icons_hidden', array());
+                    foreach ($hidden_icons as $hidden_id) {
+                        unset($builtin_icons[$hidden_id]);
+                    }
+                    
                     // Merge all icons
                     $all_icons = array_merge($builtin_icons, $custom_icons);
                     

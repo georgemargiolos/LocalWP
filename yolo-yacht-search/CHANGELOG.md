@@ -1,5 +1,14 @@
 # Changelog
 
+## [75.24] - 2025-12-22
+
+### Fixed
+- **Payment Icons Frontend** - Hidden built-in icons are now properly filtered on the yacht page
+  - Previously, hidden icons could still appear on the frontend
+  - Now respects the `yolo_ys_payment_icons_hidden` setting
+
+---
+
 ## [75.23] - 2025-12-22
 
 ### Fixed
