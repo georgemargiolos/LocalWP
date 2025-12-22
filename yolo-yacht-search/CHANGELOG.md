@@ -1,5 +1,14 @@
 # Changelog
 
+## [75.23] - 2025-12-22
+
+### Fixed
+- **Custom Icon Upload Error Handling** - Improved error messages for upload failures
+  - Now shows "Security check failed. Please refresh the page and try again." instead of generic WordPress error
+  - Better handling of nonce verification for file uploads
+
+---
+
 ## [75.22] - 2025-12-22
 
 ### Added

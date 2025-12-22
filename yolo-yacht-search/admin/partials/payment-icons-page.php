@@ -94,7 +94,11 @@ foreach ($hidden_builtin_icons as $hidden_id) {
 }
 
 // Handle custom icon upload
-if (isset($_POST['yolo_ys_upload_custom_icon']) && check_admin_referer('yolo_ys_payment_icons_nonce')) {
+if (isset($_POST['yolo_ys_upload_custom_icon'])) {
+    // Verify nonce separately to provide better error message
+    if (!wp_verify_nonce($_POST['_wpnonce'], 'yolo_ys_payment_icons_nonce')) {
+        echo '<div class="notice notice-error"><p>Security check failed. Please refresh the page and try again.</p></div>';
+    } else {
     $icon_name = sanitize_text_field($_POST['custom_icon_name']);
     $icon_id = sanitize_title($icon_name);
     
@@ -139,6 +143,7 @@ if (isset($_POST['yolo_ys_upload_custom_icon']) && check_admin_referer('yolo_ys_
     } else {
         echo '<div class="notice notice-error"><p>Please provide both icon name and file.</p></div>';
     }
+    } // end nonce check
 }
 
 // Merge built-in and custom icons
