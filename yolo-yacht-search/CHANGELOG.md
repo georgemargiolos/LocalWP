@@ -1,5 +1,24 @@
 # YOLO Yacht Search Changelog
 
+## [75.12] - 2025-12-22
+
+### Fixed
+- **Auto-Migration for Starting From Price Column** - The `plugins_loaded` migration wasn't running on existing installations
+  - Added auto-migration directly in AJAX handler - column is created on first save attempt
+  - Better error messages: now shows "Missing yacht_id" or "Invalid setting" instead of generic "Invalid parameters"
+  - Database errors are now reported back to the user
+- **Empty Price Handling** - When price is not set, `null` is sent to analytics instead of `0`
+  - Facebook Pixel and Google Analytics won't receive misleading `value: 0`
+  - Price field in admin shows empty instead of "0" when not set
+
+### Files Modified
+- `yolo-yacht-search.php` - Bumped version to 75.12
+- `admin/class-yolo-ys-admin.php` - Added auto-migration and better error handling
+- `public/js/yolo-analytics.js` - Don't default price to 0
+- `public/templates/partials/yacht-details-v3-scripts.php` - Use null for unset prices
+
+---
+
 ## [75.11] - 2025-12-22
 
 ### Added

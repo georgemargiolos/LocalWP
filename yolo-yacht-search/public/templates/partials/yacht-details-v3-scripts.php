@@ -34,20 +34,24 @@ window.fbViewContentEventId = <?php echo json_encode($fb_event_id); ?>;
 // Yacht data for analytics (v75.10 fix for pretty URLs)
 // This ensures Facebook Pixel gets correct content_ids even without ?yacht_id in URL
 // v75.11: Get starting_from_price from yacht custom settings (all boats)
+// v75.12: Use null instead of 0 when price is not set (don't send 0 to analytics)
 <?php
-$starting_price = 0;
+$starting_price = null; // null = not set, 0 = free (unlikely for yachts)
 global $wpdb;
 $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
 $stored_price = $wpdb->get_var($wpdb->prepare(
     "SELECT starting_from_price FROM $custom_settings_table WHERE yacht_id = %s",
     $yacht_id_safe
 ));
-$starting_price = $stored_price ? floatval($stored_price) : 0;
+// Only set price if it's a positive number (> 0)
+if ($stored_price && floatval($stored_price) > 0) {
+    $starting_price = floatval($stored_price);
+}
 ?>
 window.yoloYachtData = {
     id: <?php echo json_encode($yacht_id_safe); ?>,
     name: <?php echo json_encode($yacht_name_safe); ?>,
-    price: <?php echo json_encode($starting_price); ?>,
+    price: <?php echo json_encode($starting_price); ?>, // null if not set
     currency: 'EUR'
 };
 

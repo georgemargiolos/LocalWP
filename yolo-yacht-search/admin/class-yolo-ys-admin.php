@@ -761,8 +761,12 @@ class YOLO_YS_Admin {
         // v75.11: Support starting_from_price as decimal, others as int
         $allowed_settings = array('use_custom_media', 'use_custom_description', 'starting_from_price');
         
-        if (empty($yacht_id) || !in_array($setting, $allowed_settings)) {
-            wp_send_json_error('Invalid parameters');
+        // v75.12: Better error messages for debugging
+        if (empty($yacht_id)) {
+            wp_send_json_error('Missing yacht_id');
+        }
+        if (!in_array($setting, $allowed_settings)) {
+            wp_send_json_error('Invalid setting: ' . $setting);
         }
         
         // Handle value type based on setting
@@ -777,6 +781,19 @@ class YOLO_YS_Admin {
         global $wpdb;
         $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
+        // v75.12: Auto-migrate starting_from_price column if it doesn't exist
+        if ($setting === 'starting_from_price') {
+            $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'starting_from_price'");
+            if (empty($column_exists)) {
+                $wpdb->query(
+                    "ALTER TABLE {$table} 
+                     ADD COLUMN starting_from_price decimal(10,2) DEFAULT 0 
+                     COMMENT 'Starting from price for Facebook/Google Ads tracking (v75.11)'"
+                );
+                error_log('YOLO YS v75.12: Auto-added starting_from_price column to custom settings table');
+            }
+        }
+        
         // Check if record exists
         $exists = $wpdb->get_var($wpdb->prepare(
             "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
@@ -784,7 +801,7 @@ class YOLO_YS_Admin {
         ));
         
         if ($exists) {
-            $wpdb->update(
+            $result = $wpdb->update(
                 $table,
                 array($setting => $value),
                 array('yacht_id' => $yacht_id),
@@ -792,7 +809,7 @@ class YOLO_YS_Admin {
                 array('%s')
             );
         } else {
-            $wpdb->insert(
+            $result = $wpdb->insert(
                 $table,
                 array(
                     'yacht_id' => $yacht_id,
@@ -800,6 +817,11 @@ class YOLO_YS_Admin {
                 ),
                 array('%s', $format)
             );
+        }
+        
+        // v75.12: Check for database errors
+        if ($result === false) {
+            wp_send_json_error('Database error: ' . $wpdb->last_error);
         }
         
         wp_send_json_success('Setting saved');

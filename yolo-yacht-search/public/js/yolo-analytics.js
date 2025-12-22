@@ -93,11 +93,12 @@
      */
     function getYachtData() {
         // First check if yacht data was set by PHP (works for pretty URLs)
+        // v75.12: Don't default price to 0 - keep null if not set
         if (window.yoloYachtData && window.yoloYachtData.id) {
             return {
                 id: window.yoloYachtData.id,
                 name: window.yoloYachtData.name || 'Yacht',
-                price: window.yoloYachtData.price || 0,
+                price: window.yoloYachtData.price, // null if not set, don't default to 0
                 currency: window.yoloYachtData.currency || config.currency || 'EUR'
             };
         }
