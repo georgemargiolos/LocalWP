@@ -89,8 +89,20 @@
     
     /**
      * Get yacht data from current page
+     * v75.10: Now checks window.yoloYachtData first (set by PHP for pretty URLs)
      */
     function getYachtData() {
+        // First check if yacht data was set by PHP (works for pretty URLs)
+        if (window.yoloYachtData && window.yoloYachtData.id) {
+            return {
+                id: window.yoloYachtData.id,
+                name: window.yoloYachtData.name || 'Yacht',
+                price: window.yoloYachtData.price || 0,
+                currency: window.yoloYachtData.currency || config.currency || 'EUR'
+            };
+        }
+        
+        // Fallback to URL parameters (legacy URLs with ?yacht_id=)
         const urlParams = new URLSearchParams(window.location.search);
         return {
             id: urlParams.get('yacht_id') || urlParams.get('yacht'),

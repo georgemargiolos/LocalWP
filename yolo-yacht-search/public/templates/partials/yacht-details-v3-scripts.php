@@ -31,6 +31,15 @@ $yacht_id_safe = ($yacht && isset($yacht->id)) ? $yacht->id : $yacht_id;
 // MUST use window. so yolo-analytics.js can access it
 window.fbViewContentEventId = <?php echo json_encode($fb_event_id); ?>;
 
+// Yacht data for analytics (v75.10 fix for pretty URLs)
+// This ensures Facebook Pixel gets correct content_ids even without ?yacht_id in URL
+window.yoloYachtData = {
+    id: <?php echo json_encode($yacht_id_safe); ?>,
+    name: <?php echo json_encode($yacht_name_safe); ?>,
+    price: <?php echo json_encode(!empty($yacht->price) ? floatval($yacht->price) : 0); ?>,
+    currency: 'EUR'
+};
+
 // ============================================
 // FIXED: Toggle Description "More..." / "Less"
 // This function was MISSING - causing the button to not work!
@@ -230,11 +239,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const initDateFrom = dateInput.dataset.initDateFrom;
         const initDateTo = dateInput.dataset.initDateTo;
         
+        // Responsive: show 1 month on mobile, 2 on desktop
+        const isMobile = window.innerWidth <= 768;
+        
         const pickerConfig = {
             element: dateInput,
             singleMode: false,
-            numberOfMonths: 2,
-            numberOfColumns: 2,
+            numberOfMonths: isMobile ? 1 : 2,
+            numberOfColumns: isMobile ? 1 : 2,
             format: 'DD.MM.YYYY',
             minDate: new Date(),
             autoApply: true,
@@ -244,7 +256,9 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             tooltipNumber: (totalDays) => {
                 return totalDays - 1;
-            }
+            },
+            // Mobile-friendly settings
+            mobileFriendly: true
         };
         
         // Set initial date range if provided
@@ -255,6 +269,42 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create and store Litepicker instance globally
         window.yoloDatePicker = new Litepicker(pickerConfig);
+        
+        // Add touch swipe support for mobile month navigation (v75.9)
+        if (isMobile) {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            const minSwipeDistance = 50;
+            
+            // Wait for picker to render, then attach touch events
+            window.yoloDatePicker.on('render', function() {
+                const pickerContainer = document.querySelector('.litepicker');
+                if (pickerContainer && !pickerContainer.hasAttribute('data-swipe-enabled')) {
+                    pickerContainer.setAttribute('data-swipe-enabled', 'true');
+                    
+                    pickerContainer.addEventListener('touchstart', function(e) {
+                        touchStartX = e.changedTouches[0].screenX;
+                    }, { passive: true });
+                    
+                    pickerContainer.addEventListener('touchend', function(e) {
+                        touchEndX = e.changedTouches[0].screenX;
+                        const swipeDistance = touchEndX - touchStartX;
+                        
+                        if (Math.abs(swipeDistance) > minSwipeDistance) {
+                            if (swipeDistance > 0) {
+                                // Swipe right - go to previous month
+                                const prevBtn = pickerContainer.querySelector('.button-previous-month');
+                                if (prevBtn) prevBtn.click();
+                            } else {
+                                // Swipe left - go to next month
+                                const nextBtn = pickerContainer.querySelector('.button-next-month');
+                                if (nextBtn) nextBtn.click();
+                            }
+                        }
+                    }, { passive: true });
+                }
+            });
+        }
         
         // Attach event handler immediately after creation to avoid race conditions
         window.yoloDatePicker.on('selected', function(date1, date2) {

@@ -1,5 +1,35 @@
 # YOLO Yacht Search Changelog
 
+## [75.10] - 2025-12-22
+
+### Fixed
+- **Facebook Retargeting with Pretty URLs** - Facebook Pixel was sending `content_ids: [null]` for pretty URLs because `getYachtData()` only looked for `?yacht_id=` in URL
+  - Added `window.yoloYachtData` object set by PHP with yacht ID, name, price
+  - Updated `yolo-analytics.js` to check `window.yoloYachtData` first before falling back to URL params
+  - This fixes Facebook Dynamic Ads showing `{{product.name}}` instead of actual yacht name
+
+### Files Modified
+- `public/templates/partials/yacht-details-v3-scripts.php` - Added window.yoloYachtData
+- `public/js/yolo-analytics.js` - Updated getYachtData() to use window.yoloYachtData
+
+---
+
+## [75.9] - 2025-12-21
+
+### Fixed
+- **Mobile Date Picker Layout** - Calendar was showing 2 months side by side on mobile, causing viewport overflow
+  - Now shows 1 month on mobile (≤768px), 2 months on desktop
+  - Added touch swipe support for navigating between months on mobile
+  - Added CSS fixes to ensure calendar fits within viewport
+  - Added "Swipe to change month" hint text on mobile
+  - Made navigation arrows more touch-friendly (44px minimum touch target)
+
+### Files Modified
+- `public/templates/partials/yacht-details-v3-scripts.php` - Responsive Litepicker config + touch swipe
+- `public/css/yacht-details-responsive-fixes.css` - Mobile CSS for Litepicker
+
+---
+
 ## [75.8] - 2025-12-21
 
 ### Fixed
