@@ -2,7 +2,7 @@
 /**
  * Payment Icons Admin Page
  * Allows customization of payment method icons displayed under the Book Now button
- * v75.18
+ * v75.19 - Added custom icon upload
  */
 
 // Exit if accessed directly
@@ -10,8 +10,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Define available payment icons
-$available_icons = array(
+// Define available built-in payment icons
+$builtin_icons = array(
     'visa' => array('name' => 'Visa', 'file' => 'visa.svg'),
     'mastercard' => array('name' => 'Mastercard', 'file' => 'mastercard.svg'),
     'amex' => array('name' => 'American Express', 'file' => 'amex.svg'),
@@ -34,6 +34,80 @@ $available_icons = array(
     'satispay' => array('name' => 'Satispay', 'file' => 'satispay.svg'),
     'stripe' => array('name' => 'Stripe', 'file' => 'stripe.svg'),
 );
+
+// Get custom uploaded icons
+$custom_icons = get_option('yolo_ys_payment_icons_custom', array());
+
+// Handle custom icon deletion
+if (isset($_GET['delete_custom_icon']) && check_admin_referer('delete_custom_icon_' . $_GET['delete_custom_icon'])) {
+    $icon_to_delete = sanitize_text_field($_GET['delete_custom_icon']);
+    if (isset($custom_icons[$icon_to_delete])) {
+        // Delete the file from media library
+        if (isset($custom_icons[$icon_to_delete]['attachment_id'])) {
+            wp_delete_attachment($custom_icons[$icon_to_delete]['attachment_id'], true);
+        }
+        unset($custom_icons[$icon_to_delete]);
+        update_option('yolo_ys_payment_icons_custom', $custom_icons);
+        
+        // Also remove from enabled icons
+        $enabled_icons = get_option('yolo_ys_payment_icons_enabled', array());
+        $enabled_icons = array_diff($enabled_icons, array($icon_to_delete));
+        update_option('yolo_ys_payment_icons_enabled', $enabled_icons);
+        
+        echo '<div class="notice notice-success"><p>Custom icon deleted successfully!</p></div>';
+    }
+}
+
+// Handle custom icon upload
+if (isset($_POST['yolo_ys_upload_custom_icon']) && check_admin_referer('yolo_ys_payment_icons_nonce')) {
+    $icon_name = sanitize_text_field($_POST['custom_icon_name']);
+    $icon_id = sanitize_title($icon_name);
+    
+    if (!empty($icon_name) && !empty($_FILES['custom_icon_file']['name'])) {
+        // Check if it's an SVG
+        $file_type = wp_check_filetype($_FILES['custom_icon_file']['name']);
+        
+        if ($file_type['ext'] === 'svg') {
+            // Upload the file
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/media.php');
+            
+            $attachment_id = media_handle_upload('custom_icon_file', 0);
+            
+            if (!is_wp_error($attachment_id)) {
+                $file_url = wp_get_attachment_url($attachment_id);
+                
+                // Make sure icon_id is unique
+                $original_id = $icon_id;
+                $counter = 1;
+                while (isset($builtin_icons[$icon_id]) || isset($custom_icons[$icon_id])) {
+                    $icon_id = $original_id . '-' . $counter;
+                    $counter++;
+                }
+                
+                $custom_icons[$icon_id] = array(
+                    'name' => $icon_name,
+                    'file' => $file_url,
+                    'attachment_id' => $attachment_id,
+                    'is_custom' => true,
+                );
+                update_option('yolo_ys_payment_icons_custom', $custom_icons);
+                
+                echo '<div class="notice notice-success"><p>Custom icon "' . esc_html($icon_name) . '" uploaded successfully!</p></div>';
+            } else {
+                echo '<div class="notice notice-error"><p>Error uploading file: ' . esc_html($attachment_id->get_error_message()) . '</p></div>';
+            }
+        } else {
+            echo '<div class="notice notice-error"><p>Only SVG files are allowed. Please upload an SVG file.</p></div>';
+        }
+    } else {
+        echo '<div class="notice notice-error"><p>Please provide both icon name and file.</p></div>';
+    }
+}
+
+// Merge built-in and custom icons
+$available_icons = array_merge($builtin_icons, $custom_icons);
 
 // Handle form submission
 if (isset($_POST['yolo_ys_save_payment_icons']) && check_admin_referer('yolo_ys_payment_icons_nonce')) {
@@ -141,11 +215,23 @@ $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE_
         <input type="hidden" name="payment_icons_order" id="payment_icons_order" value="<?php echo esc_attr($icon_order); ?>">
         
         <div id="payment-icons-sortable" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 20px 0;">
-            <?php foreach ($ordered_icons as $icon_id => $icon_data): ?>
+            <?php foreach ($ordered_icons as $icon_id => $icon_data): 
+                $is_custom = isset($icon_data['is_custom']) && $icon_data['is_custom'];
+                $icon_src = $is_custom ? $icon_data['file'] : $icons_url . $icon_data['file'];
+            ?>
                 <div class="payment-icon-item" data-icon-id="<?php echo esc_attr($icon_id); ?>" style="display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 6px; cursor: move;">
                     <input type="checkbox" name="payment_icons_enabled[]" value="<?php echo esc_attr($icon_id); ?>" <?php checked(in_array($icon_id, $enabled_icons)); ?> style="margin-right: 10px;">
-                    <img src="<?php echo esc_url($icons_url . $icon_data['file']); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; margin-right: 10px; object-fit: contain;">
+                    <img src="<?php echo esc_url($icon_src); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; margin-right: 10px; object-fit: contain;">
                     <span style="flex: 1;"><?php echo esc_html($icon_data['name']); ?></span>
+                    <?php if ($is_custom): ?>
+                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=yolo-payment-icons&delete_custom_icon=' . $icon_id), 'delete_custom_icon_' . $icon_id); ?>" 
+                           class="delete-custom-icon" 
+                           onclick="return confirm('Are you sure you want to delete this custom icon?');"
+                           title="Delete custom icon"
+                           style="color: #dc2626; margin-right: 8px;">
+                            <span class="dashicons dashicons-trash"></span>
+                        </a>
+                    <?php endif; ?>
                     <span class="dashicons dashicons-menu" style="color: #999;"></span>
                 </div>
             <?php endforeach; ?>
@@ -160,8 +246,10 @@ $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE_
                 $count = 0;
                 foreach ($ordered_icons as $icon_id => $icon_data): 
                     if (in_array($icon_id, $enabled_icons) && $count < $visible_count):
+                        $is_custom = isset($icon_data['is_custom']) && $icon_data['is_custom'];
+                        $icon_src = $is_custom ? $icon_data['file'] : $icons_url . $icon_data['file'];
                 ?>
-                    <img src="<?php echo esc_url($icons_url . $icon_data['file']); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; object-fit: contain;">
+                    <img src="<?php echo esc_url($icon_src); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; object-fit: contain;">
                 <?php 
                         $count++;
                     endif;
@@ -183,6 +271,79 @@ $icons_url = plugins_url('public/images/payment-icons/', dirname(dirname(__FILE_
         
         <?php submit_button(__('Save Payment Icons Settings', 'yolo-yacht-search'), 'primary', 'yolo_ys_save_payment_icons'); ?>
     </form>
+    
+    <hr style="margin: 40px 0;">
+    
+    <!-- Custom Icon Upload Section -->
+    <h2><?php _e('Upload Custom Payment Icon', 'yolo-yacht-search'); ?></h2>
+    <div style="background: #f0f6fc; border: 1px solid #c3c4c7; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+        <h3 style="margin-top: 0; color: #1e3a8a;">
+            <span class="dashicons dashicons-info" style="margin-right: 8px;"></span>
+            <?php _e('SVG Icon Requirements', 'yolo-yacht-search'); ?>
+        </h3>
+        <table style="border-collapse: collapse; width: 100%; max-width: 500px;">
+            <tr>
+                <td style="padding: 8px 16px 8px 0; font-weight: 600;"><?php _e('Format:', 'yolo-yacht-search'); ?></td>
+                <td style="padding: 8px 0;"><code>SVG</code> (Scalable Vector Graphics)</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 16px 8px 0; font-weight: 600;"><?php _e('Recommended Size:', 'yolo-yacht-search'); ?></td>
+                <td style="padding: 8px 0;"><code>50px × 32px</code> (width × height)</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 16px 8px 0; font-weight: 600;"><?php _e('Aspect Ratio:', 'yolo-yacht-search'); ?></td>
+                <td style="padding: 8px 0;"><code>1.5625:1</code> (approximately 3:2)</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 16px 8px 0; font-weight: 600;"><?php _e('ViewBox:', 'yolo-yacht-search'); ?></td>
+                <td style="padding: 8px 0;"><code>viewBox="0 0 50 32"</code> (recommended)</td>
+            </tr>
+        </table>
+        <p style="margin-bottom: 0; color: #666;">
+            <strong><?php _e('Tip:', 'yolo-yacht-search'); ?></strong> 
+            <?php _e('SVG icons scale perfectly to any size. The dimensions above are display sizes - your SVG can have any internal dimensions as long as the aspect ratio is similar.', 'yolo-yacht-search'); ?>
+        </p>
+    </div>
+    
+    <form method="post" action="" enctype="multipart/form-data">
+        <?php wp_nonce_field('yolo_ys_payment_icons_nonce'); ?>
+        
+        <table class="form-table">
+            <tr>
+                <th scope="row"><label for="custom_icon_name"><?php _e('Icon Name', 'yolo-yacht-search'); ?></label></th>
+                <td>
+                    <input type="text" id="custom_icon_name" name="custom_icon_name" class="regular-text" placeholder="e.g., My Payment Method" required>
+                    <p class="description"><?php _e('Display name for the payment method', 'yolo-yacht-search'); ?></p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><label for="custom_icon_file"><?php _e('SVG File', 'yolo-yacht-search'); ?></label></th>
+                <td>
+                    <input type="file" id="custom_icon_file" name="custom_icon_file" accept=".svg" required>
+                    <p class="description"><?php _e('Upload an SVG file (50×32px recommended)', 'yolo-yacht-search'); ?></p>
+                </td>
+            </tr>
+        </table>
+        
+        <?php submit_button(__('Upload Custom Icon', 'yolo-yacht-search'), 'secondary', 'yolo_ys_upload_custom_icon'); ?>
+    </form>
+    
+    <?php if (!empty($custom_icons)): ?>
+    <h3><?php _e('Your Custom Icons', 'yolo-yacht-search'); ?></h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+        <?php foreach ($custom_icons as $icon_id => $icon_data): ?>
+            <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; text-align: center; width: 120px;">
+                <img src="<?php echo esc_url($icon_data['file']); ?>" alt="<?php echo esc_attr($icon_data['name']); ?>" style="width: 50px; height: 32px; object-fit: contain; margin-bottom: 8px;">
+                <div style="font-size: 12px; font-weight: 600;"><?php echo esc_html($icon_data['name']); ?></div>
+                <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=yolo-payment-icons&delete_custom_icon=' . $icon_id), 'delete_custom_icon_' . $icon_id); ?>" 
+                   onclick="return confirm('Are you sure you want to delete this custom icon?');"
+                   style="font-size: 11px; color: #dc2626;">
+                    <?php _e('Delete', 'yolo-yacht-search'); ?>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -219,5 +380,8 @@ jQuery(document).ready(function($) {
     border: 2px dashed #2271b1;
     background: #f0f6fc;
     visibility: visible !important;
+}
+.delete-custom-icon:hover {
+    color: #991b1b !important;
 }
 </style>

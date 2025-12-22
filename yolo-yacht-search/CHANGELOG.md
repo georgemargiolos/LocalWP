@@ -1,5 +1,24 @@
 # Changelog
 
+## [75.19] - 2025-12-22
+
+### Added
+- **Stripe: All Payment Methods Enabled** - Changed from `payment_method_types: ['card']` to `automatic_payment_methods` so Stripe Checkout now shows all payment methods enabled in your Stripe Dashboard (Apple Pay, Google Pay, Klarna, PayPal, etc.)
+- **Custom Payment Icon Upload** - Admin can now upload custom SVG icons for payment methods not in the built-in list
+  - SVG icon requirements displayed in admin (50×32px recommended, viewBox="0 0 50 32")
+  - Delete functionality for custom uploaded icons
+  - Custom icons appear in the sortable list alongside built-in icons
+
+### Changed
+- Payment icons frontend code refactored to support both built-in and custom icons
+
+### Files Modified
+- `includes/class-yolo-ys-stripe.php` - Changed to `automatic_payment_methods`
+- `admin/partials/payment-icons-page.php` - Added custom icon upload section
+- `public/templates/yacht-details-v3.php` - Support custom icons in frontend
+
+---
+
 ## [75.18] - 2025-12-22
 
 ### Added

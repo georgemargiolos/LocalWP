@@ -876,7 +876,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 </button>
                 
                 <?php
-                // Payment Icons Box (v75.18)
+                // Payment Icons Box (v75.19 - supports custom icons)
                 $show_payment_icons = get_option('yolo_ys_payment_icons_show_box', '1');
                 if ($show_payment_icons === '1') {
                     $payment_icons_title = get_option('yolo_ys_payment_icons_title', 'We accept');
@@ -886,30 +886,50 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     $show_more_text = get_option('yolo_ys_payment_icons_show_more_text', '+ %d more payment methods');
                     $show_less_text = get_option('yolo_ys_payment_icons_show_less_text', 'Show less');
                     
-                    // Define available icons
-                    $available_icons = array(
-                        'visa' => 'visa.svg', 'mastercard' => 'mastercard.svg', 'amex' => 'amex.svg',
-                        'discover' => 'discover.svg', 'paypal' => 'paypal.svg', 'apple-pay' => 'apple-pay.svg',
-                        'google-pay' => 'google-pay.svg', 'klarna' => 'klarna.svg', 'revolut' => 'revolut.svg',
-                        'samsung-pay' => 'samsung-pay.svg', 'link' => 'link.svg', 'bancontact' => 'bancontact.svg',
-                        'blik' => 'blik.svg', 'eps' => 'eps.svg', 'mbway' => 'mbway.svg',
-                        'mobilepay' => 'mobilepay.svg', 'kakaopay' => 'kakaopay.svg', 'naverpay' => 'naverpay.svg',
-                        'payco' => 'payco.svg', 'satispay' => 'satispay.svg', 'stripe' => 'stripe.svg'
+                    // Define built-in icons (file path relative to plugin)
+                    $builtin_icons = array(
+                        'visa' => array('file' => 'visa.svg', 'is_custom' => false),
+                        'mastercard' => array('file' => 'mastercard.svg', 'is_custom' => false),
+                        'amex' => array('file' => 'amex.svg', 'is_custom' => false),
+                        'discover' => array('file' => 'discover.svg', 'is_custom' => false),
+                        'paypal' => array('file' => 'paypal.svg', 'is_custom' => false),
+                        'apple-pay' => array('file' => 'apple-pay.svg', 'is_custom' => false),
+                        'google-pay' => array('file' => 'google-pay.svg', 'is_custom' => false),
+                        'klarna' => array('file' => 'klarna.svg', 'is_custom' => false),
+                        'revolut' => array('file' => 'revolut.svg', 'is_custom' => false),
+                        'samsung-pay' => array('file' => 'samsung-pay.svg', 'is_custom' => false),
+                        'link' => array('file' => 'link.svg', 'is_custom' => false),
+                        'bancontact' => array('file' => 'bancontact.svg', 'is_custom' => false),
+                        'blik' => array('file' => 'blik.svg', 'is_custom' => false),
+                        'eps' => array('file' => 'eps.svg', 'is_custom' => false),
+                        'mbway' => array('file' => 'mbway.svg', 'is_custom' => false),
+                        'mobilepay' => array('file' => 'mobilepay.svg', 'is_custom' => false),
+                        'kakaopay' => array('file' => 'kakaopay.svg', 'is_custom' => false),
+                        'naverpay' => array('file' => 'naverpay.svg', 'is_custom' => false),
+                        'payco' => array('file' => 'payco.svg', 'is_custom' => false),
+                        'satispay' => array('file' => 'satispay.svg', 'is_custom' => false),
+                        'stripe' => array('file' => 'stripe.svg', 'is_custom' => false)
                     );
                     
-                    // Sort by order
+                    // Get custom uploaded icons
+                    $custom_icons = get_option('yolo_ys_payment_icons_custom', array());
+                    
+                    // Merge all icons
+                    $all_icons = array_merge($builtin_icons, $custom_icons);
+                    
+                    // Sort by order and filter enabled
                     $ordered_icons = array();
                     if (!empty($icon_order)) {
                         foreach (explode(',', $icon_order) as $icon_id) {
-                            if (isset($available_icons[$icon_id]) && in_array($icon_id, $enabled_icons)) {
-                                $ordered_icons[$icon_id] = $available_icons[$icon_id];
+                            if (isset($all_icons[$icon_id]) && in_array($icon_id, $enabled_icons)) {
+                                $ordered_icons[$icon_id] = $all_icons[$icon_id];
                             }
                         }
                     }
                     // Add any enabled icons not in order
                     foreach ($enabled_icons as $icon_id) {
-                        if (isset($available_icons[$icon_id]) && !isset($ordered_icons[$icon_id])) {
-                            $ordered_icons[$icon_id] = $available_icons[$icon_id];
+                        if (isset($all_icons[$icon_id]) && !isset($ordered_icons[$icon_id])) {
+                            $ordered_icons[$icon_id] = $all_icons[$icon_id];
                         }
                     }
                     
@@ -919,16 +939,19 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     
                     if ($total_icons > 0):
                 ?>
-                <!-- Payment Icons Box (v75.18) -->
+                <!-- Payment Icons Box (v75.19) -->
                 <div class="payment-icons-box">
                     <div class="payment-icons-title"><?php echo esc_html($payment_icons_title); ?></div>
                     <div class="payment-icons-grid" id="paymentIconsGrid">
                         <?php 
                         $count = 0;
-                        foreach ($ordered_icons as $icon_id => $icon_file):
+                        foreach ($ordered_icons as $icon_id => $icon_data):
                             $hidden_class = ($count >= $visible_count) ? 'payment-icon-hidden' : '';
+                            // Custom icons have full URL, built-in icons need base URL prepended
+                            $is_custom = isset($icon_data['is_custom']) && $icon_data['is_custom'];
+                            $icon_src = $is_custom ? $icon_data['file'] : $icons_url . $icon_data['file'];
                         ?>
-                            <img src="<?php echo esc_url($icons_url . $icon_file); ?>" 
+                            <img src="<?php echo esc_url($icon_src); ?>" 
                                  alt="<?php echo esc_attr($icon_id); ?>" 
                                  class="payment-icon <?php echo $hidden_class; ?>"
                                  loading="lazy">
