@@ -110,30 +110,47 @@ function scrollToBookingSection() {
     }
 }
 
-// Hide sticky bar when booking section is visible or scrolled past (v75.15)
+// Hide sticky bar when booking section is visible (v75.17)
 (function() {
     if (window.innerWidth > 991) return;
     
     var stickyBar = document.getElementById('mobileStickBar');
     var bookingSection = document.getElementById('yacht-booking-section');
     
-    if (!stickyBar || !bookingSection) return;
+    if (!stickyBar) return;
+    if (!bookingSection) return;
     
-    function checkVisibility() {
+    // Use IntersectionObserver with large bottom margin to trigger early
+    // rootMargin: '0px 0px 200% 0px' means trigger when element is within 200% viewport height from bottom
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                stickyBar.classList.add('hidden');
+            } else {
+                // Only show if we haven't scrolled past (booking section is below viewport)
+                var rect = bookingSection.getBoundingClientRect();
+                if (rect.top > 0) {
+                    stickyBar.classList.remove('hidden');
+                }
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '0px 0px 0px 0px',
+        threshold: 0.1
+    });
+    
+    observer.observe(bookingSection);
+    
+    // Also check on scroll for when we've scrolled past
+    var lastScrollY = 0;
+    window.addEventListener('scroll', function() {
         var rect = bookingSection.getBoundingClientRect();
-        var viewHeight = window.innerHeight;
-        var inView = rect.top < viewHeight && rect.bottom > 0;
-        var pastIt = rect.top < 0;
-        
-        if (inView || pastIt) {
+        // If booking section top is above viewport (scrolled past), hide sticky bar
+        if (rect.top < 0) {
             stickyBar.classList.add('hidden');
-        } else {
-            stickyBar.classList.remove('hidden');
         }
-    }
-    
-    window.addEventListener('scroll', checkVisibility, { passive: true });
-    checkVisibility();
+    }, { passive: true });
 })();
 
 // ============================================

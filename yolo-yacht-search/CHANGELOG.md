@@ -1,5 +1,15 @@
 # Changelog
 
+## [75.17] - 2025-12-22
+
+### Fixed
+- **JavaScript Syntax Error** - Reverted to IntersectionObserver approach (v75.14 style)
+  - WordPress was HTML-encoding `&&` operators as `&#038;&#038;`
+  - Now uses IntersectionObserver + separate scroll listener to avoid `&&`
+  - Sticky bar hides when booking section visible OR when scrolled past it
+
+---
+
 ## [75.16] - 2025-12-22
 
 ### Fixed
