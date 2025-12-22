@@ -1,121 +1,53 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
-**Date:** December 17, 2025  
-**Version:** v70.1 (Last Stable Version)  
-**Task Goal:** Fix guest login password mismatch and remove BM- prefix from booking references.
+**Date:** December 22, 2025  
+**Version:** v75.31 (Last Stable Version)  
+**Task Goal:** Fix Stripe checkout and availability box scrollbar.
 
 ---
 
-## 🔴 Summary of Work Completed (v65.23 → v70.1)
+## 🔴 Summary of Work Completed (v75.30 - v75.31)
 
-### Critical Bug Fixed: Guest Login Password Mismatch
+### 1. Stripe Checkout Fix (v75.30)
+- **Issue:** Checkout stuck on "Processing..." due to "Received unknown parameter: automatic_payment_methods".
+- **Root Cause:** The `automatic_payment_methods` parameter is not supported for Stripe Checkout Sessions (only for PaymentIntents/SetupIntents).
+- **Solution:** Removed all payment method parameters (`payment_method_types` and `automatic_payment_methods`) from the `Checkout\Session::create()` call. This allows the Stripe Dashboard settings to automatically control which payment methods are displayed, which is the official, stable approach.
+- **Status:** **FIXED and STABLE.** Tested with Google Pay and confirmed working.
 
-**Problem:**
-- Email showed password as: `BM-7333050630000107850YoLo`
-- Actual password in WordPress was: `123YoLo` (using booking ID instead of BM reservation ID)
-- **Result:** Customers could not log in to their guest accounts!
-
-**Solution:**
-1. Updated all password generation code to use the same `$booking_reference` formula
-2. Reordered operations so BM reservation is created BEFORE guest user
-3. Fixed confirmation page to show booking reference with `BM-` prefix
-
-### Files Modified in v70.0:
-
-| File | Changes |
-|------|--------|
-| `yolo-yacht-search.php` | Version bump from 65.23 to 70.0 |
-| `includes/class-yolo-ys-stripe-handlers.php` | Fixed AJAX handler - password now uses `BM-{bm_reservation_id}YoLo` |
-| `includes/class-yolo-ys-stripe.php` | Reordered operations, fixed webhook handler password generation |
-| `public/templates/booking-confirmation.php` | Fixed booking reference display to include `BM-` prefix |
+### 2. Availability Box Scrollbar Fix (v75.31)
+- **Issue:** The sticky availability box on the yacht details page was showing an unwanted vertical scrollbar.
+- **Root Cause:** The box's content (including the new payment icons) grew taller than the fixed `max-height` constraint (`max-height: calc(100vh - 120px)`).
+- **Solution:** Removed the `max-height` and `overflow-y: auto` CSS properties from `.yacht-booking-section` in `public/css/yacht-details-v3.css`.
+- **Status:** **FIXED.** The box now grows to fit all content while maintaining its sticky position.
 
 ---
 
-## Order of Operations After Stripe Payment (v70.0)
+## Files Modified in Latest Commits
 
-1. ✅ Stripe payment completes
-2. ✅ Redirect to confirmation page with spinner
-3. ✅ AJAX call to `yolo_process_stripe_booking`
-4. ✅ Retrieve Stripe session and verify payment
-5. ✅ **Create booking in WordPress DB**
-6. ✅ **Create BM reservation** (get `bm_reservation_id`)
-7. ✅ **Create guest user** with password = `{bm_reservation_id}YoLo`
-8. ✅ Send confirmation emails (with matching password)
-9. ✅ Track Purchase event (FB CAPI + GA4)
-10. ✅ Page reloads with confirmation showing `{bm_reservation_id}` format
-
----
-
-## Password Format
-
-| Scenario | Booking Reference | Password |
-|----------|------------------|----------|
-| With BM reservation | `7333050630000107850` | `7333050630000107850YoLo` |
-| Without BM reservation | `YOLO-2025-0123` | `YOLO-2025-0123YoLo` |
-
----
-
-## ⚠️ Existing Users Need Password Fix
-
-Users who booked BEFORE v70.0 have incorrect passwords.
-
-### Option 1: Manual Password Reset
-1. Go to WordPress Admin → Users
-2. Find the guest user by email
-3. Set password to: `{their_bm_reservation_id}YoLo`
-
-### Option 2: Run Migration Script
-
-Create `fix-guest-passwords.php` in WordPress root:
-
-```php
-<?php
-require_once('wp-load.php');
-if (!is_user_logged_in() || !current_user_can('manage_options')) {
-    die('Access denied.');
-}
-global $wpdb;
-$query = "SELECT b.id, b.customer_email, b.bm_reservation_id, u.ID as user_id
-          FROM {$wpdb->prefix}yolo_bookings b
-          INNER JOIN {$wpdb->users} u ON u.user_email = b.customer_email
-          WHERE b.bm_reservation_id IS NOT NULL";
-$bookings = $wpdb->get_results($query);
-foreach ($bookings as $booking) {
-    $password = $booking->bm_reservation_id . 'YoLo';
-    wp_set_password($password, $booking->user_id);
-    echo "Fixed: {$booking->customer_email}<br>";
-}
-echo "Done! DELETE THIS FILE NOW!";
-?>
-```
-
-**DELETE the file immediately after running!**
-
----
-
-## Testing Checklist
-
-- [ ] Make a test booking
-- [ ] Complete Stripe payment
-- [ ] Verify confirmation page shows `{bm_reservation_id}` format (no BM- prefix)
-- [ ] Verify email shows same `{bm_reservation_id}` format
-- [ ] Try to login with password from email
-- [ ] Login should work! ✅
+| File | Change Summary |
+| :--- | :--- |
+| `yolo-yacht-search.php` | Version bump to 75.31 |
+| `CHANGELOG.md` | Updated with v75.30 and v75.31 entries |
+| `README.md` | Updated with latest version and v75.30/v75.31 summaries |
+| `includes/class-yolo-ys-stripe.php` | Removed all payment method parameters (v75.30 fix) |
+| `public/css/yacht-details-v3.css` | Removed `max-height` and `overflow-y` from `.yacht-booking-section` (v75.31 fix) |
 
 ---
 
 ## Suggested Next Steps
 
-1. **Deploy v70.0** to production
-2. **Test with a real booking** to verify fix works
-3. **Run migration script** to fix existing users (if needed)
-4. **Monitor error logs** for 24 hours
+1. **Deploy v75.31** to production
+2. **Test a real booking** to verify the Stripe fix is stable
+3. **Monitor error logs** for 24 hours
 
 ---
 
-## Previous Work (v65.21 - v65.23)
+## Next Session Links
 
-The v65.x series implemented:
-- AJAX-based booking confirmation flow with immediate spinner display
-- Customizable progressive spinner texts (0s, 10s, 35s, 45s)
-- Removed debug code from yacht-details-v3.php
+| Resource | Link | Notes |
+| :--- | :--- | :--- |
+| **GitHub Repository** | [https://github.com/georgemargiolos/LocalWP](https://github.com/georgemargiolos/LocalWP) | All code is pushed here. |
+| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v75.31.zip` | Use this file to update the plugin on your WordPress site. |
+| **Latest Changelog** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md) | For a detailed history of changes. |
+| **Latest README** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md) | For an overview of the latest features. |
+| **Handoff File** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md) | This document. |

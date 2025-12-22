@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 60.2
+**Version:** 75.31
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -14,6 +14,42 @@
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v75.31 - Availability Box Scrollbar Fix (December 22, 2025)
+
+**CSS Fix - Removed Unwanted Scrollbar**
+
+**Issue:** The sticky availability box on the yacht details page was showing an unwanted vertical scrollbar on desktop due to a `max-height` constraint that was no longer necessary after adding the payment icons.
+
+**Fix Applied:**
+- ✅ **Removed Height Constraint** - Removed `max-height: calc(100vh - 120px)` and `overflow-y: auto` from `.yacht-booking-section` in `public/css/yacht-details-v3.css`.
+- ✅ **Box Grows to Fit** - The box now grows to fit all content, including the new payment icons, without a scrollbar.
+- ✅ **Sticky Maintained** - The `position: sticky` property remains for desktop UX.
+
+**Files Modified:** 1 file (public/css/yacht-details-v3.css)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅ (Tested & Verified)
+
+---
+
+### v75.30 - Stripe Checkout Final Fix (December 22, 2025)
+
+**Critical Booking Fix - Checkout Session Stuck**
+
+**Issue:** Stripe checkout was stuck on "Processing..." due to an "Received unknown parameter: automatic_payment_methods" error.
+
+**Fix Applied:**
+- ✅ **Final Solution** - Removed ALL payment method parameters (`payment_method_types` and `automatic_payment_methods`) from `create_checkout_session` and `create_balance_checkout_session` in `includes/class-yolo-ys-stripe.php`.
+- ✅ **Stripe Recommended Approach** - This lets the Stripe Dashboard control which payment methods appear, which is the official, stable approach for Checkout Sessions.
+- ✅ **Google Pay Confirmed** - Tested and confirmed working with Google Pay.
+
+**Files Modified:** 1 file (includes/class-yolo-ys-stripe.php)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅ (Tested & Verified)
+
+---
 
 ### v60.2 - Search Results Layout Fix (WORKING) (December 12, 2025)
 
