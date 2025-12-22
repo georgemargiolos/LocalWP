@@ -1,5 +1,16 @@
 # Changelog
 
+## [75.22] - 2025-12-22
+
+### Added
+- **Hide/Delete Built-in Payment Icons** - You can now hide built-in icons you don't need
+  - Click the eye-slash icon next to any built-in icon to hide it
+  - Hidden icons appear in a "Hidden Built-in Icons" section at the bottom
+  - Click "Restore" to bring back any hidden icon
+  - Custom icons can still be permanently deleted with the trash icon
+
+---
+
 ## [75.21] - 2025-12-22
 
 ### Fixed
