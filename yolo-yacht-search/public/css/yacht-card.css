@@ -125,6 +125,43 @@ article .yolo-ys-search-results {
 }
 
 /* ========================================
+   CLICKABLE CARD (v80.1)
+   ======================================== */
+
+/* Make entire card clickable with stretched link */
+.yolo-ys-clickable-card {
+    position: relative !important;
+    cursor: pointer !important;
+}
+
+/* Stretched link covers the entire card */
+.yolo-ys-card-link {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 1 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+}
+
+/* Ensure interactive elements are above the card link */
+.yolo-ys-clickable-card .swiper-button-prev,
+.yolo-ys-clickable-card .swiper-button-next,
+.yolo-ys-clickable-card .swiper-pagination {
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+/* Details button visual styling (no longer an <a> tag) */
+.yolo-ys-clickable-card .yolo-ys-details-btn {
+    position: relative !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ========================================
    YACHT CARD
    ======================================== */
 

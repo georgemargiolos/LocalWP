@@ -356,6 +356,43 @@ main .yolo-ys-search-results,
 }
 
 /* ========================================
+   CLICKABLE CARD (v80.1)
+   ======================================== */
+
+/* Make entire card clickable with stretched link */
+.yolo-ys-clickable-card {
+    position: relative;
+    cursor: pointer;
+}
+
+/* Stretched link covers the entire card */
+.yolo-ys-card-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    text-decoration: none;
+    background: transparent;
+}
+
+/* Ensure interactive elements are above the card link */
+.yolo-ys-clickable-card .swiper-button-prev,
+.yolo-ys-clickable-card .swiper-button-next,
+.yolo-ys-clickable-card .swiper-pagination {
+    z-index: 10;
+    position: relative;
+}
+
+/* Details button visual styling (no longer an <a> tag) */
+.yolo-ys-clickable-card .yolo-ys-details-btn {
+    position: relative;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ========================================
    Yacht Card Styles - Match "Our Yachts" Design (v2.3.7)
    Updated to match the Our Fleet page design for consistency
    ======================================== */

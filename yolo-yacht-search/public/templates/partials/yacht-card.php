@@ -56,7 +56,10 @@ if ($yacht->refit_year) {
 $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
 ?>
 
-<div class="yolo-ys-yacht-card <?php echo $is_yolo ? 'yolo-yacht' : ''; ?>">
+<div class="yolo-ys-yacht-card yolo-ys-clickable-card <?php echo $is_yolo ? 'yolo-yacht' : ''; ?>">
+    <!-- Clickable Card Link (v80.1) - Entire card is now clickable -->
+    <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-card-link" aria-label="<?php echo esc_attr($yacht->name); ?> - <?php echo esc_attr($yacht->model); ?>"></a>
+    
     <div class="yolo-ys-yacht-image">
         <?php if ($primary_image): ?>
             <img src="<?php echo esc_url($primary_image); ?>" alt="<?php echo esc_attr($yacht->name); ?>">
@@ -134,9 +137,9 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
         </div>
         <?php endif; ?>
         
-        <!-- Details Button -->
-        <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-details-btn">
+        <!-- Details Button (visual only - card link handles navigation) -->
+        <span class="yolo-ys-details-btn">
             <?php yolo_ys_text_e('details_button', 'DETAILS'); ?>
-        </a>
+        </span>
     </div>
 </div>

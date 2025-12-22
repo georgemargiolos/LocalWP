@@ -48,7 +48,10 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
         $min_price = YOLO_YS_Database_Prices::get_min_price($yacht->id);
     ?>
     
-    <div class="yolo-ys-horizontal-card">
+    <div class="yolo-ys-horizontal-card yolo-ys-clickable-card">
+        <!-- Clickable Card Link (v80.1) - Entire card is now clickable -->
+        <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-card-link" aria-label="<?php echo esc_attr($yacht->name); ?> - <?php echo esc_attr($yacht->model); ?>"></a>
+        
         <!-- Image Carousel (Left Side) -->
         <div class="yolo-ys-horizontal-card-images">
             <?php if (!empty($images)): ?>
@@ -60,7 +63,7 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <!-- Navigation buttons -->
+                    <!-- Navigation buttons (z-index elevated to be above card link) -->
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-button-next"></div>
                     <!-- Pagination -->
@@ -133,10 +136,10 @@ $details_page_id = get_option('yolo_ys_yacht_details_page', '');
                 </div>
                 <?php endif; ?>
                 
-                <!-- Details Button -->
-                <a href="<?php echo esc_url($details_url); ?>" class="yolo-ys-details-btn">
+                <!-- Details Button (visual only - card link handles navigation) -->
+                <span class="yolo-ys-details-btn">
                     <?php yolo_ys_text_e('details_button', 'DETAILS'); ?>
-                </a>
+                </span>
             </div>
         </div>
     </div>

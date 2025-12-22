@@ -438,12 +438,12 @@
             `;
         }
         
+        // v80.1: Entire card is now clickable
         return `
-            <div class="yolo-ys-yacht-card ${yoloClass}">
+            <div class="yolo-ys-yacht-card yolo-ys-clickable-card ${yoloClass}">
+                <a href="${detailsUrl}" class="yolo-ys-card-link" aria-label="${yachtName} - ${yachtModel}"></a>
                 <div class="yolo-ys-yacht-image">
-                    <a href="${detailsUrl}">
-                        ${imageHtml}
-                    </a>
+                    ${imageHtml}
                     ${yoloLogoHtml}
                 </div>
                 <div class="yolo-ys-yacht-content">
@@ -483,7 +483,7 @@
                         </div>
                     </div>
                     ${priceHtml}
-                    <a href="${detailsUrl}" class="yolo-ys-details-btn">DETAILS</a>
+                    <span class="yolo-ys-details-btn">DETAILS</span>
                 </div>
             </div>
         `;

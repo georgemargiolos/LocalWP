@@ -1,18 +1,21 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
 **Date:** December 22, 2025  
-**Version:** v80.0 (Last Stable Version)  
-**Task Goal:** Adjust sticky booking section top offset from 100px to 50px.
+**Version:** v80.1 (Last Stable Version)  
+**Task Goal:** Make entire yacht card clickable (not just the DETAILS button).
 
 ---
 
-## 🔴 Summary of Work Completed (v80.0)
+## 🔴 Summary of Work Completed (v80.1)
 
-### 1. Sticky Booking Section Position Adjustment (v80.0)
-- **Change:** Adjusted the top offset for the sticky booking section on the yacht details page.
-- **Modification:** Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`.
-- **File Modified:** `public/css/yacht-details-v3.css`
-- **Status:** **COMPLETE.** The booking sidebar now sticks closer to the top of the viewport.
+### 1. Clickable Yacht Cards (v80.1)
+- **Change:** Entire yacht card is now clickable, not just the DETAILS button.
+- **Technique:** CSS stretched link - an invisible `<a>` tag covers the entire card.
+- **Accessibility:** Added `aria-label` attributes for screen readers.
+- **Visual Feedback:** Cursor changes to pointer when hovering anywhere on the card.
+- **DETAILS Button:** Converted from `<a>` to `<span>` - remains visible for visual clarity.
+- **Swiper Compatibility:** Image carousel navigation buttons remain functional (elevated z-index).
+- **Status:** **COMPLETE - READY FOR TESTING.**
 
 ---
 
@@ -20,34 +23,85 @@
 
 | File | Change Summary |
 | :--- | :--- |
-| `yolo-yacht-search.php` | Version bump to 80.0 |
-| `CHANGELOG.md` | Updated with v80.0 entry |
-| `README.md` | Updated with latest version and v80.0 summary |
-| `public/css/yacht-details-v3.css` | Changed `top: 100px` to `top: 50px` in `.yacht-booking-section` |
+| `yolo-yacht-search.php` | Version bump to 80.1 |
+| `CHANGELOG.md` | Updated with v80.1 entry |
+| `README.md` | Updated with latest version and v80.1 summary |
+| `public/templates/partials/yacht-card.php` | Added `yolo-ys-clickable-card` class and `yolo-ys-card-link` element |
+| `public/blocks/yacht-horizontal-cards/render.php` | Added clickable card wrapper |
+| `public/js/yolo-yacht-search-public.js` | Updated JS card rendering for search results |
+| `public/css/yacht-card.css` | Added clickable card CSS styles |
+| `public/css/search-results.css` | Added clickable card CSS styles |
 
 ---
 
-## Previous Session Summary (v75.30 - v75.31)
+## Technical Implementation Details
 
-### 1. Stripe Checkout Fix (v75.30)
-- **Issue:** Checkout stuck on "Processing..." due to "Received unknown parameter: automatic_payment_methods".
-- **Root Cause:** The `automatic_payment_methods` parameter is not supported for Stripe Checkout Sessions (only for PaymentIntents/SetupIntents).
-- **Solution:** Removed all payment method parameters (`payment_method_types` and `automatic_payment_methods`) from the `Checkout\Session::create()` call. This allows the Stripe Dashboard settings to automatically control which payment methods are displayed, which is the official, stable approach.
-- **Status:** **FIXED and STABLE.** Tested with Google Pay and confirmed working.
+### CSS Stretched Link Technique
+```css
+/* Make entire card clickable with stretched link */
+.yolo-ys-clickable-card {
+    position: relative;
+    cursor: pointer;
+}
 
-### 2. Availability Box Scrollbar Fix (v75.31)
-- **Issue:** The sticky availability box on the yacht details page was showing an unwanted vertical scrollbar.
-- **Root Cause:** The box's content (including the new payment icons) grew taller than the fixed `max-height` constraint (`max-height: calc(100vh - 120px)`).
-- **Solution:** Removed the `max-height` and `overflow-y: auto` CSS properties from `.yacht-booking-section` in `public/css/yacht-details-v3.css`.
-- **Status:** **FIXED.** The box now grows to fit all content while maintaining its sticky position.
+/* Stretched link covers the entire card */
+.yolo-ys-card-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    text-decoration: none;
+    background: transparent;
+}
+```
+
+### HTML Structure
+```html
+<div class="yolo-ys-yacht-card yolo-ys-clickable-card">
+    <a href="/yacht/..." class="yolo-ys-card-link" aria-label="Yacht Name - Model"></a>
+    <!-- Card content -->
+</div>
+```
+
+---
+
+## Pages Affected
+
+1. **Our Yachts (Fleet) page** - Uses `yacht-card.php` template
+2. **Search Results page** - Uses JavaScript rendering in `yolo-yacht-search-public.js`
+3. **Horizontal Yacht Cards block** - Uses `render.php` in blocks folder
+
+---
+
+## Testing Checklist
+
+- [ ] Click anywhere on yacht card → navigates to yacht details page
+- [ ] Cursor shows pointer on hover anywhere on card
+- [ ] DETAILS button still visible and styled correctly
+- [ ] Swiper image carousel navigation buttons still work
+- [ ] Swiper pagination dots still clickable
+- [ ] Hover effects (card lift, shadow) still work
+- [ ] Mobile touch works correctly
+- [ ] Screen reader announces card link correctly
+
+---
+
+## Previous Session Summary (v80.0)
+
+### Sticky Booking Section Position (v80.0)
+- Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
+- The booking sidebar now sticks closer to the top of the viewport.
 
 ---
 
 ## Suggested Next Steps
 
-1. **Deploy v80.0** to production
-2. **Verify the sticky booking section** appears at the correct position (50px from top)
-3. **Monitor for any visual issues** on different screen sizes
+1. **Test v80.1** on staging/production
+2. **Verify clickable cards** work on all pages (Our Yachts, Search Results)
+3. **Test Swiper navigation** - ensure carousel buttons still work
+4. **Test on mobile** - ensure touch interaction works correctly
 
 ---
 
@@ -56,7 +110,7 @@
 | Resource | Link | Notes |
 | :--- | :--- | :--- |
 | **GitHub Repository** | [https://github.com/georgemargiolos/LocalWP](https://github.com/georgemargiolos/LocalWP) | All code is pushed here. |
-| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.0.zip` | Use this file to update the plugin on your WordPress site. |
+| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.1.zip` | Use this file to update the plugin on your WordPress site. |
 | **Latest Changelog** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md) | For a detailed history of changes. |
 | **Latest README** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md) | For an overview of the latest features. |
 | **Handoff File** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md) | This document. |

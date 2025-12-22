@@ -1,5 +1,24 @@
 # Changelog
 
+## [80.1] - 2025-12-22
+
+### Added
+- **Clickable Yacht Cards** - Entire yacht card is now clickable, not just the DETAILS button
+  - Implemented using CSS stretched link technique for better accessibility
+  - Works on both "Our Yachts" fleet page and Search Results page
+  - Cursor changes to pointer when hovering anywhere on the card
+  - DETAILS button remains visible for visual clarity
+  - Swiper navigation buttons remain functional (elevated z-index)
+
+### Files Modified
+- `public/templates/partials/yacht-card.php` - Added card link wrapper
+- `public/blocks/yacht-horizontal-cards/render.php` - Added card link wrapper
+- `public/js/yolo-yacht-search-public.js` - Updated JS card rendering
+- `public/css/yacht-card.css` - Added clickable card CSS
+- `public/css/search-results.css` - Added clickable card CSS
+
+---
+
 ## [80.0] - 2025-12-22
 
 ### Changed
