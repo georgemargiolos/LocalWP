@@ -467,8 +467,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             
             <!-- Equipment Section -->
             <?php if (!empty($equipment)): ?>
-            <div class="yacht-equipment-section">
-                <h3><?php echo yolo_ys_get_icon('section', 'Equipment', 'fa-solid fa-ship'); ?> <?php yolo_ys_text_e('equipment', 'Equipment'); ?></h3>
+            <div class="yacht-equipment-section yolo-accordion-section">
+                <h3 onclick="toggleAccordion(this)"><?php echo yolo_ys_get_icon('section', 'Equipment', 'fa-solid fa-ship'); ?> <?php yolo_ys_text_e('equipment', 'Equipment'); ?><span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                <div class="yolo-accordion-content">
                 <div class="row g-3 equipment-grid">
                     <?php foreach ($equipment as $item): ?>
                         <?php $icon_class = yolo_get_equipment_icon($item->equipment_id, $item->equipment_name); ?>
@@ -480,6 +481,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                     <?php endforeach; ?>
                 </div>
+                </div><!-- end accordion-content -->
             </div>
             <?php endif; ?>
             
@@ -509,8 +511,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php endif; ?>
             
             <!-- Technical Characteristics -->
-            <div class="yacht-technical">
-                <h3><?php echo yolo_ys_get_icon('section', 'Technical Characteristics', 'fa-solid fa-cogs'); ?> <?php yolo_ys_text_e('technical_specs', 'Technical Characteristics'); ?></h3>
+            <div class="yacht-technical yolo-accordion-section">
+                <h3 onclick="toggleAccordion(this)"><?php echo yolo_ys_get_icon('section', 'Technical Characteristics', 'fa-solid fa-cogs'); ?> <?php yolo_ys_text_e('technical_specs', 'Technical Characteristics'); ?><span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                <div class="yolo-accordion-content">
                 <div class="row g-3 tech-grid">
                     <?php if ($yacht->draft): ?>
                         <div class="col-12 col-sm-6">
@@ -584,6 +587,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- end accordion-content -->
             </div>
             
             <!-- Extras -->
@@ -593,8 +597,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 $optional_extras = array_filter($extras, function($e) { return $e->obligatory == 0; });
                 ?>
                 
-                <div class="yacht-extras-combined">
-                    <h3><i class="fa-solid fa-plus-circle"></i> <?php yolo_ys_text_e('extras', 'Extras'); ?> <span class="extras-note"><?php yolo_ys_text_e('payable_at_base', '(Payable at the base)'); ?></span></h3>
+                <div class="yacht-extras-combined yolo-accordion-section">
+                    <h3 onclick="toggleAccordion(this)"><i class="fa-solid fa-plus-circle"></i> <?php yolo_ys_text_e('extras', 'Extras'); ?> <span class="extras-note"><?php yolo_ys_text_e('payable_at_base', '(Payable at the base)'); ?></span><span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                    <div class="yolo-accordion-content">
                     <div class="row g-4 extras-two-column">
                         <?php if (!empty($obligatory_extras)): ?>
                         <div class="col-12 col-md-6 extras-column">
@@ -734,13 +739,15 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                         <?php endif; ?>
                     </div>
+                    </div><!-- end accordion-content -->
                 </div>
             <?php endif; ?>
             
             <!-- Security Deposit Section -->
             <?php if (!empty($yacht->deposit)): ?>
-            <div class="yacht-section deposit-section">
-                <h3><?php echo yolo_ys_get_icon('section', 'Security Deposit', 'fa-solid fa-shield-halved'); ?> <?php yolo_ys_text_e('security_deposit', 'Security Deposit'); ?></h3>
+            <div class="yacht-section deposit-section yolo-accordion-section">
+                <h3 onclick="toggleAccordion(this)"><?php echo yolo_ys_get_icon('section', 'Security Deposit', 'fa-solid fa-shield-halved'); ?> <?php yolo_ys_text_e('security_deposit', 'Security Deposit'); ?><span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                <div class="yolo-accordion-content">
                 <div class="row g-3">
                     <div class="col-12">
                         <div class="info-card deposit-card">
@@ -751,12 +758,14 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                     </div>
                 </div>
+                </div><!-- end accordion-content -->
             </div>
             <?php endif; ?>
             
             <!-- Cancellation Policy Section -->
-            <div class="yacht-section cancellation-section">
-                <h3><?php echo yolo_ys_get_icon('section', 'Cancellation Policy', 'fa-solid fa-calendar-xmark'); ?> <?php yolo_ys_text_e('cancellation_policy', 'Cancellation Policy'); ?></h3>
+            <div class="yacht-section cancellation-section yolo-accordion-section">
+                <h3 onclick="toggleAccordion(this)"><?php echo yolo_ys_get_icon('section', 'Cancellation Policy', 'fa-solid fa-calendar-xmark'); ?> <?php yolo_ys_text_e('cancellation_policy', 'Cancellation Policy'); ?><span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                <div class="yolo-accordion-content">
                 <div class="row g-3">
                     <div class="col-12">
                         <div class="info-card cancellation-card">
@@ -787,11 +796,13 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                         </div>
                     </div>
                 </div>
+                </div><!-- end accordion-content -->
             </div>
             
             <!-- Check-in / Check-out Section -->
-            <div class="yacht-section checkin-section">
-                <h3><i class="fa-solid fa-clock"></i> Check-in & Check-out</h3>
+            <div class="yacht-section checkin-section yolo-accordion-section">
+                <h3 onclick="toggleAccordion(this)"><i class="fa-solid fa-clock"></i> Check-in & Check-out<span class="yolo-accordion-toggle"><i class="fa-solid fa-chevron-down"></i></span></h3>
+                <div class="yolo-accordion-content">
                 <div class="row g-3 checkin-grid-redesign">
                     <?php if (!empty($yacht->checkin_time)): ?>
                     <div class="col-12 col-md-4">
@@ -825,6 +836,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- end accordion-content -->
             </div>
             
                 </div>
@@ -835,7 +847,7 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <!-- BOOKING SIDEBAR (RIGHT - STICKY - 4 cols desktop) -->
             <!-- ============================================ -->
             <div class="col-12 col-lg-4">
-            <div class="yacht-booking-section">
+            <div class="yacht-booking-section" id="yacht-booking-section">
                 <h3><i class="fa-solid fa-calendar-check"></i> <?php yolo_ys_text_e('availability_pricing', 'Availability & Pricing'); ?></h3>
                 
                 <?php if (empty($prices)): ?>
@@ -913,6 +925,13 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
     </div>
     <!-- END CONTAINER -->
     
+</div>
+
+<!-- Mobile Sticky Bottom Bar (v75.13) -->
+<div class="yolo-mobile-sticky-bar" id="mobileStickBar">
+    <button type="button" class="yolo-sticky-cta-btn" onclick="scrollToBookingSection()">
+        <i class="fa-solid fa-calendar-check"></i> CHECK AVAILABILITY
+    </button>
 </div>
 
 <?php include dirname(__FILE__) . '/partials/yacht-details-v3-styles.php'; ?>

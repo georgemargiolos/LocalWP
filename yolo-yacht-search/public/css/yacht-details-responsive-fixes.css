@@ -834,3 +834,176 @@
     }
 }
 
+
+/* ============================================
+   22. MOBILE STICKY BOTTOM BAR (v75.13)
+   Shows "CHECK AVAILABILITY" button on mobile
+   ============================================ */
+
+/* Hide by default on desktop */
+.yolo-mobile-sticky-bar {
+    display: none;
+}
+
+/* Show only on mobile/tablet */
+@media (max-width: 991px) {
+    .yolo-mobile-sticky-bar {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9998;
+        background: #fff;
+        padding: 12px 16px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(0);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        /* Safe area for iPhone notch */
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+    
+    .yolo-mobile-sticky-bar.hidden {
+        transform: translateY(100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .yolo-sticky-cta-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 16px 24px;
+        background: var(--yolo-primary, #1e3a5f);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+        /* Minimum touch target */
+        min-height: 52px;
+    }
+    
+    .yolo-sticky-cta-btn:hover {
+        background: var(--yolo-primary-dark, #152a47);
+    }
+    
+    .yolo-sticky-cta-btn:active {
+        transform: scale(0.98);
+    }
+    
+    .yolo-sticky-cta-btn i {
+        font-size: 18px;
+    }
+    
+    /* Add padding to bottom of page so content isn't hidden behind sticky bar */
+    .yolo-yacht-details-v3 {
+        padding-bottom: 80px;
+    }
+}
+
+/* Hide sticky bar when printing */
+@media print {
+    .yolo-mobile-sticky-bar {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   23. MOBILE ACCORDIONS (v75.13)
+   Collapsible sections on mobile for better UX
+   ============================================ */
+
+/* Desktop: No accordion behavior */
+@media (min-width: 992px) {
+    .yolo-accordion-toggle {
+        display: none !important;
+    }
+    
+    .yolo-accordion-content {
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}
+
+/* Mobile: Accordion behavior */
+@media (max-width: 991px) {
+    /* Accordion header (the h3 becomes clickable) */
+    .yolo-accordion-section h3 {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        margin: 0;
+        border-bottom: 1px solid #e5e7eb;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .yolo-accordion-section h3:active {
+        background: #f9fafb;
+    }
+    
+    /* Accordion toggle icon */
+    .yolo-accordion-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        margin-left: 12px;
+        color: #6b7280;
+        transition: transform 0.3s ease;
+    }
+    
+    .yolo-accordion-section.expanded .yolo-accordion-toggle {
+        transform: rotate(180deg);
+    }
+    
+    /* Accordion content */
+    .yolo-accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+        padding: 0;
+    }
+    
+    .yolo-accordion-section.expanded .yolo-accordion-content {
+        max-height: 2000px; /* Large enough for any content */
+        padding: 16px 0;
+        transition: max-height 0.5s ease-in, padding 0.35s ease-in;
+    }
+    
+    /* Remove default section margins on mobile when using accordions */
+    .yolo-accordion-section {
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+        background: #fff;
+    }
+    
+    /* Add subtle separator between accordion sections */
+    .yolo-accordion-section + .yolo-accordion-section {
+        border-top: none;
+    }
+    
+    /* Style adjustments for content inside accordions */
+    .yolo-accordion-content .equipment-grid,
+    .yolo-accordion-content .tech-grid,
+    .yolo-accordion-content .extras-two-column,
+    .yolo-accordion-content .checkin-grid-redesign {
+        padding-top: 8px;
+    }
+    
+    /* Info cards inside accordions */
+    .yolo-accordion-content .info-card {
+        margin-top: 8px;
+    }
+}

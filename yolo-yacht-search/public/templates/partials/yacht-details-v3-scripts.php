@@ -93,6 +93,68 @@ function toggleQuoteForm() {
 }
 
 // ============================================
+// MOBILE STICKY BAR - Scroll to booking section (v75.13)
+// ============================================
+function scrollToBookingSection() {
+    const bookingSection = document.getElementById('yacht-booking-section');
+    if (bookingSection) {
+        // Calculate offset to account for any fixed headers
+        const headerOffset = 20;
+        const elementPosition = bookingSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Hide sticky bar when booking section is visible (v75.13)
+(function() {
+    // Only run on mobile
+    if (window.innerWidth > 991) return;
+    
+    const stickyBar = document.getElementById('mobileStickBar');
+    const bookingSection = document.getElementById('yacht-booking-section');
+    
+    if (!stickyBar || !bookingSection) return;
+    
+    // Use Intersection Observer to detect when booking section is visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Booking section is visible - hide sticky bar
+                stickyBar.classList.add('hidden');
+            } else {
+                // Booking section not visible - show sticky bar
+                stickyBar.classList.remove('hidden');
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 // Trigger when 10% of booking section is visible
+    });
+    
+    observer.observe(bookingSection);
+})();
+
+// ============================================
+// MOBILE ACCORDIONS - Toggle sections (v75.13)
+// ============================================
+function toggleAccordion(header) {
+    // Only work on mobile
+    if (window.innerWidth > 991) return;
+    
+    const section = header.closest('.yolo-accordion-section');
+    if (!section) return;
+    
+    // Toggle expanded class
+    section.classList.toggle('expanded');
+}
+
+// ============================================
 // YouTube Video Click Handler (v65.16)
 // Opens YouTube video in lightbox when clicking play button in Swiper
 // ============================================

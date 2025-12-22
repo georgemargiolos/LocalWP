@@ -1,4 +1,31 @@
-# YOLO Yacht Search Changelog
+# Changelog
+
+## [75.13] - 2025-12-22
+
+### Added
+- **Mobile Sticky Bottom Bar** - "CHECK AVAILABILITY" button fixed at bottom of screen on mobile
+  - Only visible on mobile/tablet (< 992px)
+  - Smooth scroll to booking section when tapped
+  - Auto-hides when booking section is visible (using Intersection Observer)
+  - Supports iPhone safe area (notch)
+
+- **Mobile Accordion Sections** - Collapsible sections for better mobile UX
+  - Equipment section - collapsed by default
+  - Technical Characteristics - collapsed by default
+  - Extras (Obligatory & Optional) - collapsed by default
+  - Security Deposit - collapsed by default
+  - Cancellation Policy - collapsed by default
+  - Check-in/Check-out - collapsed by default
+  - Desktop layout unchanged (always expanded)
+  - Smooth expand/collapse animation with rotating chevron icon
+
+### Files Modified
+- `yolo-yacht-search.php` - Bumped version to 75.13
+- `public/templates/yacht-details-v3.php` - Added sticky bar HTML, accordion markup to sections
+- `public/css/yacht-details-responsive-fixes.css` - Added sticky bar and accordion CSS
+- `public/templates/partials/yacht-details-v3-scripts.php` - Added scroll and accordion toggle JS
+
+---
 
 ## [75.12] - 2025-12-22
 
