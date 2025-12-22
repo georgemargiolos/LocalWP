@@ -1,5 +1,15 @@
 # Changelog
 
+## [75.21] - 2025-12-22
+
+### Fixed
+- **SVG Upload for Payment Icons** - WordPress blocks SVG uploads by default for security
+  - Added `upload_mimes` filter to allow SVG files
+  - Added `wp_check_filetype_and_ext` filter to fix SVG file type detection
+  - Custom payment icons can now be uploaded as SVG files
+
+---
+
 ## [75.20] - 2025-12-22
 
 ### Fixed
