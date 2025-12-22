@@ -19,6 +19,8 @@ class YOLO_YS_Stripe {
         }
         
         \Stripe\Stripe::setApiKey($secret_key);
+        // v75.29: Explicitly set API version to support automatic_payment_methods for Checkout Sessions
+        \Stripe\Stripe::setApiVersion('2024-10-28.acacia');
     }
     
     /**

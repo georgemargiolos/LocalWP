@@ -1,5 +1,15 @@
 # Changelog
 
+## [75.29] - 2025-12-22
+
+### Fixed
+- **Stripe API Version Explicitly Set** - Added `setApiVersion('2024-10-28.acacia')` in init_stripe()
+  - Even with updated library, Stripe was using older API version from account default
+  - Now explicitly sets the API version to support `automatic_payment_methods` for Checkout Sessions
+  - This ensures the code uses the modern API regardless of account settings
+
+---
+
 ## [75.28] - 2025-12-22
 
 ### Fixed
