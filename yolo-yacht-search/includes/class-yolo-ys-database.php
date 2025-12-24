@@ -862,6 +862,40 @@ class YOLO_YS_Database {
     }
     
     /**
+     * Deactivate all yachts from companies that are no longer in the active list
+     * v81.15: Handles case when a company is removed from Friend Companies
+     * 
+     * @param array $active_company_ids Array of company IDs that should remain active
+     * @return int Number of yachts deactivated
+     */
+    public function deactivate_removed_company_yachts($active_company_ids) {
+        global $wpdb;
+        
+        if (empty($active_company_ids)) {
+            // Safety: Don't deactivate everything if no companies provided
+            return 0;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($active_company_ids), '%d'));
+        
+        $query = $wpdb->prepare(
+            "UPDATE {$this->table_yachts} 
+             SET status = 'inactive', deactivated_at = NOW() 
+             WHERE company_id NOT IN ($placeholders) 
+             AND (status = 'active' OR status IS NULL)",
+            $active_company_ids
+        );
+        
+        $result = $wpdb->query($query);
+        
+        if ($result > 0) {
+            error_log("YOLO DB: Deactivated {$result} yachts from removed companies");
+        }
+        
+        return $result;
+    }
+    
+    /**
      * Store yacht data WITHOUT images (Phase 1 of two-phase sync)
      * v81.1: Separate data sync from image sync to prevent timeouts
      * 

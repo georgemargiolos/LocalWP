@@ -352,6 +352,9 @@ class YOLO_YS_Progressive_Sync {
         $state['phase'] = 2;
         $state['image_queue_size'] = count($image_queue);
         $state['image_batch_index'] = 0;
+        // v81.15: Track position within yacht images
+        $state['current_yacht_index'] = 0;
+        $state['current_image_offset'] = 0;
         
         // Store image queue
         update_option(self::IMAGE_QUEUE_OPTION, $image_queue, false);
@@ -376,8 +379,8 @@ class YOLO_YS_Progressive_Sync {
     
     /**
      * Sync next batch of images (Phase 2)
-     * v81.14 FIX: Fetches yacht images on-demand, one yacht at a time
-     * Downloads up to IMAGES_PER_BATCH images per request
+     * v81.15 FIX: Downloads only IMAGES_PER_BATCH (3) images per request
+     * Tracks current yacht and image offset to resume properly
      * 
      * @return array Result with updated state
      */
@@ -393,7 +396,9 @@ class YOLO_YS_Progressive_Sync {
             );
         }
         
-        $yacht_index = isset($state['image_batch_index']) ? $state['image_batch_index'] : 0;
+        // v81.15: Track yacht index AND image offset within yacht
+        $yacht_index = isset($state['current_yacht_index']) ? $state['current_yacht_index'] : 0;
+        $image_offset = isset($state['current_image_offset']) ? $state['current_image_offset'] : 0;
         
         // Check if all yachts done
         if ($yacht_index >= count($image_queue)) {
@@ -407,9 +412,11 @@ class YOLO_YS_Progressive_Sync {
         $start_time = microtime(true);
         $images_downloaded = 0;
         $total_images = 0;
+        $is_first_batch = ($image_offset === 0);
+        $yacht_complete = false;
         
         try {
-            // v81.14: Fetch yacht data fresh from API for this yacht only
+            // Fetch yacht data from API
             $yacht_result = $this->api->get_yacht($yacht_id);
             
             if (!$yacht_result['success'] || empty($yacht_result['data'])) {
@@ -417,26 +424,46 @@ class YOLO_YS_Progressive_Sync {
             }
             
             $yacht_data = $yacht_result['data'];
-            $images = isset($yacht_data['images']) ? $yacht_data['images'] : array();
-            $total_images = count($images);
+            $all_images = isset($yacht_data['images']) ? $yacht_data['images'] : array();
+            $total_images = count($all_images);
             
-            // Clear old images for this yacht
-            $this->db->clear_yacht_images($yacht_id);
+            // If first batch for this yacht, clear old images
+            if ($is_first_batch) {
+                $this->db->clear_yacht_images($yacht_id);
+            }
             
-            // Download all images for this yacht (one yacht per request)
-            foreach ($images as $index => $image) {
-                $result = $this->db->download_and_store_single_image($yacht_id, $image, $index);
+            // v81.15: Get only the batch of images we need (3 at a time)
+            $batch_images = array_slice($all_images, $image_offset, self::IMAGES_PER_BATCH);
+            
+            // Download this batch of images
+            foreach ($batch_images as $batch_idx => $image) {
+                $actual_index = $image_offset + $batch_idx;
+                $result = $this->db->download_and_store_single_image($yacht_id, $image, $actual_index);
                 if ($result) {
                     $images_downloaded++;
                     $state['synced_images']++;
                 }
             }
             
-            $state['image_batch_index']++;
+            // Update offset
+            $new_offset = $image_offset + count($batch_images);
+            
+            // Check if this yacht is complete
+            if ($new_offset >= $total_images) {
+                // Move to next yacht
+                $state['current_yacht_index'] = $yacht_index + 1;
+                $state['current_image_offset'] = 0;
+                $state['image_batch_index']++;  // For progress tracking
+                $yacht_complete = true;
+            } else {
+                // Continue with same yacht, next batch
+                $state['current_image_offset'] = $new_offset;
+            }
             
             $elapsed = round((microtime(true) - $start_time) * 1000);
             
-            error_log("YOLO Progressive Sync: Phase 2 - Downloaded {$images_downloaded}/{$total_images} images for {$yacht_name} in {$elapsed}ms");
+            $batch_info = $is_first_batch ? "batch 1" : "batch " . (ceil($new_offset / self::IMAGES_PER_BATCH));
+            error_log("YOLO Progressive Sync: Phase 2 - {$yacht_name} {$batch_info}: {$images_downloaded} images ({$new_offset}/{$total_images}) in {$elapsed}ms");
             
         } catch (Exception $e) {
             $state['errors'][] = array(
@@ -444,7 +471,11 @@ class YOLO_YS_Progressive_Sync {
                 'yacht_name' => $yacht_name,
                 'error' => 'Image sync failed: ' . $e->getMessage()
             );
-            $state['image_batch_index']++; // Skip this yacht
+            // Skip to next yacht on error
+            $state['current_yacht_index'] = $yacht_index + 1;
+            $state['current_image_offset'] = 0;
+            $state['image_batch_index']++;
+            $yacht_complete = true;
             error_log("YOLO Progressive Sync: ERROR downloading images for {$yacht_name}: " . $e->getMessage());
         }
         
@@ -452,13 +483,15 @@ class YOLO_YS_Progressive_Sync {
         update_option(self::STATE_OPTION, $state, false);
         
         // Calculate progress (Phase 2 is 50-100%)
+        // Use yacht index for progress since we track batches within yachts
+        $yachts_done = isset($state['current_yacht_index']) ? $state['current_yacht_index'] : 0;
         $phase2_progress = ($state['image_queue_size'] > 0)
-            ? ($state['image_batch_index'] / $state['image_queue_size']) * 50
+            ? ($yachts_done / $state['image_queue_size']) * 50
             : 0;
         $total_progress = 50 + $phase2_progress;
         
-        // Check if done
-        if ($state['image_batch_index'] >= count($image_queue)) {
+        // Check if all yachts done
+        if ($state['current_yacht_index'] >= count($image_queue)) {
             return $this->complete_yacht_sync($state);
         }
         
@@ -468,14 +501,15 @@ class YOLO_YS_Progressive_Sync {
             'phase' => 2,
             'phase_name' => 'Downloading images',
             'yacht_name' => $yacht_name,
+            'yacht_complete' => $yacht_complete,
             'images_downloaded' => $images_downloaded,
-            'total_yacht_images' => $total_images,
+            'yacht_images_progress' => (isset($new_offset) ? $new_offset : 0) . '/' . $total_images,
             'progress' => round($total_progress, 1),
-            'synced' => $state['image_batch_index'],
+            'synced' => $state['current_yacht_index'],
             'total' => $state['image_queue_size'],
             'synced_images' => $state['synced_images'],
             'total_images' => $state['total_images'],
-            'batch_progress' => $state['image_batch_index'] . '/' . $state['image_queue_size'],
+            'batch_progress' => $state['current_yacht_index'] . '/' . $state['image_queue_size'],
             'stats' => $state['stats'],
             'elapsed_ms' => isset($elapsed) ? $elapsed : 0
         );
@@ -492,12 +526,14 @@ class YOLO_YS_Progressive_Sync {
         $queue = get_option(self::YACHT_QUEUE_OPTION, array());
         $synced_yacht_ids = array_column($queue, 'yacht_id');
         
+        // v81.15: Get current company list (YOLO + Friend Companies)
+        $current_companies = $this->get_all_company_ids();
+        
         if (!empty($synced_yacht_ids)) {
             $this->db->activate_yachts($synced_yacht_ids);
             
-            // Deactivate missing yachts per company
-            $companies = $this->get_all_company_ids();
-            foreach ($companies as $company_id) {
+            // Deactivate missing yachts per company (within current companies)
+            foreach ($current_companies as $company_id) {
                 $company_yacht_ids = array_column(
                     array_filter($queue, function($item) use ($company_id) {
                         return $item['company_id'] == $company_id;
@@ -509,6 +545,10 @@ class YOLO_YS_Progressive_Sync {
                 }
             }
         }
+        
+        // v81.15 FIX: Deactivate ALL boats from companies that are no longer in the list
+        // This handles the case when a company is removed from Friend Companies
+        $this->db->deactivate_removed_company_yachts($current_companies);
         
         // Update last sync time
         update_option('yolo_ys_last_sync', current_time('mysql'));
