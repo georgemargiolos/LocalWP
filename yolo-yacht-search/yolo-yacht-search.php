@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 81.12
+ * Version: 81.13
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '81.12');
+define('YOLO_YS_VERSION', '81.13');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -30,6 +30,59 @@ define('YOLO_YS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Plugin basename
 define('YOLO_YS_PLUGIN_BASENAME', plugin_basename(__FILE__));
+
+// Greek Ionian Base IDs - hardcoded for reliable filtering (v81.13)
+// These are verified Greek Ionian bases: Lefkada, Corfu, Kefalonia, Zakynthos, Ithaca, Preveza, Paxos
+define('YOLO_YS_GREEK_IONIAN_BASE_IDS', array(
+    // Lefkada
+    194,                    // D-Marin Marina Lefkas
+    1639588120000100000,    // Port of Lefkas
+    757699090000100000,     // Nikiana Marina
+    1392047590000100000,    // Marina Perigiali
+    1470547850000100000,    // Nydri Port
+    5720014270000100000,    // Nydri Marina
+    7263354840000100000,    // Hotel Armonia - Nydri
+    6100618350000100000,    // Port of Vasiliki
+    4038352310000100000,    // Vliho Yacht Club
+    5018374970000100000,    // Vliho Bay
+    2863072060000100000,    // Sivota Marina Lefkada
+    6647930080000100000,    // Lygia Marina
+    // Corfu
+    14,                     // Corfu harbor
+    492201260000100000,     // D-Marin Marina Gouvia
+    3129817260000100000,    // Marina Benitses
+    3885298680000100000,    // Old Port Corfu
+    3885342670000100000,    // Corfu Sailing Club - Mandraki
+    3143071690000100000,    // NAOK Sailing Club
+    4483668290000100000,    // Alipa port - Palaiokastritsas
+    // Kefalonia
+    699817710000100000,     // Argostoli Yacht Marina
+    6368129940000100000,    // Fiskardo Marina
+    133,                    // Sami Port
+    1472810110000100000,    // Agia Effimia
+    3969163100000100000,    // Agia Pelagia Marina
+    // Zakynthos
+    153,                    // Zakynthos Marina
+    23,                     // Zante
+    5714550710000100000,    // Agios Sostis Harbor
+    // Ithaca
+    155,                    // Marina Ithakis - Vathy
+    4837974350000100000,    // Port of Ithaca
+    // Preveza area
+    89,                     // Preveza Marina
+    1935994390000100000,    // Preveza Main Port
+    2491645230000100000,    // Cleopatra Marina
+    6192088780000100000,    // Port of Mitikas
+    6827132820000100000,    // Mytikas Port
+    3838448700000100000,    // Port of Plataria
+    1976257640000100000,    // Marina Sivota
+    973630110000100000,     // Marina of Vonitsa
+    395874570000100000,     // Marina Paleros
+    96447290000100000,      // Vounaki - Palairos
+    3868266710000100000,    // Marina Astakos
+    // Paxos
+    18                      // Paxos - Gaios
+));
 
 // Load dependencies
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-booking-manager-api.php';
