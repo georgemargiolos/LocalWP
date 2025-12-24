@@ -292,8 +292,8 @@ class YOLO_YS_Progressive_Sync {
             'phase_name' => 'Downloading images',
             'phase_changed' => true,
             'progress' => 50, // Phase 1 complete = 50%
-            'synced' => $state['synced_yachts'],
-            'total' => $state['total_yachts'],
+            'synced' => 0,  // v81.3: Starting Phase 2 at 0
+            'total' => count($image_queue),  // v81.3: Total image batches
             'image_batches' => count($image_queue),
             'stats' => $state['stats'],
             'companies' => $state['companies']
@@ -387,6 +387,8 @@ class YOLO_YS_Progressive_Sync {
             'yacht_name' => $yacht_name,
             'images_downloaded' => $images_downloaded,
             'progress' => round($total_progress, 1),
+            'synced' => $state['image_batch_index'],  // v81.3: For UI consistency
+            'total' => $state['image_queue_size'],     // v81.3: For UI consistency
             'synced_images' => $state['synced_images'],
             'total_images' => $state['total_images'],
             'batch_progress' => $state['image_batch_index'] . '/' . $state['image_queue_size'],
