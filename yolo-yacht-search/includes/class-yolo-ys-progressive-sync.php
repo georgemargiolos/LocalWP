@@ -626,12 +626,29 @@ class YOLO_YS_Progressive_Sync {
         $offers_count = 0;
         
         try {
-            // Fetch offers for this yacht
-            $offers = $this->api->get_offers($yacht_id, $year);
+            // Fetch offers for this yacht using correct array parameter format
+            $offers = $this->api->get_offers(array(
+                'yachtId' => $yacht_id,
+                'dateFrom' => "{$year}-01-01T00:00:00",
+                'dateTo' => "{$year}-12-31T23:59:59",
+                'flexibility' => 6,
+                'productName' => 'bareboat'
+            ));
             
             if (is_array($offers) && !empty($offers)) {
-                // Store offers
-                $this->db->store_offers($yacht_id, $offers, $year);
+                // Delete existing offers for this yacht/year first
+                global $wpdb;
+                $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
+                $wpdb->query($wpdb->prepare(
+                    "DELETE FROM {$prices_table} WHERE yacht_id = %s AND YEAR(date_from) = %d",
+                    $yacht_id, $year
+                ));
+                
+                // Store new offers using batch insert (correct method)
+                if (!class_exists('YOLO_YS_Database_Prices')) {
+                    require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-database-prices.php';
+                }
+                YOLO_YS_Database_Prices::store_offers_batch($offers, $company_id);
                 $offers_count = count($offers);
                 $state['stats']['offers'] += $offers_count;
             }

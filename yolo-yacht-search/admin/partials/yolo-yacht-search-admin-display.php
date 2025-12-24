@@ -780,10 +780,8 @@ jQuery(document).ready(function($) {
                 nonce: yoloYsAdmin.nonce
             },
             success: function(response) {
-                console.log('Price sync response:', response); // DEBUG
                 if (response.success) {
                     var data = response.data;
-                    console.log('Price sync data:', data); // DEBUG
                     
                     // Add to live feed
                     if (data.yacht_synced) {
