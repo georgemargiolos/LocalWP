@@ -8,6 +8,7 @@
  * - Override synced description with custom HTML
  * 
  * @since 65.14
+ * @updated 81.10 - Added company filter dropdown
  */
 
 if (!defined('ABSPATH')) {
@@ -21,8 +22,47 @@ $images_table = $wpdb->prefix . 'yolo_yacht_images';
 $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
 $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
 
-// Get all yachts for dropdown
-$yachts = $wpdb->get_results("SELECT id, name, model, company_id FROM {$yachts_table} ORDER BY name ASC");
+// Get YOLO company ID
+$yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
+
+// Get friend company IDs
+$friend_ids_raw = get_option('yolo_ys_friend_company_ids', '');
+$friend_company_ids = array_filter(array_map('trim', explode(',', $friend_ids_raw)));
+
+// Build company list with names
+$companies = array();
+
+// Add YOLO first
+$companies[$yolo_company_id] = array(
+    'id' => $yolo_company_id,
+    'name' => 'YOLO Charters',
+    'is_yolo' => true
+);
+
+// Add friend companies with names from API cache or database
+$company_names = get_option('yolo_ys_company_names_cache', array());
+foreach ($friend_company_ids as $company_id) {
+    $company_name = isset($company_names[$company_id]) ? $company_names[$company_id] : "Company $company_id";
+    $companies[$company_id] = array(
+        'id' => $company_id,
+        'name' => $company_name,
+        'is_yolo' => false
+    );
+}
+
+// Get selected company (default to YOLO)
+$selected_company_id = isset($_GET['company_id']) ? sanitize_text_field($_GET['company_id']) : '';
+
+// Get yachts based on company filter
+if ($selected_company_id) {
+    $yachts = $wpdb->get_results($wpdb->prepare(
+        "SELECT id, name, model, company_id FROM {$yachts_table} WHERE company_id = %s ORDER BY name ASC",
+        $selected_company_id
+    ));
+} else {
+    // If no company selected, show empty yacht list
+    $yachts = array();
+}
 
 // Get selected yacht
 $selected_yacht_id = isset($_GET['yacht_id']) ? sanitize_text_field($_GET['yacht_id']) : '';
@@ -57,33 +97,89 @@ if ($selected_yacht_id) {
     ));
 }
 
-// Get YOLO company ID for badge display
-$yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
+// Count yachts per company for display
+$company_yacht_counts = array();
+foreach ($companies as $company_id => $company) {
+    $count = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$yachts_table} WHERE company_id = %s",
+        $company_id
+    ));
+    $company_yacht_counts[$company_id] = $count;
+}
 ?>
 
 <div class="wrap yolo-yacht-customization">
     <h1><span class="dashicons dashicons-images-alt2"></span> Yacht Customization</h1>
     <p class="description">Customize media (images & videos) and descriptions for individual yachts. Changes here override synced data from Booking Manager.</p>
     
-    <!-- Yacht Selector -->
+    <!-- Company & Yacht Selector -->
     <div class="yacht-selector-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; margin: 20px 0; border-radius: 4px;">
-        <form method="get" action="">
+        <form method="get" action="" id="yacht-selector-form">
             <input type="hidden" name="page" value="yolo-yacht-customization">
-            <label for="yacht_id" style="font-weight: 600; margin-right: 10px;">Select Yacht:</label>
-            <select name="yacht_id" id="yacht_id" style="min-width: 300px; padding: 8px;" onchange="this.form.submit()">
-                <option value="">-- Choose a yacht --</option>
-                <?php foreach ($yachts as $yacht): ?>
-                    <?php 
-                    $is_yolo = ($yacht->company_id == $yolo_company_id);
-                    $badge = $is_yolo ? ' [YOLO]' : '';
-                    ?>
-                    <option value="<?php echo esc_attr($yacht->id); ?>" <?php selected($selected_yacht_id, $yacht->id); ?>>
-                        <?php echo esc_html($yacht->name . ' - ' . $yacht->model . $badge); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            
+            <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <!-- Company Dropdown -->
+                <div>
+                    <label for="company_id" style="display: block; font-weight: 600; margin-bottom: 5px;">
+                        <span class="dashicons dashicons-building" style="vertical-align: middle;"></span> Select Company:
+                    </label>
+                    <select name="company_id" id="company_id" style="min-width: 250px; padding: 8px;">
+                        <option value="">-- Choose a company --</option>
+                        <?php foreach ($companies as $company_id => $company): ?>
+                            <?php 
+                            $count = isset($company_yacht_counts[$company_id]) ? $company_yacht_counts[$company_id] : 0;
+                            $badge = $company['is_yolo'] ? ' ⭐' : '';
+                            ?>
+                            <option value="<?php echo esc_attr($company_id); ?>" <?php selected($selected_company_id, $company_id); ?>>
+                                <?php echo esc_html($company['name'] . $badge . ' (' . $count . ' boats)'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <!-- Yacht Dropdown -->
+                <div>
+                    <label for="yacht_id" style="display: block; font-weight: 600; margin-bottom: 5px;">
+                        <span class="dashicons dashicons-sos" style="vertical-align: middle;"></span> Select Yacht:
+                    </label>
+                    <select name="yacht_id" id="yacht_id" style="min-width: 350px; padding: 8px;" <?php echo empty($yachts) ? 'disabled' : ''; ?>>
+                        <option value="">-- <?php echo empty($selected_company_id) ? 'Select a company first' : 'Choose a yacht'; ?> --</option>
+                        <?php foreach ($yachts as $yacht): ?>
+                            <option value="<?php echo esc_attr($yacht->id); ?>" <?php selected($selected_yacht_id, $yacht->id); ?>>
+                                <?php echo esc_html($yacht->name . ' - ' . $yacht->model); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <button type="submit" class="button button-primary" style="height: 36px;">
+                    <span class="dashicons dashicons-search" style="vertical-align: middle;"></span> Load Yacht
+                </button>
+            </div>
+            
+            <?php if ($selected_company_id && count($yachts) > 0): ?>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <span class="dashicons dashicons-info" style="vertical-align: middle;"></span>
+                    Found <strong><?php echo count($yachts); ?></strong> yachts for <?php echo esc_html($companies[$selected_company_id]['name']); ?>
+                </p>
+            <?php elseif ($selected_company_id && count($yachts) === 0): ?>
+                <p style="margin: 10px 0 0 0; color: #d63638;">
+                    <span class="dashicons dashicons-warning" style="vertical-align: middle;"></span>
+                    No yachts found for this company. Please run a sync first.
+                </p>
+            <?php endif; ?>
         </form>
     </div>
+    
+    <script>
+    // Auto-submit when company changes to load yachts
+    document.getElementById('company_id').addEventListener('change', function() {
+        // Clear yacht selection when company changes
+        document.getElementById('yacht_id').value = '';
+        // Submit form to reload with new company
+        document.getElementById('yacht-selector-form').submit();
+    });
+    </script>
     
     <?php if ($selected_yacht): ?>
         <!-- Yacht Info Header -->
@@ -92,9 +188,11 @@ $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
                 <?php echo esc_html($selected_yacht->name); ?>
                 <?php if ($selected_yacht->company_id == $yolo_company_id): ?>
                     <span style="background: #ffd700; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px;">YOLO FLEET</span>
+                <?php else: ?>
+                    <span style="background: #17a2b8; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px;">PARTNER</span>
                 <?php endif; ?>
             </h2>
-            <p style="margin: 0; opacity: 0.9;"><?php echo esc_html($selected_yacht->model); ?> | ID: <?php echo esc_html($selected_yacht->id); ?></p>
+            <p style="margin: 0; opacity: 0.9;"><?php echo esc_html($selected_yacht->model); ?> | ID: <?php echo esc_html($selected_yacht->id); ?> | Company: <?php echo esc_html($companies[$selected_yacht->company_id]['name'] ?? 'Unknown'); ?></p>
         </div>
         
         <!-- Media Section -->
@@ -192,9 +290,35 @@ $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
             </div>
         </div>
         
+        <!-- Starting From Price Section (v75.11) -->
+        <div class="customization-section price-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; margin-bottom: 20px; border-radius: 4px;">
+            <h3><span class="dashicons dashicons-money-alt"></span> Starting From Price</h3>
+            <p class="description">Set a custom "Starting from" price for this yacht. This overrides the calculated weekly price.</p>
+            
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+                <span style="font-size: 18px; font-weight: bold;">€</span>
+                <input type="number" id="starting_from_price" name="starting_from_price" 
+                       value="<?php echo esc_attr($yacht_settings ? $yacht_settings->starting_from_price : ''); ?>"
+                       placeholder="e.g., 2500"
+                       style="width: 150px; padding: 8px; font-size: 16px;">
+                <span style="color: #666;">/week</span>
+                <button type="button" id="save-starting-price" class="button button-primary">
+                    <span class="dashicons dashicons-saved" style="vertical-align: middle;"></span>
+                    Save Price
+                </button>
+            </div>
+            
+            <?php if ($yacht_settings && $yacht_settings->starting_from_price): ?>
+                <p style="margin-top: 10px; color: #00a32a;">
+                    <span class="dashicons dashicons-yes-alt" style="vertical-align: middle;"></span>
+                    Custom price set: <strong>€<?php echo number_format($yacht_settings->starting_from_price, 0); ?>/week</strong>
+                </p>
+            <?php endif; ?>
+        </div>
+        
         <!-- Description Section -->
         <div class="customization-section description-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; margin-bottom: 20px; border-radius: 4px;">
-            <h3><span class="dashicons dashicons-editor-paragraph"></span> Description</h3>
+            <h3><span class="dashicons dashicons-edit"></span> Custom Description</h3>
             
             <div class="toggle-section" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
                 <label style="display: flex; align-items: center; cursor: pointer;">
@@ -215,73 +339,41 @@ $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
                     <?php if (!empty($selected_yacht->description)): ?>
                         <?php echo wp_kses_post($selected_yacht->description); ?>
                     <?php else: ?>
-                        <p style="color: #666; font-style: italic;">No description synced from Booking Manager.</p>
+                        <p style="color: #666; font-style: italic;">No synced description available.</p>
                     <?php endif; ?>
                 </div>
-                
                 <button type="button" id="copy-synced-description" class="button" style="margin-top: 10px;"
                         <?php echo empty($selected_yacht->description) ? 'disabled' : ''; ?>>
                     <span class="dashicons dashicons-migrate" style="vertical-align: middle;"></span>
-                    Copy to Custom Description Editor
+                    Copy to Custom Description
                 </button>
             </div>
             
             <!-- Custom Description Editor -->
             <div id="custom-description-section" style="<?php echo ($yacht_settings && $yacht_settings->use_custom_description) ? '' : 'opacity: 0.5; pointer-events: none;'; ?>">
-                <h4>Custom Description (HTML Editor)</h4>
-                <?php
-                $custom_description = $yacht_settings ? $yacht_settings->custom_description : '';
-                wp_editor($custom_description, 'custom_description_editor', array(
-                    'textarea_name' => 'custom_description',
+                <h4>Custom Description (HTML supported)</h4>
+                <?php 
+                $custom_desc = $yacht_settings ? $yacht_settings->custom_description : '';
+                wp_editor($custom_desc, 'custom_description_editor', array(
                     'textarea_rows' => 10,
-                    'media_buttons' => true,
+                    'media_buttons' => false,
                     'teeny' => false,
                     'quicktags' => true,
                 ));
                 ?>
-                
-                <button type="button" id="save-description" class="button button-primary" style="margin-top: 15px;">
+                <button type="button" id="save-description" class="button button-primary" style="margin-top: 10px;">
                     <span class="dashicons dashicons-saved" style="vertical-align: middle;"></span>
                     Save Description
                 </button>
             </div>
         </div>
         
-        <!-- Starting From Price Section (all boats) -->
-        <div class="customization-section pricing-section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; margin-bottom: 20px; border-radius: 4px;">
-            <h3><span class="dashicons dashicons-money-alt"></span> Starting From Price (for Facebook/Google Ads)</h3>
-            <p class="description">This price is used for Facebook Pixel ViewContent events and Google Analytics view_item events. Set this to your lowest weekly charter rate.</p>
-            
-            <div style="margin-top: 15px;">
-                <label for="starting_from_price" style="font-weight: 600; display: block; margin-bottom: 5px;">Starting From Price (EUR):</label>
-                <input type="number" id="starting_from_price" name="starting_from_price" 
-                       value="<?php 
-                           // v75.11: Load starting_from_price from column (not key-value)
-                           $starting_price = $yacht_settings && isset($yacht_settings->starting_from_price) ? $yacht_settings->starting_from_price : '';
-                           // Only show if > 0
-                           echo esc_attr($starting_price > 0 ? $starting_price : '');
-                       ?>"
-                       placeholder="e.g., 2500"
-                       style="width: 150px; padding: 8px;" min="0" step="1">
-                <span style="color: #666; margin-left: 10px;">EUR</span>
-                
-                <button type="button" id="save-starting-price" class="button button-primary" style="margin-left: 15px;">
-                    <span class="dashicons dashicons-saved" style="vertical-align: middle;"></span>
-                    Save Price
-                </button>
-                
-                <p class="description" style="margin-top: 10px;">
-                    <strong>Tip:</strong> This should match the price you set in your Facebook Product Catalog for this yacht.
-                </p>
-            </div>
-        </div>
-        
     <?php else: ?>
         <!-- No yacht selected message -->
-        <div style="background: #fff; padding: 40px; text-align: center; border: 1px solid #ccd0d4; border-radius: 4px;">
-            <span class="dashicons dashicons-yacht" style="font-size: 48px; color: #ccc;"></span>
-            <h3 style="color: #666;">Select a yacht to customize</h3>
-            <p style="color: #999;">Choose a yacht from the dropdown above to manage its media and description.</p>
+        <div class="no-yacht-selected" style="background: #fff; padding: 40px; text-align: center; border: 1px solid #ccd0d4; border-radius: 4px;">
+            <span class="dashicons dashicons-sos" style="font-size: 48px; color: #ccc;"></span>
+            <h2 style="color: #666;">Select a yacht to customize</h2>
+            <p style="color: #999;">Choose a company from the dropdown above, then select a yacht to manage its media and description.</p>
         </div>
     <?php endif; ?>
 </div>
@@ -301,11 +393,12 @@ $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
 }
 </style>
 
+<?php if ($selected_yacht): ?>
 <script>
 jQuery(document).ready(function($) {
     var yachtId = '<?php echo esc_js($selected_yacht_id); ?>';
     var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
-    var nonce = '<?php echo wp_create_nonce('yolo_yacht_customization_nonce'); ?>';
+    var nonce = '<?php echo wp_create_nonce('yolo_yacht_customization'); ?>';
     
     // Toggle custom media section
     $('#use_custom_media').on('change', function() {
@@ -343,66 +436,20 @@ jQuery(document).ready(function($) {
         });
     });
     
-    // Initialize sortable for drag-drop reordering (v65.15)
-    if (typeof $.fn.sortable !== 'undefined') {
-        $('#custom-media-grid').sortable({
-            items: '.media-item',
-            placeholder: 'ui-sortable-placeholder',
-            cursor: 'move',
-            tolerance: 'pointer',
-            update: function(event, ui) {
-                // Auto-save order after drag
-                saveMediaOrder();
-            }
-        });
-    }
-    
-    // Helper function to render media item HTML
-    function renderMediaItem(media) {
-        var isVideo = media.media_type === 'video';
-        var thumbUrl = media.thumbnail_url || (isVideo ? 'https://img.youtube.com/vi/' + media.media_url + '/mqdefault.jpg' : media.media_url);
-        
-        var html = '<div class="media-item" data-id="' + media.id + '" data-type="' + media.media_type + '" ' +
-                   'style="background: #fff; border: 2px solid #ddd; border-radius: 4px; overflow: hidden; cursor: move; position: relative;">';
-        
-        if (isVideo) {
-            html += '<div style="position: relative;">' +
-                    '<img src="' + thumbUrl + '" style="width: 100%; height: 100px; object-fit: cover;">' +
-                    '<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: #fff; padding: 5px 10px; border-radius: 4px;">' +
-                    '<span class="dashicons dashicons-video-alt3"></span></span></div>';
-        } else {
-            html += '<img src="' + thumbUrl + '" style="width: 100%; height: 100px; object-fit: cover;">';
+    // Initialize sortable for custom media
+    $('#custom-media-grid').sortable({
+        items: '.media-item',
+        placeholder: 'ui-sortable-placeholder',
+        tolerance: 'pointer',
+        update: function(event, ui) {
+            // Order will be saved when clicking "Save Order"
         }
-        
-        html += '<div style="padding: 5px; font-size: 11px; background: #f8f9fa;">' +
-                '<span class="media-type-badge" style="background: ' + (isVideo ? '#e74c3c' : '#3498db') + '; color: #fff; padding: 1px 5px; border-radius: 2px; font-size: 10px;">' +
-                media.media_type.toUpperCase() + '</span>' +
-                '<button type="button" class="delete-media-btn" data-id="' + media.id + '" ' +
-                'style="float: right; background: none; border: none; color: #dc3545; cursor: pointer; padding: 0;">' +
-                '<span class="dashicons dashicons-trash"></span></button></div></div>';
-        
-        return html;
-    }
+    });
     
-    // Helper function to save media order
-    function saveMediaOrder() {
-        var order = [];
-        $('#custom-media-grid .media-item').each(function() {
-            order.push($(this).data('id'));
-        });
-        
-        $.post(ajaxUrl, {
-            action: 'yolo_save_media_order',
-            yacht_id: yachtId,
-            order: order,
-            nonce: nonce
-        });
-    }
-    
-    // Copy synced images button (v65.15)
+    // Copy synced images to custom media
     $('#copy-synced-images').on('click', function() {
         var $btn = $(this);
-        $btn.prop('disabled', true).text('Copying...');
+        $btn.prop('disabled', true).html('<span class="dashicons dashicons-update" style="vertical-align: middle;"></span> Copying...');
         
         $.post(ajaxUrl, {
             action: 'yolo_copy_synced_images',
@@ -410,115 +457,79 @@ jQuery(document).ready(function($) {
             nonce: nonce
         }, function(response) {
             if (response.success) {
-                // Clear grid and add new items
-                $('#custom-media-grid').empty();
-                $.each(response.data.media, function(i, media) {
-                    $('#custom-media-grid').append(renderMediaItem(media));
-                });
-                // Reinitialize sortable
-                $('#custom-media-grid').sortable('refresh');
-                alert(response.data.message);
+                location.reload();
             } else {
                 alert('Error: ' + response.data);
+                $btn.prop('disabled', false).html('<span class="dashicons dashicons-migrate" style="vertical-align: middle;"></span> Copy Synced Images to Custom Media');
             }
-            $btn.prop('disabled', false).html('<span class="dashicons dashicons-migrate" style="vertical-align: middle;"></span> Copy Synced Images to Custom Media');
         });
     });
     
-    // Add image button - opens WordPress Media Library (v65.15)
+    // Add image via media library
     $('#add-image-btn').on('click', function() {
-        // Check if wp.media is available
-        if (typeof wp !== 'undefined' && wp.media) {
-            var mediaUploader = wp.media({
-                title: 'Select or Upload Image',
-                button: { text: 'Add Image' },
-                multiple: true,
-                library: { type: 'image' }
-            });
-            
-            mediaUploader.on('select', function() {
-                var attachments = mediaUploader.state().get('selection').toJSON();
-                $.each(attachments, function(i, attachment) {
-                    addMedia('image', attachment.url, attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url);
-                });
-            });
-            
-            mediaUploader.open();
-        } else {
-            // Fallback to URL prompt
-            var url = prompt('Enter image URL:');
-            if (url) {
-                addMedia('image', url, url);
-            }
-        }
-    });
-    
-    // Add video button (v65.15)
-    $('#add-video-btn').on('click', function() {
-        var choice = confirm('Click OK to enter a YouTube URL, or Cancel to upload a video file.');
-        
-        if (choice) {
-            // YouTube URL
-            var url = prompt('Enter YouTube URL (e.g., https://www.youtube.com/watch?v=XXXXX):');
-            if (url) {
-                addMedia('video', url, '');
-            }
-        } else {
-            // Upload video file
-            if (typeof wp !== 'undefined' && wp.media) {
-                var mediaUploader = wp.media({
-                    title: 'Select or Upload Video',
-                    button: { text: 'Add Video' },
-                    multiple: false,
-                    library: { type: 'video' }
-                });
-                
-                mediaUploader.on('select', function() {
-                    var attachment = mediaUploader.state().get('selection').first().toJSON();
-                    addMedia('video', attachment.url, attachment.thumb ? attachment.thumb.src : '');
-                });
-                
-                mediaUploader.open();
-            } else {
-                alert('WordPress Media Library not available. Please enter a YouTube URL instead.');
-            }
-        }
-    });
-    
-    // Helper function to add media via AJAX
-    function addMedia(type, url, thumbnail) {
-        $.post(ajaxUrl, {
-            action: 'yolo_add_custom_media',
-            yacht_id: yachtId,
-            media_type: type,
-            media_url: url,
-            thumbnail_url: thumbnail,
-            nonce: nonce
-        }, function(response) {
-            if (response.success) {
-                // Remove "no media" message if present
-                $('#custom-media-grid .no-media-message').remove();
-                // Add new media item
-                $('#custom-media-grid').append(renderMediaItem(response.data));
-                // Reinitialize sortable
-                $('#custom-media-grid').sortable('refresh');
-            } else {
-                alert('Error: ' + response.data);
-            }
+        var frame = wp.media({
+            title: 'Select Image for Yacht',
+            button: { text: 'Add to Yacht' },
+            multiple: true
         });
-    }
+        
+        frame.on('select', function() {
+            var attachments = frame.state().get('selection').toJSON();
+            var promises = [];
+            
+            attachments.forEach(function(attachment) {
+                promises.push($.post(ajaxUrl, {
+                    action: 'yolo_add_custom_media',
+                    yacht_id: yachtId,
+                    media_type: 'image',
+                    media_url: attachment.url,
+                    thumbnail_url: attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url,
+                    nonce: nonce
+                }));
+            });
+            
+            $.when.apply($, promises).done(function() {
+                location.reload();
+            });
+        });
+        
+        frame.open();
+    });
     
-    // Delete media button (v65.15)
-    $(document).on('click', '.delete-media-btn', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (!confirm('Are you sure you want to delete this media?')) {
-            return;
+    // Add video modal
+    $('#add-video-btn').on('click', function() {
+        var videoUrl = prompt('Enter YouTube video URL or video ID:');
+        if (videoUrl) {
+            // Extract video ID from URL if needed
+            var videoId = videoUrl;
+            var match = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+            if (match) {
+                videoId = match[1];
+            }
+            
+            $.post(ajaxUrl, {
+                action: 'yolo_add_custom_media',
+                yacht_id: yachtId,
+                media_type: 'video',
+                media_url: videoId,
+                thumbnail_url: 'https://img.youtube.com/vi/' + videoId + '/mqdefault.jpg',
+                nonce: nonce
+            }, function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.data);
+                }
+            });
         }
+    });
+    
+    // Delete media item
+    $(document).on('click', '.delete-media-btn', function() {
+        if (!confirm('Delete this media item?')) return;
         
-        var $item = $(this).closest('.media-item');
         var mediaId = $(this).data('id');
+        var $item = $(this).closest('.media-item');
         
         $.post(ajaxUrl, {
             action: 'yolo_delete_custom_media',
@@ -526,28 +537,29 @@ jQuery(document).ready(function($) {
             nonce: nonce
         }, function(response) {
             if (response.success) {
-                $item.fadeOut(300, function() {
-                    $(this).remove();
-                    // Show "no media" message if grid is empty
-                    if ($('#custom-media-grid .media-item').length === 0) {
-                        $('#custom-media-grid').html('<p class="no-media-message" style="color: #666; grid-column: 1/-1;">No custom media yet. Use "Copy Synced Images" or add new media below.</p>');
-                    }
-                });
+                $item.fadeOut(300, function() { $(this).remove(); });
             } else {
                 alert('Error: ' + response.data);
             }
         });
     });
     
-    // Save order button (v65.15)
+    // Save media order
     $('#save-media-order').on('click', function() {
-        var $btn = $(this);
-        $btn.prop('disabled', true).text('Saving...');
+        var order = [];
+        $('#custom-media-grid .media-item').each(function(index) {
+            order.push({
+                id: $(this).data('id'),
+                sort_order: index
+            });
+        });
         
-        saveMediaOrder();
-        
-        setTimeout(function() {
-            $btn.prop('disabled', false).html('<span class="dashicons dashicons-saved" style="vertical-align: middle;"></span> Save Order');
+        $.post(ajaxUrl, {
+            action: 'yolo_save_media_order',
+            yacht_id: yachtId,
+            order: JSON.stringify(order),
+            nonce: nonce
+        }, function(response) {
             alert('Order saved!');
         }, 500);
     });
@@ -612,3 +624,4 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
+<?php endif; ?>
