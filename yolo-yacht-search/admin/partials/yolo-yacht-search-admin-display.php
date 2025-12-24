@@ -664,20 +664,33 @@ jQuery(document).ready(function($) {
         $('#yacht-sync-cancel-button').hide();
         
         var $message = $('#yolo-ys-sync-message');
-        $message.html(
-            '<div class="notice notice-success"><p>' +
-            '<strong>✅ Success!</strong> ' + data.message +
+        var hasErrors = data.errors && data.errors.length > 0;
+        var noticeClass = hasErrors ? 'notice-warning' : 'notice-success';
+        var statusIcon = hasErrors ? '⚠️' : '✅';
+        
+        var html = '<div class="notice ' + noticeClass + '"><p>' +
+            '<strong>' + statusIcon + ' Sync Complete!</strong> ' + data.message +
             '<br>Duration: ' + data.duration +
-            '<br>Images: ' + data.stats.images + ' | Extras: ' + data.stats.extras + ' | Equipment: ' + data.stats.equipment +
-            '</p></div>'
-        );
+            '<br>Images: ' + data.stats.images + ' | Extras: ' + data.stats.extras + ' | Equipment: ' + data.stats.equipment;
+        
+        // v81.13: Display errors if any occurred
+        if (hasErrors) {
+            html += '<br><br><strong style="color: #dc2626;">⚠️ ' + data.errors.length + ' Error(s):</strong><ul style="margin: 5px 0 0 20px;">';
+            data.errors.forEach(function(err) {
+                html += '<li style="color: #dc2626;">' + err.yacht_name + ': ' + err.error + '</li>';
+            });
+            html += '</ul>';
+        }
+        
+        html += '</p></div>';
+        $message.html(html);
         
         $('#yolo-progressive-yacht-sync-button').prop('disabled', false);
         
-        // Reload page after 5 seconds
+        // Reload page after 5 seconds (10 if errors to give time to read)
         setTimeout(function() {
             location.reload();
-        }, 5000);
+        }, hasErrors ? 10000 : 5000);
     }
     
     // Cancel yacht sync
@@ -904,20 +917,33 @@ jQuery(document).ready(function($) {
         $('#price-sync-cancel-button').hide();
         
         var $message = $('#yolo-ys-price-sync-message');
-        $message.html(
-            '<div class="notice notice-success"><p>' +
-            '<strong>✅ Success!</strong> ' + data.message +
+        var hasErrors = data.errors && data.errors.length > 0;
+        var noticeClass = hasErrors ? 'notice-warning' : 'notice-success';
+        var statusIcon = hasErrors ? '⚠️' : '✅';
+        
+        var html = '<div class="notice ' + noticeClass + '"><p>' +
+            '<strong>' + statusIcon + ' Sync Complete!</strong> ' + data.message +
             '<br>Duration: ' + data.duration +
-            '<br>Year: ' + data.year +
-            '</p></div>'
-        );
+            '<br>Year: ' + data.year;
+        
+        // v81.13: Display errors if any occurred
+        if (hasErrors) {
+            html += '<br><br><strong style="color: #dc2626;">⚠️ ' + data.errors.length + ' Error(s):</strong><ul style="margin: 5px 0 0 20px;">';
+            data.errors.forEach(function(err) {
+                html += '<li style="color: #dc2626;">' + (err.yacht_name || 'Unknown') + ': ' + err.error + '</li>';
+            });
+            html += '</ul>';
+        }
+        
+        html += '</p></div>';
+        $message.html(html);
         
         $('#yolo-progressive-price-sync-button').prop('disabled', false);
         
-        // Reload page after 5 seconds
+        // Reload page after 5 seconds (10 if errors to give time to read)
         setTimeout(function() {
             location.reload();
-        }, 5000);
+        }, hasErrors ? 10000 : 5000);
     }
     
     // Cancel price sync
