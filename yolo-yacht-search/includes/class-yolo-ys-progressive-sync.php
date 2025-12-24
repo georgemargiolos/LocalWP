@@ -73,14 +73,24 @@ class YOLO_YS_Progressive_Sync {
         $yacht_queue = array();
         $company_stats = array();
         
-        error_log("YOLO Progressive Sync v81.1: Initializing two-phase yacht sync for " . count($companies) . " companies");
+        // Get YOLO's company ID - their boats are NOT filtered
+        $my_company_id = (int) get_option('yolo_ys_my_company_id', 7850);
+        
+        // Ionian Sea sailing area ID = 7 (used to filter friend company boats)
+        $ionian_sailing_area_id = 7;
+        
+        error_log("YOLO Progressive Sync v81.8: Initializing two-phase yacht sync for " . count($companies) . " companies (Ionian filter for partners)");
         
         foreach ($companies as $company_id) {
             if (empty($company_id)) continue;
             
             try {
+                // For friend companies, filter by Ionian sailing area
+                // For YOLO (my company), get ALL yachts (no filter)
+                $sailing_area_filter = ((int)$company_id !== $my_company_id) ? $ionian_sailing_area_id : null;
+                
                 // Fetch yacht list for this company
-                $yachts = $this->api->get_yachts_by_company($company_id);
+                $yachts = $this->api->get_yachts_by_company($company_id, $sailing_area_filter);
                 
                 if (is_array($yachts) && !empty($yachts)) {
                     $company_stats[$company_id] = array(

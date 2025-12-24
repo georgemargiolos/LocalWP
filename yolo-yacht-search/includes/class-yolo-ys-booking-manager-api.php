@@ -180,9 +180,14 @@ class YOLO_YS_Booking_Manager_API {
      * @return array Array of yacht objects
      * @throws Exception if API call fails
      */
-    public function get_yachts_by_company($company_id) {
+    public function get_yachts_by_company($company_id, $sailing_area_id = null) {
         $endpoint = '/yachts';
         $params = array('companyId' => $company_id);
+        
+        // Add sailing area filter if specified (e.g., Ionian Sea = 7)
+        if ($sailing_area_id !== null) {
+            $params['sailingAreaId'] = (int) $sailing_area_id;
+        }
         
         $result = $this->make_request($endpoint, $params);
         
