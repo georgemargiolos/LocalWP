@@ -1240,10 +1240,23 @@ class YOLO_YS_Admin {
             wp_send_json_error(array('message' => 'Unauthorized'));
         }
         
-        $sync = new YOLO_YS_Progressive_Sync();
-        $result = $sync->sync_next_image_batch();
-        
-        wp_send_json_success($result);
+        try {
+            $sync = new YOLO_YS_Progressive_Sync();
+            $result = $sync->sync_next_image_batch();
+            wp_send_json_success($result);
+        } catch (Exception $e) {
+            error_log('YOLO Image Batch Sync Error: ' . $e->getMessage());
+            wp_send_json_error(array(
+                'message' => 'Error: ' . $e->getMessage(),
+                'retry' => true
+            ));
+        } catch (Error $e) {
+            error_log('YOLO Image Batch Sync Fatal: ' . $e->getMessage());
+            wp_send_json_error(array(
+                'message' => 'Fatal: ' . $e->getMessage(),
+                'retry' => false
+            ));
+        }
     }
     
     /**

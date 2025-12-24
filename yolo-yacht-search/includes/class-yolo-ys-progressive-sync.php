@@ -94,7 +94,8 @@ class YOLO_YS_Progressive_Sync {
                             'yacht_id' => $yacht['id'],
                             'yacht_name' => $yacht['name'],
                             'company_id' => $company_id,
-                            'yacht_data' => $yacht,
+                            // v81.6: Don't store full yacht_data to avoid MySQL size limits
+                            // Yacht data will be fetched fresh from API during sync
                             'image_count' => isset($yacht['images']) ? count($yacht['images']) : 0
                         );
                     }
@@ -177,11 +178,17 @@ class YOLO_YS_Progressive_Sync {
         $yacht_id = $yacht_item['yacht_id'];
         $yacht_name = $yacht_item['yacht_name'];
         $company_id = $yacht_item['company_id'];
-        $yacht_data = $yacht_item['yacht_data'];
         
         $start_time = microtime(true);
         
         try {
+            // v81.6: Fetch fresh yacht data from API (not stored in queue to avoid MySQL size limits)
+            $yacht_result = $this->api->get_yacht($yacht_id);
+            if (!$yacht_result['success'] || empty($yacht_result['data'])) {
+                throw new Exception('Failed to fetch yacht data from API');
+            }
+            $yacht_data = $yacht_result['data'];
+            
             // Store yacht data WITHOUT images (Phase 1)
             $this->db->store_yacht_data_only($yacht_data, $company_id);
             
@@ -431,6 +438,7 @@ class YOLO_YS_Progressive_Sync {
         
         // Clean up queues
         delete_option(self::IMAGE_QUEUE_OPTION);
+        delete_option(self::YACHT_QUEUE_OPTION);
         
         // Save final state
         update_option(self::STATE_OPTION, $state, false);
