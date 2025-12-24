@@ -67,14 +67,24 @@ class YOLO_YS_Database_Prices {
         
         if ($existing) {
             // Update
-            $wpdb->update(
+            $result = $wpdb->update(
                 $table_name,
                 $data,
                 array('id' => $existing->id)
             );
+            // v80.3: Add error logging for debugging
+            if ($result === false && $wpdb->last_error) {
+                error_log('YOLO YS: Failed to update offer - ' . $wpdb->last_error);
+                error_log('YOLO YS: Offer data: yacht_id=' . $data['yacht_id'] . ', date_from=' . $data['date_from']);
+            }
         } else {
             // Insert
-            $wpdb->insert($table_name, $data);
+            $result = $wpdb->insert($table_name, $data);
+            // v80.3: Add error logging for debugging
+            if ($result === false && $wpdb->last_error) {
+                error_log('YOLO YS: Failed to insert offer - ' . $wpdb->last_error);
+                error_log('YOLO YS: Offer data: yacht_id=' . $data['yacht_id'] . ', date_from=' . $data['date_from']);
+            }
         }
     }
     
@@ -165,14 +175,24 @@ class YOLO_YS_Database_Prices {
         
         if ($existing) {
             // Update
-            $wpdb->update(
+            $result = $wpdb->update(
                 $table_name,
                 $data,
                 array('id' => $existing->id)
             );
+            // v80.3: Add error logging for debugging
+            if ($result === false && $wpdb->last_error) {
+                error_log('YOLO YS: Failed to update offer - ' . $wpdb->last_error);
+                error_log('YOLO YS: Offer data: yacht_id=' . $data['yacht_id'] . ', date_from=' . $data['date_from']);
+            }
         } else {
             // Insert
-            $wpdb->insert($table_name, $data);
+            $result = $wpdb->insert($table_name, $data);
+            // v80.3: Add error logging for debugging
+            if ($result === false && $wpdb->last_error) {
+                error_log('YOLO YS: Failed to insert offer - ' . $wpdb->last_error);
+                error_log('YOLO YS: Offer data: yacht_id=' . $data['yacht_id'] . ', date_from=' . $data['date_from']);
+            }
         }
     }
     

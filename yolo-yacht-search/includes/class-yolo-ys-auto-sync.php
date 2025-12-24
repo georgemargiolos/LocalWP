@@ -94,48 +94,43 @@ class YOLO_YS_Auto_Sync {
         
         error_log('[YOLO Auto-Sync] Starting offers sync at ' . current_time('mysql'));
         
-        $current_year = (int) date('Y');
-        $next_year = $current_year + 1;
+        // v80.3 FIX: Use the year selected in the dropdown (same as manual sync)
+        // This is simpler, more reliable, and matches user expectations
+        // The year is stored when user selects it in the admin dropdown
+        $selected_year = (int) get_option('yolo_ys_offers_sync_year', date('Y') + 1);
         $total_offers = 0;
-        $success_count = 0;
         
         try {
             $sync = new YOLO_YS_Sync();
             
-            // Sync CURRENT year
-            error_log('[YOLO Auto-Sync] Syncing offers for CURRENT year ' . $current_year . '...');
-            $result1 = $sync->sync_all_offers($current_year);
-            // FIX v80.2: Check if offers were actually synced, not just success flag
-            // This handles cases where sync partially succeeds or has minor errors
-            if (isset($result1['offers_synced']) && $result1['offers_synced'] > 0) {
-                $total_offers += $result1['offers_synced'];
-                $success_count++;
-                error_log('[YOLO Auto-Sync] Current year sync complete: ' . $result1['offers_synced'] . ' offers');
-            } else {
-                error_log('[YOLO Auto-Sync] Current year sync issues: ' . json_encode($result1));
-            }
+            // Sync the selected year only (same as manual sync)
+            error_log('[YOLO Auto-Sync] Syncing offers for year ' . $selected_year . ' (from dropdown)...');
+            $result = $sync->sync_all_offers($selected_year);
             
-            // Sync NEXT year
-            error_log('[YOLO Auto-Sync] Syncing offers for NEXT year ' . $next_year . '...');
-            $result2 = $sync->sync_all_offers($next_year);
-            // FIX v80.2: Check if offers were actually synced, not just success flag
-            // This handles cases where sync partially succeeds or has minor errors
-            if (isset($result2['offers_synced']) && $result2['offers_synced'] > 0) {
-                $total_offers += $result2['offers_synced'];
-                $success_count++;
-                error_log('[YOLO Auto-Sync] Next year sync complete: ' . $result2['offers_synced'] . ' offers');
+            // Check if offers were actually synced
+            if (isset($result['offers_synced']) && $result['offers_synced'] > 0) {
+                $total_offers = $result['offers_synced'];
+                error_log('[YOLO Auto-Sync] Year ' . $selected_year . ' sync complete: ' . $total_offers . ' offers');
+                
+                // Log per-company results if available
+                if (isset($result['message'])) {
+                    error_log('[YOLO Auto-Sync] Result: ' . $result['message']);
+                }
+                if (!empty($result['errors'])) {
+                    error_log('[YOLO Auto-Sync] Warnings: ' . implode('; ', $result['errors']));
+                }
             } else {
-                error_log('[YOLO Auto-Sync] Next year sync issues: ' . json_encode($result2));
+                error_log('[YOLO Auto-Sync] Year ' . $selected_year . ' sync issues: ' . json_encode($result));
             }
             
             // Log final result
-            if ($success_count > 0) {
-                error_log('[YOLO Auto-Sync] Offers sync completed: ' . $total_offers . ' total offers for ' . $current_year . ' and ' . $next_year);
-                // Update last sync time (sync_all_offers() also updates this, but we update here for overall status)
+            if ($total_offers > 0) {
+                error_log('[YOLO Auto-Sync] Offers sync completed: ' . $total_offers . ' total offers for year ' . $selected_year);
+                // Update last sync time
                 update_option('yolo_ys_last_offer_sync', current_time('mysql'));
                 update_option('yolo_ys_last_offers_sync_status', 'success');
             } else {
-                error_log('[YOLO Auto-Sync] Offers sync failed for both years - no offers synced');
+                error_log('[YOLO Auto-Sync] Offers sync failed - no offers synced for year ' . $selected_year);
                 update_option('yolo_ys_last_offers_sync_status', 'warning');
                 // Don't update last_offer_sync if nothing was synced
             }

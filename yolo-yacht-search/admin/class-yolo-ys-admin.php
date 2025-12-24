@@ -32,6 +32,9 @@ class YOLO_YS_Admin {
         
         // Booking management AJAX handlers (v70.3)
         add_action('wp_ajax_yolo_delete_booking', array($this, 'ajax_delete_booking'));
+        
+        // v80.3: Save offers year for auto-sync
+        add_action('wp_ajax_yolo_ys_save_offers_year', array($this, 'ajax_save_offers_year'));
     }
     
     /**
@@ -763,6 +766,30 @@ class YOLO_YS_Admin {
         } else {
             wp_send_json_error($result);
         }
+    }
+    
+    /**
+     * AJAX: Save offers year for auto-sync
+     * v80.3: Auto-sync now uses the same year as manual sync (from dropdown)
+     */
+    public function ajax_save_offers_year() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        // Validate year is reasonable (current year to +5 years)
+        $current_year = (int) date('Y');
+        if ($year < $current_year || $year > $current_year + 5) {
+            wp_send_json_error(array('message' => 'Invalid year'));
+        }
+        
+        update_option('yolo_ys_offers_sync_year', $year);
+        
+        wp_send_json_success(array('message' => 'Year saved', 'year' => $year));
     }
     
     /**

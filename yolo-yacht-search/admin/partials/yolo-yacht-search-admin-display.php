@@ -123,12 +123,15 @@ $sync_status = $sync->get_sync_status();
             <select id="yolo-ys-sync-year" style="padding: 8px 12px; font-size: 16px; border: 2px solid #2563eb; border-radius: 6px;">
                 <?php 
                 $current_year = date('Y');
+                // v80.3: Get saved year for auto-sync (default to next year)
+                $saved_year = (int) get_option('yolo_ys_offers_sync_year', $current_year + 1);
                 for ($y = $current_year; $y <= $current_year + 3; $y++) {
-                    $selected = ($y == $current_year + 1) ? 'selected' : '';
+                    $selected = ($y == $saved_year) ? 'selected' : '';
                     echo "<option value='$y' $selected>$y</option>";
                 }
                 ?>
             </select>
+            <span style="color: #6b7280; font-size: 12px; margin-left: 10px;">Also used for auto-sync</span>
         </div>
         
         <button type="button" id="yolo-ys-sync-prices-button" class="button button-primary button-hero" style="background: #2563eb; border-color: #2563eb; text-shadow: none; box-shadow: none;">
@@ -321,6 +324,23 @@ jQuery(document).ready(function($) {
             complete: function() {
                 $button.prop('disabled', false);
                 $button.find('.dashicons').removeClass('dashicons-update-spin');
+            }
+        });
+    });
+    
+    // v80.3: Save year selection for auto-sync when dropdown changes
+    $('#yolo-ys-sync-year').on('change', function() {
+        var year = $(this).val();
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_ys_save_offers_year',
+                nonce: yoloYsAdmin.nonce,
+                year: year
+            },
+            success: function(response) {
+                console.log('Year saved for auto-sync: ' + year);
             }
         });
     });

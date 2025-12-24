@@ -1,19 +1,36 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
 **Date:** December 24, 2025  
-**Version:** v80.2 (Last Stable Version)  
-**Task Goal:** Fix auto-sync weekly offers bug where boats don't show prices until manual refresh.
+**Version:** v80.3 (Latest Stable Version)  
+**Task Goal:** Fix CRITICAL bug where YOLO boats lose prices after auto-sync while partner boats keep prices.
 
 ---
 
-## 🔴 Summary of Work Completed (v80.2)
+## 🔴 Summary of Work Completed (v80.3)
 
-### 1. Auto-Sync Weekly Offers Bug Fix (v80.2)
-- **Problem:** Auto-sync for weekly offers was not properly detecting successful syncs, causing boats to not display prices until a manual refresh was performed.
-- **Root Cause:** The `run_offers_sync()` method was checking `$result['success']` flag instead of verifying if offers were actually synced.
-- **Solution:** Changed success detection to check `$result['offers_synced'] > 0` instead of `$result['success']`.
-- **Benefit:** Handles cases where sync partially succeeds or has minor errors but still syncs offers.
+### 1. CRITICAL: Per-Company Delete Fix for Offers Sync
+- **Problem:** YOLO boats were losing prices after auto-sync while partner boats kept their prices.
+- **Root Cause:** The DELETE query was deleting ALL prices for ALL companies for the year, then only storing offers from companies that returned data. If YOLO's fetch failed but partners succeeded, YOLO's prices were deleted but never replaced.
+- **Bug Location:** Line 314 in `class-yolo-ys-sync.php`: `DELETE FROM prices WHERE YEAR(date_from) = %d`
+- **Solution:** Rewrote `sync_all_offers()` to:
+  1. Fetch all offers first, grouped by company ID
+  2. For each company that returned offers:
+     - Get that company's yacht IDs from the database
+     - DELETE only that company's yacht prices for the year
+     - Store that company's new offers
+  3. Companies that failed keep their existing prices
 - **Status:** **COMPLETE - READY FOR TESTING.**
+
+### 2. Auto-Sync Uses Dropdown Year
+- **Change:** Auto-sync now uses the same year selected in the dropdown (same as manual sync)
+- **Before:** Synced both current year AND next year (causing longer execution and potential timeouts)
+- **After:** Syncs only the year you select in the "Select Year" dropdown
+- **Benefit:** Simpler, faster, matches user expectations
+
+### 3. Error Logging for Offer Storage
+- **Added:** Detailed error logging when storing offers fails
+- **Logs:** Database errors with yacht_id and date_from for debugging
+- **Benefit:** Helps identify which specific offers are failing to store
 
 ---
 
@@ -21,84 +38,134 @@
 
 | File | Change Summary |
 | :--- | :--- |
-| `yolo-yacht-search.php` | Version bump to 80.2 |
-| `CHANGELOG.md` | Updated with v80.2 entry |
-| `README.md` | Updated with latest version and v80.2 summary |
-| `includes/class-yolo-ys-auto-sync.php` | Fixed `run_offers_sync()` success detection logic |
+| `yolo-yacht-search.php` | Version bump to 80.3 |
+| `CHANGELOG.md` | Updated with v80.3 entry |
+| `README.md` | Updated with latest version and v80.3 summary |
+| `includes/class-yolo-ys-sync.php` | Rewrote `sync_all_offers()` with per-company delete logic |
+| `includes/class-yolo-ys-auto-sync.php` | Changed to use dropdown year instead of current+next year |
+| `includes/class-yolo-ys-database-prices.php` | Added error logging to `store_price()` and `store_offer()` |
+| `admin/class-yolo-ys-admin.php` | Added AJAX handler for saving offers year |
+| `admin/partials/yolo-yacht-search-admin-display.php` | Added year dropdown save functionality and hint text |
 
 ---
 
 ## Technical Implementation Details
 
-### Before (Bug)
+### The Bug (Before)
 ```php
-if (isset($result1['success']) && $result1['success']) {
-    // Only counted as success if success flag was true
+// Fetch offers from all companies
+foreach ($all_companies as $company_id) {
+    $offers = $api->get_offers($company_id);
+    if (!empty($offers)) {
+        $all_offers = array_merge($all_offers, $offers);
+    }
+}
+
+// BUG: Delete ALL prices for ALL companies
+if (!empty($all_offers)) {
+    DELETE FROM prices WHERE YEAR(date_from) = 2026  // Deletes EVERYONE's prices!
+}
+
+// Only store offers from companies that succeeded
+foreach ($all_offers as $offer) {
+    store_offer($offer);  // YOLO has no offers to store if YOLO's fetch failed
 }
 ```
 
-### After (Fix)
+### The Fix (After)
 ```php
-// FIX v80.2: Check if offers were actually synced, not just success flag
-if (isset($result1['offers_synced']) && $result1['offers_synced'] > 0) {
-    // Counts as success if any offers were actually synced
+// Phase 1: Fetch all offers, grouped by company
+$offers_by_company = [];
+foreach ($all_companies as $company_id) {
+    $offers = $api->get_offers($company_id);
+    if (!empty($offers)) {
+        $offers_by_company[$company_id] = $offers;
+    }
 }
+
+// Phase 2: Delete and store per-company
+foreach ($offers_by_company as $company_id => $offers) {
+    // Get this company's yacht IDs
+    $yacht_ids = get_yacht_ids_for_company($company_id);
+    
+    // Delete ONLY this company's prices
+    DELETE FROM prices WHERE yacht_id IN ($yacht_ids) AND YEAR(date_from) = 2026
+    
+    // Store this company's offers
+    foreach ($offers as $offer) {
+        store_offer($offer);
+    }
+}
+// Companies that failed keep their existing prices!
 ```
 
 ---
 
-## Known Issues / Recurring Bugs
+## API Documentation Reference
 
-### WordPress Cron Reliability
-**Problem:** WordPress uses "pseudo-cron" which only runs when someone visits the site.
+### /offers Endpoint
 
-**Solution:** Set up a real server cron job:
+**Endpoint:** `GET /api/v2/offers`
 
-1. Add to `wp-config.php`:
-   ```php
-   define('DISABLE_WP_CRON', true);
-   ```
+**Response Format:** Direct JSON array (NOT wrapped in `{value: [...]}`)
 
-2. Add to server crontab:
-   ```bash
-   */15 * * * * wget -q -O /dev/null "https://yolo-charters.com/wp-cron.php?doing_wp_cron" >/dev/null 2>&1
-   ```
+**Example Response:**
+```json
+[
+  {
+    "yachtId": 12345,
+    "dateFrom": "2026-05-02",
+    "dateTo": "2026-05-09",
+    "price": 3600.00,
+    "startPrice": 4000.00,
+    "discountPercentage": 10,
+    "currency": "EUR"
+  }
+]
+```
 
-### Offers Sync - Fetch-First Pattern (v72.9)
-The `sync_all_offers()` method uses a fetch-first pattern to prevent data loss:
-1. Fetches ALL offers from API first into memory
-2. Only deletes old prices if fetch was successful
-3. Then stores the new offers
+**Note:** Unlike `/yachts` endpoint which returns `{value: [...]}`, the `/offers` endpoint returns a direct array.
 
 ---
 
-## Previous Session Summary (v80.1)
+## Server Cron Setup (Recommended)
 
-### Clickable Yacht Cards (v80.1)
-- Made entire yacht card clickable, not just the DETAILS button
-- Used CSS stretched link technique for better accessibility
-- Works on both "Our Yachts" fleet page and Search Results page
+WordPress pseudo-cron only runs when someone visits the site. For reliable auto-sync, set up a server cron:
 
-### Sticky Booking Section Position (v80.0)
-- Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
+**Step 1: Add to wp-config.php:**
+```php
+define('DISABLE_WP_CRON', true);
+```
+
+**Step 2: Add to server crontab:**
+```bash
+*/15 * * * * wget -q -O /dev/null "https://yolo-charters.com/wp-cron.php?doing_wp_cron" >/dev/null 2>&1
+```
 
 ---
 
 ## Testing Checklist
 
+- [ ] Select year 2026 in the dropdown (should show "Also used for auto-sync" hint)
 - [ ] Wait for auto-sync to run (or trigger manually via WP Crontrol plugin)
 - [ ] Check WordPress error logs for `[YOLO Auto-Sync]` messages
-- [ ] Verify prices appear on frontend after auto-sync
-- [ ] Check "Our Yachts" page shows prices
-- [ ] Check search results show prices
+- [ ] Verify YOLO boats have prices on frontend after auto-sync
+- [ ] Verify partner boats also have prices
+- [ ] Check "Our Yachts" page shows prices for all boats
+- [ ] Check search results show prices for all boats
 
 ---
 
-## Suggested Next Steps
+## Previous Session Summary
 
-1. **Set up server cron** for reliable auto-sync execution
-2. **Monitor error logs** for `[YOLO Auto-Sync]` messages
-3. **Test auto-sync** by triggering it manually via WP Crontrol plugin
+### v80.2 - Auto-Sync Success Detection Fix
+- Changed success detection from `$result['success']` to `$result['offers_synced'] > 0`
+
+### v80.1 - Clickable Yacht Cards
+- Made entire yacht card clickable, not just the DETAILS button
+
+### v80.0 - Sticky Booking Section Position
+- Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
 
 ---
 
@@ -107,7 +174,7 @@ The `sync_all_offers()` method uses a fetch-first pattern to prevent data loss:
 | Resource | Link | Notes |
 | :--- | :--- | :--- |
 | **GitHub Repository** | [https://github.com/georgemargiolos/LocalWP](https://github.com/georgemargiolos/LocalWP) | All code is pushed here. |
-| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.2.zip` | Use this file to update the plugin on your WordPress site. |
+| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.3.zip` | Use this file to update the plugin on your WordPress site. |
 | **Latest Changelog** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md) | For a detailed history of changes. |
 | **Latest README** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md) | For an overview of the latest features. |
 | **Handoff File** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md) | This document. |

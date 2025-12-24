@@ -1,5 +1,40 @@
 # Changelog
 
+## [80.3] - 2025-12-24
+
+### Fixed
+- **CRITICAL: Per-Company Delete for Offers Sync** - Fixed data loss bug where YOLO boats lost prices when partner syncs succeeded but YOLO sync failed
+  - **Root Cause:** DELETE query was deleting ALL prices for the year, then only storing offers from companies that succeeded
+  - **Fix:** Now fetches all offers first, groups by company, then deletes and stores per-company
+  - If a company's API call fails, that company's existing prices are preserved
+  - Other companies' syncs are not affected by one company's failure
+
+### Changed
+- **Auto-Sync Uses Dropdown Year** - Auto-sync now uses the same year selected in the dropdown (same as manual sync)
+  - Previously synced both current year AND next year (causing longer execution and potential timeouts)
+  - Now syncs only the year you select in the "Select Year" dropdown
+  - Dropdown shows "Also used for auto-sync" hint
+  - Year selection is saved automatically when changed
+
+### Added
+- **Error Logging for Offer Storage** - Added detailed error logging when storing offers fails
+  - Logs database errors with yacht_id and date_from for debugging
+  - Helps identify which specific offers are failing to store
+
+### Files Modified
+- `includes/class-yolo-ys-sync.php` - Rewrote `sync_all_offers()` with per-company delete logic
+- `includes/class-yolo-ys-auto-sync.php` - Changed to use dropdown year instead of current+next year
+- `includes/class-yolo-ys-database-prices.php` - Added error logging to `store_price()` and `store_offer()`
+- `admin/class-yolo-ys-admin.php` - Added AJAX handler for saving offers year
+- `admin/partials/yolo-yacht-search-admin-display.php` - Added year dropdown save functionality and hint text
+
+### Technical Details
+- The bug was on line 314 of `class-yolo-ys-sync.php`: `DELETE FROM prices WHERE YEAR(date_from) = %d`
+- This deleted ALL companies' prices, then only stored offers from companies that returned data
+- If YOLO's API call failed but partners succeeded, YOLO's prices were deleted but never replaced
+
+---
+
 ## [80.2] - 2025-12-24
 
 ### Fixed

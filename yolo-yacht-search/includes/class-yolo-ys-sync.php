@@ -179,29 +179,30 @@ class YOLO_YS_Sync {
      * @return array Results with success status, message, and statistics
      */
     /**
-     * Sync weekly charter offers (prices) for all yachts from all companies
+     * Sync all weekly offers from Booking Manager API
      * 
-     * CRITICAL PROCESS - DO NOT MODIFY WITHOUT UNDERSTANDING:
-     * 1. DELETE all old prices for the year (prevents price accumulation bug)
-     * 2. Fetch offers from API for each company separately
-     * 3. Store offers in database in batches (fast REPLACE INTO)
+     * v80.3 FIX: Per-company delete - only delete prices for companies that successfully fetched
+     * This prevents data loss when one company's API call fails but others succeed.
+     * 
+     * This method:
+     * 1. Fetch offers from API for each company separately (PHASE 1: FETCH ALL)
+     * 2. Track which companies succeeded
+     * 3. Delete prices ONLY for successful companies' yachts (PHASE 2: DELETE)
+     * 4. Store new offers for successful companies (PHASE 2: STORE)
+     * 5. Preserve existing prices for failed companies
      * 
      * Bug history:
      * - v2.3.3 and earlier: DELETE was not working, prices accumulated
      * - v2.3.4: Fixed DELETE to properly clear old prices before sync
-     * 
-     * IMPORTANT NOTES:
-     * - Must DELETE before INSERT to avoid wrong/duplicate prices
-     * - API called once per company (multiple companies in one call causes 500 error)
-     * - Date format must be yyyy-MM-ddTHH:mm:ss (API requirement)
-     * - Batch insert is much faster than individual inserts
+     * - v72.9: Added fetch-first pattern to prevent data loss on API failure
+     * - v80.3: Per-company delete - only delete prices for companies that succeeded
      * 
      * @param int|null $year Year to sync (defaults to next year)
      * @return array Result with success status, counts, and errors
      */
     public function sync_all_offers($year = null) {
         // Increase time limit for sync (can take 2-3 minutes for all companies)
-        set_time_limit(300); // 5 minutes should be enough for single API call
+        set_time_limit(300); // 5 minutes should be enough
         ini_set('max_execution_time', 300);
         
         $results = array(
@@ -218,14 +219,14 @@ class YOLO_YS_Sync {
             $year = (int)date('Y') + 1;
         }
         
-        // Get company IDs
-        $my_company_id = get_option('yolo_ys_my_company_id', 7850);
+        // Get company IDs - ensure they are integers for consistent handling
+        $my_company_id = (int) get_option('yolo_ys_my_company_id', 7850);
         $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
-        $friend_ids = array_map('trim', explode(',', $friend_companies));
+        $friend_ids = array_map('intval', array_map('trim', explode(',', $friend_companies)));
         
         // Combine all companies
         $all_companies = array_merge(array($my_company_id), $friend_ids);
-        $all_companies = array_filter($all_companies); // Remove empty values
+        $all_companies = array_filter($all_companies); // Remove empty/zero values
         
         if (empty($all_companies)) {
             $results['message'] = 'No companies configured. Please check plugin settings.';
@@ -236,21 +237,23 @@ class YOLO_YS_Sync {
         $dateFrom = "{$year}-01-01T00:00:00";
         $dateTo = "{$year}-12-31T23:59:59";
         
-        // Get yacht-to-company mapping from database
         global $wpdb;
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
         
         // Track unique yachts with offers
         $yachtOffersMap = array();
         
-        // v72.9 FIX: Collect ALL offers in memory FIRST before deleting anything
-        // This prevents data loss when API fails
-        $all_offers = array();
+        // v80.3 FIX: Track offers PER COMPANY for selective delete
+        $offers_by_company = array();
+        $successful_companies = array();
         
-        error_log("YOLO YS: ===== FETCHING OFFERS FOR YEAR {$year} (fetch-first pattern) =====");
+        error_log("YOLO YS: ===== FETCHING OFFERS FOR YEAR {$year} (per-company pattern v80.3) =====");
+        error_log("YOLO YS: Companies to sync: " . implode(', ', $all_companies));
         
-        // Call API once per company to avoid HTTP 500 error
-        // The API fails when multiple companies are passed with array syntax companyId[0]=...
+        // ============================================
+        // PHASE 1: FETCH ALL - Collect offers from all companies first
+        // ============================================
         foreach ($all_companies as $company_id) {
             if (empty($company_id)) continue;
             
@@ -269,7 +272,7 @@ class YOLO_YS_Sync {
                 
                 // Validate response is an array
                 if (!is_array($offers)) {
-                    $error_msg = "Company $company_id: Unexpected response format (not an array): " . print_r($offers, true);
+                    $error_msg = "Company $company_id: Unexpected response format (not an array)";
                     $results['errors'][] = $error_msg;
                     error_log('YOLO YS: ' . $error_msg);
                     continue;
@@ -277,16 +280,22 @@ class YOLO_YS_Sync {
                 
                 // Check if response is empty
                 if (empty($offers)) {
-                    $error_msg = "Company $company_id: No offers returned for year $year";
+                    $error_msg = "Company $company_id: No offers returned for year $year - PRESERVING EXISTING PRICES";
                     $results['errors'][] = $error_msg;
                     error_log('YOLO YS: ' . $error_msg);
+                    // v80.3: Company failed - do NOT add to successful_companies
+                    // This company's existing prices will be preserved
                     continue;
                 }
                 
-                // Collect offers with company ID for later storage
+                // v80.3: Track this company as successful
+                $successful_companies[] = (int) $company_id;
+                $offers_by_company[$company_id] = array();
+                
+                // Collect offers for this company
                 foreach ($offers as $offer) {
-                    $offer['_company_id'] = $company_id; // Tag with company ID
-                    $all_offers[] = $offer;
+                    $offer['_company_id'] = $company_id;
+                    $offers_by_company[$company_id][] = $offer;
                     
                     // Track yacht
                     if (isset($offer['yachtId'])) {
@@ -294,50 +303,78 @@ class YOLO_YS_Sync {
                     }
                 }
                 
-                error_log('YOLO YS: Fetched ' . count($offers) . ' offers for company ' . $company_id);
+                error_log('YOLO YS: SUCCESS - Fetched ' . count($offers) . ' offers for company ' . $company_id);
                 
             } catch (Exception $e) {
-                $error_msg = 'Company ' . $company_id . ': ' . $e->getMessage();
+                $error_msg = 'Company ' . $company_id . ': ' . $e->getMessage() . ' - PRESERVING EXISTING PRICES';
                 $results['errors'][] = $error_msg;
-                error_log('YOLO YS: Failed to fetch offers - ' . $error_msg);
+                error_log('YOLO YS: FAILED to fetch offers - ' . $error_msg);
+                // v80.3: Company failed - existing prices will be preserved
             }
         }
         
-        // v72.9 FIX: Only delete old prices if we successfully fetched new data
-        if (!empty($all_offers)) {
-            error_log("YOLO YS: ===== FETCH SUCCESSFUL: " . count($all_offers) . " offers fetched =====");
-            error_log("YOLO YS: ===== NOW DELETING OLD PRICES FOR YEAR {$year} =====");
+        // ============================================
+        // PHASE 2: DELETE + STORE - Only for companies that successfully fetched
+        // ============================================
+        if (!empty($successful_companies)) {
+            error_log("YOLO YS: ===== " . count($successful_companies) . "/" . count($all_companies) . " COMPANIES SUCCEEDED =====");
+            error_log("YOLO YS: Successful companies: " . implode(', ', $successful_companies));
             
-            // Delete all existing prices for this year
-            $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
-            $deleted = $wpdb->query($wpdb->prepare(
-                "DELETE FROM {$prices_table} WHERE YEAR(date_from) = %d",
-                $year
-            ));
+            // v80.3 FIX: Delete prices ONLY for yachts belonging to successful companies
+            // Get yacht IDs for successful companies
+            $placeholders = implode(',', array_fill(0, count($successful_companies), '%d'));
+            $yacht_ids_query = $wpdb->prepare(
+                "SELECT id FROM {$yachts_table} WHERE company_id IN ($placeholders)",
+                $successful_companies
+            );
+            $yacht_ids = $wpdb->get_col($yacht_ids_query);
             
-            error_log("YOLO YS: ===== DELETE COMPLETED: {$deleted} records deleted =====");
-            
-            if ($deleted === false) {
-                error_log("YOLO YS: DELETE FAILED! wpdb->last_error: " . $wpdb->last_error);
+            if (!empty($yacht_ids)) {
+                error_log("YOLO YS: Found " . count($yacht_ids) . " yachts for successful companies");
+                
+                // Delete prices only for these yachts for this year
+                $yacht_placeholders = implode(',', array_fill(0, count($yacht_ids), '%d'));
+                $delete_params = array_merge($yacht_ids, array($year));
+                
+                $deleted = $wpdb->query($wpdb->prepare(
+                    "DELETE FROM {$prices_table} WHERE yacht_id IN ($yacht_placeholders) AND YEAR(date_from) = %d",
+                    $delete_params
+                ));
+                
+                error_log("YOLO YS: ===== DELETED {$deleted} prices for " . count($successful_companies) . " successful companies =====");
+                
+                if ($deleted === false) {
+                    error_log("YOLO YS: DELETE FAILED! wpdb->last_error: " . $wpdb->last_error);
+                }
+            } else {
+                error_log("YOLO YS: No yachts found in database for successful companies - skipping delete");
             }
             
             // Now store all the fetched offers
-            error_log("YOLO YS: ===== STORING " . count($all_offers) . " NEW OFFERS =====");
+            error_log("YOLO YS: ===== STORING OFFERS FOR SUCCESSFUL COMPANIES =====");
             
-            foreach ($all_offers as $offer) {
-                $company_id = isset($offer['_company_id']) ? $offer['_company_id'] : null;
-                unset($offer['_company_id']); // Remove our internal tag
-                
-                YOLO_YS_Database_Prices::store_offer($offer, $company_id);
-                $results['offers_synced']++;
+            foreach ($offers_by_company as $company_id => $company_offers) {
+                foreach ($company_offers as $offer) {
+                    unset($offer['_company_id']); // Remove our internal tag
+                    
+                    YOLO_YS_Database_Prices::store_offer($offer, $company_id);
+                    $results['offers_synced']++;
+                }
+                error_log("YOLO YS: Stored " . count($company_offers) . " offers for company " . $company_id);
             }
             
             error_log("YOLO YS: ===== STORAGE COMPLETED: {$results['offers_synced']} offers stored =====");
             
+            // Log which companies failed (if any)
+            $failed_companies = array_diff($all_companies, $successful_companies);
+            if (!empty($failed_companies)) {
+                error_log("YOLO YS: ===== PRESERVED EXISTING PRICES FOR FAILED COMPANIES: " . implode(', ', $failed_companies) . " =====");
+            }
+            
         } else {
-            // v72.9 FIX: If fetch failed or returned empty, DO NOT delete existing prices
-            error_log("YOLO YS: ===== FETCH RETURNED EMPTY - KEEPING EXISTING PRICES =====");
-            $results['errors'][] = "No offers fetched from API - existing prices preserved to prevent data loss";
+            // ALL companies failed - preserve all existing prices
+            error_log("YOLO YS: ===== ALL COMPANIES FAILED - KEEPING ALL EXISTING PRICES =====");
+            $results['errors'][] = "All API calls failed - existing prices preserved to prevent data loss";
         }
         
         // Calculate yachts with offers
@@ -346,9 +383,10 @@ class YOLO_YS_Sync {
         if ($results['offers_synced'] > 0) {
             $results['success'] = true;
             $results['message'] = sprintf(
-                'Successfully synced %d weekly offers for year %d (%d companies, %d yachts)',
+                'Successfully synced %d weekly offers for year %d (%d/%d companies, %d yachts)',
                 $results['offers_synced'],
                 $year,
+                count($successful_companies),
                 count($all_companies),
                 $results['yachts_with_offers']
             );
