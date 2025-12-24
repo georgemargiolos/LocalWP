@@ -1,0 +1,26 @@
+# Booking Manager API Research Notes
+Date: Dec 24, 2025
+
+## Source
+SwaggerHub: https://app.swaggerhub.com/apis-docs/mmksystems/bm-api/2.2.0
+
+## Key Findings from Swagger Documentation
+
+### /offers endpoint
+- GET /offers - Provides a list of available offers
+- Added `myReservationId` to response when parameter `showOptions` is set to true (10.07.2024)
+- Added `obligatoryExtras` list to response (05.12.2023)
+- Added `minYearOfBuild`, `maxYearOfBuild` parameters (27.12.2023)
+- Added `kind` parameter in the request (29.05.2020)
+- Added `sailingAreaId` as additional parameter in request (10.04.2020)
+
+## Response Format Question
+Need to verify: Does /offers return direct array or wrapped in {value: [...]}?
+
+The code comment says:
+"API returns direct array, make_request() wraps it in ['success' => true, 'data' => [...]]"
+
+But Cursor suggests it returns {value: [...]} like other endpoints.
+
+## Next Step
+Need to click on the /offers endpoint in Swagger to see the actual response schema.

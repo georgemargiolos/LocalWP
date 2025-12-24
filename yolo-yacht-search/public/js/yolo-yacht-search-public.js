@@ -288,8 +288,16 @@
         });
     }
     
+    // v81.1: Store all boats for Load More functionality
+    let allYoloBoats = [];
+    let allFriendBoats = [];
+    let displayedYoloCount = 0;
+    let displayedFriendCount = 0;
+    const BOATS_PER_PAGE = 15;
+    
     /**
-     * Display search results
+     * Display search results with Load More pagination
+     * v81.1: Shows 15 boats initially, then Load More for rest
      */
     function displayResults(data) {
         const resultsContainer = $('#yolo-ys-results-container');
@@ -305,6 +313,12 @@
             return;
         }
         
+        // Store all boats for Load More
+        allYoloBoats = data.yolo_boats || [];
+        allFriendBoats = data.friend_boats || [];
+        displayedYoloCount = 0;
+        displayedFriendCount = 0;
+        
         // Build HTML directly
         let html = `
             <div class="yolo-ys-results-header">
@@ -313,35 +327,118 @@
             </div>
         `;
         
-        // Render YOLO boats
-        if (data.yolo_boats && data.yolo_boats.length > 0) {
+        // Calculate how many to show initially (15 total, YOLO first)
+        let remainingSlots = BOATS_PER_PAGE;
+        let initialYoloCount = Math.min(allYoloBoats.length, remainingSlots);
+        remainingSlots -= initialYoloCount;
+        let initialFriendCount = Math.min(allFriendBoats.length, remainingSlots);
+        
+        // Render YOLO boats section
+        if (allYoloBoats.length > 0) {
             html += `
                 <div class="yolo-ys-section-header">
                     <h3>YOLO Charters Fleet</h3>
                 </div>
-                <div class="row g-4">
+                <div class="row g-4" id="yolo-boats-container">
             `;
-            data.yolo_boats.forEach(boat => {
-                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, true)}</div>`;
-            });
+            for (let i = 0; i < initialYoloCount; i++) {
+                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(allYoloBoats[i], true)}</div>`;
+            }
             html += '</div>';
+            displayedYoloCount = initialYoloCount;
+            
+            // Add Load More for YOLO if needed
+            if (allYoloBoats.length > initialYoloCount) {
+                html += `
+                    <div class="yolo-ys-load-more-container" id="yolo-load-more-container">
+                        <button type="button" class="yolo-ys-load-more-btn" id="yolo-load-more-btn">
+                            Load More YOLO Yachts (${allYoloBoats.length - initialYoloCount} remaining)
+                        </button>
+                    </div>
+                `;
+            }
         }
         
-        // Render friend boats
-        if (data.friend_boats && data.friend_boats.length > 0) {
+        // Render friend boats section
+        if (allFriendBoats.length > 0) {
             html += `
                 <div class="yolo-ys-section-header friends">
                     <h3>Partner Fleet</h3>
                 </div>
-                <div class="row g-4">
+                <div class="row g-4" id="friend-boats-container">
             `;
-            data.friend_boats.forEach(boat => {
-                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, false)}</div>`;
-            });
+            for (let i = 0; i < initialFriendCount; i++) {
+                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(allFriendBoats[i], false)}</div>`;
+            }
             html += '</div>';
+            displayedFriendCount = initialFriendCount;
+            
+            // Add Load More for friends if needed
+            if (allFriendBoats.length > initialFriendCount) {
+                html += `
+                    <div class="yolo-ys-load-more-container" id="friend-load-more-container">
+                        <button type="button" class="yolo-ys-load-more-btn" id="friend-load-more-btn">
+                            Load More Partner Yachts (${allFriendBoats.length - initialFriendCount} remaining)
+                        </button>
+                    </div>
+                `;
+            }
         }
         
         resultsContainer.html(html);
+        
+        // Bind Load More button events
+        $('#yolo-load-more-btn').on('click', function() {
+            loadMoreYoloBoats();
+        });
+        
+        $('#friend-load-more-btn').on('click', function() {
+            loadMoreFriendBoats();
+        });
+    }
+    
+    /**
+     * Load more YOLO boats
+     */
+    function loadMoreYoloBoats() {
+        const container = $('#yolo-boats-container');
+        const nextBatch = allYoloBoats.slice(displayedYoloCount, displayedYoloCount + BOATS_PER_PAGE);
+        
+        nextBatch.forEach(boat => {
+            container.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, true)}</div>`);
+        });
+        
+        displayedYoloCount += nextBatch.length;
+        
+        // Update or hide Load More button
+        const remaining = allYoloBoats.length - displayedYoloCount;
+        if (remaining > 0) {
+            $('#yolo-load-more-btn').text(`Load More YOLO Yachts (${remaining} remaining)`);
+        } else {
+            $('#yolo-load-more-container').hide();
+        }
+    }
+    
+    /**
+     * Load more friend boats
+     */
+    function loadMoreFriendBoats() {
+        const container = $('#friend-boats-container');
+        const nextBatch = allFriendBoats.slice(displayedFriendCount, displayedFriendCount + BOATS_PER_PAGE);
+        
+        nextBatch.forEach(boat => {
+            container.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, false)}</div>`);
+        });
+        
+        displayedFriendCount += nextBatch.length;
+        
+        // Update or hide Load More button
+        const remaining = allFriendBoats.length - displayedFriendCount;
+        if (remaining > 0) {
+            $('#friend-load-more-btn').text(`Load More Partner Yachts (${remaining} remaining)`);
+        } else {
+            $('#friend-load-more-container').hide();
+        }
     }
     
     /**

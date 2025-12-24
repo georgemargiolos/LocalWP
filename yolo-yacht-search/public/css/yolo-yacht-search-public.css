@@ -68,3 +68,47 @@
    To change the search widget background, edit:
    public/blocks/yacht-search/style.css lines 3-12
 */
+
+
+/* v81.1: Load More Button Styles */
+.yolo-ys-load-more-container {
+    text-align: center;
+    margin: 30px 0 40px 0;
+    padding: 20px;
+}
+
+.yolo-ys-load-more-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.yolo-ys-load-more-btn:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+
+.yolo-ys-load-more-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(30, 58, 138, 0.3);
+}
+
+/* Partner fleet Load More button - slightly different color */
+#friend-load-more-container .yolo-ys-load-more-btn {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    box-shadow: 0 4px 15px rgba(55, 65, 81, 0.3);
+}
+
+#friend-load-more-container .yolo-ys-load-more-btn:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    box-shadow: 0 6px 20px rgba(55, 65, 81, 0.4);
+}

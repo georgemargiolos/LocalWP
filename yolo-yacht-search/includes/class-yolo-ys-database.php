@@ -397,6 +397,7 @@ class YOLO_YS_Database {
         }
         
         // Store images - Download and save locally
+        // v81.1: Added try-catch and memory management to prevent crashes
         if (isset($yacht_data['images']) && is_array($yacht_data['images'])) {
             // Create upload directory if it doesn't exist
             $upload_dir = wp_upload_dir();
@@ -408,56 +409,81 @@ class YOLO_YS_Database {
             }
             
             foreach ($yacht_data['images'] as $index => $image) {
-                if (empty($image['url'])) {
-                    continue; // Skip if no URL
-                }
-                
-                // Download image from Booking Manager CDN
-                $remote_url = $image['url'];
-                $filename = basename(parse_url($remote_url, PHP_URL_PATH));
-                $local_path = $yolo_images_dir . '/' . $filename;
-                $local_url = $yolo_images_url . '/' . $filename;
-                
-                // Download if not already exists
-                if (!file_exists($local_path)) {
-                    $image_data = @file_get_contents($remote_url);
-                    if ($image_data !== false) {
-                        file_put_contents($local_path, $image_data);
-                        
-                        // Optimize the downloaded image to reduce file size
-                        $this->optimize_yacht_image($local_path);
-                    } else {
-                        // If download fails, use CDN URL as fallback
-                        $local_url = $remote_url;
+                try {
+                    if (empty($image['url'])) {
+                        continue; // Skip if no URL
                     }
-                }
-                
-                // Download thumbnail if available
-                $thumbnail_local_url = null;
-                if (!empty($image['thumbnailUrl'])) {
-                    $thumb_remote_url = $image['thumbnailUrl'];
-                    $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
-                    $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
-                    $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
                     
-                    if (!file_exists($thumb_local_path)) {
-                        $thumb_data = @file_get_contents($thumb_remote_url);
-                        if ($thumb_data !== false) {
-                            file_put_contents($thumb_local_path, $thumb_data);
+                    // Download image from Booking Manager CDN
+                    $remote_url = $image['url'];
+                    $filename = basename(parse_url($remote_url, PHP_URL_PATH));
+                    $local_path = $yolo_images_dir . '/' . $filename;
+                    $local_url = $yolo_images_url . '/' . $filename;
+                    
+                    // Download if not already exists
+                    if (!file_exists($local_path)) {
+                        // v81.1: Use wp_remote_get with timeout instead of file_get_contents
+                        $response = wp_remote_get($remote_url, array(
+                            'timeout' => 15,
+                            'sslverify' => false
+                        ));
+                        
+                        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+                            $image_data = wp_remote_retrieve_body($response);
+                            if (!empty($image_data)) {
+                                file_put_contents($local_path, $image_data);
+                                
+                                // Optimize the downloaded image to reduce file size
+                                $this->optimize_yacht_image($local_path);
+                            }
+                            // Free memory immediately
+                            unset($image_data, $response);
                         } else {
-                            $thumbnail_local_url = $thumb_remote_url;
+                            // If download fails, use CDN URL as fallback
+                            $local_url = $remote_url;
                         }
                     }
+                    
+                    // Download thumbnail if available
+                    $thumbnail_local_url = null;
+                    if (!empty($image['thumbnailUrl'])) {
+                        $thumb_remote_url = $image['thumbnailUrl'];
+                        $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+                        $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
+                        $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
+                        
+                        if (!file_exists($thumb_local_path)) {
+                            $thumb_response = wp_remote_get($thumb_remote_url, array(
+                                'timeout' => 10,
+                                'sslverify' => false
+                            ));
+                            
+                            if (!is_wp_error($thumb_response) && wp_remote_retrieve_response_code($thumb_response) === 200) {
+                                $thumb_data = wp_remote_retrieve_body($thumb_response);
+                                if (!empty($thumb_data)) {
+                                    file_put_contents($thumb_local_path, $thumb_data);
+                                }
+                                unset($thumb_data, $thumb_response);
+                            } else {
+                                $thumbnail_local_url = $thumb_remote_url;
+                            }
+                        }
+                    }
+                    
+                    // Store local URL in database
+                    $wpdb->insert($this->table_images, array(
+                        'yacht_id' => $yacht_id,
+                        'image_url' => $local_url,
+                        'thumbnail_url' => $thumbnail_local_url,
+                        'is_primary' => ($index === 0) ? 1 : 0,
+                        'sort_order' => $index
+                    ));
+                    
+                } catch (Exception $e) {
+                    // v81.1: Log error but continue with other images
+                    error_log('YOLO YS: Image download failed for yacht ' . $yacht_id . ': ' . $e->getMessage());
+                    continue;
                 }
-                
-                // Store local URL in database
-                $wpdb->insert($this->table_images, array(
-                    'yacht_id' => $yacht_id,
-                    'image_url' => $local_url,
-                    'thumbnail_url' => $thumbnail_local_url,
-                    'is_primary' => ($index === 0) ? 1 : 0,
-                    'sort_order' => $index
-                ));
             }
         }
         
@@ -833,5 +859,265 @@ class YOLO_YS_Database {
         );
         
         return $wpdb->query($query);
+    }
+    
+    /**
+     * Store yacht data WITHOUT images (Phase 1 of two-phase sync)
+     * v81.1: Separate data sync from image sync to prevent timeouts
+     * 
+     * @param array $yacht_data Yacht data from API
+     * @param int $company_id Company ID
+     * @return bool Success
+     */
+    public function store_yacht_data_only($yacht_data, $company_id) {
+        global $wpdb;
+        
+        // Generate slug from yacht name and model
+        $yacht_name = $yacht_data['name'];
+        $yacht_model = isset($yacht_data['model']) ? $yacht_data['model'] : '';
+        $base_slug = sanitize_title($yacht_name . '-' . $yacht_model);
+        
+        // Check if slug already exists for a different yacht
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$this->table_yachts} WHERE slug = %s AND id != %s",
+            $base_slug,
+            $yacht_data['id']
+        ));
+        
+        // If slug exists for different yacht, append company ID to make unique
+        $slug = $existing ? $base_slug . '-' . $company_id : $base_slug;
+        
+        // Prepare yacht data
+        $yacht_insert = array(
+            'id' => $yacht_data['id'],
+            'company_id' => $company_id,
+            'name' => $yacht_data['name'],
+            'model' => isset($yacht_data['model']) ? $yacht_data['model'] : null,
+            'slug' => $slug,
+            'type' => isset($yacht_data['kind']) ? $yacht_data['kind'] : null,
+            'shipyard_id' => isset($yacht_data['shipyardId']) ? $yacht_data['shipyardId'] : null,
+            'year_of_build' => isset($yacht_data['year']) ? $yacht_data['year'] : null,
+            'refit_year' => $this->parse_refit_year($yacht_data),
+            'home_base' => isset($yacht_data['homeBase']) ? $yacht_data['homeBase'] : null,
+            'length' => isset($yacht_data['length']) ? $yacht_data['length'] : null,
+            'beam' => isset($yacht_data['beam']) ? $yacht_data['beam'] : null,
+            'draft' => isset($yacht_data['draught']) ? $yacht_data['draught'] : null,
+            'deposit' => isset($yacht_data['deposit']) ? $yacht_data['deposit'] : null,
+            'checkin_time' => isset($yacht_data['defaultCheckInTime']) ? $yacht_data['defaultCheckInTime'] : null,
+            'checkout_time' => isset($yacht_data['defaultCheckOutTime']) ? $yacht_data['defaultCheckOutTime'] : null,
+            'checkin_day' => isset($yacht_data['defaultCheckInDay']) ? $yacht_data['defaultCheckInDay'] : null,
+            'cabins' => isset($yacht_data['cabins']) ? $yacht_data['cabins'] : null,
+            'wc' => isset($yacht_data['wc']) ? $yacht_data['wc'] : null,
+            'berths' => isset($yacht_data['berths']) ? $yacht_data['berths'] : null,
+            'max_people_on_board' => isset($yacht_data['maxPeopleOnBoard']) ? $yacht_data['maxPeopleOnBoard'] : null,
+            'engine_power' => isset($yacht_data['enginePower']) ? $yacht_data['enginePower'] : null,
+            'fuel_capacity' => isset($yacht_data['fuelCapacity']) ? $yacht_data['fuelCapacity'] : null,
+            'water_capacity' => isset($yacht_data['waterCapacity']) ? $yacht_data['waterCapacity'] : null,
+            'description' => isset($yacht_data['descriptions'][0]['text']) ? $yacht_data['descriptions'][0]['text'] : null,
+            'cancellation_policy' => isset($yacht_data['cancellationPolicy']) ? $yacht_data['cancellationPolicy'] : null,
+            'raw_data' => json_encode($yacht_data),
+            'last_synced' => current_time('mysql')
+        );
+        
+        // Insert or update yacht
+        $wpdb->replace($this->table_yachts, $yacht_insert);
+        
+        $yacht_id = $yacht_data['id'];
+        
+        // Delete old products, extras, equipment (NOT images - those are handled in Phase 2)
+        $wpdb->delete($this->table_products, array('yacht_id' => $yacht_id));
+        $wpdb->delete($this->table_extras, array('yacht_id' => $yacht_id));
+        $wpdb->delete($this->table_equipment, array('yacht_id' => $yacht_id));
+        
+        // Store products
+        if (isset($yacht_data['products']) && is_array($yacht_data['products'])) {
+            foreach ($yacht_data['products'] as $product) {
+                $wpdb->insert($this->table_products, array(
+                    'yacht_id' => $yacht_id,
+                    'product_type' => isset($product['product']) ? $product['product'] : 'Unknown',
+                    'base_price' => isset($product['basePrice']) ? $product['basePrice'] : null,
+                    'currency' => isset($product['currency']) ? $product['currency'] : 'EUR',
+                    'is_default' => isset($product['isDefaultProduct']) ? $product['isDefaultProduct'] : 0,
+                    'raw_data' => json_encode($product)
+                ));
+            }
+        }
+        
+        // Store extras - collect from ALL products
+        $extras_to_store = array();
+        
+        if (!empty($yacht_data['products']) && is_array($yacht_data['products'])) {
+            foreach ($yacht_data['products'] as $product) {
+                if (!empty($product['extras']) && is_array($product['extras'])) {
+                    $extras_to_store = array_merge($extras_to_store, $product['extras']);
+                }
+            }
+        }
+        
+        if (!empty($yacht_data['extras']) && is_array($yacht_data['extras'])) {
+            $extras_to_store = array_merge($extras_to_store, $yacht_data['extras']);
+        }
+        
+        foreach ($extras_to_store as $extra) {
+            $wpdb->insert($this->table_extras, array(
+                'id' => $extra['id'],
+                'yacht_id' => $yacht_id,
+                'name' => $extra['name'],
+                'price' => isset($extra['price']) ? $extra['price'] : null,
+                'currency' => isset($extra['currency']) ? $extra['currency'] : 'EUR',
+                'obligatory' => !empty($extra['obligatory']) ? 1 : 0,
+                'unit' => isset($extra['unit']) ? $extra['unit'] : null,
+                'payableInBase' => !empty($extra['payableInBase']) ? 1 : 0
+            ));
+        }
+        
+        // Store equipment
+        if (isset($yacht_data['equipment']) && is_array($yacht_data['equipment'])) {
+            foreach ($yacht_data['equipment'] as $equip) {
+                $wpdb->insert($this->table_equipment, array(
+                    'yacht_id' => $yacht_id,
+                    'equipment_id' => $equip['id'],
+                    'equipment_name' => null,
+                    'category' => isset($equip['category']) ? $equip['category'] : null
+                ));
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Clear all images for a yacht (before re-syncing)
+     * v81.1: Part of two-phase sync
+     * 
+     * @param string $yacht_id Yacht ID
+     * @return bool Success
+     */
+    public function clear_yacht_images($yacht_id) {
+        global $wpdb;
+        
+        // Get old images to delete files
+        $old_images = $wpdb->get_results($wpdb->prepare(
+            "SELECT image_url, thumbnail_url FROM {$this->table_images} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        $upload_dir = wp_upload_dir();
+        $yolo_images_dir = $upload_dir['basedir'] . '/yolo-yacht-images';
+        
+        foreach ($old_images as $old_image) {
+            // Delete main image if it's a local file
+            if (!empty($old_image->image_url) && strpos($old_image->image_url, $upload_dir['baseurl']) !== false) {
+                $filename = basename($old_image->image_url);
+                $file_path = $yolo_images_dir . '/' . $filename;
+                if (file_exists($file_path)) {
+                    @unlink($file_path);
+                }
+            }
+            
+            // Delete thumbnail if it's a local file
+            if (!empty($old_image->thumbnail_url) && strpos($old_image->thumbnail_url, $upload_dir['baseurl']) !== false) {
+                $thumb_filename = basename($old_image->thumbnail_url);
+                $thumb_path = $yolo_images_dir . '/' . $thumb_filename;
+                if (file_exists($thumb_path)) {
+                    @unlink($thumb_path);
+                }
+            }
+        }
+        
+        // Delete database records
+        $wpdb->delete($this->table_images, array('yacht_id' => $yacht_id));
+        
+        return true;
+    }
+    
+    /**
+     * Download and store a single image (Phase 2 of two-phase sync)
+     * v81.1: Downloads one image at a time to prevent memory/timeout issues
+     * 
+     * @param string $yacht_id Yacht ID
+     * @param array $image Image data from API
+     * @param int $index Sort order index
+     * @return bool Success
+     */
+    public function download_and_store_single_image($yacht_id, $image, $index) {
+        global $wpdb;
+        
+        if (empty($image['url'])) {
+            return false;
+        }
+        
+        $upload_dir = wp_upload_dir();
+        $yolo_images_dir = $upload_dir['basedir'] . '/yolo-yacht-images';
+        $yolo_images_url = $upload_dir['baseurl'] . '/yolo-yacht-images';
+        
+        // Create directory if needed
+        if (!file_exists($yolo_images_dir)) {
+            wp_mkdir_p($yolo_images_dir);
+        }
+        
+        $remote_url = $image['url'];
+        $filename = basename(parse_url($remote_url, PHP_URL_PATH));
+        $local_path = $yolo_images_dir . '/' . $filename;
+        $local_url = $yolo_images_url . '/' . $filename;
+        
+        // Download if not already exists
+        if (!file_exists($local_path)) {
+            $response = wp_remote_get($remote_url, array(
+                'timeout' => 30,
+                'sslverify' => false
+            ));
+            
+            if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+                $image_data = wp_remote_retrieve_body($response);
+                if (!empty($image_data)) {
+                    file_put_contents($local_path, $image_data);
+                    
+                    // Optimize the downloaded image
+                    $this->optimize_yacht_image($local_path);
+                }
+                unset($image_data, $response);
+            } else {
+                // If download fails, use CDN URL as fallback
+                $local_url = $remote_url;
+            }
+        }
+        
+        // Download thumbnail if available
+        $thumbnail_local_url = null;
+        if (!empty($image['thumbnailUrl'])) {
+            $thumb_remote_url = $image['thumbnailUrl'];
+            $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+            $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
+            $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
+            
+            if (!file_exists($thumb_local_path)) {
+                $thumb_response = wp_remote_get($thumb_remote_url, array(
+                    'timeout' => 15,
+                    'sslverify' => false
+                ));
+                
+                if (!is_wp_error($thumb_response) && wp_remote_retrieve_response_code($thumb_response) === 200) {
+                    $thumb_data = wp_remote_retrieve_body($thumb_response);
+                    if (!empty($thumb_data)) {
+                        file_put_contents($thumb_local_path, $thumb_data);
+                    }
+                    unset($thumb_data, $thumb_response);
+                } else {
+                    $thumbnail_local_url = $thumb_remote_url;
+                }
+            }
+        }
+        
+        // Store in database
+        $wpdb->insert($this->table_images, array(
+            'yacht_id' => $yacht_id,
+            'image_url' => $local_url,
+            'thumbnail_url' => $thumbnail_local_url,
+            'is_primary' => ($index === 0) ? 1 : 0,
+            'sort_order' => $index
+        ));
+        
+        return true;
     }
 }

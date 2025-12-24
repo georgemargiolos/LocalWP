@@ -39,6 +39,7 @@ class YOLO_YS_Admin {
         // v81.0: Progressive sync AJAX handlers
         add_action('wp_ajax_yolo_progressive_init_yacht_sync', array($this, 'ajax_progressive_init_yacht_sync'));
         add_action('wp_ajax_yolo_progressive_sync_next_yacht', array($this, 'ajax_progressive_sync_next_yacht'));
+        add_action('wp_ajax_yolo_progressive_sync_next_image_batch', array($this, 'ajax_progressive_sync_next_image_batch')); // v81.1: Phase 2 image sync
         add_action('wp_ajax_yolo_progressive_init_price_sync', array($this, 'ajax_progressive_init_price_sync'));
         add_action('wp_ajax_yolo_progressive_sync_next_price', array($this, 'ajax_progressive_sync_next_price'));
         add_action('wp_ajax_yolo_progressive_cancel_sync', array($this, 'ajax_progressive_cancel_sync'));
@@ -1220,6 +1221,23 @@ class YOLO_YS_Admin {
         
         $sync = new YOLO_YS_Progressive_Sync();
         $result = $sync->sync_next_yacht();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Sync next image batch (Phase 2 of two-phase sync)
+     * v81.1: Downloads images for one yacht at a time
+     */
+    public function ajax_progressive_sync_next_image_batch() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->sync_next_image_batch();
         
         wp_send_json_success($result);
     }

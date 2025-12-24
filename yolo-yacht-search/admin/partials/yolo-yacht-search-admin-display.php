@@ -451,7 +451,8 @@ jQuery(document).ready(function($) {
         cancelled: false,
         startTime: null,
         timerInterval: null,
-        speedSamples: []
+        speedSamples: [],
+        phase: 1  // 1 = data sync, 2 = image sync
     };
     
     $('#yolo-progressive-yacht-sync-button').on('click', function() {
@@ -474,10 +475,11 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     $message.html('');
                     $dashboard.show();
-                    yachtSyncState.running = true;
-                    yachtSyncState.cancelled = false;
-                    yachtSyncState.startTime = Date.now();
-                    yachtSyncState.speedSamples = [];
+        yachtSyncState.running = true;
+        yachtSyncState.cancelled = false;
+        yachtSyncState.startTime = Date.now();
+        yachtSyncState.speedSamples = [];
+        yachtSyncState.phase = 1;  // Start with Phase 1 (data sync)
                     
                     // Start timer
                     yachtSyncState.timerInterval = setInterval(updateYachtTimer, 1000);
@@ -502,46 +504,69 @@ jQuery(document).ready(function($) {
     function syncNextYacht() {
         if (yachtSyncState.cancelled) return;
         
+        // Determine which action to call based on current phase
+        var action = yachtSyncState.phase === 2 
+            ? 'yolo_progressive_sync_next_image_batch' 
+            : 'yolo_progressive_sync_next_yacht';
+        
         $.ajax({
             url: yoloYsAdmin.ajax_url,
             type: 'POST',
             data: {
-                action: 'yolo_progressive_sync_next_yacht',
+                action: action,
                 nonce: yoloYsAdmin.nonce
             },
             success: function(response) {
                 if (response.success) {
                     var data = response.data;
                     
-                    // Add to live feed
-                    if (data.yacht_synced) {
-                        addToYachtLiveFeed('✓ ' + data.yacht_synced, data.elapsed_ms);
-                        
-                        // Track speed
-                        if (data.elapsed_ms > 0) {
-                            yachtSyncState.speedSamples.push(data.elapsed_ms);
-                            if (yachtSyncState.speedSamples.length > 10) {
-                                yachtSyncState.speedSamples.shift();
-                            }
+                    // Check if phase changed
+                    if (data.phase_changed && data.phase === 2) {
+                        yachtSyncState.phase = 2;
+                        addToYachtLiveFeed('📦 Phase 1 complete - Starting image download...', 0);
+                    }
+                    
+                    // Add to live feed based on phase
+                    if (data.phase === 1 && data.yacht_synced) {
+                        addToYachtLiveFeed('✓ ' + data.yacht_synced + ' (data)', data.elapsed_ms);
+                    } else if (data.phase === 2 && data.yacht_name) {
+                        addToYachtLiveFeed('🖼️ ' + data.yacht_name + ' (+' + data.images_downloaded + ' images)', data.elapsed_ms);
+                    }
+                    
+                    // Track speed
+                    if (data.elapsed_ms > 0) {
+                        yachtSyncState.speedSamples.push(data.elapsed_ms);
+                        if (yachtSyncState.speedSamples.length > 10) {
+                            yachtSyncState.speedSamples.shift();
                         }
                     }
                     
                     // Update UI
                     updateYachtProgress(data);
                     
+                    // Update phase indicator
+                    if (data.phase === 1) {
+                        $('#yacht-sync-status-text').text('PHASE 1: Syncing yacht data');
+                    } else if (data.phase === 2) {
+                        $('#yacht-sync-status-text').text('PHASE 2: Downloading images');
+                    }
+                    
                     if (data.done) {
                         completeYachtSync(data);
                     } else {
-                        // Continue to next yacht
-                        setTimeout(syncNextYacht, 100);
+                        // Continue (300ms delay for data, 500ms for images)
+                        var delay = data.phase === 2 ? 500 : 300;
+                        setTimeout(syncNextYacht, delay);
                     }
                 } else {
                     addToYachtLiveFeed('❌ Error: ' + (response.data.message || 'Unknown error'), 0);
+                    // Retry after error
+                    setTimeout(syncNextYacht, 2000);
                 }
             },
             error: function() {
                 addToYachtLiveFeed('❌ Network error - retrying...', 0);
-                setTimeout(syncNextYacht, 2000);
+                setTimeout(syncNextYacht, 3000);
             }
         });
     }

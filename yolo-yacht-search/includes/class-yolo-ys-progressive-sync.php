@@ -1,18 +1,21 @@
 <?php
 /**
- * Progressive Sync - Boat-by-boat sync with live progress
+ * Progressive Sync - Two-Phase Sync with Image Batching
  * 
- * v81.0 - Complete rewrite for timeout-proof syncing
+ * v81.1 - Two-phase sync to prevent timeout/memory issues
+ * 
+ * Phase 1: Sync yacht data only (fast, ~500ms per yacht)
+ * Phase 2: Download images in batches of 2-3 per request
  * 
  * Features:
- * - Syncs one yacht at a time (2-5 seconds per request)
+ * - No timeout risk - each request is short
  * - Live progress updates via AJAX
- * - Works on any hosting (no timeout issues)
+ * - Works on any hosting
  * - Supports both manual and auto-sync
  * - Resume capability if interrupted
  * 
  * @package YOLO_Yacht_Search
- * @since 81.0
+ * @since 81.1
  */
 
 if (!defined('ABSPATH')) {
@@ -27,7 +30,11 @@ class YOLO_YS_Progressive_Sync {
     // Sync state option keys
     const STATE_OPTION = 'yolo_ys_progressive_sync_state';
     const YACHT_QUEUE_OPTION = 'yolo_ys_sync_yacht_queue';
+    const IMAGE_QUEUE_OPTION = 'yolo_ys_sync_image_queue';
     const PRICE_QUEUE_OPTION = 'yolo_ys_sync_price_queue';
+    
+    // Batch sizes
+    const IMAGES_PER_BATCH = 3;
     
     public function __construct() {
         if (class_exists('YOLO_YS_Booking_Manager_API')) {
@@ -40,6 +47,7 @@ class YOLO_YS_Progressive_Sync {
         
         // Register cron hooks for auto-sync
         add_action('yolo_progressive_sync_yacht', array($this, 'cron_sync_next_yacht'));
+        add_action('yolo_progressive_sync_image', array($this, 'cron_sync_next_image_batch'));
         add_action('yolo_progressive_sync_price', array($this, 'cron_sync_next_price'));
         add_action('yolo_progressive_sync_start', array($this, 'cron_start_sync'));
     }
@@ -56,7 +64,7 @@ class YOLO_YS_Progressive_Sync {
     }
     
     /**
-     * Initialize yacht sync - fetches yacht list and creates queue
+     * Initialize yacht sync - Phase 1: Yacht data (no images)
      * 
      * @return array Initial state with yacht queue
      */
@@ -65,13 +73,13 @@ class YOLO_YS_Progressive_Sync {
         $yacht_queue = array();
         $company_stats = array();
         
-        error_log("YOLO Progressive Sync: Initializing yacht sync for " . count($companies) . " companies");
+        error_log("YOLO Progressive Sync v81.1: Initializing two-phase yacht sync for " . count($companies) . " companies");
         
         foreach ($companies as $company_id) {
             if (empty($company_id)) continue;
             
             try {
-                // Fetch yacht list for this company (just IDs and names, not full data)
+                // Fetch yacht list for this company
                 $yachts = $this->api->get_yachts_by_company($company_id);
                 
                 if (is_array($yachts) && !empty($yachts)) {
@@ -86,7 +94,8 @@ class YOLO_YS_Progressive_Sync {
                             'yacht_id' => $yacht['id'],
                             'yacht_name' => $yacht['name'],
                             'company_id' => $company_id,
-                            'yacht_data' => $yacht // Store full data to avoid re-fetching
+                            'yacht_data' => $yacht,
+                            'image_count' => isset($yacht['images']) ? count($yacht['images']) : 0
                         );
                     }
                     
@@ -97,13 +106,19 @@ class YOLO_YS_Progressive_Sync {
             }
         }
         
+        // Count total images
+        $total_images = array_sum(array_column($yacht_queue, 'image_count'));
+        
         // Create initial state
         $state = array(
             'type' => 'yachts',
+            'phase' => 1, // Phase 1: yacht data
             'status' => 'ready',
             'total_yachts' => count($yacht_queue),
             'synced_yachts' => 0,
             'current_index' => 0,
+            'total_images' => $total_images,
+            'synced_images' => 0,
             'companies' => $company_stats,
             'started_at' => null,
             'completed_at' => null,
@@ -122,12 +137,13 @@ class YOLO_YS_Progressive_Sync {
         return array(
             'success' => true,
             'state' => $state,
-            'message' => "Ready to sync {$state['total_yachts']} yachts from " . count($companies) . " companies"
+            'message' => "Ready to sync {$state['total_yachts']} yachts ({$total_images} images) from " . count($companies) . " companies"
         );
     }
     
     /**
-     * Sync a single yacht (called repeatedly via AJAX)
+     * Sync a single yacht - DATA ONLY (Phase 1)
+     * Images are synced separately in Phase 2
      * 
      * @return array Result with updated state
      */
@@ -151,9 +167,10 @@ class YOLO_YS_Progressive_Sync {
         
         $current_index = $state['current_index'];
         
-        // Check if done
+        // Check if Phase 1 is done
         if ($current_index >= count($queue)) {
-            return $this->complete_yacht_sync($state);
+            // Move to Phase 2: Image sync
+            return $this->start_image_sync_phase($state, $queue);
         }
         
         $yacht_item = $queue[$current_index];
@@ -165,8 +182,8 @@ class YOLO_YS_Progressive_Sync {
         $start_time = microtime(true);
         
         try {
-            // Store yacht data (already have it from init)
-            $this->db->store_yacht($yacht_data, $company_id);
+            // Store yacht data WITHOUT images (Phase 1)
+            $this->db->store_yacht_data_only($yacht_data, $company_id);
             
             // Count stats from yacht data
             $images_count = isset($yacht_data['images']) ? count($yacht_data['images']) : 0;
@@ -192,7 +209,7 @@ class YOLO_YS_Progressive_Sync {
             
             $elapsed = round((microtime(true) - $start_time) * 1000);
             
-            error_log("YOLO Progressive Sync: Synced yacht {$yacht_name} ({$yacht_id}) in {$elapsed}ms");
+            error_log("YOLO Progressive Sync: Phase 1 - Synced yacht data {$yacht_name} ({$yacht_id}) in {$elapsed}ms");
             
         } catch (Exception $e) {
             $state['errors'][] = array(
@@ -207,28 +224,173 @@ class YOLO_YS_Progressive_Sync {
         // Save state
         update_option(self::STATE_OPTION, $state, false);
         
-        // Calculate progress
-        $progress = ($state['total_yachts'] > 0) 
-            ? round(($state['synced_yachts'] / $state['total_yachts']) * 100, 1) 
+        // Calculate progress (Phase 1 is 50% of total)
+        $phase1_progress = ($state['total_yachts'] > 0) 
+            ? ($state['synced_yachts'] / $state['total_yachts']) * 50 
             : 0;
         
-        // Check if this was the last one
-        $done = ($state['current_index'] >= count($queue));
+        return array(
+            'success' => true,
+            'done' => false,
+            'phase' => 1,
+            'phase_name' => 'Syncing yacht data',
+            'yacht_synced' => $yacht_name,
+            'company_id' => $company_id,
+            'progress' => round($phase1_progress, 1),
+            'synced' => $state['synced_yachts'],
+            'total' => $state['total_yachts'],
+            'stats' => $state['stats'],
+            'companies' => $state['companies'],
+            'elapsed_ms' => isset($elapsed) ? $elapsed : 0
+        );
+    }
+    
+    /**
+     * Start Phase 2: Image sync
+     * Creates queue of image batches
+     */
+    private function start_image_sync_phase($state, $yacht_queue) {
+        // Build image queue - batches of IMAGES_PER_BATCH
+        $image_queue = array();
         
-        if ($done) {
+        foreach ($yacht_queue as $yacht_item) {
+            $yacht_data = $yacht_item['yacht_data'];
+            $yacht_id = $yacht_item['yacht_id'];
+            $yacht_name = $yacht_item['yacht_name'];
+            
+            if (isset($yacht_data['images']) && is_array($yacht_data['images'])) {
+                $images = $yacht_data['images'];
+                $batches = array_chunk($images, self::IMAGES_PER_BATCH);
+                
+                foreach ($batches as $batch_index => $batch) {
+                    $image_queue[] = array(
+                        'yacht_id' => $yacht_id,
+                        'yacht_name' => $yacht_name,
+                        'batch_index' => $batch_index,
+                        'images' => $batch,
+                        'is_first_batch' => ($batch_index === 0)
+                    );
+                }
+            }
+        }
+        
+        // Update state for Phase 2
+        $state['phase'] = 2;
+        $state['image_queue_size'] = count($image_queue);
+        $state['image_batch_index'] = 0;
+        
+        // Store image queue
+        update_option(self::IMAGE_QUEUE_OPTION, $image_queue, false);
+        update_option(self::STATE_OPTION, $state, false);
+        
+        error_log("YOLO Progressive Sync: Phase 1 complete. Starting Phase 2 with " . count($image_queue) . " image batches");
+        
+        return array(
+            'success' => true,
+            'done' => false,
+            'phase' => 2,
+            'phase_name' => 'Downloading images',
+            'phase_changed' => true,
+            'progress' => 50, // Phase 1 complete = 50%
+            'synced' => $state['synced_yachts'],
+            'total' => $state['total_yachts'],
+            'image_batches' => count($image_queue),
+            'stats' => $state['stats'],
+            'companies' => $state['companies']
+        );
+    }
+    
+    /**
+     * Sync next batch of images (Phase 2)
+     * Downloads 2-3 images per request
+     * 
+     * @return array Result with updated state
+     */
+    public function sync_next_image_batch() {
+        $state = get_option(self::STATE_OPTION, null);
+        $image_queue = get_option(self::IMAGE_QUEUE_OPTION, array());
+        
+        if (!$state || $state['phase'] !== 2) {
+            return array(
+                'success' => false,
+                'message' => 'Not in image sync phase',
+                'done' => true
+            );
+        }
+        
+        $batch_index = isset($state['image_batch_index']) ? $state['image_batch_index'] : 0;
+        
+        // Check if all images done
+        if ($batch_index >= count($image_queue)) {
+            return $this->complete_yacht_sync($state);
+        }
+        
+        $batch = $image_queue[$batch_index];
+        $yacht_id = $batch['yacht_id'];
+        $yacht_name = $batch['yacht_name'];
+        $images = $batch['images'];
+        $is_first_batch = $batch['is_first_batch'];
+        
+        $start_time = microtime(true);
+        $images_downloaded = 0;
+        
+        try {
+            // If first batch for this yacht, clear old images
+            if ($is_first_batch) {
+                $this->db->clear_yacht_images($yacht_id);
+            }
+            
+            // Download and store this batch of images
+            foreach ($images as $index => $image) {
+                $result = $this->db->download_and_store_single_image($yacht_id, $image, $index);
+                if ($result) {
+                    $images_downloaded++;
+                    $state['synced_images']++;
+                }
+            }
+            
+            $state['image_batch_index']++;
+            
+            $elapsed = round((microtime(true) - $start_time) * 1000);
+            
+            error_log("YOLO Progressive Sync: Phase 2 - Downloaded {$images_downloaded} images for {$yacht_name} in {$elapsed}ms");
+            
+        } catch (Exception $e) {
+            $state['errors'][] = array(
+                'yacht_id' => $yacht_id,
+                'yacht_name' => $yacht_name,
+                'error' => 'Image batch failed: ' . $e->getMessage()
+            );
+            $state['image_batch_index']++; // Skip this batch
+            error_log("YOLO Progressive Sync: ERROR downloading images for {$yacht_name}: " . $e->getMessage());
+        }
+        
+        // Save state
+        update_option(self::STATE_OPTION, $state, false);
+        
+        // Calculate progress (Phase 2 is 50-100%)
+        $phase2_progress = ($state['image_queue_size'] > 0)
+            ? ($state['image_batch_index'] / $state['image_queue_size']) * 50
+            : 0;
+        $total_progress = 50 + $phase2_progress;
+        
+        // Check if done
+        if ($state['image_batch_index'] >= count($image_queue)) {
             return $this->complete_yacht_sync($state);
         }
         
         return array(
             'success' => true,
             'done' => false,
-            'yacht_synced' => $yacht_name,
-            'company_id' => $company_id,
-            'progress' => $progress,
-            'synced' => $state['synced_yachts'],
-            'total' => $state['total_yachts'],
+            'phase' => 2,
+            'phase_name' => 'Downloading images',
+            'yacht_name' => $yacht_name,
+            'images_downloaded' => $images_downloaded,
+            'progress' => round($total_progress, 1),
+            'synced_images' => $state['synced_images'],
+            'total_images' => $state['total_images'],
+            'batch_progress' => $state['image_batch_index'] . '/' . $state['image_queue_size'],
             'stats' => $state['stats'],
-            'companies' => $state['companies'],
             'elapsed_ms' => isset($elapsed) ? $elapsed : 0
         );
     }
@@ -265,6 +427,9 @@ class YOLO_YS_Progressive_Sync {
         // Update last sync time
         update_option('yolo_ys_last_sync', current_time('mysql'));
         
+        // Clean up queues
+        delete_option(self::IMAGE_QUEUE_OPTION);
+        
         // Save final state
         update_option(self::STATE_OPTION, $state, false);
         
@@ -276,23 +441,59 @@ class YOLO_YS_Progressive_Sync {
             $seconds = $end - $start;
             $minutes = floor($seconds / 60);
             $secs = $seconds % 60;
-            $duration = $minutes > 0 ? "{$minutes}m {$secs}s" : "{$secs}s";
+            $duration = ($minutes > 0 ? "{$minutes}m " : '') . "{$secs}s";
         }
         
-        error_log("YOLO Progressive Sync: COMPLETE - {$state['synced_yachts']} yachts in {$duration}");
+        error_log("YOLO Progressive Sync: COMPLETE - {$state['synced_yachts']} yachts, {$state['synced_images']} images in {$duration}");
         
         return array(
             'success' => true,
             'done' => true,
-            'message' => "Successfully synced {$state['synced_yachts']} yachts",
+            'message' => "Successfully synced {$state['synced_yachts']} yachts and {$state['synced_images']} images",
             'synced' => $state['synced_yachts'],
             'total' => $state['total_yachts'],
+            'synced_images' => $state['synced_images'],
+            'total_images' => $state['total_images'],
             'duration' => $duration,
             'stats' => $state['stats'],
             'companies' => $state['companies'],
             'errors' => $state['errors']
         );
     }
+    
+    /**
+     * Cancel running sync
+     */
+    public function cancel_sync() {
+        $state = get_option(self::STATE_OPTION, null);
+        
+        if ($state) {
+            $state['status'] = 'cancelled';
+            $state['completed_at'] = current_time('mysql');
+            update_option(self::STATE_OPTION, $state, false);
+        }
+        
+        // Clear scheduled cron events
+        wp_clear_scheduled_hook('yolo_progressive_sync_yacht');
+        wp_clear_scheduled_hook('yolo_progressive_sync_image');
+        wp_clear_scheduled_hook('yolo_progressive_sync_price');
+        
+        return array(
+            'success' => true,
+            'message' => 'Sync cancelled'
+        );
+    }
+    
+    /**
+     * Get current sync state
+     */
+    public function get_state() {
+        return get_option(self::STATE_OPTION, null);
+    }
+    
+    // =========================================
+    // PRICE SYNC
+    // =========================================
     
     /**
      * Initialize price/offers sync - creates queue of yachts to sync prices for
@@ -308,9 +509,9 @@ class YOLO_YS_Progressive_Sync {
         global $wpdb;
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         
-        // Get all active yachts from database
+        // Get all active yachts from database (fixed: use status column)
         $yachts = $wpdb->get_results(
-            "SELECT id, name, company_id FROM {$yachts_table} WHERE is_active = 1 ORDER BY company_id, name",
+            "SELECT id, name, company_id FROM {$yachts_table} WHERE (status = 'active' OR status IS NULL) ORDER BY company_id, name",
             ARRAY_A
         );
         
@@ -399,7 +600,6 @@ class YOLO_YS_Progressive_Sync {
         }
         
         $current_index = $state['current_index'];
-        $year = $state['year'];
         
         // Check if done
         if ($current_index >= count($queue)) {
@@ -410,36 +610,20 @@ class YOLO_YS_Progressive_Sync {
         $yacht_id = $yacht_item['yacht_id'];
         $yacht_name = $yacht_item['yacht_name'];
         $company_id = $yacht_item['company_id'];
+        $year = $state['year'];
         
         $start_time = microtime(true);
+        $offers_count = 0;
         
         try {
-            // Fetch offers for this yacht for the entire year
-            $dateFrom = "{$year}-01-01T00:00:00";
-            $dateTo = "{$year}-12-31T23:59:59";
-            
-            $offers = $this->api->get_offers(array(
-                'yachtId' => $yacht_id,
-                'dateFrom' => $dateFrom,
-                'dateTo' => $dateTo,
-                'flexibility' => 6,
-                'productName' => 'bareboat'
-            ));
+            // Fetch offers for this yacht
+            $offers = $this->api->get_offers($yacht_id, $year);
             
             if (is_array($offers) && !empty($offers)) {
-                // Delete existing prices for this yacht/year
-                global $wpdb;
-                $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
-                $wpdb->query($wpdb->prepare(
-                    "DELETE FROM {$prices_table} WHERE yacht_id = %s AND YEAR(date_from) = %d",
-                    $yacht_id, $year
-                ));
-                
-                // Store new offers using batch insert
-                YOLO_YS_Database_Prices::store_offers_batch($offers, $company_id);
-                
-                $state['stats']['offers'] += count($offers);
-                $state['stats']['weeks'] += count($offers);
+                // Store offers
+                $this->db->store_offers($yacht_id, $offers, $year);
+                $offers_count = count($offers);
+                $state['stats']['offers'] += $offers_count;
             }
             
             // Update state
@@ -457,9 +641,8 @@ class YOLO_YS_Progressive_Sync {
             }
             
             $elapsed = round((microtime(true) - $start_time) * 1000);
-            $offers_count = is_array($offers) ? count($offers) : 0;
             
-            error_log("YOLO Progressive Sync: Synced {$offers_count} prices for {$yacht_name} in {$elapsed}ms");
+            error_log("YOLO Progressive Sync: Synced {$offers_count} offers for {$yacht_name} in {$elapsed}ms");
             
         } catch (Exception $e) {
             $state['errors'][] = array(
@@ -479,10 +662,8 @@ class YOLO_YS_Progressive_Sync {
             ? round(($state['synced_yachts'] / $state['total_yachts']) * 100, 1) 
             : 0;
         
-        // Check if this was the last one
-        $done = ($state['current_index'] >= count($queue));
-        
-        if ($done) {
+        // Check if done
+        if ($state['current_index'] >= count($queue)) {
             return $this->complete_price_sync($state);
         }
         
@@ -491,7 +672,7 @@ class YOLO_YS_Progressive_Sync {
             'done' => false,
             'yacht_synced' => $yacht_name,
             'company_id' => $company_id,
-            'offers_count' => isset($offers_count) ? $offers_count : 0,
+            'offers_synced' => $offers_count,
             'progress' => $progress,
             'synced' => $state['synced_yachts'],
             'total' => $state['total_yachts'],
@@ -502,18 +683,14 @@ class YOLO_YS_Progressive_Sync {
     }
     
     /**
-     * Complete price sync - cleanup and final stats
+     * Complete price sync
      */
     private function complete_price_sync($state) {
         $state['status'] = 'complete';
         $state['completed_at'] = current_time('mysql');
         
-        // Delete old offers
-        YOLO_YS_Database_Prices::delete_old_offers();
-        
-        // Update last sync time
-        update_option('yolo_ys_last_offer_sync', current_time('mysql'));
-        update_option('yolo_ys_last_offer_sync_year', $state['year']);
+        // Update last offers sync time
+        update_option('yolo_ys_last_offers_sync', current_time('mysql'));
         
         // Save final state
         update_option(self::STATE_OPTION, $state, false);
@@ -526,18 +703,17 @@ class YOLO_YS_Progressive_Sync {
             $seconds = $end - $start;
             $minutes = floor($seconds / 60);
             $secs = $seconds % 60;
-            $duration = $minutes > 0 ? "{$minutes}m {$secs}s" : "{$secs}s";
+            $duration = ($minutes > 0 ? "{$minutes}m " : '') . "{$secs}s";
         }
         
-        error_log("YOLO Progressive Sync: PRICE SYNC COMPLETE - {$state['synced_yachts']} yachts, {$state['stats']['offers']} offers in {$duration}");
+        error_log("YOLO Progressive Sync: Price sync COMPLETE - {$state['synced_yachts']} yachts, {$state['stats']['offers']} offers in {$duration}");
         
         return array(
             'success' => true,
             'done' => true,
-            'message' => "Successfully synced prices for {$state['synced_yachts']} yachts ({$state['stats']['offers']} weekly offers)",
+            'message' => "Successfully synced prices for {$state['synced_yachts']} yachts ({$state['stats']['offers']} offers)",
             'synced' => $state['synced_yachts'],
             'total' => $state['total_yachts'],
-            'year' => $state['year'],
             'duration' => $duration,
             'stats' => $state['stats'],
             'companies' => $state['companies'],
@@ -545,113 +721,108 @@ class YOLO_YS_Progressive_Sync {
         );
     }
     
-    /**
-     * Get current sync state
-     */
-    public function get_state() {
-        return get_option(self::STATE_OPTION, null);
-    }
-    
-    /**
-     * Cancel current sync
-     */
-    public function cancel_sync() {
-        $state = get_option(self::STATE_OPTION, null);
-        
-        if ($state) {
-            $state['status'] = 'cancelled';
-            $state['completed_at'] = current_time('mysql');
-            update_option(self::STATE_OPTION, $state, false);
-        }
-        
-        // Clear any scheduled cron events
-        wp_clear_scheduled_hook('yolo_progressive_sync_yacht');
-        wp_clear_scheduled_hook('yolo_progressive_sync_price');
-        
-        return array(
-            'success' => true,
-            'message' => 'Sync cancelled'
-        );
-    }
-    
-    /**
-     * Clear sync state (reset)
-     */
-    public function clear_state() {
-        delete_option(self::STATE_OPTION);
-        delete_option(self::YACHT_QUEUE_OPTION);
-        delete_option(self::PRICE_QUEUE_OPTION);
-        
-        return array('success' => true);
-    }
-    
-    // ==========================================
-    // AUTO-SYNC (WP-CRON) METHODS
-    // ==========================================
+    // =========================================
+    // AUTO-SYNC (WP-CRON)
+    // =========================================
     
     /**
      * Start auto-sync via cron
-     * 
-     * @param string $type 'yachts' or 'prices'
-     * @param int $year Year for price sync (optional)
      */
-    public function start_auto_sync($type, $year = null) {
-        error_log("YOLO Progressive Sync: Starting auto-sync for {$type}");
+    public function cron_start_sync($type = 'yachts') {
+        error_log("YOLO Auto-Sync: Starting {$type} sync via cron");
         
         if ($type === 'yachts') {
             $result = $this->init_yacht_sync();
             if ($result['success']) {
-                // Schedule first yacht sync immediately
-                wp_schedule_single_event(time(), 'yolo_progressive_sync_yacht');
+                // Schedule first yacht sync
+                wp_schedule_single_event(time() + 2, 'yolo_progressive_sync_yacht');
             }
         } else if ($type === 'prices') {
+            $year = get_option('yolo_ys_sync_year', date('Y') + 1);
             $result = $this->init_price_sync($year);
             if ($result['success']) {
-                // Schedule first price sync immediately
-                wp_schedule_single_event(time(), 'yolo_progressive_sync_price');
+                // Schedule first price sync
+                wp_schedule_single_event(time() + 2, 'yolo_progressive_sync_price');
             }
         }
-        
-        return $result;
     }
     
     /**
-     * Cron handler - sync next yacht and schedule next
+     * Cron handler: Sync next yacht (Phase 1)
      */
     public function cron_sync_next_yacht() {
-        $result = $this->sync_next_yacht();
+        $state = get_option(self::STATE_OPTION, null);
+        
+        if (!$state || $state['status'] === 'cancelled') {
+            error_log("YOLO Auto-Sync: Yacht sync cancelled or no state");
+            return;
+        }
+        
+        // Check if we're in Phase 1 or Phase 2
+        if (isset($state['phase']) && $state['phase'] === 2) {
+            // Phase 2: Image sync
+            $result = $this->sync_next_image_batch();
+        } else {
+            // Phase 1: Yacht data sync
+            $result = $this->sync_next_yacht();
+        }
         
         if (!$result['done']) {
-            // Schedule next yacht sync in 1 second
-            wp_schedule_single_event(time() + 1, 'yolo_progressive_sync_yacht');
+            // Check if phase changed to 2
+            if (isset($result['phase']) && $result['phase'] === 2) {
+                // Schedule image batch sync
+                wp_schedule_single_event(time() + 1, 'yolo_progressive_sync_yacht');
+            } else {
+                // Schedule next yacht
+                wp_schedule_single_event(time() + 1, 'yolo_progressive_sync_yacht');
+            }
         } else {
-            error_log("YOLO Progressive Sync: Auto yacht sync complete");
+            error_log("YOLO Auto-Sync: Yacht sync complete");
+        }
+        
+        // Log progress every 10 items
+        if (isset($result['synced']) && $result['synced'] % 10 === 0) {
+            error_log("YOLO Auto-Sync Progress: {$result['synced']}/{$result['total']} - {$result['progress']}%");
         }
     }
     
     /**
-     * Cron handler - sync next price and schedule next
+     * Cron handler: Sync next image batch (Phase 2)
+     */
+    public function cron_sync_next_image_batch() {
+        $result = $this->sync_next_image_batch();
+        
+        if (!$result['done']) {
+            // Schedule next batch
+            wp_schedule_single_event(time() + 1, 'yolo_progressive_sync_image');
+        } else {
+            error_log("YOLO Auto-Sync: Image sync complete");
+        }
+    }
+    
+    /**
+     * Cron handler: Sync next price
      */
     public function cron_sync_next_price() {
+        $state = get_option(self::STATE_OPTION, null);
+        
+        if (!$state || $state['status'] === 'cancelled' || $state['type'] !== 'prices') {
+            error_log("YOLO Auto-Sync: Price sync cancelled or wrong type");
+            return;
+        }
+        
         $result = $this->sync_next_price();
         
         if (!$result['done']) {
-            // Schedule next price sync in 1 second
+            // Schedule next yacht price sync
             wp_schedule_single_event(time() + 1, 'yolo_progressive_sync_price');
         } else {
-            error_log("YOLO Progressive Sync: Auto price sync complete");
+            error_log("YOLO Auto-Sync: Price sync complete");
         }
-    }
-    
-    /**
-     * Cron handler - start scheduled sync
-     * 
-     * @param array $args Array with 'type' and optionally 'year'
-     */
-    public function cron_start_sync($args = array()) {
-        $type = isset($args['type']) ? $args['type'] : 'yachts';
-        $year = isset($args['year']) ? $args['year'] : null;
         
-        $this->start_auto_sync($type, $year);
+        // Log progress every 10 yachts
+        if (isset($result['synced']) && $result['synced'] % 10 === 0) {
+            error_log("YOLO Auto-Sync Price Progress: {$result['synced']}/{$result['total']} - {$result['progress']}%");
+        }
     }
 }
