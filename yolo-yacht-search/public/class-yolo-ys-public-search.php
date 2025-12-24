@@ -65,7 +65,8 @@ function yolo_ys_ajax_search_yachts() {
             FROM {$yachts_table} y
             INNER JOIN {$prices_table} p ON y.id = p.yacht_id
             WHERE p.date_from >= %s 
-            AND p.date_from <= %s";
+            AND p.date_from <= %s
+            AND (y.status = 'active' OR y.status IS NULL)";  -- v80.5: Only show active yachts
     
     $params = array($search_date_from, $search_date_to);
     

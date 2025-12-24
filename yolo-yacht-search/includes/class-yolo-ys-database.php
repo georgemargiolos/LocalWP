@@ -73,7 +73,10 @@ class YOLO_YS_Database {
             cancellation_policy longtext DEFAULT NULL,
             raw_data longtext DEFAULT NULL,
             last_synced datetime DEFAULT CURRENT_TIMESTAMP,
+            status varchar(20) DEFAULT 'active',
+            deactivated_at datetime DEFAULT NULL,
             PRIMARY KEY  (id),
+            KEY status (status),
             KEY company_id (company_id),
             KEY name (name),
             UNIQUE KEY slug (slug)
@@ -507,13 +510,21 @@ class YOLO_YS_Database {
     /**
      * Get all yachts from database
      */
-    public function get_all_yachts($company_id = null) {
+    public function get_all_yachts($company_id = null, $include_inactive = false) {
         global $wpdb;
         
-        $where = '';
+        $conditions = array();
+        
         if ($company_id) {
-            $where = $wpdb->prepare("WHERE company_id = %d", $company_id);
+            $conditions[] = $wpdb->prepare("company_id = %d", $company_id);
         }
+        
+        // v80.5: Filter by status - only show active yachts by default
+        if (!$include_inactive) {
+            $conditions[] = "(status = 'active' OR status IS NULL)";
+        }
+        
+        $where = !empty($conditions) ? 'WHERE ' . implode(' AND ', $conditions) : '';
         
         $yachts = $wpdb->get_results("SELECT * FROM {$this->table_yachts} {$where} ORDER BY name ASC");
         
@@ -764,5 +775,63 @@ class YOLO_YS_Database {
         }
         
         return $updated;
+    }
+    
+    /**
+     * Activate yachts that are present in API response (v80.5)
+     * Sets status to 'active' and clears deactivated_at timestamp
+     * 
+     * @param array $yacht_ids Array of yacht IDs from API
+     * @return int Number of yachts activated
+     */
+    public function activate_yachts($yacht_ids) {
+        if (empty($yacht_ids)) {
+            return 0;
+        }
+        
+        global $wpdb;
+        
+        $placeholders = implode(',', array_fill(0, count($yacht_ids), '%d'));
+        $query = $wpdb->prepare(
+            "UPDATE {$this->table_yachts} 
+             SET status = 'active', deactivated_at = NULL 
+             WHERE id IN ($placeholders) AND (status != 'active' OR status IS NULL)",
+            $yacht_ids
+        );
+        
+        return $wpdb->query($query);
+    }
+    
+    /**
+     * Deactivate yachts from a company that are NOT in API response (v80.5)
+     * Sets status to 'inactive' and records deactivated_at timestamp
+     * These yachts are no longer in the company's fleet but data is preserved
+     * 
+     * @param int $company_id Company ID
+     * @param array $api_yacht_ids Yacht IDs that ARE in the API response
+     * @return int Number of yachts deactivated
+     */
+    public function deactivate_missing_yachts($company_id, $api_yacht_ids) {
+        global $wpdb;
+        
+        if (empty($api_yacht_ids)) {
+            // If no yachts in API response, don't deactivate anything
+            // This prevents mass deactivation on API failure
+            return 0;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($api_yacht_ids), '%d'));
+        $params = array_merge($api_yacht_ids, array($company_id));
+        
+        $query = $wpdb->prepare(
+            "UPDATE {$this->table_yachts} 
+             SET status = 'inactive', deactivated_at = NOW() 
+             WHERE id NOT IN ($placeholders) 
+             AND company_id = %d 
+             AND (status = 'active' OR status IS NULL)",
+            $params
+        );
+        
+        return $wpdb->query($query);
     }
 }

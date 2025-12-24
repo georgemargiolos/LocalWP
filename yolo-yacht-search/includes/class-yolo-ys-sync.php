@@ -95,9 +95,9 @@ class YOLO_YS_Sync {
      * @return array Result with success status, counts, and errors
      */
     public function sync_all_yachts() {
-        // Increase time limit for sync (can take 2-3 minutes)
-        set_time_limit(300); // 5 minutes
-        ini_set('max_execution_time', 300);
+        // Increase time limit for sync (v80.5: increased for batch pause support)
+        set_time_limit(1800); // 30 minutes (allows for 2-min pauses between batches)
+        ini_set('max_execution_time', 1800);
         
         $results = array(
             'success' => false,
@@ -115,7 +115,16 @@ class YOLO_YS_Sync {
         // Combine all companies
         $all_companies = array_merge(array($my_company_id), $friend_ids);
         
+        // v80.5: Batch processing with pause every 5 companies
+        $batch_size = 5;
+        $batch_pause_seconds = 120; // 2 minutes
+        $company_count = 0;
+        $total_companies = count($all_companies);
+        
+        error_log("YOLO YS: ===== YACHT SYNC STARTING - {$total_companies} companies (batch size: {$batch_size}) =====");
+        
         foreach ($all_companies as $company_id) {
+            $company_count++;
             if (empty($company_id)) continue;
             
             error_log('YOLO YS: Starting sync for company ID: ' . $company_id);
@@ -134,12 +143,26 @@ class YOLO_YS_Sync {
                 }
                 
                 if (count($yachts) > 0) {
+                    // v80.5: Track yacht IDs from API for deactivation check
+                    $api_yacht_ids = array();
+                    
                     foreach ($yachts as $yacht) {
                         error_log('YOLO YS: Processing yacht: ' . $yacht['name'] . ' (ID: ' . $yacht['id'] . ')');
                         $this->db->store_yacht($yacht, $company_id);
+                        $api_yacht_ids[] = $yacht['id'];
                         $results['yachts_synced']++;
                         error_log('YOLO YS: Yacht stored successfully. Total synced: ' . $results['yachts_synced']);
                     }
+                    
+                    // v80.5: Activate yachts that are in API response
+                    $this->db->activate_yachts($api_yacht_ids);
+                    
+                    // v80.5: Deactivate yachts from this company that are NOT in API response
+                    $deactivated = $this->db->deactivate_missing_yachts($company_id, $api_yacht_ids);
+                    if ($deactivated > 0) {
+                        error_log("YOLO YS: Deactivated {$deactivated} yachts from company {$company_id} (not in API response)");
+                    }
+                    
                     $results['companies_synced']++;
                     error_log('YOLO YS: Completed sync for company ' . $company_id);
                 } else {
@@ -150,6 +173,13 @@ class YOLO_YS_Sync {
                 $results['errors'][] = "Company $company_id: " . $e->getMessage();
                 error_log('YOLO YS: EXCEPTION - Failed to sync yachts for company ' . $company_id . ': ' . $e->getMessage());
                 error_log('YOLO YS: Exception trace: ' . $e->getTraceAsString());
+            }
+            
+            // v80.5: Batch pause - pause every 5 companies to prevent rate limiting and server overload
+            if ($company_count % $batch_size === 0 && $company_count < $total_companies) {
+                error_log("YOLO YS: ===== BATCH PAUSE - Completed {$company_count}/{$total_companies} companies. Pausing {$batch_pause_seconds} seconds... =====");
+                sleep($batch_pause_seconds);
+                error_log("YOLO YS: ===== BATCH PAUSE ENDED - Resuming sync... =====");
             }
         }
         
@@ -202,8 +232,9 @@ class YOLO_YS_Sync {
      */
     public function sync_all_offers($year = null) {
         // Increase time limit for sync (can take 2-3 minutes for all companies)
-        set_time_limit(300); // 5 minutes should be enough
-        ini_set('max_execution_time', 300);
+        // v80.5: Increased time limit for batch pause support
+        set_time_limit(1800); // 30 minutes (allows for 2-min pauses between batches)
+        ini_set('max_execution_time', 1800);
         
         $results = array(
             'success' => false,
@@ -248,13 +279,20 @@ class YOLO_YS_Sync {
         $offers_by_company = array();
         $successful_companies = array();
         
+        // v80.5: Batch processing with pause every 5 companies
+        $batch_size = 5;
+        $batch_pause_seconds = 120; // 2 minutes
+        $company_count = 0;
+        $total_companies = count($all_companies);
+        
         error_log("YOLO YS: ===== FETCHING OFFERS FOR YEAR {$year} (per-company pattern v80.3) =====");
-        error_log("YOLO YS: Companies to sync: " . implode(', ', $all_companies));
+        error_log("YOLO YS: Companies to sync: " . implode(', ', $all_companies) . " (batch size: {$batch_size})");
         
         // ============================================
         // PHASE 1: FETCH ALL - Collect offers from all companies first
         // ============================================
         foreach ($all_companies as $company_id) {
+            $company_count++;
             if (empty($company_id)) continue;
             
             try {
@@ -310,6 +348,13 @@ class YOLO_YS_Sync {
                 $results['errors'][] = $error_msg;
                 error_log('YOLO YS: FAILED to fetch offers - ' . $error_msg);
                 // v80.3: Company failed - existing prices will be preserved
+            }
+            
+            // v80.5: Batch pause - pause every 5 companies to prevent rate limiting and server overload
+            if ($company_count % $batch_size === 0 && $company_count < $total_companies) {
+                error_log("YOLO YS: ===== BATCH PAUSE - Fetched {$company_count}/{$total_companies} companies. Pausing {$batch_pause_seconds} seconds... =====");
+                sleep($batch_pause_seconds);
+                error_log("YOLO YS: ===== BATCH PAUSE ENDED - Resuming fetch... =====");
             }
         }
         

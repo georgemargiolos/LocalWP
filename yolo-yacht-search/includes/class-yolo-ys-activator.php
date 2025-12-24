@@ -179,5 +179,21 @@ class YOLO_YS_Activator {
             $updated = YOLO_YS_Database::generate_all_slugs();
             error_log('YOLO YS: Generated slugs for ' . $updated . ' existing yachts');
         }
+        
+        // Migration 5: Add status and deactivated_at columns for yacht deactivation (v80.5)
+        $status_column_exists = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$yachts_table} LIKE 'status'"
+        );
+        
+        if (empty($status_column_exists)) {
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD COLUMN status varchar(20) DEFAULT 'active' AFTER last_synced,
+                 ADD COLUMN deactivated_at datetime DEFAULT NULL AFTER status,
+                 ADD KEY status (status)"
+            );
+            
+            error_log('YOLO YS: Added status and deactivated_at columns for yacht deactivation');
+        }
     }
 }

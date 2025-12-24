@@ -1,5 +1,40 @@
 # Changelog
 
+## [80.5] - 2025-12-24
+
+### Added
+- **Yacht Deactivation System (Soft Delete)** - Yachts no longer in API response are marked as inactive instead of deleted
+  - Added `status` column (`active`/`inactive`) to yachts table
+  - Added `deactivated_at` timestamp column to track when yacht was deactivated
+  - Yachts automatically reactivate if they return to API response
+  - All yacht data (images, equipment, history) is preserved
+  - Inactive yachts are hidden from search results and "Our Yachts" pages
+
+- **Batch Pause for Scalability** - Process companies in batches of 5 with 2-minute pause between batches
+  - Prevents API rate limiting with large number of companies (15+)
+  - Reduces server load during sync operations
+  - Applies to both Yacht Database Sync and Weekly Offers Sync
+  - Increased execution time limit to 30 minutes to accommodate pauses
+
+### Changed
+- **Search Filter for Active Yachts** - All search queries now filter by `status = 'active'`
+  - Search results only show active yachts
+  - "Our Yachts" page only shows active yachts
+  - Horizontal yacht cards only show active yachts
+  - `get_all_yachts()` now accepts optional `$include_inactive` parameter
+
+### Database Migration
+- Automatically adds `status` and `deactivated_at` columns to existing yachts table
+- Sets all existing yachts to `status = 'active'` by default
+
+### Files Modified
+- `includes/class-yolo-ys-database.php` - Added status columns to schema, activate/deactivate methods, status filter in get_all_yachts()
+- `includes/class-yolo-ys-activator.php` - Added migration for status columns
+- `includes/class-yolo-ys-sync.php` - Added batch pause, yacht activation/deactivation logic
+- `public/class-yolo-ys-public-search.php` - Added status filter to search query
+
+---
+
 ## [80.4] - 2025-12-24
 
 ### Fixed
