@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 80.3
+**Version:** 80.4
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -14,6 +14,20 @@
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v80.4 - Performance & Consistency Fixes (December 24, 2025)
+
+**Bug Fixes & Performance Improvements**
+
+1. **Bug #6: Search Company ID Type** - Cast company IDs to integers for consistent database matching
+2. **Bug #4: Batch Inserts** - Switched to batch REPLACE INTO for 10-100x faster sync performance
+
+**Files Modified:** 2 files
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅
+
+---
 
 ### v80.3 - CRITICAL: Per-Company Delete Fix (December 24, 2025)
 

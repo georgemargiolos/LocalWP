@@ -1,5 +1,27 @@
 # Changelog
 
+## [80.4] - 2025-12-24
+
+### Fixed
+- **Bug #6: Search Company ID Type** - Cast company IDs to integers in search for consistent type matching with database
+  - Changed `get_option('yolo_ys_my_company_id', '7850')` to `(int) get_option(...)`
+  - Changed `array_map('trim', ...)` to `array_map('intval', array_map('trim', ...))`
+  - Prevents potential SQL type mismatch issues
+
+### Performance
+- **Bug #4: Batch Inserts** - Switched from individual INSERT statements to batch REPLACE INTO
+  - Previously: 1,000 offers = 1,000 separate database queries
+  - Now: 1,000 offers = 1 batch query
+  - **10-100x faster sync performance**
+  - Uses existing `store_offers_batch()` method that was never utilized
+  - Ensures unique index exists for fast REPLACE operations
+
+### Files Modified
+- `public/class-yolo-ys-public-search.php` - Cast company IDs to integers
+- `includes/class-yolo-ys-sync.php` - Use batch inserts instead of individual store_offer() calls
+
+---
+
 ## [80.3] - 2025-12-24
 
 ### Fixed

@@ -25,10 +25,10 @@ function yolo_ys_ajax_search_yachts() {
         return;
     }
     
-    // Get company IDs
-    $my_company_id = get_option('yolo_ys_my_company_id', '7850');
+    // Get company IDs - v80.4: Cast to integers for consistent type matching with database
+    $my_company_id = (int) get_option('yolo_ys_my_company_id', '7850');
     $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
-    $friend_ids = array_map('trim', explode(',', $friend_companies));
+    $friend_ids = array_map('intval', array_map('trim', explode(',', $friend_companies)));
     
     // Extract dates (format: 2026-05-01T00:00:00)
     $search_date_from = substr($date_from, 0, 10); // Get YYYY-MM-DD

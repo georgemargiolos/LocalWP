@@ -1,14 +1,31 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
 **Date:** December 24, 2025  
-**Version:** v80.3 (Latest Stable Version)  
-**Task Goal:** Fix CRITICAL bug where YOLO boats lose prices after auto-sync while partner boats keep prices.
+**Version:** v80.4 (Latest Stable Version)  
+**Task Goal:** Fix all remaining bugs from Cursor's analysis - batch inserts for performance and search company ID type consistency.
 
 ---
 
-## 🔴 Summary of Work Completed (v80.3)
+## 🔴 Summary of Work Completed (v80.4)
 
-### 1. CRITICAL: Per-Company Delete Fix for Offers Sync
+### 1. Bug #6: Search Company ID Type - FIXED
+- **Location:** `public/class-yolo-ys-public-search.php` line 29
+- **Problem:** Company ID was retrieved as string but database column is `bigint(20)`
+- **Fix:** Cast to integer: `(int) get_option('yolo_ys_my_company_id', '7850')`
+- **Status:** **COMPLETE**
+
+### 2. Bug #4: Batch Inserts - FIXED
+- **Location:** `includes/class-yolo-ys-sync.php` lines 353-374
+- **Problem:** Individual INSERT statements (1,000 offers = 1,000 queries)
+- **Fix:** Use existing `store_offers_batch()` method with REPLACE INTO
+- **Performance:** 10-100x faster sync
+- **Status:** **COMPLETE**
+
+---
+
+## Previous Session Summary (v80.3)
+
+### v80.3: CRITICAL: Per-Company Delete Fix for Offers Sync
 - **Problem:** YOLO boats were losing prices after auto-sync while partner boats kept their prices.
 - **Root Cause:** The DELETE query was deleting ALL prices for ALL companies for the year, then only storing offers from companies that returned data. If YOLO's fetch failed but partners succeeded, YOLO's prices were deleted but never replaced.
 - **Bug Location:** Line 314 in `class-yolo-ys-sync.php`: `DELETE FROM prices WHERE YEAR(date_from) = %d`

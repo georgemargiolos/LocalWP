@@ -350,20 +350,28 @@ class YOLO_YS_Sync {
                 error_log("YOLO YS: No yachts found in database for successful companies - skipping delete");
             }
             
-            // Now store all the fetched offers
-            error_log("YOLO YS: ===== STORING OFFERS FOR SUCCESSFUL COMPANIES =====");
+            // Now store all the fetched offers using BATCH INSERT for performance (v80.4)
+            error_log("YOLO YS: ===== STORING OFFERS FOR SUCCESSFUL COMPANIES (BATCH MODE) =====");
+            
+            // Ensure unique index exists for fast REPLACE operations
+            YOLO_YS_Database_Prices::ensure_unique_index();
             
             foreach ($offers_by_company as $company_id => $company_offers) {
+                // Remove internal tags before batch insert
+                $clean_offers = array();
                 foreach ($company_offers as $offer) {
-                    unset($offer['_company_id']); // Remove our internal tag
-                    
-                    YOLO_YS_Database_Prices::store_offer($offer, $company_id);
-                    $results['offers_synced']++;
+                    unset($offer['_company_id']);
+                    $clean_offers[] = $offer;
                 }
-                error_log("YOLO YS: Stored " . count($company_offers) . " offers for company " . $company_id);
+                
+                // v80.4: Use batch insert for 10-100x faster performance
+                YOLO_YS_Database_Prices::store_offers_batch($clean_offers, $company_id);
+                $results['offers_synced'] += count($clean_offers);
+                
+                error_log("YOLO YS: Batch stored " . count($clean_offers) . " offers for company " . $company_id);
             }
             
-            error_log("YOLO YS: ===== STORAGE COMPLETED: {$results['offers_synced']} offers stored =====");
+            error_log("YOLO YS: ===== BATCH STORAGE COMPLETED: {$results['offers_synced']} offers stored =====");
             
             // Log which companies failed (if any)
             $failed_companies = array_diff($all_companies, $successful_companies);
