@@ -780,8 +780,10 @@ jQuery(document).ready(function($) {
                 nonce: yoloYsAdmin.nonce
             },
             success: function(response) {
+                console.log('Price sync response:', response); // DEBUG
                 if (response.success) {
                     var data = response.data;
+                    console.log('Price sync data:', data); // DEBUG
                     
                     // Add to live feed
                     if (data.yacht_synced) {
@@ -848,14 +850,19 @@ jQuery(document).ready(function($) {
     }
     
     function updatePriceProgress(data) {
+        // Defensive checks - ensure data exists
+        var synced = data.synced || 0;
+        var total = data.total || 0;
+        var progress = data.progress || 0;
+        
         // Progress bar
-        $('#price-sync-progress-bar').css('width', data.progress + '%');
-        $('#price-sync-count').text(data.synced + '/' + data.total + ' yachts');
-        $('#price-sync-percent').text(data.progress + '%');
+        $('#price-sync-progress-bar').css('width', progress + '%');
+        $('#price-sync-count').text(synced + '/' + total + ' yachts');
+        $('#price-sync-percent').text(progress + '%');
         
         // Stats
-        $('#price-sync-yachts').text(data.synced + '/' + data.total);
-        if (data.stats) {
+        $('#price-sync-yachts').text(synced + '/' + total);
+        if (data.stats && data.stats.offers !== undefined) {
             $('#price-sync-offers').text(data.stats.offers);
         }
         
