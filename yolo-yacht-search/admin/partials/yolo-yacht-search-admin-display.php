@@ -744,8 +744,16 @@ jQuery(document).ready(function($) {
                     // Start timer
                     priceSyncState.timerInterval = setInterval(updatePriceTimer, 1000);
                     
-                    // Update initial state
-                    updatePriceSyncUI(response.data.state);
+                    // Set initial progress values
+                    var initialState = response.data.state;
+                    $('#price-sync-progress-bar').css('width', '0%');
+                    $('#price-sync-count').text('0/' + initialState.total_yachts + ' yachts');
+                    $('#price-sync-percent').text('0%');
+                    $('#price-sync-yachts').text('0/' + initialState.total_yachts);
+                    $('#price-sync-offers').text('0');
+                    
+                    // Update company breakdown
+                    updatePriceSyncUI(initialState);
                     
                     // Start syncing
                     syncNextPrice();
@@ -777,7 +785,7 @@ jQuery(document).ready(function($) {
                     
                     // Add to live feed
                     if (data.yacht_synced) {
-                        var offersText = data.offers_count ? ' - ' + data.offers_count + ' weeks' : '';
+                        var offersText = data.offers_synced ? ' - ' + data.offers_synced + ' weeks' : '';
                         addToPriceLiveFeed('✓ ' + data.yacht_synced + offersText, data.elapsed_ms);
                         
                         // Track speed
