@@ -461,20 +461,29 @@ class YOLO_YS_Sync {
     
     /**
      * Get sync status
+     * v81.11: Fixed timezone handling for "X ago" display
      */
     public function get_sync_status() {
         $stats = $this->db->get_sync_stats();
         $last_sync = get_option('yolo_ys_last_sync', null);
         $last_offer_sync = get_option('yolo_ys_last_offer_sync', null);
         
+        // Get current time in WordPress timezone
+        $now = current_time('timestamp');
+        
+        // Convert stored times to timestamps in WordPress timezone
+        // Times are stored via current_time('mysql') which is already in WP timezone
+        $last_sync_ts = $last_sync ? strtotime($last_sync . ' ' . wp_timezone_string()) : 0;
+        $last_offer_sync_ts = $last_offer_sync ? strtotime($last_offer_sync . ' ' . wp_timezone_string()) : 0;
+        
         return array(
             'total_yachts' => $stats['total_yachts'],
             'yolo_yachts' => $stats['yolo_yachts'],
             'partner_yachts' => $stats['total_yachts'] - $stats['yolo_yachts'],
             'last_sync' => $last_sync,
-            'last_sync_human' => $last_sync ? human_time_diff(strtotime($last_sync), current_time('timestamp')) . ' ago' : 'Never',
+            'last_sync_human' => $last_sync ? human_time_diff($last_sync_ts, $now) . ' ago' : 'Never',
             'last_price_sync' => $last_offer_sync,
-            'last_price_sync_human' => $last_offer_sync ? human_time_diff(strtotime($last_offer_sync), current_time('timestamp')) . ' ago' : 'Never'
+            'last_price_sync_human' => $last_offer_sync ? human_time_diff($last_offer_sync_ts, $now) . ' ago' : 'Never'
         );
     }
 }

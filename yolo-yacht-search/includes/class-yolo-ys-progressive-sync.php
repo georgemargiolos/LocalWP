@@ -64,6 +64,51 @@ class YOLO_YS_Progressive_Sync {
     }
     
     /**
+     * Get Greek Ionian base IDs for filtering friend company yachts
+     * v81.11: Filters yachts to only those based in Greek Ionian Sea
+     * 
+     * The /yachts API endpoint ignores sailingAreaId parameter,
+     * so we must filter client-side by checking yacht's homeBaseId
+     * against bases that are in sailing area 7 (Ionian) AND country Greece.
+     * 
+     * @return array Array of base IDs that are in Greek Ionian Sea
+     */
+    public function get_greek_ionian_base_ids() {
+        // Check cache first (bases rarely change)
+        $cached = get_transient('yolo_ys_greek_ionian_base_ids');
+        if ($cached !== false && is_array($cached)) {
+            error_log('YOLO Progressive Sync: Using cached Greek Ionian base IDs (' . count($cached) . ' bases)');
+            return $cached;
+        }
+        
+        try {
+            $bases = $this->api->get_bases();
+            $ionian_base_ids = array();
+            
+            foreach ($bases as $base) {
+                $sailing_areas = isset($base['sailingAreas']) ? $base['sailingAreas'] : array();
+                $country = isset($base['country']) ? $base['country'] : '';
+                
+                // Check if base is in sailing area 7 (Ionian) AND in Greece
+                if (in_array(7, $sailing_areas) && $country === 'Greece') {
+                    $ionian_base_ids[] = $base['id'];
+                }
+            }
+            
+            // Cache for 24 hours
+            set_transient('yolo_ys_greek_ionian_base_ids', $ionian_base_ids, DAY_IN_SECONDS);
+            
+            error_log('YOLO Progressive Sync v81.11: Fetched ' . count($ionian_base_ids) . ' Greek Ionian base IDs');
+            
+            return $ionian_base_ids;
+            
+        } catch (Exception $e) {
+            error_log('YOLO Progressive Sync: Failed to get bases: ' . $e->getMessage());
+            return array();
+        }
+    }
+    
+    /**
      * Initialize yacht sync - Phase 1: Yacht data (no images)
      * 
      * @return array Initial state with yacht queue
@@ -76,41 +121,54 @@ class YOLO_YS_Progressive_Sync {
         // Get YOLO's company ID - their boats are NOT filtered
         $my_company_id = (int) get_option('yolo_ys_my_company_id', 7850);
         
-        // Ionian Sea sailing area ID = 7 (used to filter friend company boats)
-        $ionian_sailing_area_id = 7;
+        // v81.11: Get Greek Ionian base IDs for client-side filtering
+        // The /yachts API endpoint ignores sailingAreaId parameter, so we must filter by homeBaseId
+        $greek_ionian_base_ids = $this->get_greek_ionian_base_ids();
         
-        error_log("YOLO Progressive Sync v81.8: Initializing two-phase yacht sync for " . count($companies) . " companies (Ionian filter for partners)");
+        error_log("YOLO Progressive Sync v81.11: Initializing yacht sync for " . count($companies) . " companies (Greek Ionian filter for partners using " . count($greek_ionian_base_ids) . " base IDs)");
         
         foreach ($companies as $company_id) {
             if (empty($company_id)) continue;
             
+            $is_friend_company = ((int)$company_id !== $my_company_id);
+            
             try {
-                // For friend companies, filter by Ionian sailing area
-                // For YOLO (my company), get ALL yachts (no filter)
-                $sailing_area_filter = ((int)$company_id !== $my_company_id) ? $ionian_sailing_area_id : null;
-                
-                // Fetch yacht list for this company
-                $yachts = $this->api->get_yachts_by_company($company_id, $sailing_area_filter);
+                // Fetch ALL yachts for this company (API ignores sailingAreaId)
+                $yachts = $this->api->get_yachts_by_company($company_id);
                 
                 if (is_array($yachts) && !empty($yachts)) {
-                    $company_stats[$company_id] = array(
-                        'total' => count($yachts),
-                        'synced' => 0,
-                        'status' => 'pending'
-                    );
+                    $original_count = count($yachts);
                     
-                    foreach ($yachts as $yacht) {
-                        $yacht_queue[] = array(
-                            'yacht_id' => $yacht['id'],
-                            'yacht_name' => $yacht['name'],
-                            'company_id' => $company_id,
-                            // v81.6: Don't store full yacht_data to avoid MySQL size limits
-                            // Yacht data will be fetched fresh from API during sync
-                            'image_count' => isset($yacht['images']) ? count($yacht['images']) : 0
-                        );
+                    // v81.11: For friend companies, filter to Greek Ionian bases only
+                    if ($is_friend_company && !empty($greek_ionian_base_ids)) {
+                        $yachts = array_filter($yachts, function($yacht) use ($greek_ionian_base_ids) {
+                            return isset($yacht['homeBaseId']) && in_array($yacht['homeBaseId'], $greek_ionian_base_ids);
+                        });
+                        $yachts = array_values($yachts); // Re-index array
+                        
+                        error_log("YOLO Progressive Sync: Company {$company_id} filtered from {$original_count} to " . count($yachts) . " Greek Ionian yachts");
                     }
                     
-                    error_log("YOLO Progressive Sync: Company {$company_id} has " . count($yachts) . " yachts");
+                    if (!empty($yachts)) {
+                        $company_stats[$company_id] = array(
+                            'total' => count($yachts),
+                            'synced' => 0,
+                            'status' => 'pending'
+                        );
+                        
+                        foreach ($yachts as $yacht) {
+                            $yacht_queue[] = array(
+                                'yacht_id' => $yacht['id'],
+                                'yacht_name' => $yacht['name'],
+                                'company_id' => $company_id,
+                                // v81.6: Don't store full yacht_data to avoid MySQL size limits
+                                // Yacht data will be fetched fresh from API during sync
+                                'image_count' => isset($yacht['images']) ? count($yacht['images']) : 0
+                            );
+                        }
+                        
+                        error_log("YOLO Progressive Sync: Company {$company_id} queued " . count($yachts) . " yachts");
+                    }
                 }
             } catch (Exception $e) {
                 error_log("YOLO Progressive Sync: Failed to get yachts for company {$company_id}: " . $e->getMessage());

@@ -67,6 +67,28 @@ class YOLO_YS_Booking_Manager_API {
     }
     
     /**
+     * Get all bases from API
+     * v81.11: Used to get Greek Ionian base IDs for filtering
+     * 
+     * @return array Array of base objects
+     * @throws Exception if API call fails
+     */
+    public function get_bases() {
+        $endpoint = '/bases';
+        $result = $this->make_request($endpoint);
+        
+        if ($result['success']) {
+            // API returns { "value": [...], "Count": N } or direct array
+            if (isset($result['data']['value']) && is_array($result['data']['value'])) {
+                return $result['data']['value'];
+            }
+            return is_array($result['data']) ? $result['data'] : array();
+        }
+        
+        throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch bases');
+    }
+    
+    /**
      * Get weekly offers (availability + prices) for specific parameters
      * This is the preferred method for getting weekly charter prices
      */
@@ -180,13 +202,18 @@ class YOLO_YS_Booking_Manager_API {
      * @return array Array of yacht objects
      * @throws Exception if API call fails
      */
-    public function get_yachts_by_company($company_id, $sailing_area_id = null) {
+    public function get_yachts_by_company($company_id, $sailing_area_id = null, $country = null) {
         $endpoint = '/yachts';
         $params = array('companyId' => $company_id);
         
         // Add sailing area filter if specified (e.g., Ionian Sea = 7)
         if ($sailing_area_id !== null) {
             $params['sailingAreaId'] = (int) $sailing_area_id;
+        }
+        
+        // Add country filter if specified (e.g., Greece)
+        if ($country !== null) {
+            $params['country'] = $country;
         }
         
         $result = $this->make_request($endpoint, $params);
