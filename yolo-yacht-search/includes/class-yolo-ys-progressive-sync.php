@@ -121,16 +121,28 @@ class YOLO_YS_Progressive_Sync {
         // Get YOLO's company ID - their boats are NOT filtered
         $my_company_id = (int) get_option('yolo_ys_my_company_id', 7850);
         
-        // v81.11: Get Greek Ionian base IDs for client-side filtering
+        // v81.12: Get Greek Ionian base IDs for client-side filtering
         // The /yachts API endpoint ignores sailingAreaId parameter, so we must filter by homeBaseId
+        // FAIL-SAFE: If we can't get base IDs, we skip friend companies entirely (don't sync unfiltered)
         $greek_ionian_base_ids = $this->get_greek_ionian_base_ids();
+        $can_filter_friends = !empty($greek_ionian_base_ids);
         
-        error_log("YOLO Progressive Sync v81.11: Initializing yacht sync for " . count($companies) . " companies (Greek Ionian filter for partners using " . count($greek_ionian_base_ids) . " base IDs)");
+        if (!$can_filter_friends) {
+            error_log("YOLO Progressive Sync v81.12 WARNING: Could not get Greek Ionian base IDs - friend companies will be SKIPPED to prevent unfiltered sync");
+        }
+        
+        error_log("YOLO Progressive Sync v81.12: Initializing yacht sync for " . count($companies) . " companies (Greek Ionian filter for partners using " . count($greek_ionian_base_ids) . " base IDs)");
         
         foreach ($companies as $company_id) {
             if (empty($company_id)) continue;
             
             $is_friend_company = ((int)$company_id !== $my_company_id);
+            
+            // v81.12 FAIL-SAFE: Skip friend companies if we can't filter them
+            if ($is_friend_company && !$can_filter_friends) {
+                error_log("YOLO Progressive Sync: SKIPPING company {$company_id} - no Greek Ionian base IDs available for filtering");
+                continue;
+            }
             
             try {
                 // Fetch ALL yachts for this company (API ignores sailingAreaId)
@@ -139,8 +151,8 @@ class YOLO_YS_Progressive_Sync {
                 if (is_array($yachts) && !empty($yachts)) {
                     $original_count = count($yachts);
                     
-                    // v81.11: For friend companies, filter to Greek Ionian bases only
-                    if ($is_friend_company && !empty($greek_ionian_base_ids)) {
+                    // v81.12: For friend companies, filter to Greek Ionian bases only
+                    if ($is_friend_company) {
                         $yachts = array_filter($yachts, function($yacht) use ($greek_ionian_base_ids) {
                             return isset($yacht['homeBaseId']) && in_array($yacht['homeBaseId'], $greek_ionian_base_ids);
                         });
