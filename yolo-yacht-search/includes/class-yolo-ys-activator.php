@@ -193,7 +193,13 @@ class YOLO_YS_Activator {
                  ADD KEY status (status)"
             );
             
+            // Set all existing yachts to 'active' status
+            $wpdb->query("UPDATE {$yachts_table} SET status = 'active' WHERE status IS NULL");
+            
             error_log('YOLO YS: Added status and deactivated_at columns for yacht deactivation');
+        } else {
+            // Column exists but some yachts might have NULL status - fix them
+            $wpdb->query("UPDATE {$yachts_table} SET status = 'active' WHERE status IS NULL");
         }
     }
 }

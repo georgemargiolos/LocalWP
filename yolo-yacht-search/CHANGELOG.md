@@ -1,5 +1,15 @@
 # Changelog
 
+## [80.7] - 2025-12-24
+
+### Fixed
+- **CRITICAL: "No yachts available" after update** - Migrations were only running on plugin activation, not on update
+  - Added version check to run migrations automatically when plugin is updated
+  - Migration now sets existing yachts with NULL status to 'active'
+  - Yachts will now appear correctly after updating the plugin
+
+---
+
 ## [80.6] - 2025-12-24
 
 ### Fixed
