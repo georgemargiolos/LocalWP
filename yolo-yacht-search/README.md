@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 80.1
+**Version:** 80.2
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -14,6 +14,23 @@
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v80.2 - Auto-Sync Weekly Offers Fix (December 24, 2025)
+
+**Bug Fix - Auto-Sync Success Detection**
+
+**Problem:** Auto-sync for weekly offers was not properly detecting successful syncs, causing boats to not display prices until a manual refresh was performed.
+
+**Root Cause:** The `run_offers_sync()` method was checking the `$result['success']` flag instead of verifying if offers were actually synced. This caused issues when syncs partially succeeded.
+
+**Solution:** Changed success detection to check `$result['offers_synced'] > 0` instead of `$result['success']`.
+
+**Files Modified:** 1 file (`includes/class-yolo-ys-auto-sync.php`)
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅
+
+---
 
 ### v80.1 - Clickable Yacht Cards (December 22, 2025)
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## [80.2] - 2025-12-24
+
+### Fixed
+- **Auto-Sync Weekly Offers Bug** - Fixed issue where auto-sync was not properly detecting successful syncs
+  - Changed success detection from checking `$result['success']` flag to checking `$result['offers_synced'] > 0`
+  - This handles cases where sync partially succeeds or has minor errors but still syncs offers
+  - Boats will now properly show prices after auto-sync runs (no manual refresh needed)
+  - Added improved logging for debugging sync issues
+
+### Files Modified
+- `includes/class-yolo-ys-auto-sync.php` - Fixed `run_offers_sync()` success detection logic
+
+---
+
 ## [80.1] - 2025-12-22
 
 ### Added

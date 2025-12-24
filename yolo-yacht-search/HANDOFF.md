@@ -1,20 +1,18 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
-**Date:** December 22, 2025  
-**Version:** v80.1 (Last Stable Version)  
-**Task Goal:** Make entire yacht card clickable (not just the DETAILS button).
+**Date:** December 24, 2025  
+**Version:** v80.2 (Last Stable Version)  
+**Task Goal:** Fix auto-sync weekly offers bug where boats don't show prices until manual refresh.
 
 ---
 
-## 🔴 Summary of Work Completed (v80.1)
+## 🔴 Summary of Work Completed (v80.2)
 
-### 1. Clickable Yacht Cards (v80.1)
-- **Change:** Entire yacht card is now clickable, not just the DETAILS button.
-- **Technique:** CSS stretched link - an invisible `<a>` tag covers the entire card.
-- **Accessibility:** Added `aria-label` attributes for screen readers.
-- **Visual Feedback:** Cursor changes to pointer when hovering anywhere on the card.
-- **DETAILS Button:** Converted from `<a>` to `<span>` - remains visible for visual clarity.
-- **Swiper Compatibility:** Image carousel navigation buttons remain functional (elevated z-index).
+### 1. Auto-Sync Weekly Offers Bug Fix (v80.2)
+- **Problem:** Auto-sync for weekly offers was not properly detecting successful syncs, causing boats to not display prices until a manual refresh was performed.
+- **Root Cause:** The `run_offers_sync()` method was checking `$result['success']` flag instead of verifying if offers were actually synced.
+- **Solution:** Changed success detection to check `$result['offers_synced'] > 0` instead of `$result['success']`.
+- **Benefit:** Handles cases where sync partially succeeds or has minor errors but still syncs offers.
 - **Status:** **COMPLETE - READY FOR TESTING.**
 
 ---
@@ -23,85 +21,84 @@
 
 | File | Change Summary |
 | :--- | :--- |
-| `yolo-yacht-search.php` | Version bump to 80.1 |
-| `CHANGELOG.md` | Updated with v80.1 entry |
-| `README.md` | Updated with latest version and v80.1 summary |
-| `public/templates/partials/yacht-card.php` | Added `yolo-ys-clickable-card` class and `yolo-ys-card-link` element |
-| `public/blocks/yacht-horizontal-cards/render.php` | Added clickable card wrapper |
-| `public/js/yolo-yacht-search-public.js` | Updated JS card rendering for search results |
-| `public/css/yacht-card.css` | Added clickable card CSS styles |
-| `public/css/search-results.css` | Added clickable card CSS styles |
+| `yolo-yacht-search.php` | Version bump to 80.2 |
+| `CHANGELOG.md` | Updated with v80.2 entry |
+| `README.md` | Updated with latest version and v80.2 summary |
+| `includes/class-yolo-ys-auto-sync.php` | Fixed `run_offers_sync()` success detection logic |
 
 ---
 
 ## Technical Implementation Details
 
-### CSS Stretched Link Technique
-```css
-/* Make entire card clickable with stretched link */
-.yolo-ys-clickable-card {
-    position: relative;
-    cursor: pointer;
-}
-
-/* Stretched link covers the entire card */
-.yolo-ys-card-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    text-decoration: none;
-    background: transparent;
+### Before (Bug)
+```php
+if (isset($result1['success']) && $result1['success']) {
+    // Only counted as success if success flag was true
 }
 ```
 
-### HTML Structure
-```html
-<div class="yolo-ys-yacht-card yolo-ys-clickable-card">
-    <a href="/yacht/..." class="yolo-ys-card-link" aria-label="Yacht Name - Model"></a>
-    <!-- Card content -->
-</div>
+### After (Fix)
+```php
+// FIX v80.2: Check if offers were actually synced, not just success flag
+if (isset($result1['offers_synced']) && $result1['offers_synced'] > 0) {
+    // Counts as success if any offers were actually synced
+}
 ```
 
 ---
 
-## Pages Affected
+## Known Issues / Recurring Bugs
 
-1. **Our Yachts (Fleet) page** - Uses `yacht-card.php` template
-2. **Search Results page** - Uses JavaScript rendering in `yolo-yacht-search-public.js`
-3. **Horizontal Yacht Cards block** - Uses `render.php` in blocks folder
+### WordPress Cron Reliability
+**Problem:** WordPress uses "pseudo-cron" which only runs when someone visits the site.
+
+**Solution:** Set up a real server cron job:
+
+1. Add to `wp-config.php`:
+   ```php
+   define('DISABLE_WP_CRON', true);
+   ```
+
+2. Add to server crontab:
+   ```bash
+   */15 * * * * wget -q -O /dev/null "https://yolo-charters.com/wp-cron.php?doing_wp_cron" >/dev/null 2>&1
+   ```
+
+### Offers Sync - Fetch-First Pattern (v72.9)
+The `sync_all_offers()` method uses a fetch-first pattern to prevent data loss:
+1. Fetches ALL offers from API first into memory
+2. Only deletes old prices if fetch was successful
+3. Then stores the new offers
+
+---
+
+## Previous Session Summary (v80.1)
+
+### Clickable Yacht Cards (v80.1)
+- Made entire yacht card clickable, not just the DETAILS button
+- Used CSS stretched link technique for better accessibility
+- Works on both "Our Yachts" fleet page and Search Results page
+
+### Sticky Booking Section Position (v80.0)
+- Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
 
 ---
 
 ## Testing Checklist
 
-- [ ] Click anywhere on yacht card → navigates to yacht details page
-- [ ] Cursor shows pointer on hover anywhere on card
-- [ ] DETAILS button still visible and styled correctly
-- [ ] Swiper image carousel navigation buttons still work
-- [ ] Swiper pagination dots still clickable
-- [ ] Hover effects (card lift, shadow) still work
-- [ ] Mobile touch works correctly
-- [ ] Screen reader announces card link correctly
-
----
-
-## Previous Session Summary (v80.0)
-
-### Sticky Booking Section Position (v80.0)
-- Changed `top: 100px` to `top: 50px` in `.yolo-yacht-details-v3 .yacht-booking-section`
-- The booking sidebar now sticks closer to the top of the viewport.
+- [ ] Wait for auto-sync to run (or trigger manually via WP Crontrol plugin)
+- [ ] Check WordPress error logs for `[YOLO Auto-Sync]` messages
+- [ ] Verify prices appear on frontend after auto-sync
+- [ ] Check "Our Yachts" page shows prices
+- [ ] Check search results show prices
 
 ---
 
 ## Suggested Next Steps
 
-1. **Test v80.1** on staging/production
-2. **Verify clickable cards** work on all pages (Our Yachts, Search Results)
-3. **Test Swiper navigation** - ensure carousel buttons still work
-4. **Test on mobile** - ensure touch interaction works correctly
+1. **Set up server cron** for reliable auto-sync execution
+2. **Monitor error logs** for `[YOLO Auto-Sync]` messages
+3. **Test auto-sync** by triggering it manually via WP Crontrol plugin
 
 ---
 
@@ -110,7 +107,7 @@
 | Resource | Link | Notes |
 | :--- | :--- | :--- |
 | **GitHub Repository** | [https://github.com/georgemargiolos/LocalWP](https://github.com/georgemargiolos/LocalWP) | All code is pushed here. |
-| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.1.zip` | Use this file to update the plugin on your WordPress site. |
+| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.2.zip` | Use this file to update the plugin on your WordPress site. |
 | **Latest Changelog** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md) | For a detailed history of changes. |
 | **Latest README** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md) | For an overview of the latest features. |
 | **Handoff File** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md) | This document. |
