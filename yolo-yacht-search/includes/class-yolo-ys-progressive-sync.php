@@ -329,45 +329,23 @@ class YOLO_YS_Progressive_Sync {
     
     /**
      * Start Phase 2: Image sync
-     * Creates queue of image batches
-     * v81.13 FIX: Fetch yacht data fresh from API (yacht_data removed from queue in v81.6)
+     * v81.14 FIX: Don't make API calls here - just create a simple yacht queue
+     * Images will be fetched one yacht at a time in sync_next_image_batch()
+     * This prevents timeout when transitioning from Phase 1 to Phase 2
      */
     private function start_image_sync_phase($state, $yacht_queue) {
-        // Build image queue - batches of IMAGES_PER_BATCH
+        // v81.14: Create simple image queue with just yacht IDs
+        // Don't fetch images here - that caused 500 errors due to timeout
         $image_queue = array();
         
         foreach ($yacht_queue as $yacht_item) {
-            $yacht_id = $yacht_item['yacht_id'];
-            $yacht_name = $yacht_item['yacht_name'];
-            
-            // v81.13 FIX: Fetch fresh yacht data since we don't store it in queue
-            // (yacht_data was removed in v81.6 to prevent MySQL size limits)
-            try {
-                $yacht_result = $this->api->get_yacht($yacht_id);
-                if (!$yacht_result['success'] || empty($yacht_result['data'])) {
-                    error_log("YOLO Progressive Sync: Failed to get yacht data for images: {$yacht_name}");
-                    continue;
-                }
-                $yacht_data = $yacht_result['data'];
-            } catch (Exception $e) {
-                error_log("YOLO Progressive Sync: Exception getting yacht for images: " . $e->getMessage());
-                continue;
-            }
-            
-            if (isset($yacht_data['images']) && is_array($yacht_data['images'])) {
-                $images = $yacht_data['images'];
-                $batches = array_chunk($images, self::IMAGES_PER_BATCH);
-                
-                foreach ($batches as $batch_index => $batch) {
-                    $image_queue[] = array(
-                        'yacht_id' => $yacht_id,
-                        'yacht_name' => $yacht_name,
-                        'batch_index' => $batch_index,
-                        'images' => $batch,
-                        'is_first_batch' => ($batch_index === 0)
-                    );
-                }
-            }
+            // Only store yacht reference - images fetched during sync_next_image_batch
+            $image_queue[] = array(
+                'yacht_id' => $yacht_item['yacht_id'],
+                'yacht_name' => $yacht_item['yacht_name'],
+                'image_count' => isset($yacht_item['image_count']) ? $yacht_item['image_count'] : 0,
+                'images_synced' => false  // Flag to track if this yacht's images are done
+            );
         }
         
         // Update state for Phase 2
@@ -398,7 +376,8 @@ class YOLO_YS_Progressive_Sync {
     
     /**
      * Sync next batch of images (Phase 2)
-     * Downloads 2-3 images per request
+     * v81.14 FIX: Fetches yacht images on-demand, one yacht at a time
+     * Downloads up to IMAGES_PER_BATCH images per request
      * 
      * @return array Result with updated state
      */
@@ -414,29 +393,37 @@ class YOLO_YS_Progressive_Sync {
             );
         }
         
-        $batch_index = isset($state['image_batch_index']) ? $state['image_batch_index'] : 0;
+        $yacht_index = isset($state['image_batch_index']) ? $state['image_batch_index'] : 0;
         
-        // Check if all images done
-        if ($batch_index >= count($image_queue)) {
+        // Check if all yachts done
+        if ($yacht_index >= count($image_queue)) {
             return $this->complete_yacht_sync($state);
         }
         
-        $batch = $image_queue[$batch_index];
-        $yacht_id = $batch['yacht_id'];
-        $yacht_name = $batch['yacht_name'];
-        $images = $batch['images'];
-        $is_first_batch = $batch['is_first_batch'];
+        $yacht_item = $image_queue[$yacht_index];
+        $yacht_id = $yacht_item['yacht_id'];
+        $yacht_name = $yacht_item['yacht_name'];
         
         $start_time = microtime(true);
         $images_downloaded = 0;
+        $total_images = 0;
         
         try {
-            // If first batch for this yacht, clear old images
-            if ($is_first_batch) {
-                $this->db->clear_yacht_images($yacht_id);
+            // v81.14: Fetch yacht data fresh from API for this yacht only
+            $yacht_result = $this->api->get_yacht($yacht_id);
+            
+            if (!$yacht_result['success'] || empty($yacht_result['data'])) {
+                throw new Exception('Failed to fetch yacht data from API');
             }
             
-            // Download and store this batch of images
+            $yacht_data = $yacht_result['data'];
+            $images = isset($yacht_data['images']) ? $yacht_data['images'] : array();
+            $total_images = count($images);
+            
+            // Clear old images for this yacht
+            $this->db->clear_yacht_images($yacht_id);
+            
+            // Download all images for this yacht (one yacht per request)
             foreach ($images as $index => $image) {
                 $result = $this->db->download_and_store_single_image($yacht_id, $image, $index);
                 if ($result) {
@@ -449,15 +436,15 @@ class YOLO_YS_Progressive_Sync {
             
             $elapsed = round((microtime(true) - $start_time) * 1000);
             
-            error_log("YOLO Progressive Sync: Phase 2 - Downloaded {$images_downloaded} images for {$yacht_name} in {$elapsed}ms");
+            error_log("YOLO Progressive Sync: Phase 2 - Downloaded {$images_downloaded}/{$total_images} images for {$yacht_name} in {$elapsed}ms");
             
         } catch (Exception $e) {
             $state['errors'][] = array(
                 'yacht_id' => $yacht_id,
                 'yacht_name' => $yacht_name,
-                'error' => 'Image batch failed: ' . $e->getMessage()
+                'error' => 'Image sync failed: ' . $e->getMessage()
             );
-            $state['image_batch_index']++; // Skip this batch
+            $state['image_batch_index']++; // Skip this yacht
             error_log("YOLO Progressive Sync: ERROR downloading images for {$yacht_name}: " . $e->getMessage());
         }
         
@@ -482,9 +469,10 @@ class YOLO_YS_Progressive_Sync {
             'phase_name' => 'Downloading images',
             'yacht_name' => $yacht_name,
             'images_downloaded' => $images_downloaded,
+            'total_yacht_images' => $total_images,
             'progress' => round($total_progress, 1),
-            'synced' => $state['image_batch_index'],  // v81.3: For UI consistency
-            'total' => $state['image_queue_size'],     // v81.3: For UI consistency
+            'synced' => $state['image_batch_index'],
+            'total' => $state['image_queue_size'],
             'synced_images' => $state['synced_images'],
             'total_images' => $state['total_images'],
             'batch_progress' => $state['image_batch_index'] . '/' . $state['image_queue_size'],
