@@ -36,6 +36,9 @@ class YOLO_YS_Admin {
         // v80.3: Save offers year for auto-sync
         add_action('wp_ajax_yolo_ys_save_offers_year', array($this, 'ajax_save_offers_year'));
         
+        // v81.4: Look up company names
+        add_action('wp_ajax_yolo_lookup_company_names', array($this, 'ajax_lookup_company_names'));
+        
         // v81.0: Progressive sync AJAX handlers
         add_action('wp_ajax_yolo_progressive_init_yacht_sync', array($this, 'ajax_progressive_init_yacht_sync'));
         add_action('wp_ajax_yolo_progressive_sync_next_yacht', array($this, 'ajax_progressive_sync_next_yacht'));
@@ -562,8 +565,9 @@ class YOLO_YS_Admin {
     
     public function friend_companies_callback() {
         $value = get_option('yolo_ys_friend_companies', '4366,3604,6711');
-        echo '<input type="text" name="yolo_ys_friend_companies" value="' . esc_attr($value) . '" class="large-text" />';
+        echo '<input type="text" name="yolo_ys_friend_companies" id="yolo_ys_friend_companies" value="' . esc_attr($value) . '" class="large-text" />';
         echo '<p class="description">' . __('Comma-separated list of friend company IDs (prefilled: 4366, 3604, 6711)', 'yolo-yacht-search') . '</p>';
+        echo '<div id="yolo-friend-companies-names" style="margin-top: 10px;"></div>';
     }
     
     public function results_page_callback() {
@@ -1310,5 +1314,66 @@ class YOLO_YS_Admin {
         $state = $sync->get_state();
         
         wp_send_json_success(array('state' => $state));
+    }
+    
+    /**
+     * AJAX: Look up company names from IDs
+     * v81.4: Shows company names below the Friend Companies IDs field
+     */
+    public function ajax_lookup_company_names() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $company_ids = isset($_POST['company_ids']) ? sanitize_text_field($_POST['company_ids']) : '';
+        
+        if (empty($company_ids)) {
+            wp_send_json_success(array('companies' => array()));
+            return;
+        }
+        
+        // Parse comma-separated IDs
+        $ids = array_map('trim', explode(',', $company_ids));
+        $ids = array_filter($ids, function($id) {
+            return is_numeric($id) && $id > 0;
+        });
+        
+        if (empty($ids)) {
+            wp_send_json_success(array('companies' => array()));
+            return;
+        }
+        
+        $api = new YOLO_YS_Booking_Manager_API();
+        $companies = array();
+        
+        foreach ($ids as $company_id) {
+            try {
+                $result = $api->get_company($company_id);
+                if ($result['success'] && isset($result['data'])) {
+                    $data = $result['data'];
+                    $companies[] = array(
+                        'id' => $company_id,
+                        'name' => isset($data['name']) ? $data['name'] : 'Unknown',
+                        'status' => 'found'
+                    );
+                } else {
+                    $companies[] = array(
+                        'id' => $company_id,
+                        'name' => 'Not found',
+                        'status' => 'error'
+                    );
+                }
+            } catch (Exception $e) {
+                $companies[] = array(
+                    'id' => $company_id,
+                    'name' => 'Error: ' . $e->getMessage(),
+                    'status' => 'error'
+                );
+            }
+        }
+        
+        wp_send_json_success(array('companies' => $companies));
     }
 }

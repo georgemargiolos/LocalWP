@@ -928,6 +928,64 @@ jQuery(document).ready(function($) {
     });
     
     // ==========================================
+    // FRIEND COMPANIES NAME LOOKUP (v81.4)
+    // ==========================================
+    
+    // Look up company names on page load and when field changes
+    function lookupCompanyNames() {
+        var $field = $('#yolo_ys_friend_companies');
+        var $container = $('#yolo-friend-companies-names');
+        var companyIds = $field.val();
+        
+        if (!companyIds || companyIds.trim() === '') {
+            $container.html('');
+            return;
+        }
+        
+        $container.html('<span style="color: #6b7280;">🔍 Looking up company names...</span>');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_lookup_company_names',
+                nonce: yoloYsAdmin.nonce,
+                company_ids: companyIds
+            },
+            success: function(response) {
+                if (response.success && response.data.companies) {
+                    var html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                    response.data.companies.forEach(function(company) {
+                        var bgColor = company.status === 'found' ? '#dcfce7' : '#fee2e2';
+                        var textColor = company.status === 'found' ? '#166534' : '#991b1b';
+                        var icon = company.status === 'found' ? '✓' : '✗';
+                        html += '<span style="background: ' + bgColor + '; color: ' + textColor + '; padding: 4px 10px; border-radius: 4px; font-size: 13px;">';
+                        html += icon + ' <strong>' + company.id + '</strong>: ' + company.name;
+                        html += '</span>';
+                    });
+                    html += '</div>';
+                    $container.html(html);
+                } else {
+                    $container.html('<span style="color: #dc2626;">Failed to look up companies</span>');
+                }
+            },
+            error: function() {
+                $container.html('<span style="color: #dc2626;">Error looking up companies</span>');
+            }
+        });
+    }
+    
+    // Run on page load
+    lookupCompanyNames();
+    
+    // Run when field changes (with debounce)
+    var companyLookupTimeout;
+    $('#yolo_ys_friend_companies').on('input', function() {
+        clearTimeout(companyLookupTimeout);
+        companyLookupTimeout = setTimeout(lookupCompanyNames, 500);
+    });
+    
+    // ==========================================
     // AUTO-SYNC SETTINGS
     // ==========================================
     
