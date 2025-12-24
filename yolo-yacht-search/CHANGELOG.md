@@ -1,5 +1,14 @@
 # Changelog
 
+## [80.6] - 2025-12-24
+
+### Fixed
+- **CRITICAL: PHP Syntax Error** - Fixed parse error in `public/class-yolo-ys-public-search.php` line 69
+  - Bug: SQL comment `-- v80.5:` was placed outside the string, causing PHP to interpret `.5` as a floating-point number
+  - Fix: Changed to PHP comment `// v80.5:`
+
+---
+
 ## [80.5] - 2025-12-24
 
 ### Added
