@@ -35,6 +35,14 @@ class YOLO_YS_Admin {
         
         // v80.3: Save offers year for auto-sync
         add_action('wp_ajax_yolo_ys_save_offers_year', array($this, 'ajax_save_offers_year'));
+        
+        // v81.0: Progressive sync AJAX handlers
+        add_action('wp_ajax_yolo_progressive_init_yacht_sync', array($this, 'ajax_progressive_init_yacht_sync'));
+        add_action('wp_ajax_yolo_progressive_sync_next_yacht', array($this, 'ajax_progressive_sync_next_yacht'));
+        add_action('wp_ajax_yolo_progressive_init_price_sync', array($this, 'ajax_progressive_init_price_sync'));
+        add_action('wp_ajax_yolo_progressive_sync_next_price', array($this, 'ajax_progressive_sync_next_price'));
+        add_action('wp_ajax_yolo_progressive_cancel_sync', array($this, 'ajax_progressive_cancel_sync'));
+        add_action('wp_ajax_yolo_progressive_get_state', array($this, 'ajax_progressive_get_state'));
     }
     
     /**
@@ -1174,5 +1182,115 @@ class YOLO_YS_Admin {
         } else {
             wp_send_json_error('Failed to delete booking');
         }
+    }
+    
+    // ==========================================
+    // v81.0: PROGRESSIVE SYNC AJAX HANDLERS
+    // ==========================================
+    
+    /**
+     * AJAX: Initialize yacht sync (get yacht list, create queue)
+     */
+    public function ajax_progressive_init_yacht_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->init_yacht_sync();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX: Sync next yacht in queue
+     */
+    public function ajax_progressive_sync_next_yacht() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->sync_next_yacht();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Initialize price sync
+     */
+    public function ajax_progressive_init_price_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->init_price_sync($year);
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX: Sync next price in queue
+     */
+    public function ajax_progressive_sync_next_price() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->sync_next_price();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Cancel current sync
+     */
+    public function ajax_progressive_cancel_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->cancel_sync();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Get current sync state
+     */
+    public function ajax_progressive_get_state() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $state = $sync->get_state();
+        
+        wp_send_json_success(array('state' => $state));
     }
 }
