@@ -1,5 +1,17 @@
 # Changelog
 
+## [85.7] - 2025-12-25
+
+### Fixed
+- **Airport & Location Inline Display** - Text now displays inline on same line
+  - CSS fix: `display: inline` for all location elements
+  - `.yolo-ys-yacht-location` now uses `display: block` with `line-height: 1.5`
+  - All children (icon, text, airport) use `display: inline`
+  - Responsive text sizing for mobile (13px at 768px, 12px at 480px)
+  - Text wraps naturally on mobile devices
+
+---
+
 ## [85.6] - 2025-12-25
 
 ### Changed
