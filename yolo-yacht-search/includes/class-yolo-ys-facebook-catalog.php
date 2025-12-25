@@ -251,7 +251,7 @@ class YOLO_YS_Facebook_Catalog {
         // v86.9: Build company IDs directly into query (simpler, more reliable)
         $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
-        // v87.0: Use INNER JOIN since we only want boats WITH prices
+        // v87.1: Use LEFT JOIN with COALESCE (same as get_stats which works)
         $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
@@ -262,13 +262,13 @@ class YOLO_YS_Facebook_Catalog {
                 y.home_base,
                 y.build_year,
                 y.company_id,
-                c.starting_from_price,
+                COALESCE(c.starting_from_price, 0) as starting_from_price,
                 COALESCE(c.custom_description, '') as custom_description
             FROM {$yachts_table} y
-            INNER JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
+            LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
             WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
-            AND c.starting_from_price > 0
+            AND COALESCE(c.starting_from_price, 0) > 0
             ORDER BY y.model ASC";
         
         return $wpdb->get_results($sql);
