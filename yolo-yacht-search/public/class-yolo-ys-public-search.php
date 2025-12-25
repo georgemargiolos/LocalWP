@@ -160,22 +160,7 @@ function yolo_ys_ajax_search_yachts() {
         if ($row->company_id == $my_company_id) {
             $yolo_boats[] = $boat;
         } else {
-            // v81.25: Only include partner boats from Greek Ionian bases
-            if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
-                // Get home_base_id from raw_data if available
-                $home_base_id = null;
-                if (!empty($row->raw_data)) {
-                    $raw_data = json_decode($row->raw_data, true);
-                    $home_base_id = isset($raw_data['homeBaseId']) ? $raw_data['homeBaseId'] : null;
-                }
-                // Only add if in Greek Ionian bases
-                if ($home_base_id && in_array($home_base_id, YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
-                    $friend_boats[] = $boat;
-                }
-            } else {
-                // Fallback: include all partner boats if filter not defined
-                $friend_boats[] = $boat;
-            }
+            $friend_boats[] = $boat;
         }
     }
     
@@ -424,17 +409,6 @@ function yolo_ys_ajax_search_yachts_filtered() {
         }
     }
     
-    // v81.25: Filter partner boats to Greek Ionian bases ONLY
-    // This ensures only Ionian boats appear even if non-Ionian boats exist in database
-    if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
-        $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
-        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%s'));
-        $partner_sql .= " AND y.home_base_id IN ($ionian_placeholders)";
-        foreach ($ionian_base_ids as $base_id) {
-            $partner_params[] = $base_id;
-        }
-    }
-    
     // Get total count before pagination
     $count_sql = str_replace("SELECT DISTINCT", "SELECT COUNT(DISTINCT y.id) as total FROM (SELECT DISTINCT", $partner_sql);
     $count_sql = preg_replace('/SELECT DISTINCT.*?FROM/s', 'SELECT COUNT(DISTINCT y.id) as total FROM', $partner_sql);
@@ -519,15 +493,6 @@ function yolo_ys_ajax_search_yachts_filtered() {
                 $count_sql .= " AND EXISTS (SELECT 1 FROM {$equipment_table} e WHERE e.yacht_id = y.id AND e.equipment_id = %d)";
                 $count_params[] = $equip_id;
             }
-        }
-    }
-    // v81.25: Greek Ionian filter for count query
-    if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
-        $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
-        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%s'));
-        $count_sql .= " AND y.home_base_id IN ($ionian_placeholders)";
-        foreach ($ionian_base_ids as $base_id) {
-            $count_params[] = $base_id;
         }
     }
     $count_sql .= ") as counted";

@@ -1,5 +1,25 @@
 # Changelog
 
+## [85.1] - 2025-12-25
+
+### Fixed
+- **HOTFIX: Partner Boats Not Showing in Search** - v85.0 broke partner boat display
+  - **Root Cause:** Greek Ionian filter was checking `home_base_id` column which isn't populated for partner boats
+  - **Solution:** Removed the search-time Greek Ionian filter (sync already handles this filtering)
+  - Partner boats now display correctly again
+
+### Reverted
+- Removed `home_base_id IN (...)` filter from partner query
+- Removed `home_base_id` check from original search function
+- Removed `home_base_id` filter from count query
+
+### Note
+- Greek Ionian filtering is handled during sync, not during search
+- The sync process already filters boats to Greek Ionian bases only
+- Search should display all boats that are in the database
+
+---
+
 ## [85.0] - 2025-12-25
 
 ### Fixed
