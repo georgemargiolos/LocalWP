@@ -82,7 +82,7 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
                 if ($airport_info): 
                 ?>
                     <span class="yolo-ys-airport-distance">
-                        · ✈️ <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?>
+                        · ✈️ <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> (<?php echo esc_html($airport_info[0]); ?>)
                     </span>
                 <?php endif; ?>
             </div>
