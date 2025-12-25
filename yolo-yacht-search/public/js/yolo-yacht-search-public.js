@@ -502,7 +502,8 @@
      */
     function showLoading() {
         $('#yolo-ys-loading').show();
-        $('#load-more-btn').prop('disabled', true).text('Loading...');
+        $('#load-more-btn').prop('disabled', true);
+        $('#load-more-text').text('Loading...');
     }
     
     /**
@@ -511,7 +512,7 @@
     function hideLoading() {
         $('#yolo-ys-loading').hide();
         $('#load-more-btn').prop('disabled', false);
-        $('#load-more-text').text('Load More');
+        $('#load-more-text').text('Load more yachts');
     }
     
     /**
@@ -583,14 +584,14 @@
         // Try exact match first
         if (airportMap[baseLower]) {
             const [name, code, km] = airportMap[baseLower];
-            return `<span class="yolo-ys-airport-distance">, ✈️ ${km}km from ${code} - ${name}</span>`;
+            return `<span class="yolo-ys-airport-distance"><i class="fa-duotone fa-plane" style="color: #3b82f6;"></i> ${km}km from ${code} - ${name}</span>`;
         }
         
         // Try partial match
         for (const [searchTerm, airportInfo] of Object.entries(airportMap)) {
             if (baseLower.includes(searchTerm)) {
                 const [name, code, km] = airportInfo;
-                return `<span class="yolo-ys-airport-distance">, ✈️ ${km}km from ${code} - ${name}</span>`;
+                return `<span class="yolo-ys-airport-distance"><i class="fa-duotone fa-plane" style="color: #3b82f6;"></i> ${km}km from ${code} - ${name}</span>`;
             }
         }
         
@@ -704,7 +705,7 @@
                 </div>
                 <div class="yolo-ys-yacht-content">
                     <div class="yolo-ys-yacht-location">
-                        <span class="yolo-ys-location-icon">📍</span>
+                        <span class="yolo-ys-location-icon"><i class="fa-duotone fa-location-dot" style="color: #dc2626;"></i></span>
                         <span class="yolo-ys-location-text">${boat.startBase || 'Location not specified'}</span>
                         ${airportHtml}
                     </div>

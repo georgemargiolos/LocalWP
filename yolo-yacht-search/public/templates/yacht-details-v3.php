@@ -226,11 +226,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
             <?php if ($yacht->home_base): ?>
                 <span class="separator">|</span>
                 <span class="location" onclick="document.querySelector('.yacht-map-section h3')?.scrollIntoView({behavior: 'smooth'});">
-                    📍 <?php echo esc_html($yacht->home_base); ?><?php 
+                    <i class="fa-duotone fa-location-dot" style="color: #dc2626;"></i> <?php echo esc_html($yacht->home_base); ?><?php 
                     // v85.0: Show airport info in same line
                     $airport_info = yolo_ys_get_nearest_airport($yacht->home_base);
                     if ($airport_info): 
-                    ?>, ✈️ <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> - <?php echo esc_html($airport_info[0]); ?><?php endif; ?>
+                    ?> <i class="fa-duotone fa-plane" style="color: #3b82f6;"></i> <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> - <?php echo esc_html($airport_info[0]); ?><?php endif; ?>
                 </span>
             <?php endif; ?>
         </h1>

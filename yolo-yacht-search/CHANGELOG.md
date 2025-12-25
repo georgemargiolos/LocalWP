@@ -1,5 +1,22 @@
 # Changelog
 
+## [85.6] - 2025-12-25
+
+### Changed
+- **Font Awesome Duotone Icons** - Replaced emoji icons with FA duotone icons
+  - Location marker: `fa-duotone fa-location-dot` (red #dc2626)
+  - Airplane: `fa-duotone fa-plane` (blue #3b82f6)
+  - Updated in yacht-card.php, yacht-details-v3.php, and JS file
+  - Removed comma separator between location and airport
+
+### Fixed
+- **Load More button stuck on "Loading..."** - Button never reset after search
+  - Bug: `showLoading()` used `.text()` on button, destroying child spans
+  - Fix: Now updates `#load-more-text` span instead of replacing button content
+  - Load More button now properly shows "Load more yachts" after loading completes
+
+---
+
 ## [85.5] - 2025-12-25
 
 ### Fixed
