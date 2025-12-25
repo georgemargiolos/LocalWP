@@ -89,7 +89,7 @@ $initial_partner_count = min(count($partner_yachts), $remaining_slots);
                     <?php if (count($partner_yachts) > $initial_partner_count): ?>
                         <div class="yolo-ys-load-more-container" id="partner-fleet-load-more">
                             <button type="button" class="yolo-ys-load-more-btn partner-btn" data-target="partner" data-shown="<?php echo $initial_partner_count; ?>" data-total="<?php echo count($partner_yachts); ?>">
-                                Load More Partner Yachts (<?php echo count($partner_yachts) - $initial_partner_count; ?> remaining)
+                                Load more yachts...
                             </button>
                         </div>
                     <?php endif; ?>
@@ -141,8 +141,7 @@ $initial_partner_count = min(count($partner_yachts), $remaining_slots);
             $btn.data('shown', newShown);
             
             if (remaining > 0) {
-                const typeLabel = target === 'yolo' ? 'YOLO' : 'Partner';
-                $btn.text(`Load More ${typeLabel} Yachts (${remaining} remaining)`);
+                $btn.text(`Load more yachts...`);
             } else {
                 // Hide the button container
                 $btn.closest('.yolo-ys-load-more-container').fadeOut(300);
