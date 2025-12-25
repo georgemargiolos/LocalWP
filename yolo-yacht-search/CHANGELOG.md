@@ -1,5 +1,15 @@
 # Changelog
 
+## [85.8] - 2025-12-25
+
+### Changed
+- **Pipe Separator Between Location & Airport** - Added `|` separator with spacing
+  - Format: `📍 Preveza Main Port | ✈️ 7km from PVK - Aktion Airport`
+  - Added `.yolo-ys-location-separator` class with gray color (#9ca3af)
+  - Updated yacht-card.php, yacht-details-v3.php, and JS file
+
+---
+
 ## [85.7] - 2025-12-25
 
 ### Fixed

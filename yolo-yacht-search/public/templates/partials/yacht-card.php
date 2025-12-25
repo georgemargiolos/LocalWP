@@ -81,7 +81,7 @@ $length_ft = $yacht->length ? round($yacht->length * 3.28084) : 0;
                 $airport_info = yolo_ys_get_nearest_airport($yacht->home_base);
                 if ($airport_info): 
                 ?>
-<span class="yolo-ys-airport-distance"><i class="fa-duotone fa-plane" style="color: #3b82f6;"></i> <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> - <?php echo esc_html($airport_info[0]); ?></span>
+<span class="yolo-ys-location-separator"> | </span><span class="yolo-ys-airport-distance"><i class="fa-duotone fa-plane" style="color: #3b82f6;"></i> <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> - <?php echo esc_html($airport_info[0]); ?></span>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

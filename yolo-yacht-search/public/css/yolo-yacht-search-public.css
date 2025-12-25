@@ -608,3 +608,11 @@
         font-size: 12px;
     }
 }
+
+
+/* v85.8: Pipe separator between location and airport */
+.yolo-ys-location-separator {
+    color: #9ca3af;
+    padding: 0 4px;
+    display: inline;
+}
