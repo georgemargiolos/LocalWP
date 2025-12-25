@@ -418,7 +418,9 @@ class YOLO_YS_Database {
                     
                     // Download image from Booking Manager CDN
                     $remote_url = $image['url'];
-                    $filename = basename(parse_url($remote_url, PHP_URL_PATH));
+                    // v86.2 FIX: Prefix filename with yacht_id to prevent collisions
+                    $original_filename = basename(parse_url($remote_url, PHP_URL_PATH));
+                    $filename = $yacht_id . '_' . $original_filename;
                     $local_path = $yolo_images_dir . '/' . $filename;
                     $local_url = $yolo_images_url . '/' . $filename;
                     
@@ -450,7 +452,9 @@ class YOLO_YS_Database {
                     $thumbnail_local_url = null;
                     if (!empty($image['thumbnailUrl'])) {
                         $thumb_remote_url = $image['thumbnailUrl'];
-                        $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+                        // v86.2 FIX: Prefix thumbnail filename with yacht_id
+                        $thumb_original = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+                        $thumb_filename = $yacht_id . '_thumb_' . $thumb_original;
                         $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
                         $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
                         
@@ -1094,7 +1098,9 @@ class YOLO_YS_Database {
         }
         
         $remote_url = $image['url'];
-        $filename = basename(parse_url($remote_url, PHP_URL_PATH));
+        // v86.2 FIX: Prefix filename with yacht_id to prevent collisions
+        $original_filename = basename(parse_url($remote_url, PHP_URL_PATH));
+        $filename = $yacht_id . '_' . $original_filename;
         $local_path = $yolo_images_dir . '/' . $filename;
         $local_url = $yolo_images_url . '/' . $filename;
         
@@ -1124,7 +1130,9 @@ class YOLO_YS_Database {
         $thumbnail_local_url = null;
         if (!empty($image['thumbnailUrl'])) {
             $thumb_remote_url = $image['thumbnailUrl'];
-            $thumb_filename = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+            // v86.2 FIX: Prefix thumbnail filename with yacht_id
+            $thumb_original = basename(parse_url($thumb_remote_url, PHP_URL_PATH));
+            $thumb_filename = $yacht_id . '_thumb_' . $thumb_original;
             $thumb_local_path = $yolo_images_dir . '/' . $thumb_filename;
             $thumbnail_local_url = $yolo_images_url . '/' . $thumb_filename;
             

@@ -39,10 +39,31 @@ $companies[$yolo_company_id] = array(
     'is_yolo' => true
 );
 
-// Add friend companies with names from API cache or database
+// Add friend companies with names from API cache or hardcoded fallback
 $company_names = get_option('yolo_ys_company_names_cache', array());
+
+// Hardcoded company name mapping as fallback (same as sync dashboard)
+$hardcoded_company_names = array(
+    '7850' => 'YOLO Charters',
+    '4366' => 'Albatros Yachting',
+    '3604' => 'Kiriacoulis Mediterranean',
+    '6711' => 'Seafarer Cruising & Sailing',
+    '2934' => 'Sail Greece',
+    '2971' => 'Ionion Sails',
+    '3502' => 'Kavas Yachting',
+    '4438' => 'Istion Yachting',
+    '7348' => 'Sunsail'
+);
+
 foreach ($friend_company_ids as $company_id) {
-    $company_name = isset($company_names[$company_id]) ? $company_names[$company_id] : "Company $company_id";
+    // Try cached name first, then hardcoded fallback
+    if (isset($company_names[$company_id])) {
+        $company_name = $company_names[$company_id];
+    } elseif (isset($hardcoded_company_names[$company_id])) {
+        $company_name = $hardcoded_company_names[$company_id];
+    } else {
+        $company_name = "Company $company_id";
+    }
     $companies[$company_id] = array(
         'id' => $company_id,
         'name' => $company_name,

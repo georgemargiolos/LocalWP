@@ -461,7 +461,7 @@ class YOLO_YS_Sync {
     
     /**
      * Get sync status
-     * v81.11: Fixed timezone handling for "X ago" display
+     * v86.2: Fixed timezone handling - times stored via current_time('mysql') are already in WP timezone
      */
     public function get_sync_status() {
         $stats = $this->db->get_sync_stats();
@@ -471,10 +471,10 @@ class YOLO_YS_Sync {
         // Get current time in WordPress timezone
         $now = current_time('timestamp');
         
-        // Convert stored times to timestamps in WordPress timezone
         // Times are stored via current_time('mysql') which is already in WP timezone
-        $last_sync_ts = $last_sync ? strtotime($last_sync . ' ' . wp_timezone_string()) : 0;
-        $last_offer_sync_ts = $last_offer_sync ? strtotime($last_offer_sync . ' ' . wp_timezone_string()) : 0;
+        // Just convert to timestamp without adding timezone again
+        $last_sync_ts = $last_sync ? strtotime($last_sync) : 0;
+        $last_offer_sync_ts = $last_offer_sync ? strtotime($last_offer_sync) : 0;
         
         return array(
             'total_yachts' => $stats['total_yachts'],
