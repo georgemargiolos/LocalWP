@@ -583,14 +583,14 @@
         // Try exact match first
         if (airportMap[baseLower]) {
             const [name, code, km] = airportMap[baseLower];
-            return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code} (${name})</span>`;
+            return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code} - ${name}</span>`;
         }
         
         // Try partial match
         for (const [searchTerm, airportInfo] of Object.entries(airportMap)) {
             if (baseLower.includes(searchTerm)) {
                 const [name, code, km] = airportInfo;
-                return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code} (${name})</span>`;
+                return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code} - ${name}</span>`;
             }
         }
         
