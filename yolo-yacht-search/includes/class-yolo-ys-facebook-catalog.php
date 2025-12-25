@@ -251,9 +251,10 @@ class YOLO_YS_Facebook_Catalog {
         // v86.9: Build company IDs directly into query (simpler, more reliable)
         $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
-        // v87.1: Use LEFT JOIN with COALESCE (same as get_stats which works)
+        // v87.2: Use LEFT JOIN with COALESCE (same as get_stats which works)
+        // CAST y.id AS CHAR to ensure yacht_id is string for image lookup
         $sql = "SELECT 
-                y.id as yacht_id,
+                CAST(y.id AS CHAR) as yacht_id,
                 y.model,
                 y.slug,
                 y.description,
@@ -276,16 +277,21 @@ class YOLO_YS_Facebook_Catalog {
     
     /**
      * Get images for a yacht
+     * v87.2: Ensure yacht_id is string for consistent matching
      * 
-     * @param string $yacht_id The yacht ID
+     * @param mixed $yacht_id The yacht ID (will be cast to string)
      * @return array Array of image URLs
      */
     public function get_yacht_images($yacht_id) {
         global $wpdb;
         
+        // v87.2: Ensure yacht_id is string for consistent matching
+        $yacht_id = (string) $yacht_id;
+        
         $images_table = $wpdb->prefix . 'yolo_yacht_images';
         $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
         $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
         
         // First check if yacht uses custom media
         $use_custom = $wpdb->get_var($wpdb->prepare(
@@ -310,6 +316,17 @@ class YOLO_YS_Facebook_Catalog {
             "SELECT image_url FROM {$images_table} WHERE yacht_id = %s ORDER BY sort_order ASC LIMIT 11",
             $yacht_id
         ));
+        
+        // v87.2: If no images in images table, check main image in yachts table
+        if (empty($api_images)) {
+            $main_image = $wpdb->get_var($wpdb->prepare(
+                "SELECT image_url FROM {$yachts_table} WHERE CAST(id AS CHAR) = %s AND image_url IS NOT NULL AND image_url != ''",
+                $yacht_id
+            ));
+            if ($main_image) {
+                return array($main_image);
+            }
+        }
         
         return $api_images ?: array();
     }
