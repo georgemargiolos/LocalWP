@@ -94,7 +94,7 @@ class YOLO_YS_Public {
         global $post;
         if (is_a($post, 'WP_Post')) {
             // Search results page CSS
-            if (has_shortcode($post->post_content, 'yolo_yacht_search')) {
+            if (has_shortcode($post->post_content, 'yolo_search_results')) {
                 wp_enqueue_style(
                     'yolo-ys-search-results',
                     YOLO_YS_PLUGIN_URL . 'public/css/search-results.css',
