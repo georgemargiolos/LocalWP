@@ -109,6 +109,15 @@ class YOLO_YS_Progressive_Sync {
      * @return array Initial state with yacht queue
      */
     public function init_yacht_sync() {
+        // v86.6: Race condition protection - check if sync already running
+        $existing_state = get_option(self::STATE_OPTION, null);
+        if ($existing_state && isset($existing_state['status']) && $existing_state['status'] === 'running') {
+            return array(
+                'success' => false,
+                'message' => 'A sync is already in progress. Please wait for it to complete or cancel it first.'
+            );
+        }
+        
         $companies = $this->get_all_company_ids();
         $yacht_queue = array();
         $company_stats = array();
@@ -648,6 +657,15 @@ class YOLO_YS_Progressive_Sync {
      * @return array Initial state
      */
     public function init_price_sync($year = null) {
+        // v86.6: Race condition protection - check if sync already running
+        $existing_state = get_option(self::PRICE_STATE_OPTION, null);
+        if ($existing_state && isset($existing_state['status']) && $existing_state['status'] === 'running') {
+            return array(
+                'success' => false,
+                'message' => 'A price sync is already in progress. Please wait for it to complete or cancel it first.'
+            );
+        }
+        
         if ($year === null) {
             $year = (int) date('Y') + 1;
         }

@@ -36,8 +36,8 @@ class YOLO_YS_Facebook_Catalog {
         }
         
         // Combine: YOLO + Partners for catalog
-        // v86.5 FIX: Keep as strings to match database column type
-        $this->catalog_company_ids = array_unique(array_merge(array(strval($yolo_company)), array_map('strval', $partners)));
+        // v86.6: Use integers - MySQL handles bigint comparison correctly
+        $this->catalog_company_ids = array_unique(array_merge(array($yolo_company), $partners));
     }
     
     /**
@@ -165,8 +165,8 @@ class YOLO_YS_Facebook_Catalog {
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
         // Get all catalog yachts (YOLO + Partners) with their minimum prices from offers
-        // v86.5 FIX: Use %s for string company_ids
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
+        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -254,8 +254,8 @@ class YOLO_YS_Facebook_Catalog {
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         $images_table = $wpdb->prefix . 'yolo_yacht_images';
         
-        // v86.5 FIX: Use %s for string company_ids
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
+        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -469,8 +469,8 @@ class YOLO_YS_Facebook_Catalog {
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        // v86.5 FIX: Use %s for string company_ids
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
+        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         // Total catalog boats (YOLO + Partners)
         $total = $wpdb->get_var($wpdb->prepare(

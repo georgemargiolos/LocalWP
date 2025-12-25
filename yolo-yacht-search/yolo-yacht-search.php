@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 86.5
+ * Version: 86.6
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '86.5');
+define('YOLO_YS_VERSION', '86.6');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -268,6 +268,19 @@ function yolo_ys_fb_catalog_query_vars($vars) {
 add_action('template_redirect', 'yolo_ys_fb_catalog_template_redirect');
 function yolo_ys_fb_catalog_template_redirect() {
     if (get_query_var('yolo_fb_catalog')) {
+        // v86.6: Basic rate limiting - max 10 requests per minute per IP
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : 'unknown';
+        $transient_key = 'yolo_fb_rate_' . md5($ip);
+        $request_count = (int) get_transient($transient_key);
+        
+        if ($request_count >= 10) {
+            status_header(429);
+            echo 'Rate limit exceeded. Please try again later.';
+            exit;
+        }
+        
+        set_transient($transient_key, $request_count + 1, 60); // 60 seconds
+        
         if (class_exists('YOLO_YS_Facebook_Catalog')) {
             $catalog = new YOLO_YS_Facebook_Catalog();
             $catalog->output_feed();
