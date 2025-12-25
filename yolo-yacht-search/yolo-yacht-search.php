@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 86.0
+ * Version: 86.1
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '86.0');
+define('YOLO_YS_VERSION', '86.1');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -144,6 +144,9 @@ require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-auto-sync.php';
 // Load progressive sync system (v81.0)
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-progressive-sync.php';
 
+// Load Facebook catalog feed (v86.1)
+require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-facebook-catalog.php';
+
 // Load CRM system (v71.0)
 require_once YOLO_YS_PLUGIN_DIR . 'includes/class-yolo-ys-crm.php';
 
@@ -243,6 +246,32 @@ function run_yolo_yacht_search() {
 }
 
 run_yolo_yacht_search();
+
+/**
+ * Facebook Catalog Feed Endpoint
+ * @since 86.1
+ */
+add_action('init', 'yolo_ys_register_fb_catalog_endpoint');
+function yolo_ys_register_fb_catalog_endpoint() {
+    add_rewrite_rule('^facebook-catalog-feed/?$', 'index.php?yolo_fb_catalog=1', 'top');
+}
+
+add_filter('query_vars', 'yolo_ys_fb_catalog_query_vars');
+function yolo_ys_fb_catalog_query_vars($vars) {
+    $vars[] = 'yolo_fb_catalog';
+    return $vars;
+}
+
+add_action('template_redirect', 'yolo_ys_fb_catalog_template_redirect');
+function yolo_ys_fb_catalog_template_redirect() {
+    if (get_query_var('yolo_fb_catalog')) {
+        if (class_exists('YOLO_YS_Facebook_Catalog')) {
+            $catalog = new YOLO_YS_Facebook_Catalog();
+            $catalog->output_feed();
+        }
+        exit;
+    }
+}
 
 // Initialize CRM singleton to register hooks (v71.2 fix)
 add_action('init', function() {

@@ -940,7 +940,9 @@ class YOLO_YS_Admin {
     
     /**
      * AJAX: Copy synced images to custom media
+     * v86.1: Downloads images locally to WordPress media library instead of copying external URLs
      * @since 65.15
+     * @updated 86.1
      */
     public function ajax_copy_synced_images() {
         check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
@@ -958,6 +960,14 @@ class YOLO_YS_Admin {
         global $wpdb;
         $images_table = $wpdb->prefix . 'yolo_yacht_images';
         $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Get yacht name for file naming
+        $yacht = $wpdb->get_row($wpdb->prepare(
+            "SELECT name FROM {$yachts_table} WHERE id = %s",
+            $yacht_id
+        ));
+        $yacht_name = $yacht ? sanitize_title($yacht->name) : 'yacht';
         
         // Get synced images
         $synced_images = $wpdb->get_results($wpdb->prepare(
@@ -972,16 +982,70 @@ class YOLO_YS_Admin {
         // Clear existing custom media for this yacht
         $wpdb->delete($custom_media_table, array('yacht_id' => $yacht_id), array('%s'));
         
-        // Copy synced images to custom media
+        // Require WordPress media functions
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        
+        // Copy synced images to custom media - download locally
         $sort_order = 0;
+        $copied_count = 0;
+        $failed_count = 0;
+        
         foreach ($synced_images as $image) {
+            $image_url = $image->image_url;
+            $local_url = $image_url; // Fallback to original URL if download fails
+            $thumbnail_url = $image->thumbnail_url;
+            
+            // Try to download the image to WordPress media library
+            if (!empty($image_url)) {
+                $tmp_file = download_url($image_url, 30); // 30 second timeout
+                
+                if (!is_wp_error($tmp_file)) {
+                    // Get file extension from URL or default to jpg
+                    $path_info = pathinfo(parse_url($image_url, PHP_URL_PATH));
+                    $extension = isset($path_info['extension']) ? $path_info['extension'] : 'jpg';
+                    // Clean extension (remove query strings)
+                    $extension = preg_replace('/[^a-zA-Z0-9]/', '', $extension);
+                    if (empty($extension) || strlen($extension) > 4) {
+                        $extension = 'jpg';
+                    }
+                    
+                    $file_array = array(
+                        'name' => $yacht_name . '-' . ($sort_order + 1) . '.' . $extension,
+                        'tmp_name' => $tmp_file
+                    );
+                    
+                    // Upload to WordPress media library
+                    $attachment_id = media_handle_sideload($file_array, 0, $yacht_name . ' Image ' . ($sort_order + 1));
+                    
+                    if (!is_wp_error($attachment_id)) {
+                        // Get the local URL
+                        $local_url = wp_get_attachment_url($attachment_id);
+                        // Get thumbnail URL (medium size)
+                        $thumbnail_data = wp_get_attachment_image_src($attachment_id, 'medium');
+                        if ($thumbnail_data) {
+                            $thumbnail_url = $thumbnail_data[0];
+                        }
+                        $copied_count++;
+                    } else {
+                        $failed_count++;
+                        // Clean up temp file on error
+                        @unlink($tmp_file);
+                    }
+                } else {
+                    $failed_count++;
+                }
+            }
+            
+            // Insert into custom media table
             $wpdb->insert(
                 $custom_media_table,
                 array(
                     'yacht_id' => $yacht_id,
                     'media_type' => 'image',
-                    'media_url' => $image->image_url,
-                    'thumbnail_url' => $image->thumbnail_url,
+                    'media_url' => $local_url,
+                    'thumbnail_url' => $thumbnail_url,
                     'title' => null,
                     'sort_order' => $sort_order++
                 ),
@@ -995,8 +1059,13 @@ class YOLO_YS_Admin {
             $yacht_id
         ));
         
+        $message = $copied_count . ' images downloaded locally';
+        if ($failed_count > 0) {
+            $message .= ' (' . $failed_count . ' failed, using original URLs)';
+        }
+        
         wp_send_json_success(array(
-            'message' => count($synced_images) . ' images copied',
+            'message' => $message,
             'media' => $custom_media
         ));
     }

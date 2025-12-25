@@ -1,5 +1,33 @@
 # Changelog
 
+## [86.1] - 2025-12-25
+
+### Added
+- **Facebook Product Catalog Feed** - Auto-generates CSV feed for Facebook Business Manager
+  - Partner boat prices auto-calculated from minimum weekly offer price
+  - Updates automatically after each Offers Sync
+  - Feed URL: `/facebook-catalog-feed/`
+  - Backoffice section shows stats and feed URL
+  - Smart brand extraction from yacht model (e.g., "Oceanis 46.1" → "Beneteau")
+  - Boat type detection (Sailboat vs Catamaran)
+  - Only partner boats included (excludes YOLO fleet)
+
+### Fixed
+- **Copy Synced Images - Local Download** - Now downloads images to WordPress media library instead of copying external URLs
+  - **Problem:** Booking Manager image URLs are temporary/signed and expire after some time
+  - **Solution:** When clicking "Copy Synced Images to Custom Media", images are now downloaded locally
+  - Images are saved to WordPress uploads with yacht name (e.g., `strawberry-1.jpg`, `strawberry-2.jpg`)
+  - Thumbnails are generated automatically by WordPress
+  - Custom media images are now permanent and won't break when API URLs expire
+  - Fallback: If download fails, original URL is used as fallback
+
+- **Delete Custom Media Bug** - Fixed nonce mismatch preventing deletion of custom media items
+  - **Bug:** JavaScript created nonce `yolo_yacht_customization` but PHP expected `yolo_yacht_customization_nonce`
+  - **Fix:** Changed JavaScript to use correct nonce name
+  - Delete buttons now work correctly for custom media items
+
+---
+
 ## [86.0] - 2025-12-25
 
 ### Fixed

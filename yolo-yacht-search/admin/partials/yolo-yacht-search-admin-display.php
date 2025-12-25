@@ -344,6 +344,47 @@ $sync_status = $sync->get_sync_status();
         </p>
     </div>
     
+    <!-- Facebook Catalog Feed (v86.1) -->
+    <div class="yolo-ys-fb-catalog-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #1877f2; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #1877f2;">📘 Facebook Product Catalog</h2>
+        
+        <?php
+        $fb_catalog = new YOLO_YS_Facebook_Catalog();
+        $fb_stats = $fb_catalog->get_stats();
+        ?>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; font-weight: 700; color: #1877f2;"><?php echo $fb_stats['boats_with_prices']; ?></div>
+                <div style="color: #6b7280; font-size: 14px;">Partner Boats in Catalog</div>
+            </div>
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
+                <div style="font-size: 24px; font-weight: 700; color: #1877f2;"><?php echo $fb_stats['total_partner_boats']; ?></div>
+                <div style="color: #6b7280; font-size: 14px;">Total Partner Boats</div>
+            </div>
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
+                <div style="font-size: 16px; font-weight: 600; color: #374151;"><?php echo $fb_stats['last_update']; ?></div>
+                <div style="color: #6b7280; font-size: 14px;">Last Catalog Update</div>
+            </div>
+        </div>
+        
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <strong>Feed URL:</strong>
+            <code style="background: white; padding: 5px 10px; border-radius: 4px; margin-left: 10px; font-size: 13px;">
+                <?php echo esc_html($fb_catalog->get_feed_url()); ?>
+            </code>
+            <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js($fb_catalog->get_feed_url()); ?>'); alert('Copied!');" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">📋 Copy</button>
+        </div>
+        
+        <p style="color: #6b7280; font-size: 13px; margin: 0;">
+            <strong>How it works:</strong><br>
+            • Partner boat prices are auto-calculated from Weekly Offers (minimum price)<br>
+            • Catalog updates automatically after each Offers Sync<br>
+            • Use the feed URL in Facebook Business Manager → Commerce Manager → Catalogs<br>
+            • Only partner boats are included (excludes YOLO fleet)
+        </p>
+    </div>
+    
     <!-- Shortcodes Info -->
     <div class="yolo-ys-shortcodes-info" style="background: #dbeafe; padding: 20px; margin: 20px 0; border-left: 4px solid #1e3a8a; border-radius: 4px;">
         <h3 style="margin-top: 0; color: #1e3a8a;">📋 Available Shortcodes</h3>

@@ -856,6 +856,13 @@ class YOLO_YS_Progressive_Sync {
         // v85.4 FIX: Use correct option key (was 'yolo_ys_last_offers_sync', display reads 'yolo_ys_last_offer_sync')
         update_option('yolo_ys_last_offer_sync', current_time('mysql'));
         
+        // v86.1: Update Facebook catalog partner prices after offers sync
+        if (class_exists('YOLO_YS_Facebook_Catalog')) {
+            $fb_catalog = new YOLO_YS_Facebook_Catalog();
+            $updated = $fb_catalog->update_partner_starting_prices();
+            error_log("YOLO Progressive Sync: Updated {$updated} partner starting prices for Facebook catalog");
+        }
+        
         // Save final state
         update_option(self::STATE_OPTION, $state, false);
         

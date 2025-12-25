@@ -398,7 +398,7 @@ foreach ($companies as $company_id => $company) {
 jQuery(document).ready(function($) {
     var yachtId = '<?php echo esc_js($selected_yacht_id); ?>';
     var ajaxUrl = '<?php echo admin_url('admin-ajax.php'); ?>';
-    var nonce = '<?php echo wp_create_nonce('yolo_yacht_customization'); ?>';
+    var nonce = '<?php echo wp_create_nonce('yolo_yacht_customization_nonce'); ?>';
     
     // Toggle custom media section
     $('#use_custom_media').on('change', function() {
