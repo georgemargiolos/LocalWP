@@ -178,3 +178,369 @@ function yolo_ys_ajax_search_yachts() {
 // Register AJAX handlers
 add_action('wp_ajax_yolo_ys_search_yachts', 'yolo_ys_ajax_search_yachts');
 add_action('wp_ajax_nopriv_yolo_ys_search_yachts', 'yolo_ys_ajax_search_yachts');
+
+
+/**
+ * AJAX handler for filtered yacht search with pagination (v81.17)
+ * 
+ * Features:
+ * - Server-side filtering (cabins, length, year, location, equipment)
+ * - Server-side sorting (price, year, length)
+ * - Pagination with Load More
+ * - Featured Yachts (YOLO) shown separately without filters
+ */
+function yolo_ys_ajax_search_yachts_filtered() {
+    global $wpdb;
+    
+    // Get search parameters
+    $date_from = isset($_POST['dateFrom']) ? sanitize_text_field($_POST['dateFrom']) : '';
+    $date_to = isset($_POST['dateTo']) ? sanitize_text_field($_POST['dateTo']) : '';
+    $kind = isset($_POST['kind']) ? sanitize_text_field($_POST['kind']) : '';
+    
+    // Get filter parameters
+    $cabins = isset($_POST['cabins']) ? intval($_POST['cabins']) : 0;
+    $length = isset($_POST['length']) ? floatval($_POST['length']) : 0;
+    $year = isset($_POST['year']) ? intval($_POST['year']) : 0;
+    $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+    $equipment = isset($_POST['equipment']) ? json_decode(stripslashes($_POST['equipment']), true) : array();
+    
+    // Get sort parameter
+    $sort = isset($_POST['sort']) ? sanitize_text_field($_POST['sort']) : 'price_asc';
+    
+    // Get pagination parameters
+    $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+    $per_page = 15;
+    $offset = ($page - 1) * $per_page;
+    
+    // Check required fields
+    if (empty($date_from) || empty($date_to)) {
+        wp_send_json_error(array('message' => 'Missing required date parameters'));
+        return;
+    }
+    
+    // Get company IDs
+    $my_company_id = (int) get_option('yolo_ys_my_company_id', '7850');
+    
+    // Extract dates
+    $search_date_from = substr($date_from, 0, 10);
+    $search_date_to = substr($date_to, 0, 10);
+    
+    // Table names
+    $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
+    $yachts_table = $wpdb->prefix . 'yolo_yachts';
+    $images_table = $wpdb->prefix . 'yolo_yacht_images';
+    $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
+    
+    // Get yacht details page URL
+    $details_page_id = get_option('yolo_ys_yacht_details_page', 0);
+    $details_page_url = $details_page_id ? get_permalink($details_page_id) : home_url('/yacht-details/');
+    
+    // ========================================
+    // QUERY 1: Featured Yachts (YOLO) - No filters
+    // ========================================
+    $featured_sql = "SELECT DISTINCT 
+                y.id as yacht_id,
+                y.name as yacht,
+                y.model,
+                y.slug,
+                y.company_id,
+                y.home_base as startBase,
+                y.home_base_id,
+                y.length,
+                y.cabins,
+                y.wc,
+                y.berths,
+                y.year_of_build,
+                y.refit_year,
+                p.date_from,
+                p.date_to,
+                p.price,
+                p.start_price,
+                p.currency,
+                p.discount_percentage as discount,
+                'Bareboat' as product,
+                (SELECT image_url FROM {$images_table} img WHERE img.yacht_id = y.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as image_url
+            FROM {$yachts_table} y
+            INNER JOIN {$prices_table} p ON y.id = p.yacht_id
+            WHERE p.date_from >= %s 
+            AND p.date_from <= %s
+            AND y.company_id = %d
+            AND (y.status = 'active' OR y.status IS NULL)";
+    
+    $featured_params = array($search_date_from, $search_date_to, $my_company_id);
+    
+    // Filter by boat type if specified
+    if (!empty($kind)) {
+        $type_map = array(
+            'Sailing yacht' => 'Sail boat',
+            'Catamaran' => 'Catamaran'
+        );
+        $db_type = isset($type_map[$kind]) ? $type_map[$kind] : $kind;
+        $featured_sql .= " AND y.type = %s";
+        $featured_params[] = $db_type;
+    }
+    
+    $featured_sql .= " ORDER BY p.price ASC";
+    
+    $featured_results = $wpdb->get_results($wpdb->prepare($featured_sql, $featured_params));
+    
+    // ========================================
+    // QUERY 2: Partner Yachts - With filters
+    // ========================================
+    $partner_sql = "SELECT DISTINCT 
+                y.id as yacht_id,
+                y.name as yacht,
+                y.model,
+                y.slug,
+                y.company_id,
+                y.home_base as startBase,
+                y.home_base_id,
+                y.length,
+                y.cabins,
+                y.wc,
+                y.berths,
+                y.year_of_build,
+                y.refit_year,
+                p.date_from,
+                p.date_to,
+                p.price,
+                p.start_price,
+                p.currency,
+                p.discount_percentage as discount,
+                'Bareboat' as product,
+                (SELECT image_url FROM {$images_table} img WHERE img.yacht_id = y.id ORDER BY is_primary DESC, sort_order ASC LIMIT 1) as image_url
+            FROM {$yachts_table} y
+            INNER JOIN {$prices_table} p ON y.id = p.yacht_id
+            WHERE p.date_from >= %s 
+            AND p.date_from <= %s
+            AND y.company_id != %d
+            AND (y.status = 'active' OR y.status IS NULL)";
+    
+    $partner_params = array($search_date_from, $search_date_to, $my_company_id);
+    
+    // Filter by boat type if specified
+    if (!empty($kind)) {
+        $partner_sql .= " AND y.type = %s";
+        $partner_params[] = $db_type;
+    }
+    
+    // Filter by cabins
+    if ($cabins > 0) {
+        $partner_sql .= " AND y.cabins >= %d";
+        $partner_params[] = $cabins;
+    }
+    
+    // Filter by length
+    if ($length > 0) {
+        $partner_sql .= " AND y.length >= %f";
+        $partner_params[] = $length;
+    }
+    
+    // Filter by year
+    if ($year > 0) {
+        $partner_sql .= " AND y.year_of_build >= %d";
+        $partner_params[] = $year;
+    }
+    
+    // Filter by location (using base IDs mapping)
+    if (!empty($location) && defined('YOLO_YS_LOCATION_BASE_IDS')) {
+        $location_base_ids = YOLO_YS_LOCATION_BASE_IDS;
+        if (isset($location_base_ids[$location])) {
+            $base_ids = $location_base_ids[$location];
+            $placeholders = implode(',', array_fill(0, count($base_ids), '%s'));
+            $partner_sql .= " AND y.home_base_id IN ($placeholders)";
+            foreach ($base_ids as $base_id) {
+                $partner_params[] = $base_id;
+            }
+        }
+    }
+    
+    // Filter by equipment (yacht must have ALL selected equipment)
+    if (!empty($equipment) && is_array($equipment)) {
+        foreach ($equipment as $equip_id) {
+            $equip_id = intval($equip_id);
+            if ($equip_id > 0) {
+                $partner_sql .= " AND EXISTS (SELECT 1 FROM {$equipment_table} e WHERE e.yacht_id = y.id AND e.equipment_id = %d)";
+                $partner_params[] = $equip_id;
+            }
+        }
+    }
+    
+    // Get total count before pagination
+    $count_sql = str_replace("SELECT DISTINCT", "SELECT COUNT(DISTINCT y.id) as total FROM (SELECT DISTINCT", $partner_sql);
+    $count_sql = preg_replace('/SELECT DISTINCT.*?FROM/s', 'SELECT COUNT(DISTINCT y.id) as total FROM', $partner_sql);
+    
+    // Simpler approach: wrap the query
+    $count_sql = "SELECT COUNT(*) FROM (SELECT DISTINCT y.id FROM {$yachts_table} y
+            INNER JOIN {$prices_table} p ON y.id = p.yacht_id
+            WHERE p.date_from >= %s 
+            AND p.date_from <= %s
+            AND y.company_id != %d
+            AND (y.status = 'active' OR y.status IS NULL)";
+    
+    $count_params = array($search_date_from, $search_date_to, $my_company_id);
+    
+    if (!empty($kind)) {
+        $count_sql .= " AND y.type = %s";
+        $count_params[] = $db_type;
+    }
+    if ($cabins > 0) {
+        $count_sql .= " AND y.cabins >= %d";
+        $count_params[] = $cabins;
+    }
+    if ($length > 0) {
+        $count_sql .= " AND y.length >= %f";
+        $count_params[] = $length;
+    }
+    if ($year > 0) {
+        $count_sql .= " AND y.year_of_build >= %d";
+        $count_params[] = $year;
+    }
+    if (!empty($location) && defined('YOLO_YS_LOCATION_BASE_IDS')) {
+        $location_base_ids = YOLO_YS_LOCATION_BASE_IDS;
+        if (isset($location_base_ids[$location])) {
+            $base_ids = $location_base_ids[$location];
+            $placeholders = implode(',', array_fill(0, count($base_ids), '%s'));
+            $count_sql .= " AND y.home_base_id IN ($placeholders)";
+            foreach ($base_ids as $base_id) {
+                $count_params[] = $base_id;
+            }
+        }
+    }
+    if (!empty($equipment) && is_array($equipment)) {
+        foreach ($equipment as $equip_id) {
+            $equip_id = intval($equip_id);
+            if ($equip_id > 0) {
+                $count_sql .= " AND EXISTS (SELECT 1 FROM {$equipment_table} e WHERE e.yacht_id = y.id AND e.equipment_id = %d)";
+                $count_params[] = $equip_id;
+            }
+        }
+    }
+    $count_sql .= ") as counted";
+    
+    $total_count = $wpdb->get_var($wpdb->prepare($count_sql, $count_params));
+    
+    // Add sorting
+    switch ($sort) {
+        case 'price_desc':
+            $partner_sql .= " ORDER BY p.price DESC";
+            break;
+        case 'year_desc':
+            $partner_sql .= " ORDER BY y.year_of_build DESC, p.price ASC";
+            break;
+        case 'length_desc':
+            $partner_sql .= " ORDER BY y.length DESC, p.price ASC";
+            break;
+        case 'cabins_desc':
+            $partner_sql .= " ORDER BY y.cabins DESC, p.price ASC";
+            break;
+        case 'price_asc':
+        default:
+            $partner_sql .= " ORDER BY p.price ASC";
+            break;
+    }
+    
+    // Add pagination
+    $partner_sql .= " LIMIT %d OFFSET %d";
+    $partner_params[] = $per_page;
+    $partner_params[] = $offset;
+    
+    $partner_results = $wpdb->get_results($wpdb->prepare($partner_sql, $partner_params));
+    
+    // ========================================
+    // Format results
+    // ========================================
+    $featured_boats = array();
+    $partner_boats = array();
+    
+    // Format featured boats
+    foreach ($featured_results as $row) {
+        $featured_boats[] = yolo_ys_format_boat_result($row, $details_page_url);
+    }
+    
+    // Format partner boats
+    foreach ($partner_results as $row) {
+        $partner_boats[] = yolo_ys_format_boat_result($row, $details_page_url);
+    }
+    
+    // Prepare response
+    $response = array(
+        'success' => true,
+        'featured_boats' => $featured_boats,
+        'partner_boats' => $partner_boats,
+        'total_count' => intval($total_count),
+        'page' => $page,
+        'per_page' => $per_page,
+        'total_pages' => ceil($total_count / $per_page),
+        'has_more' => ($page * $per_page) < $total_count
+    );
+    
+    wp_send_json($response);
+}
+
+/**
+ * Helper function to format boat result
+ */
+function yolo_ys_format_boat_result($row, $details_page_url) {
+    $primary_image = $row->image_url;
+    
+    // Fallback: Extract from raw_data if no image in database
+    if (empty($primary_image) && !empty($row->raw_data)) {
+        $raw_data = json_decode($row->raw_data, true);
+        if (!empty($raw_data['images'])) {
+            foreach ($raw_data['images'] as $img) {
+                if (!empty($img['primary']) && $img['primary']) {
+                    $primary_image = $img['url'];
+                    break;
+                }
+            }
+            if (empty($primary_image) && !empty($raw_data['images'][0]['url'])) {
+                $primary_image = $raw_data['images'][0]['url'];
+            }
+        }
+    }
+    
+    // Build details URL with search dates
+    $search_week_from = date('Y-m-d', strtotime($row->date_from));
+    $search_week_to   = date('Y-m-d', strtotime($row->date_to));
+    
+    if (!empty($row->slug)) {
+        $yacht_url = home_url('/yacht/' . $row->slug . '/');
+        $yacht_url = add_query_arg(array(
+            'dateFrom' => $search_week_from,
+            'dateTo'   => $search_week_to,
+        ), $yacht_url);
+    } else {
+        $yacht_url = add_query_arg(array(
+            'yacht_id' => $row->yacht_id,
+            'dateFrom' => $search_week_from,
+            'dateTo'   => $search_week_to,
+        ), $details_page_url);
+    }
+    
+    return array(
+        'yacht_id' => $row->yacht_id,
+        'yacht' => $row->yacht . ' ' . $row->model,
+        'product' => $row->product,
+        'startBase' => $row->startBase,
+        'home_base_id' => $row->home_base_id,
+        'price' => (float)$row->price,
+        'original_price' => $row->start_price,
+        'discount_percentage' => $row->discount,
+        'currency' => $row->currency,
+        'length' => $row->length,
+        'cabins' => $row->cabins,
+        'wc' => $row->wc,
+        'berths' => $row->berths,
+        'year_of_build' => $row->year_of_build,
+        'refit_year' => $row->refit_year,
+        'date_from' => $row->date_from,
+        'date_to' => $row->date_to,
+        'image_url' => $primary_image,
+        'details_url' => $yacht_url
+    );
+}
+
+// Register new AJAX handlers for filtered search
+add_action('wp_ajax_yolo_ys_search_yachts_filtered', 'yolo_ys_ajax_search_yachts_filtered');
+add_action('wp_ajax_nopriv_yolo_ys_search_yachts_filtered', 'yolo_ys_ajax_search_yachts_filtered');

@@ -5,8 +5,12 @@ if (!defined('ABSPATH')) {
 ?>
 <?php
 /**
- * Search Results Template
- * Uses the same yacht card component as "Our Yachts" page
+ * Search Results Template (v81.17)
+ * Features:
+ * - Server-side filtering with Apply Filters button
+ * - Featured Yachts section (YOLO boats, no filters)
+ * - Paginated results with Load More
+ * - Sort by price, year, length
  */
 ?>
 
@@ -43,6 +47,126 @@ if (!defined('ABSPATH')) {
         </form>
     </div>
     
+    <!-- Advanced Filters Section (v81.17) -->
+    <div class="yolo-ys-advanced-filters" id="yolo-ys-advanced-filters" style="display: none;">
+        <div class="filters-row">
+            <!-- Cabins Filter -->
+            <div class="filter-group">
+                <label for="filter-cabins"><?php _e('Cabins', 'yolo-yacht-search'); ?></label>
+                <select id="filter-cabins" class="yolo-filter">
+                    <option value=""><?php _e('Any', 'yolo-yacht-search'); ?></option>
+                    <option value="2">2+</option>
+                    <option value="3">3+</option>
+                    <option value="4">4+</option>
+                    <option value="5">5+</option>
+                    <option value="6">6+</option>
+                </select>
+            </div>
+            
+            <!-- Length Filter -->
+            <div class="filter-group">
+                <label for="filter-length"><?php _e('Length', 'yolo-yacht-search'); ?></label>
+                <select id="filter-length" class="yolo-filter">
+                    <option value=""><?php _e('Any', 'yolo-yacht-search'); ?></option>
+                    <option value="10">10m+</option>
+                    <option value="12">12m+</option>
+                    <option value="14">14m+</option>
+                    <option value="16">16m+</option>
+                    <option value="18">18m+</option>
+                </select>
+            </div>
+            
+            <!-- Year Filter -->
+            <div class="filter-group">
+                <label for="filter-year"><?php _e('Year Built', 'yolo-yacht-search'); ?></label>
+                <select id="filter-year" class="yolo-filter">
+                    <option value=""><?php _e('Any', 'yolo-yacht-search'); ?></option>
+                    <option value="2024">2024+</option>
+                    <option value="2022">2022+</option>
+                    <option value="2020">2020+</option>
+                    <option value="2018">2018+</option>
+                    <option value="2015">2015+</option>
+                </select>
+            </div>
+            
+            <!-- Location Filter -->
+            <div class="filter-group">
+                <label for="filter-location"><?php _e('Yacht Location', 'yolo-yacht-search'); ?></label>
+                <select id="filter-location" class="yolo-filter">
+                    <option value=""><?php _e('Any Location', 'yolo-yacht-search'); ?></option>
+                    <option value="Lefkada">Lefkada</option>
+                    <option value="Corfu">Corfu</option>
+                    <option value="Kefalonia">Kefalonia</option>
+                    <option value="Zakynthos">Zakynthos</option>
+                    <option value="Ithaca">Ithaca</option>
+                    <option value="Preveza">Preveza</option>
+                    <option value="Syvota">Syvota</option>
+                    <option value="Vonitsa">Vonitsa</option>
+                    <option value="Palairos">Palairos</option>
+                    <option value="Plataria">Plataria</option>
+                    <option value="Astakos">Astakos</option>
+                    <option value="Paxos">Paxos</option>
+                </select>
+            </div>
+            
+            <!-- Equipment Filter (Multi-select) -->
+            <div class="filter-group filter-equipment">
+                <label for="filter-equipment"><?php _e('Equipment', 'yolo-yacht-search'); ?></label>
+                <div class="equipment-dropdown">
+                    <button type="button" class="equipment-dropdown-toggle" id="equipment-dropdown-toggle">
+                        <span id="equipment-selected-text"><?php _e('Select Equipment', 'yolo-yacht-search'); ?></span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="equipment-dropdown-menu" id="equipment-dropdown-menu">
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="46"> <?php _e('Solar Panels', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="7"> <?php _e('Bimini', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="1"> <?php _e('Generator', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="2"> <?php _e('Air Conditioning', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="3"> <?php _e('Bow Thruster', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="4"> <?php _e('Electric Winch', 'yolo-yacht-search'); ?>
+                        </label>
+                        <label class="equipment-checkbox">
+                            <input type="checkbox" name="equipment[]" value="5"> <?php _e('Watermaker', 'yolo-yacht-search'); ?>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sort By -->
+            <div class="filter-group">
+                <label for="filter-sort"><?php _e('Sort By', 'yolo-yacht-search'); ?></label>
+                <select id="filter-sort" class="yolo-filter">
+                    <option value="price_asc"><?php _e('Price: Low to High', 'yolo-yacht-search'); ?></option>
+                    <option value="price_desc"><?php _e('Price: High to Low', 'yolo-yacht-search'); ?></option>
+                    <option value="year_desc"><?php _e('Year: Newest First', 'yolo-yacht-search'); ?></option>
+                    <option value="length_desc"><?php _e('Length: Longest First', 'yolo-yacht-search'); ?></option>
+                    <option value="cabins_desc"><?php _e('Cabins: Most First', 'yolo-yacht-search'); ?></option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Filter Actions -->
+        <div class="filter-actions">
+            <button type="button" id="apply-filters" class="btn-apply-filters">
+                <i class="fa-solid fa-search"></i> <?php _e('Apply Filters', 'yolo-yacht-search'); ?>
+            </button>
+            <button type="button" id="clear-filters" class="btn-clear-filters">
+                <i class="fa-solid fa-times"></i> <?php _e('Clear All', 'yolo-yacht-search'); ?>
+            </button>
+        </div>
+    </div>
+    
     <!-- Results will be loaded here via JavaScript -->
     <div id="yolo-ys-results-container">
         
@@ -52,8 +176,38 @@ if (!defined('ABSPATH')) {
             <p><?php _e('Use the search form to find available yachts for your charter.', 'yolo-yacht-search'); ?></p>
         </div>
         
+        <!-- Featured Yachts Section (YOLO boats) -->
+        <div class="yolo-ys-featured-section" id="yolo-ys-featured-section" style="display: none;">
+            <h2 class="section-title"><i class="fa-solid fa-star"></i> <?php _e('Featured Yachts', 'yolo-yacht-search'); ?></h2>
+            <div class="row" id="yolo-ys-featured-boats">
+                <!-- Featured boats loaded via JS -->
+            </div>
+        </div>
+        
+        <!-- Results Count -->
+        <div class="yolo-ys-results-count" id="yolo-ys-results-count" style="display: none;">
+            <span id="results-count-text"></span>
+        </div>
+        
+        <!-- Partner Boats Grid -->
+        <div class="row" id="yolo-ys-partner-boats">
+            <!-- Partner boats loaded via JS -->
+        </div>
+        
+        <!-- Load More Button -->
+        <div class="yolo-ys-load-more" id="yolo-ys-load-more" style="display: none;">
+            <button type="button" id="load-more-btn" class="btn-load-more">
+                <span id="load-more-text"><?php _e('Load More', 'yolo-yacht-search'); ?></span>
+                <span id="load-more-remaining"></span>
+            </button>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div class="yolo-ys-loading" id="yolo-ys-loading" style="display: none;">
+            <div class="spinner"></div>
+            <p><?php _e('Loading results...', 'yolo-yacht-search'); ?></p>
+        </div>
+        
     </div>
     </div><!-- .container-fluid -->
 </div>
-
-<!-- Templates removed - JavaScript builds HTML directly without Handlebars -->

@@ -1,11 +1,21 @@
 (function($) {
     'use strict';
     
+    // v81.17: Server-side filtering state
+    let currentSearchParams = {
+        dateFrom: '',
+        dateTo: '',
+        kind: ''
+    };
+    let currentPage = 1;
+    let isLoading = false;
+    
     // Initialize when document is ready
     $(document).ready(function() {
         initLitepicker();
         initSearchForm();
         initResultsSearchForm();
+        initFilters();
         checkForSearchParams();
     });
     
@@ -38,9 +48,6 @@
             minDate: new Date(),
             numberOfColumns: 2,
             numberOfMonths: 2,
-            // Don't auto-populate dates - show placeholder instead
-            // startDate: firstSaturday,
-            // endDate: nextSaturday,
             disallowLockDaysInRange: true,
             position: 'top',
             tooltipNumber: (totalDays) => {
@@ -53,8 +60,6 @@
             lockDaysFilter: (date) => {
                 let today = new Date();
                 let saturday = date.getTime() > today.getTime() && date.getDay() === 6;
-                
-                // Only allow Saturdays (can be made configurable)
                 return !saturday;
             }
         });
@@ -123,6 +128,95 @@
     }
     
     /**
+     * Initialize filters (v81.17)
+     */
+    function initFilters() {
+        // Equipment dropdown toggle
+        $('#equipment-dropdown-toggle').on('click', function(e) {
+            e.stopPropagation();
+            $('#equipment-dropdown-menu').toggleClass('show');
+        });
+        
+        // Close equipment dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.filter-equipment').length) {
+                $('#equipment-dropdown-menu').removeClass('show');
+            }
+        });
+        
+        // Update equipment selected text
+        $('input[name="equipment[]"]').on('change', function() {
+            updateEquipmentText();
+        });
+        
+        // Apply Filters button
+        $('#apply-filters').on('click', function() {
+            currentPage = 1;
+            searchYachtsFiltered();
+        });
+        
+        // Clear Filters button
+        $('#clear-filters').on('click', function() {
+            clearFilters();
+        });
+        
+        // Load More button
+        $(document).on('click', '#load-more-btn', function() {
+            loadMoreResults();
+        });
+    }
+    
+    /**
+     * Update equipment dropdown text
+     */
+    function updateEquipmentText() {
+        const checked = $('input[name="equipment[]"]:checked');
+        if (checked.length === 0) {
+            $('#equipment-selected-text').text('Select Equipment');
+        } else if (checked.length === 1) {
+            $('#equipment-selected-text').text(checked.parent().text().trim());
+        } else {
+            $('#equipment-selected-text').text(checked.length + ' selected');
+        }
+    }
+    
+    /**
+     * Clear all filters
+     */
+    function clearFilters() {
+        $('#filter-cabins').val('');
+        $('#filter-length').val('');
+        $('#filter-year').val('');
+        $('#filter-location').val('');
+        $('#filter-sort').val('price_asc');
+        $('input[name="equipment[]"]').prop('checked', false);
+        updateEquipmentText();
+        
+        // Re-search with cleared filters
+        currentPage = 1;
+        searchYachtsFiltered();
+    }
+    
+    /**
+     * Get current filter values
+     */
+    function getFilterValues() {
+        const equipment = [];
+        $('input[name="equipment[]"]:checked').each(function() {
+            equipment.push($(this).val());
+        });
+        
+        return {
+            cabins: $('#filter-cabins').val() || 0,
+            length: $('#filter-length').val() || 0,
+            year: $('#filter-year').val() || 0,
+            location: $('#filter-location').val() || '',
+            equipment: equipment,
+            sort: $('#filter-sort').val() || 'price_asc'
+        };
+    }
+    
+    /**
      * Perform search
      */
     function performSearch() {
@@ -154,7 +248,9 @@
             window.location.href = url.toString();
         } else {
             // Search on same page
-            searchYachts(dateFrom, dateTo, kind);
+            currentSearchParams = { dateFrom, dateTo, kind };
+            currentPage = 1;
+            searchYachtsFiltered();
         }
     }
     
@@ -181,11 +277,15 @@
         const kind = urlParams.get('kind') || '';
         
         if (dateFrom && dateTo) {
+            // Store search params
+            currentSearchParams = { dateFrom, dateTo, kind };
+            
             // Pre-fill results search form
             prefillResultsSearchForm(dateFrom, dateTo, kind);
             
-            // Perform search
-            searchYachts(dateFrom, dateTo, kind);
+            // Perform filtered search
+            currentPage = 1;
+            searchYachtsFiltered();
         }
     }
     
@@ -193,17 +293,12 @@
      * Pre-fill results search form with current search params
      */
     function prefillResultsSearchForm(dateFrom, dateTo, kind) {
-        // Only proceed if the form exists
         const formElement = $('#yolo-ys-results-search-form');
         if (!formElement.length) return;
         
-        // Show the search form
         formElement.show();
-        
-        // Set boat type
         $('#yolo-ys-results-boat-type').val(kind);
         
-        // Set dates in picker (may not be initialized yet, that's OK)
         const picker = window.yoloResultsDatePicker;
         if (picker && dateFrom && dateTo) {
             try {
@@ -238,219 +333,181 @@
         const dateTo = formatDateForAPI(endDate);
         const kind = $('#yolo-ys-results-boat-type').val();
         
-        // Update URL and search
+        // Update URL
         const url = new URL(window.location.href);
         url.searchParams.set('dateFrom', dateFrom);
         url.searchParams.set('dateTo', dateTo);
         url.searchParams.set('kind', kind);
         window.history.pushState({}, '', url);
         
-        // Perform search
-        searchYachts(dateFrom, dateTo, kind);
+        // Store and search
+        currentSearchParams = { dateFrom, dateTo, kind };
+        currentPage = 1;
+        searchYachtsFiltered();
     }
     
     /**
-     * Search yachts via AJAX
+     * Search yachts with filters via AJAX (v81.17)
      */
-    function searchYachts(dateFrom, dateTo, kind) {
-        const resultsContainer = $('#yolo-ys-results-container');
-        if (!resultsContainer.length) return;
+    function searchYachtsFiltered() {
+        if (isLoading) return;
+        isLoading = true;
+        
+        const filters = getFilterValues();
         
         // Show loading
-        resultsContainer.html(`
-            <div class="yolo-ys-loading">
-                <div class="yolo-ys-loading-spinner"></div>
-                <p>Searching for available yachts...</p>
-            </div>
-        `);
+        showLoading();
         
         // AJAX request
         $.ajax({
             url: yoloYSData.ajax_url,
             type: 'POST',
             data: {
-                action: 'yolo_ys_search_yachts',
+                action: 'yolo_ys_search_yachts_filtered',
                 nonce: yoloYSData.nonce,
-                dateFrom: dateFrom,
-                dateTo: dateTo,
-                kind: kind
+                dateFrom: currentSearchParams.dateFrom,
+                dateTo: currentSearchParams.dateTo,
+                kind: currentSearchParams.kind,
+                cabins: filters.cabins,
+                length: filters.length,
+                year: filters.year,
+                location: filters.location,
+                equipment: JSON.stringify(filters.equipment),
+                sort: filters.sort,
+                page: currentPage
             },
             success: function(response) {
+                isLoading = false;
+                hideLoading();
+                
                 if (response.success) {
-                    displayResults(response);
+                    displayFilteredResults(response, currentPage === 1);
                 } else {
-                    resultsContainer.html('<div class="yolo-ys-no-results"><h3>Error</h3><p>Failed to load results.</p></div>');
+                    showError('Failed to load results.');
                 }
             },
             error: function() {
-                resultsContainer.html('<div class="yolo-ys-no-results"><h3>Error</h3><p>Failed to connect to server.</p></div>');
+                isLoading = false;
+                hideLoading();
+                showError('Failed to connect to server.');
             }
         });
     }
     
-    // v81.1: Store all boats for Load More functionality
-    let allYoloBoats = [];
-    let allFriendBoats = [];
-    let displayedYoloCount = 0;
-    let displayedFriendCount = 0;
-    const BOATS_PER_PAGE = 15;
-    
     /**
-     * Display search results with Load More pagination
-     * v81.1: Shows 15 boats initially, then Load More for rest
+     * Display filtered results (v81.17)
      */
-    function displayResults(data) {
-        const resultsContainer = $('#yolo-ys-results-container');
+    function displayFilteredResults(data, isNewSearch) {
+        // Show filters section
+        $('#yolo-ys-advanced-filters').show();
         
-        // Check if no results
-        if (data.total_count === 0) {
-            resultsContainer.html(`
-                <div class="yolo-ys-no-results">
-                    <h3>No Yachts Found</h3>
-                    <p>Try adjusting your search criteria or dates.</p>
+        // Hide initial state
+        $('#yolo-ys-initial-state').hide();
+        
+        // Handle Featured Yachts (YOLO boats)
+        if (isNewSearch) {
+            const featuredSection = $('#yolo-ys-featured-section');
+            const featuredContainer = $('#yolo-ys-featured-boats');
+            
+            if (data.featured_boats && data.featured_boats.length > 0) {
+                featuredContainer.empty();
+                data.featured_boats.forEach(boat => {
+                    featuredContainer.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, true)}</div>`);
+                });
+                featuredSection.show();
+            } else {
+                featuredSection.hide();
+            }
+        }
+        
+        // Handle Partner boats
+        const partnerContainer = $('#yolo-ys-partner-boats');
+        
+        if (isNewSearch) {
+            partnerContainer.empty();
+        }
+        
+        if (data.partner_boats && data.partner_boats.length > 0) {
+            data.partner_boats.forEach(boat => {
+                partnerContainer.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, false)}</div>`);
+            });
+        }
+        
+        // Update results count
+        const resultsCount = $('#yolo-ys-results-count');
+        const countText = $('#results-count-text');
+        
+        if (data.total_count > 0) {
+            countText.text(`Found ${data.total_count} yacht(s)`);
+            resultsCount.show();
+        } else if (isNewSearch && (!data.featured_boats || data.featured_boats.length === 0)) {
+            // No results at all
+            partnerContainer.html(`
+                <div class="col-12">
+                    <div class="yolo-ys-no-results">
+                        <h3>No Yachts Found</h3>
+                        <p>Try adjusting your filters or search criteria.</p>
+                    </div>
                 </div>
             `);
-            return;
+            resultsCount.hide();
         }
         
-        // Store all boats for Load More
-        allYoloBoats = data.yolo_boats || [];
-        allFriendBoats = data.friend_boats || [];
-        displayedYoloCount = 0;
-        displayedFriendCount = 0;
+        // Handle Load More button
+        const loadMoreSection = $('#yolo-ys-load-more');
+        const loadMoreBtn = $('#load-more-btn');
+        const loadMoreRemaining = $('#load-more-remaining');
         
-        // Build HTML directly
-        let html = `
-            <div class="yolo-ys-results-header">
-                <h2>Search Results</h2>
-                <p class="yolo-ys-results-count">Found ${data.total_count} yacht(s) available</p>
+        if (data.has_more) {
+            const remaining = data.total_count - (data.page * data.per_page);
+            loadMoreRemaining.text(`(${remaining} remaining)`);
+            loadMoreSection.show();
+        } else {
+            loadMoreSection.hide();
+        }
+    }
+    
+    /**
+     * Load more results
+     */
+    function loadMoreResults() {
+        currentPage++;
+        searchYachtsFiltered();
+    }
+    
+    /**
+     * Show loading spinner
+     */
+    function showLoading() {
+        $('#yolo-ys-loading').show();
+        $('#load-more-btn').prop('disabled', true).text('Loading...');
+    }
+    
+    /**
+     * Hide loading spinner
+     */
+    function hideLoading() {
+        $('#yolo-ys-loading').hide();
+        $('#load-more-btn').prop('disabled', false);
+        $('#load-more-text').text('Load More');
+    }
+    
+    /**
+     * Show error message
+     */
+    function showError(message) {
+        $('#yolo-ys-partner-boats').html(`
+            <div class="col-12">
+                <div class="yolo-ys-no-results">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
             </div>
-        `;
-        
-        // Calculate how many to show initially (15 total, YOLO first)
-        let remainingSlots = BOATS_PER_PAGE;
-        let initialYoloCount = Math.min(allYoloBoats.length, remainingSlots);
-        remainingSlots -= initialYoloCount;
-        let initialFriendCount = Math.min(allFriendBoats.length, remainingSlots);
-        
-        // Render YOLO boats section
-        if (allYoloBoats.length > 0) {
-            html += `
-                <div class="yolo-ys-section-header">
-                    <h3>YOLO Charters Fleet</h3>
-                </div>
-                <div class="row g-4" id="yolo-boats-container">
-            `;
-            for (let i = 0; i < initialYoloCount; i++) {
-                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(allYoloBoats[i], true)}</div>`;
-            }
-            html += '</div>';
-            displayedYoloCount = initialYoloCount;
-            
-            // Add Load More for YOLO if needed
-            if (allYoloBoats.length > initialYoloCount) {
-                html += `
-                    <div class="yolo-ys-load-more-container" id="yolo-load-more-container">
-                        <button type="button" class="yolo-ys-load-more-btn" id="yolo-load-more-btn">
-                            Load More YOLO Yachts (${allYoloBoats.length - initialYoloCount} remaining)
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        // Render friend boats section
-        if (allFriendBoats.length > 0) {
-            html += `
-                <div class="yolo-ys-section-header friends">
-                    <h3>Partner Fleet</h3>
-                </div>
-                <div class="row g-4" id="friend-boats-container">
-            `;
-            for (let i = 0; i < initialFriendCount; i++) {
-                html += `<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(allFriendBoats[i], false)}</div>`;
-            }
-            html += '</div>';
-            displayedFriendCount = initialFriendCount;
-            
-            // Add Load More for friends if needed
-            if (allFriendBoats.length > initialFriendCount) {
-                html += `
-                    <div class="yolo-ys-load-more-container" id="friend-load-more-container">
-                        <button type="button" class="yolo-ys-load-more-btn" id="friend-load-more-btn">
-                            Load More Partner Yachts (${allFriendBoats.length - initialFriendCount} remaining)
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        resultsContainer.html(html);
-        
-        // Bind Load More button events
-        $('#yolo-load-more-btn').on('click', function() {
-            loadMoreYoloBoats();
-        });
-        
-        $('#friend-load-more-btn').on('click', function() {
-            loadMoreFriendBoats();
-        });
-    }
-    
-    /**
-     * Load more YOLO boats
-     */
-    function loadMoreYoloBoats() {
-        const container = $('#yolo-boats-container');
-        const nextBatch = allYoloBoats.slice(displayedYoloCount, displayedYoloCount + BOATS_PER_PAGE);
-        
-        nextBatch.forEach(boat => {
-            container.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, true)}</div>`);
-        });
-        
-        displayedYoloCount += nextBatch.length;
-        
-        // Update or hide Load More button
-        const remaining = allYoloBoats.length - displayedYoloCount;
-        if (remaining > 0) {
-            $('#yolo-load-more-btn').text(`Load More YOLO Yachts (${remaining} remaining)`);
-        } else {
-            $('#yolo-load-more-container').hide();
-        }
-    }
-    
-    /**
-     * Load more friend boats
-     */
-    function loadMoreFriendBoats() {
-        const container = $('#friend-boats-container');
-        const nextBatch = allFriendBoats.slice(displayedFriendCount, displayedFriendCount + BOATS_PER_PAGE);
-        
-        nextBatch.forEach(boat => {
-            container.append(`<div class="col-12 col-sm-6 col-lg-4">${renderBoatCard(boat, false)}</div>`);
-        });
-        
-        displayedFriendCount += nextBatch.length;
-        
-        // Update or hide Load More button
-        const remaining = allFriendBoats.length - displayedFriendCount;
-        if (remaining > 0) {
-            $('#friend-load-more-btn').text(`Load More Partner Yachts (${remaining} remaining)`);
-        } else {
-            $('#friend-load-more-container').hide();
-        }
+        `);
     }
     
     /**
      * Render boat card
-     * 
-     * UPDATED (v2.5.4): Complete redesign to match "Our Yachts" section
-     * - Strikethrough original price when discounted
-     * - Discount percentage badge (red)
-     * - Final discounted price (prominent, green)
-     * - 3-column grid layout
-     * - Modern card design with hover effects
-     * - Proper image handling with aspect ratio
      */
     function renderBoatCard(boat, isYolo) {
         const yoloClass = isYolo ? 'yolo-yacht' : '';
@@ -472,16 +529,15 @@
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
         // Split yacht name into name and model
-        // Example: "Lemon Sun Odyssey 469" -> "Lemon" + "Sun Odyssey 469"
         let yachtName = boat.yacht || 'Unknown';
         let yachtModel = '';
         const nameParts = yachtName.split(' ');
         if (nameParts.length > 1) {
-            yachtName = nameParts[0]; // First word is the name
-            yachtModel = nameParts.slice(1).join(' '); // Rest is the model
+            yachtName = nameParts[0];
+            yachtModel = nameParts.slice(1).join(' ');
         }
         
-        // Helper function to format price with European locale (1.234,56)
+        // Helper function to format price with European locale
         const formatPrice = (price) => {
             if (!price || isNaN(price)) return '0,00';
             return Number(price).toLocaleString('de-DE', {
@@ -490,7 +546,7 @@
             });
         };
         
-        // Refit display (if available)
+        // Refit display
         let refitDisplay = '';
         if (boat.refit_year) {
             refitDisplay = `<span class="yolo-ys-refit-note">Refit: ${boat.refit_year}</span>`;
@@ -498,13 +554,10 @@
         
         // Price display with discount logic
         let priceHtml = '';
-        
-        // Check if we have discount information
         const hasDiscount = boat.original_price && boat.discount_percentage && 
                            parseFloat(boat.original_price) > parseFloat(boat.price);
         
         if (hasDiscount) {
-            // Show original price (strikethrough), discount badge, and final price
             const originalPrice = parseFloat(boat.original_price);
             const finalPrice = parseFloat(boat.price);
             const discountPercent = Math.round(parseFloat(boat.discount_percentage));
@@ -524,7 +577,6 @@
                 </div>
             `;
         } else {
-            // No discount - show regular price
             priceHtml = `
                 <div class="yolo-ys-yacht-price-container">
                     <div class="yolo-ys-price-final">
@@ -535,7 +587,6 @@
             `;
         }
         
-        // v80.1: Entire card is now clickable
         return `
             <div class="yolo-ys-yacht-card yolo-ys-clickable-card ${yoloClass}">
                 <a href="${detailsUrl}" class="yolo-ys-card-link" aria-label="${yachtName} - ${yachtModel}"></a>

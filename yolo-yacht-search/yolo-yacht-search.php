@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 81.16
+ * Version: 81.17
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '81.16');
+define('YOLO_YS_VERSION', '81.17');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -82,6 +82,36 @@ define('YOLO_YS_GREEK_IONIAN_BASE_IDS', array(
     3868266710000100000,    // Marina Astakos
     // Paxos
     18                      // Paxos - Gaios
+));
+
+// Location to Base IDs mapping for search filters (v81.17)
+define('YOLO_YS_LOCATION_BASE_IDS', array(
+    'Lefkada' => array(
+        194, 1639588120000100000, 757699090000100000, 1392047590000100000,
+        1470547850000100000, 5720014270000100000, 7263354840000100000,
+        6100618350000100000, 4038352310000100000, 5018374970000100000,
+        2863072060000100000, 6647930080000100000
+    ),
+    'Corfu' => array(
+        14, 492201260000100000, 3129817260000100000, 3885298680000100000,
+        3885342670000100000, 3143071690000100000, 4483668290000100000
+    ),
+    'Kefalonia' => array(
+        699817710000100000, 6368129940000100000, 133, 1472810110000100000,
+        3969163100000100000
+    ),
+    'Zakynthos' => array(153, 23, 5714550710000100000),
+    'Ithaca' => array(155, 4837974350000100000),
+    'Preveza' => array(
+        89, 1935994390000100000, 2491645230000100000,
+        6192088780000100000, 6827132820000100000
+    ),
+    'Syvota' => array(1976257640000100000),
+    'Vonitsa' => array(973630110000100000),
+    'Palairos' => array(395874570000100000, 96447290000100000),
+    'Plataria' => array(3838448700000100000),
+    'Astakos' => array(3868266710000100000),
+    'Paxos' => array(18)
 ));
 
 // Load dependencies
