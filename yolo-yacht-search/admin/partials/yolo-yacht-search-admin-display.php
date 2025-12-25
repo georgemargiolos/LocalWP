@@ -368,18 +368,26 @@ $sync_status = $sync->get_sync_status();
             </div>
         </div>
         
-        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-            <strong>Feed URL:</strong>
-            <code style="background: white; padding: 5px 10px; border-radius: 4px; margin-left: 10px; font-size: 13px;">
-                <?php echo esc_html($fb_catalog->get_feed_url()); ?>
-            </code>
-            <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js($fb_catalog->get_feed_url()); ?>'); alert('Copied!');" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">📋 Copy</button>
+        <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="flex: 1; min-width: 300px;">
+                <strong>Feed URL:</strong>
+                <code style="background: white; padding: 5px 10px; border-radius: 4px; margin-left: 10px; font-size: 13px;">
+                    <?php echo esc_html($fb_catalog->get_feed_url()); ?>
+                </code>
+                <button type="button" onclick="navigator.clipboard.writeText('<?php echo esc_js($fb_catalog->get_feed_url()); ?>'); alert('Copied!');" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">📋 Copy</button>
+            </div>
+            <button type="button" id="yolo-update-catalog-prices" class="button button-primary" style="background: #1877f2; border-color: #1877f2;">
+                🔄 Update Catalog Prices
+            </button>
         </div>
+        
+        <div id="yolo-catalog-update-status" style="display: none; margin-bottom: 15px; padding: 10px; border-radius: 4px;"></div>
         
         <p style="color: #6b7280; font-size: 13px; margin: 0;">
             <strong>How it works:</strong><br>
             • Boat prices are auto-calculated from Weekly Offers (minimum price)<br>
             • Catalog updates automatically after each Offers Sync<br>
+            • Click "Update Catalog Prices" to manually refresh prices from existing offers<br>
             • Use the feed URL in Facebook Business Manager → Commerce Manager → Catalogs<br>
             • Includes YOLO fleet + Partner boats
         </p>
@@ -1098,6 +1106,43 @@ jQuery(document).ready(function($) {
                 action: 'yolo_ys_save_offers_year',
                 nonce: yoloYsAdmin.nonce,
                 year: year
+            }
+        });
+    });
+    
+    // ==========================================
+    // FACEBOOK CATALOG MANUAL UPDATE (v86.7)
+    // ==========================================
+    
+    $('#yolo-update-catalog-prices').on('click', function() {
+        var $button = $(this);
+        var $status = $('#yolo-catalog-update-status');
+        
+        $button.prop('disabled', true).text('🔄 Updating...');
+        $status.show().css('background', '#fef3c7').html('⏳ Calculating prices from existing offers...');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_ys_update_catalog_prices',
+                nonce: yoloYsAdmin.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $status.css('background', '#d1fae5').html('✅ ' + response.data.message);
+                    // Reload after 2 seconds to show updated stats
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    $status.css('background', '#fee2e2').html('❌ Error: ' + response.data);
+                    $button.prop('disabled', false).text('🔄 Update Catalog Prices');
+                }
+            },
+            error: function() {
+                $status.css('background', '#fee2e2').html('❌ Request failed. Please try again.');
+                $button.prop('disabled', false).text('🔄 Update Catalog Prices');
             }
         });
     });

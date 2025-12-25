@@ -39,6 +39,9 @@ class YOLO_YS_Admin {
         // v81.4: Look up company names
         add_action('wp_ajax_yolo_lookup_company_names', array($this, 'ajax_lookup_company_names'));
         
+        // v86.7: Facebook Catalog manual update
+        add_action('wp_ajax_yolo_ys_update_catalog_prices', array($this, 'ajax_update_catalog_prices'));
+        
         // v81.0: Progressive sync AJAX handlers
         add_action('wp_ajax_yolo_progressive_init_yacht_sync', array($this, 'ajax_progressive_init_yacht_sync'));
         add_action('wp_ajax_yolo_progressive_sync_next_yacht', array($this, 'ajax_progressive_sync_next_yacht'));
@@ -716,6 +719,29 @@ class YOLO_YS_Admin {
         echo '<p class="description">' . __('Your Facebook Conversions API Access Token. Generate it in Facebook Events Manager > Settings > Conversions API.', 'yolo-yacht-search') . '</p>';
         echo '<p class="description"><strong>' . __('Events tracked server-side:', 'yolo-yacht-search') . '</strong> ViewContent (yacht view), Lead (quote request), Purchase (booking completed)</p>';
         echo '<p class="description"><strong>' . __('Events tracked client-side:', 'yolo-yacht-search') . '</strong> Search, AddToCart (week selection), InitiateCheckout (book now), AddPaymentInfo (form submission)</p>';
+    }
+    
+    /**
+     * v86.7: AJAX handler for Facebook Catalog price update
+     */
+    public function ajax_update_catalog_prices() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        try {
+            $fb_catalog = new YOLO_YS_Facebook_Catalog();
+            $updated = $fb_catalog->update_partner_starting_prices();
+            
+            wp_send_json_success(array(
+                'message' => "Updated prices for {$updated} boats from existing offers.",
+                'updated' => $updated
+            ));
+        } catch (Exception $e) {
+            wp_send_json_error($e->getMessage());
+        }
     }
     
     /**

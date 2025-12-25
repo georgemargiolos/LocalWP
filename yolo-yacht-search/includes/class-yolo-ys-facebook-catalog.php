@@ -168,8 +168,8 @@ class YOLO_YS_Facebook_Catalog {
         // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
         $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
-        $sql = $wpdb->prepare(
-            "SELECT 
+        // v86.7: Use call_user_func_array for better compatibility
+        $query = "SELECT 
                 y.id as yacht_id,
                 y.model,
                 MIN(p.price) as min_price
@@ -178,11 +178,11 @@ class YOLO_YS_Facebook_Catalog {
             WHERE y.company_id IN ({$partner_placeholders})
             AND (y.status = 'active' OR y.status IS NULL)
             AND p.date_from >= %s
-            GROUP BY y.id, y.model",
-            ...array_merge(
-                $this->catalog_company_ids,
-                array(date('Y-m-d'))
-            )
+            GROUP BY y.id, y.model";
+        
+        $sql = call_user_func_array(
+            array($wpdb, 'prepare'),
+            array_merge(array($query), $this->catalog_company_ids, array(date('Y-m-d')))
         );
         
         $results = $wpdb->get_results($sql);
@@ -257,8 +257,8 @@ class YOLO_YS_Facebook_Catalog {
         // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
         $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
-        $sql = $wpdb->prepare(
-            "SELECT 
+        // v86.7: Use call_user_func_array for better compatibility
+        $query = "SELECT 
                 y.id as yacht_id,
                 y.model,
                 y.slug,
@@ -275,8 +275,11 @@ class YOLO_YS_Facebook_Catalog {
             WHERE y.company_id IN ({$partner_placeholders})
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0
-            ORDER BY y.model ASC",
-            ...$this->catalog_company_ids
+            ORDER BY y.model ASC";
+        
+        $sql = call_user_func_array(
+            array($wpdb, 'prepare'),
+            array_merge(array($query), $this->catalog_company_ids)
         );
         
         return $wpdb->get_results($sql);
@@ -472,22 +475,23 @@ class YOLO_YS_Facebook_Catalog {
         // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
         $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
+        // v86.7: Use call_user_func_array for better compatibility
         // Total catalog boats (YOLO + Partners)
-        $total = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$yachts_table} 
-            WHERE company_id IN ({$partner_placeholders})
-            AND (status = 'active' OR status IS NULL)",
-            ...$this->catalog_company_ids
+        $total = $wpdb->get_var(call_user_func_array(
+            array($wpdb, 'prepare'),
+            array_merge(
+                array("SELECT COUNT(*) FROM {$yachts_table} WHERE company_id IN ({$partner_placeholders}) AND (status = 'active' OR status IS NULL)"),
+                $this->catalog_company_ids
+            )
         ));
         
         // Catalog boats with prices
-        $with_prices = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$yachts_table} y
-            LEFT JOIN {$custom_table} c ON y.id = c.yacht_id
-            WHERE y.company_id IN ({$partner_placeholders})
-            AND (y.status = 'active' OR y.status IS NULL)
-            AND COALESCE(c.starting_from_price, 0) > 0",
-            ...$this->catalog_company_ids
+        $with_prices = $wpdb->get_var(call_user_func_array(
+            array($wpdb, 'prepare'),
+            array_merge(
+                array("SELECT COUNT(*) FROM {$yachts_table} y LEFT JOIN {$custom_table} c ON y.id = c.yacht_id WHERE y.company_id IN ({$partner_placeholders}) AND (y.status = 'active' OR y.status IS NULL) AND COALESCE(c.starting_from_price, 0) > 0"),
+                $this->catalog_company_ids
+            )
         ));
         
         $last_update = get_option('yolo_ys_last_fb_catalog_update', 'Never');
