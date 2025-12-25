@@ -164,26 +164,20 @@ class YOLO_YS_Facebook_Catalog {
         $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        // Get all catalog yachts (YOLO + Partners) with their minimum prices from offers
-        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.9: Build company IDs directly into query (simpler, more reliable)
+        $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
+        $today = date('Y-m-d');
         
-        // v86.7: Use call_user_func_array for better compatibility
-        $query = "SELECT 
+        $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
                 MIN(p.price) as min_price
             FROM {$yachts_table} y
-            INNER JOIN {$prices_table} p ON y.id = p.yacht_id
-            WHERE y.company_id IN ({$partner_placeholders})
+            INNER JOIN {$prices_table} p ON CAST(y.id AS CHAR) = p.yacht_id
+            WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
-            AND p.date_from >= %s
+            AND p.date_from >= '{$today}'
             GROUP BY y.id, y.model";
-        
-        $sql = call_user_func_array(
-            array($wpdb, 'prepare'),
-            array_merge(array($query), $this->catalog_company_ids, array(date('Y-m-d')))
-        );
         
         $results = $wpdb->get_results($sql);
         
@@ -252,13 +246,11 @@ class YOLO_YS_Facebook_Catalog {
         
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
-        $images_table = $wpdb->prefix . 'yolo_yacht_images';
         
-        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.9: Build company IDs directly into query (simpler, more reliable)
+        $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
-        // v86.7: Use call_user_func_array for better compatibility
-        $query = "SELECT 
+        $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
                 y.slug,
@@ -271,16 +263,11 @@ class YOLO_YS_Facebook_Catalog {
                 COALESCE(c.starting_from_price, 0) as starting_from_price,
                 COALESCE(c.custom_description, '') as custom_description
             FROM {$yachts_table} y
-            LEFT JOIN {$custom_table} c ON y.id = c.yacht_id
-            WHERE y.company_id IN ({$partner_placeholders})
+            LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
+            WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0
             ORDER BY y.model ASC";
-        
-        $sql = call_user_func_array(
-            array($wpdb, 'prepare'),
-            array_merge(array($query), $this->catalog_company_ids)
-        );
         
         return $wpdb->get_results($sql);
     }
@@ -442,32 +429,6 @@ class YOLO_YS_Facebook_Catalog {
      * Output the feed with proper headers
      */
     public function output_feed() {
-        // v86.8: Debug mode - add ?debug=1 to see diagnostic info
-        if (isset($_GET['debug']) && $_GET['debug'] == '1' && current_user_can('manage_options')) {
-            header('Content-Type: text/plain; charset=utf-8');
-            echo "=== FACEBOOK CATALOG DEBUG ==="."\n\n";
-            echo "Company IDs: " . implode(', ', $this->catalog_company_ids) . "\n";
-            echo "Count: " . count($this->catalog_company_ids) . "\n\n";
-            
-            $boats = $this->get_partner_boats();
-            echo "Boats returned: " . count($boats) . "\n\n";
-            
-            if (!empty($boats)) {
-                echo "First 3 boats:\n";
-                foreach (array_slice($boats, 0, 3) as $boat) {
-                    echo "- " . $boat->model . " (ID: " . $boat->yacht_id . ", Price: " . $boat->starting_from_price . ")\n";
-                }
-            }
-            
-            // Check stats
-            $stats = $this->get_stats();
-            echo "\nStats:\n";
-            echo "- Total boats: " . $stats['total_partner_boats'] . "\n";
-            echo "- With prices: " . $stats['boats_with_prices'] . "\n";
-            
-            exit;
-        }
-        
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: inline; filename="facebook-yacht-catalog.csv"');
@@ -498,27 +459,18 @@ class YOLO_YS_Facebook_Catalog {
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        // v86.6: Use %d for integer company_ids (consistent with rest of codebase)
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.9: Build company IDs directly into query (simpler, more reliable)
+        $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
-        // v86.7: Use call_user_func_array for better compatibility
         // Total catalog boats (YOLO + Partners)
-        $total = $wpdb->get_var(call_user_func_array(
-            array($wpdb, 'prepare'),
-            array_merge(
-                array("SELECT COUNT(*) FROM {$yachts_table} WHERE company_id IN ({$partner_placeholders}) AND (status = 'active' OR status IS NULL)"),
-                $this->catalog_company_ids
-            )
-        ));
+        $total = $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$yachts_table} WHERE company_id IN ({$company_ids_escaped}) AND (status = 'active' OR status IS NULL)"
+        );
         
         // Catalog boats with prices
-        $with_prices = $wpdb->get_var(call_user_func_array(
-            array($wpdb, 'prepare'),
-            array_merge(
-                array("SELECT COUNT(*) FROM {$yachts_table} y LEFT JOIN {$custom_table} c ON y.id = c.yacht_id WHERE y.company_id IN ({$partner_placeholders}) AND (y.status = 'active' OR y.status IS NULL) AND COALESCE(c.starting_from_price, 0) > 0"),
-                $this->catalog_company_ids
-            )
-        ));
+        $with_prices = $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$yachts_table} y LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id WHERE y.company_id IN ({$company_ids_escaped}) AND (y.status = 'active' OR y.status IS NULL) AND COALESCE(c.starting_from_price, 0) > 0"
+        );
         
         $last_update = get_option('yolo_ys_last_fb_catalog_update', 'Never');
         
