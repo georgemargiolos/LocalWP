@@ -442,6 +442,32 @@ class YOLO_YS_Facebook_Catalog {
      * Output the feed with proper headers
      */
     public function output_feed() {
+        // v86.8: Debug mode - add ?debug=1 to see diagnostic info
+        if (isset($_GET['debug']) && $_GET['debug'] == '1' && current_user_can('manage_options')) {
+            header('Content-Type: text/plain; charset=utf-8');
+            echo "=== FACEBOOK CATALOG DEBUG ==="."\n\n";
+            echo "Company IDs: " . implode(', ', $this->catalog_company_ids) . "\n";
+            echo "Count: " . count($this->catalog_company_ids) . "\n\n";
+            
+            $boats = $this->get_partner_boats();
+            echo "Boats returned: " . count($boats) . "\n\n";
+            
+            if (!empty($boats)) {
+                echo "First 3 boats:\n";
+                foreach (array_slice($boats, 0, 3) as $boat) {
+                    echo "- " . $boat->model . " (ID: " . $boat->yacht_id . ", Price: " . $boat->starting_from_price . ")\n";
+                }
+            }
+            
+            // Check stats
+            $stats = $this->get_stats();
+            echo "\nStats:\n";
+            echo "- Total boats: " . $stats['total_partner_boats'] . "\n";
+            echo "- With prices: " . $stats['boats_with_prices'] . "\n";
+            
+            exit;
+        }
+        
         // Set headers for CSV download
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: inline; filename="facebook-yacht-catalog.csv"');
