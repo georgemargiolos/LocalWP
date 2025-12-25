@@ -334,15 +334,16 @@ class YOLO_YS_Facebook_Catalog {
     
     /**
      * Generate the CSV feed content
+     * v87.4: Added proper descriptions, product_type, google_product_category
      * 
      * @return string CSV content
      */
     public function generate_feed() {
         $boats = $this->get_partner_boats();
         
-        // CSV Header
+        // CSV Header - v87.4: Added product_type and google_product_category
         $csv_lines = array();
-        $csv_lines[] = 'id,title,description,price,link,image_link,additional_image_link,brand,availability,condition,custom_label_0,custom_label_1,custom_label_2,custom_label_3,custom_label_4';
+        $csv_lines[] = 'id,title,description,price,link,image_link,additional_image_link,brand,availability,condition,product_type,google_product_category,custom_label_0,custom_label_1,custom_label_2,custom_label_3,custom_label_4';
         
         if (empty($boats)) {
             return implode("\n", $csv_lines);
@@ -363,14 +364,26 @@ class YOLO_YS_Facebook_Catalog {
             // Primary image
             $primary_image = $images[0];
             
-            // Additional images (up to 10)
+            // Additional images (up to 10) - v87.4: Ensure proper formatting
             $additional_images = array_slice($images, 1, 10);
             $additional_images_str = implode(',', $additional_images);
             
-            // Description - use custom if available, otherwise API description
+            // Build title: Name - Model (v87.3 fix)
+            $yacht_name = trim($boat->name);
+            $yacht_model = trim($boat->model);
+            $title = $yacht_name . ' - ' . $yacht_model;
+            
+            // v87.4: Generate proper description if empty
             $description = !empty($boat->custom_description) ? $boat->custom_description : $boat->description;
             $description = wp_strip_all_tags($description);
-            $description = preg_replace('/\s+/', ' ', $description); // Normalize whitespace
+            $description = preg_replace('/\s+/', ' ', $description);
+            $description = trim($description);
+            
+            // If description is empty, generate one from yacht data
+            if (empty($description)) {
+                $description = $this->generate_description($boat, $yacht_name, $yacht_model);
+            }
+            
             $description = substr($description, 0, 5000); // Facebook limit
             
             // Price
@@ -384,20 +397,25 @@ class YOLO_YS_Facebook_Catalog {
             }
             
             // Brand
-            $brand = $this->extract_brand_from_model($boat->model);
+            $brand = $this->extract_brand_from_model($yacht_model);
             
             // Boat type
-            $boat_type = $this->get_boat_type($boat->model);
+            $boat_type = $this->get_boat_type($yacht_model);
             
-            // Custom labels
+            // v87.4: Product type for Facebook (hierarchical category)
+            $product_type = 'Vehicles & Parts > Vehicles > Watercraft > ' . $boat_type . 's';
+            
+            // v87.4: Google Product Category for boats
+            // 3564 = Vehicles & Parts > Vehicles > Watercraft > Sailboats
+            // 3563 = Vehicles & Parts > Vehicles > Watercraft > Motor Boats (using for catamarans)
+            $google_category = ($boat_type === 'Catamaran') ? '3563' : '3564';
+            
+            // Custom labels with meaningful data
             $custom_label_0 = $boat_type; // Sailboat/Catamaran
-            $custom_label_1 = !empty($boat->cabins) ? $boat->cabins : '';
-            $custom_label_2 = !empty($boat->berths) ? $boat->berths : '';
+            $custom_label_1 = !empty($boat->cabins) ? $boat->cabins . ' Cabins' : '';
+            $custom_label_2 = !empty($boat->berths) ? $boat->berths . ' Berths' : '';
             $custom_label_3 = !empty($boat->home_base) ? $boat->home_base : '';
-            $custom_label_4 = !empty($boat->year_of_build) ? $boat->year_of_build : '';
-            
-            // Build title: Name + Model (v87.3 fix)
-            $title = trim($boat->name) . ' - ' . trim($boat->model);
+            $custom_label_4 = !empty($boat->year_of_build) ? 'Built ' . $boat->year_of_build : '';
             
             // Build CSV row
             $row = array(
@@ -407,10 +425,12 @@ class YOLO_YS_Facebook_Catalog {
                 $this->csv_escape($price),
                 $this->csv_escape($link),
                 $this->csv_escape($primary_image),
-                $this->csv_escape($additional_images_str),
+                $this->csv_escape($additional_images_str, true), // v87.4: Force quote for comma-separated URLs
                 $this->csv_escape($brand),
                 'in stock',
                 'used',
+                $this->csv_escape($product_type),
+                $this->csv_escape($google_category),
                 $this->csv_escape($custom_label_0),
                 $this->csv_escape($custom_label_1),
                 $this->csv_escape($custom_label_2),
@@ -422,6 +442,51 @@ class YOLO_YS_Facebook_Catalog {
         }
         
         return implode("\n", $csv_lines);
+    }
+    
+    /**
+     * Generate a description from yacht data
+     * v87.4: New method to create descriptions when none exists
+     * 
+     * @param object $boat Boat data object
+     * @param string $yacht_name Yacht name
+     * @param string $yacht_model Yacht model
+     * @return string Generated description
+     */
+    private function generate_description($boat, $yacht_name, $yacht_model) {
+        $brand = $this->extract_brand_from_model($yacht_model);
+        $boat_type = $this->get_boat_type($yacht_model);
+        
+        $parts = array();
+        
+        // Opening line
+        $parts[] = "Charter the {$yacht_name}, a beautiful {$brand} {$yacht_model} {$boat_type} available for sailing holidays in Greece.";
+        
+        // Specs
+        $specs = array();
+        if (!empty($boat->cabins)) {
+            $specs[] = $boat->cabins . ' cabin' . ($boat->cabins > 1 ? 's' : '');
+        }
+        if (!empty($boat->berths)) {
+            $specs[] = 'sleeps ' . $boat->berths . ' guests';
+        }
+        if (!empty($boat->year_of_build)) {
+            $specs[] = 'built in ' . $boat->year_of_build;
+        }
+        
+        if (!empty($specs)) {
+            $parts[] = 'This yacht features ' . implode(', ', $specs) . '.';
+        }
+        
+        // Location
+        if (!empty($boat->home_base)) {
+            $parts[] = "Based at {$boat->home_base}, perfect for exploring the Ionian islands.";
+        }
+        
+        // Call to action
+        $parts[] = 'Book now for an unforgettable sailing experience with YOLO Charters.';
+        
+        return implode(' ', $parts);
     }
     
     /**
