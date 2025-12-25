@@ -250,6 +250,7 @@ class YOLO_YS_Facebook_Catalog {
         // v86.9: Build company IDs directly into query (simpler, more reliable)
         $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
+        // v86.10: Try direct comparison without CAST - MySQL handles bigint to varchar
         $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
@@ -263,13 +264,23 @@ class YOLO_YS_Facebook_Catalog {
                 COALESCE(c.starting_from_price, 0) as starting_from_price,
                 COALESCE(c.custom_description, '') as custom_description
             FROM {$yachts_table} y
-            LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
+            LEFT JOIN {$custom_table} c ON y.id = c.yacht_id
             WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0
             ORDER BY y.model ASC";
         
-        return $wpdb->get_results($sql);
+        $results = $wpdb->get_results($sql);
+        
+        // Debug logging
+        if (empty($results)) {
+            error_log('YOLO FB Catalog get_partner_boats: Empty results. Company IDs: ' . $company_ids_escaped);
+            error_log('YOLO FB Catalog SQL: ' . $sql);
+        } else {
+            error_log('YOLO FB Catalog get_partner_boats: Found ' . count($results) . ' boats');
+        }
+        
+        return $results;
     }
     
     /**
@@ -467,9 +478,9 @@ class YOLO_YS_Facebook_Catalog {
             "SELECT COUNT(*) FROM {$yachts_table} WHERE company_id IN ({$company_ids_escaped}) AND (status = 'active' OR status IS NULL)"
         );
         
-        // Catalog boats with prices
+        // Catalog boats with prices - v86.10: Remove CAST for consistency
         $with_prices = $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$yachts_table} y LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id WHERE y.company_id IN ({$company_ids_escaped}) AND (y.status = 'active' OR y.status IS NULL) AND COALESCE(c.starting_from_price, 0) > 0"
+            "SELECT COUNT(*) FROM {$yachts_table} y LEFT JOIN {$custom_table} c ON y.id = c.yacht_id WHERE y.company_id IN ({$company_ids_escaped}) AND (y.status = 'active' OR y.status IS NULL) AND COALESCE(c.starting_from_price, 0) > 0"
         );
         
         $last_update = get_option('yolo_ys_last_fb_catalog_update', 'Never');
