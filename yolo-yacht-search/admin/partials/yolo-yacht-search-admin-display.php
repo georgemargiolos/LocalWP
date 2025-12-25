@@ -356,11 +356,11 @@ $sync_status = $sync->get_sync_status();
         <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
             <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
                 <div style="font-size: 24px; font-weight: 700; color: #1877f2;"><?php echo $fb_stats['boats_with_prices']; ?></div>
-                <div style="color: #6b7280; font-size: 14px;">Partner Boats in Catalog</div>
+                <div style="color: #6b7280; font-size: 14px;">Boats in Catalog</div>
             </div>
             <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
                 <div style="font-size: 24px; font-weight: 700; color: #1877f2;"><?php echo $fb_stats['total_partner_boats']; ?></div>
-                <div style="color: #6b7280; font-size: 14px;">Total Partner Boats</div>
+                <div style="color: #6b7280; font-size: 14px;">Total Catalog Boats</div>
             </div>
             <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; flex: 1; min-width: 150px;">
                 <div style="font-size: 16px; font-weight: 600; color: #374151;"><?php echo $fb_stats['last_update']; ?></div>
@@ -378,10 +378,10 @@ $sync_status = $sync->get_sync_status();
         
         <p style="color: #6b7280; font-size: 13px; margin: 0;">
             <strong>How it works:</strong><br>
-            • Partner boat prices are auto-calculated from Weekly Offers (minimum price)<br>
+            • Boat prices are auto-calculated from Weekly Offers (minimum price)<br>
             • Catalog updates automatically after each Offers Sync<br>
             • Use the feed URL in Facebook Business Manager → Commerce Manager → Catalogs<br>
-            • Only partner boats are included (excludes YOLO fleet)
+            • Includes YOLO fleet + Partner boats
         </p>
     </div>
     
