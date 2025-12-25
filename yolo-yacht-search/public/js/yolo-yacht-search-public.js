@@ -149,6 +149,14 @@
             updateEquipmentText();
         });
         
+        // Mobile filters toggle (v81.20)
+        $('#filters-mobile-toggle').on('click', function() {
+            const content = $('#filters-content');
+            const toggle = $(this);
+            content.toggleClass('expanded');
+            toggle.toggleClass('active');
+        });
+        
         // Apply Filters button
         $('#apply-filters').on('click', function() {
             currentPage = 1;
@@ -181,12 +189,16 @@
     }
     
     /**
-     * Clear all filters
+     * Clear all filters (v81.20: Range filters)
      */
     function clearFilters() {
         $('#filter-cabins').val('');
-        $('#filter-length').val('');
-        $('#filter-year').val('');
+        $('#filter-length-min').val('');
+        $('#filter-length-max').val('');
+        $('#filter-year-min').val('');
+        $('#filter-year-max').val('');
+        $('#filter-price-min').val('');
+        $('#filter-price-max').val('');
         $('#filter-location').val('');
         $('#filter-sort').val('price_asc');
         $('input[name="equipment[]"]').prop('checked', false);
@@ -198,7 +210,7 @@
     }
     
     /**
-     * Get current filter values
+     * Get current filter values (v81.20: Range filters)
      */
     function getFilterValues() {
         const equipment = [];
@@ -208,8 +220,12 @@
         
         return {
             cabins: $('#filter-cabins').val() || 0,
-            length: $('#filter-length').val() || 0,
-            year: $('#filter-year').val() || 0,
+            lengthMin: $('#filter-length-min').val() || 0,
+            lengthMax: $('#filter-length-max').val() || 0,
+            yearMin: $('#filter-year-min').val() || 0,
+            yearMax: $('#filter-year-max').val() || 0,
+            priceMin: $('#filter-price-min').val() || 0,
+            priceMax: $('#filter-price-max').val() || 0,
             location: $('#filter-location').val() || '',
             equipment: equipment,
             sort: $('#filter-sort').val() || 'price_asc'
@@ -347,7 +363,7 @@
     }
     
     /**
-     * Search yachts with filters via AJAX (v81.17)
+     * Search yachts with filters via AJAX (v81.20: Range filters)
      */
     function searchYachtsFiltered() {
         if (isLoading) return;
@@ -369,8 +385,12 @@
                 dateTo: currentSearchParams.dateTo,
                 kind: currentSearchParams.kind,
                 cabins: filters.cabins,
-                length: filters.length,
-                year: filters.year,
+                lengthMin: filters.lengthMin,
+                lengthMax: filters.lengthMax,
+                yearMin: filters.yearMin,
+                yearMax: filters.yearMax,
+                priceMin: filters.priceMin,
+                priceMax: filters.priceMax,
                 location: filters.location,
                 equipment: JSON.stringify(filters.equipment),
                 sort: filters.sort,

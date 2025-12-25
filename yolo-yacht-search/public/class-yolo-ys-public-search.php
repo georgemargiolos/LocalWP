@@ -199,8 +199,15 @@ function yolo_ys_ajax_search_yachts_filtered() {
     
     // Get filter parameters
     $cabins = isset($_POST['cabins']) ? intval($_POST['cabins']) : 0;
-    $length = isset($_POST['length']) ? floatval($_POST['length']) : 0;
-    $year = isset($_POST['year']) ? intval($_POST['year']) : 0;
+    
+    // v81.20: Range filters
+    $length_min = isset($_POST['lengthMin']) ? floatval($_POST['lengthMin']) : 0;
+    $length_max = isset($_POST['lengthMax']) ? floatval($_POST['lengthMax']) : 0;
+    $year_min = isset($_POST['yearMin']) ? intval($_POST['yearMin']) : 0;
+    $year_max = isset($_POST['yearMax']) ? intval($_POST['yearMax']) : 0;
+    $price_min = isset($_POST['priceMin']) ? floatval($_POST['priceMin']) : 0;
+    $price_max = isset($_POST['priceMax']) ? floatval($_POST['priceMax']) : 0;
+    
     $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
     $equipment = isset($_POST['equipment']) ? json_decode(stripslashes($_POST['equipment']), true) : array();
     
@@ -245,7 +252,6 @@ function yolo_ys_ajax_search_yachts_filtered() {
                 y.slug,
                 y.company_id,
                 y.home_base as startBase,
-                y.home_base_id,
                 y.length,
                 y.cabins,
                 y.wc,
@@ -294,7 +300,6 @@ function yolo_ys_ajax_search_yachts_filtered() {
                 y.slug,
                 y.company_id,
                 y.home_base as startBase,
-                y.home_base_id,
                 y.length,
                 y.cabins,
                 y.wc,
@@ -330,29 +335,40 @@ function yolo_ys_ajax_search_yachts_filtered() {
         $partner_params[] = $cabins;
     }
     
-    // Filter by length
-    if ($length > 0) {
+    // Filter by length range (v81.20)
+    if ($length_min > 0) {
         $partner_sql .= " AND y.length >= %f";
-        $partner_params[] = $length;
+        $partner_params[] = $length_min;
+    }
+    if ($length_max > 0) {
+        $partner_sql .= " AND y.length <= %f";
+        $partner_params[] = $length_max;
     }
     
-    // Filter by year
-    if ($year > 0) {
+    // Filter by year range (v81.20)
+    if ($year_min > 0) {
         $partner_sql .= " AND y.year_of_build >= %d";
-        $partner_params[] = $year;
+        $partner_params[] = $year_min;
+    }
+    if ($year_max > 0) {
+        $partner_sql .= " AND y.year_of_build <= %d";
+        $partner_params[] = $year_max;
     }
     
-    // Filter by location (using base IDs mapping)
-    if (!empty($location) && defined('YOLO_YS_LOCATION_BASE_IDS')) {
-        $location_base_ids = YOLO_YS_LOCATION_BASE_IDS;
-        if (isset($location_base_ids[$location])) {
-            $base_ids = $location_base_ids[$location];
-            $placeholders = implode(',', array_fill(0, count($base_ids), '%s'));
-            $partner_sql .= " AND y.home_base_id IN ($placeholders)";
-            foreach ($base_ids as $base_id) {
-                $partner_params[] = $base_id;
-            }
-        }
+    // Filter by price range (v81.20)
+    if ($price_min > 0) {
+        $partner_sql .= " AND p.price >= %f";
+        $partner_params[] = $price_min;
+    }
+    if ($price_max > 0) {
+        $partner_sql .= " AND p.price <= %f";
+        $partner_params[] = $price_max;
+    }
+    
+    // Filter by location (using text matching - v81.20)
+    if (!empty($location)) {
+        $partner_sql .= " AND y.home_base LIKE %s";
+        $partner_params[] = '%' . $wpdb->esc_like($location) . '%';
     }
     
     // Filter by equipment (yacht must have ALL selected equipment)
@@ -388,24 +404,35 @@ function yolo_ys_ajax_search_yachts_filtered() {
         $count_sql .= " AND y.cabins >= %d";
         $count_params[] = $cabins;
     }
-    if ($length > 0) {
+    // v81.20: Range filters for count query
+    if ($length_min > 0) {
         $count_sql .= " AND y.length >= %f";
-        $count_params[] = $length;
+        $count_params[] = $length_min;
     }
-    if ($year > 0) {
+    if ($length_max > 0) {
+        $count_sql .= " AND y.length <= %f";
+        $count_params[] = $length_max;
+    }
+    if ($year_min > 0) {
         $count_sql .= " AND y.year_of_build >= %d";
-        $count_params[] = $year;
+        $count_params[] = $year_min;
     }
-    if (!empty($location) && defined('YOLO_YS_LOCATION_BASE_IDS')) {
-        $location_base_ids = YOLO_YS_LOCATION_BASE_IDS;
-        if (isset($location_base_ids[$location])) {
-            $base_ids = $location_base_ids[$location];
-            $placeholders = implode(',', array_fill(0, count($base_ids), '%s'));
-            $count_sql .= " AND y.home_base_id IN ($placeholders)";
-            foreach ($base_ids as $base_id) {
-                $count_params[] = $base_id;
-            }
-        }
+    if ($year_max > 0) {
+        $count_sql .= " AND y.year_of_build <= %d";
+        $count_params[] = $year_max;
+    }
+    if ($price_min > 0) {
+        $count_sql .= " AND p.price >= %f";
+        $count_params[] = $price_min;
+    }
+    if ($price_max > 0) {
+        $count_sql .= " AND p.price <= %f";
+        $count_params[] = $price_max;
+    }
+    // Location filter for count (text matching - v81.20)
+    if (!empty($location)) {
+        $count_sql .= " AND y.home_base LIKE %s";
+        $count_params[] = '%' . $wpdb->esc_like($location) . '%';
     }
     if (!empty($equipment) && is_array($equipment)) {
         foreach ($equipment as $equip_id) {
@@ -523,7 +550,6 @@ function yolo_ys_format_boat_result($row, $details_page_url) {
         'yacht' => $row->yacht . ' ' . $row->model,
         'product' => $row->product,
         'startBase' => $row->startBase,
-        'home_base_id' => $row->home_base_id,
         'price' => (float)$row->price,
         'original_price' => $row->start_price,
         'discount_percentage' => $row->discount,

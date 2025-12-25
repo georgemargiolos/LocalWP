@@ -305,6 +305,113 @@
 }
 
 /* ========================================
+   v81.20: Range Filter Inputs
+   ======================================== */
+
+.yolo-ys-advanced-filters .filter-range {
+    min-width: 180px;
+    max-width: 220px;
+}
+
+.yolo-ys-advanced-filters .range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yolo-ys-advanced-filters .range-inputs select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 8px;
+    padding-right: 28px;
+    font-size: 13px;
+}
+
+.yolo-ys-advanced-filters .range-separator {
+    color: #94a3b8;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   v81.20: Mobile Filters Toggle
+   ======================================== */
+
+.yolo-ys-advanced-filters .filters-mobile-toggle {
+    display: none;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a8a;
+    background: #ffffff;
+    border: 1px solid #1e3a8a;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle:hover {
+    background: #f8fafc;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle .toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Mobile: Filters collapsed by default */
+@media (max-width: 768px) {
+    .yolo-ys-advanced-filters {
+        padding: 15px;
+    }
+    
+    .yolo-ys-advanced-filters .filters-mobile-toggle {
+        display: flex;
+        margin-bottom: 0;
+    }
+    
+    .yolo-ys-advanced-filters .filters-content {
+        display: none;
+        margin-top: 15px;
+    }
+    
+    .yolo-ys-advanced-filters .filters-content.expanded {
+        display: block;
+    }
+    
+    .yolo-ys-advanced-filters .filters-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yolo-ys-advanced-filters .filter-group {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .yolo-ys-advanced-filters .filter-range {
+        max-width: 100%;
+    }
+    
+    .yolo-ys-advanced-filters .filter-actions {
+        flex-direction: column;
+    }
+    
+    .yolo-ys-advanced-filters .btn-apply-filters,
+    .yolo-ys-advanced-filters .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
    v81.17: Featured Yachts Section
    ======================================== */
 
