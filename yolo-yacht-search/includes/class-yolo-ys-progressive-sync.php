@@ -853,7 +853,8 @@ class YOLO_YS_Progressive_Sync {
         $state['completed_at'] = current_time('mysql');
         
         // Update last offers sync time
-        update_option('yolo_ys_last_offers_sync', current_time('mysql'));
+        // v85.4 FIX: Use correct option key (was 'yolo_ys_last_offers_sync', display reads 'yolo_ys_last_offer_sync')
+        update_option('yolo_ys_last_offer_sync', current_time('mysql'));
         
         // Save final state
         update_option(self::STATE_OPTION, $state, false);

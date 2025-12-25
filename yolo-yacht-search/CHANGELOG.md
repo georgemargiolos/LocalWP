@@ -3,6 +3,11 @@
 ## [85.4] - 2025-12-25
 
 ### Fixed
+- **Weekly Offers Sync timestamp not updating** - "Last Offers Sync" showed old time after syncing
+  - **Bug:** Progressive sync updated `yolo_ys_last_offers_sync` (with 's')
+  - **Fix:** Changed to `yolo_ys_last_offer_sync` (without 's') to match what admin display reads
+  - "Last Offers Sync" now updates correctly after sync
+
 - **CRITICAL: Auto-Sync Phase Detection Broken** - Auto-sync was reading state from wrong option
   - **Bug:** `progressive_yacht_step()` read from `yolo_ys_yacht_sync_state` (wrong)
   - **Fix:** Changed to use `$sync->get_state()` which reads from `yolo_ys_progressive_sync_state` (correct)
