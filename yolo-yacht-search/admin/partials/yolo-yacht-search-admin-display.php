@@ -580,6 +580,23 @@ jQuery(document).ready(function($) {
         );
     }
     
+    // v85.9: Company ID to Name mapping
+    var companyNames = {
+        '7850': 'YOLO Charters',
+        '4366': 'Albatros Yachting',
+        '3604': 'Kiriacoulis',
+        '6711': 'Seafarer Cruises',
+        '2934': 'Sail Greece',
+        '2971': 'Ionion Sails',
+        '3502': 'Kavas Yachting',
+        '4438': 'Istion Yachting',
+        '7348': 'Sunsail'
+    };
+    
+    function getCompanyName(companyId) {
+        return companyNames[companyId] || 'Company ' + companyId;
+    }
+    
     function updateYachtSyncUI(state) {
         // Update company breakdown
         var companyHtml = '';
@@ -587,10 +604,11 @@ jQuery(document).ready(function($) {
             var company = state.companies[companyId];
             var percent = company.total > 0 ? Math.round((company.synced / company.total) * 100) : 0;
             var statusIcon = company.status === 'complete' ? '✅' : (company.status === 'syncing' ? '⟳' : '○');
+            var companyName = getCompanyName(companyId);
             
             companyHtml += '<div style="margin-bottom: 10px;">';
             companyHtml += '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">';
-            companyHtml += '<span>' + statusIcon + ' Company ' + companyId + '</span>';
+            companyHtml += '<span>' + statusIcon + ' ' + companyName + ' <small style="color: #9ca3af;">(#' + companyId + ')</small></span>';
             companyHtml += '<span>' + company.synced + '/' + company.total + '</span>';
             companyHtml += '</div>';
             companyHtml += '<div style="background: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">';
@@ -846,10 +864,11 @@ jQuery(document).ready(function($) {
             var company = state.companies[companyId];
             var percent = company.total > 0 ? Math.round((company.synced / company.total) * 100) : 0;
             var statusIcon = company.status === 'complete' ? '✅' : (company.status === 'syncing' ? '⟳' : '○');
+            var companyName = getCompanyName(companyId);
             
             companyHtml += '<div style="margin-bottom: 10px;">';
             companyHtml += '<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">';
-            companyHtml += '<span>' + statusIcon + ' Company ' + companyId + '</span>';
+            companyHtml += '<span>' + statusIcon + ' ' + companyName + ' <small style="color: #9ca3af;">(#' + companyId + ')</small></span>';
             companyHtml += '<span>' + company.synced + '/' + company.total + '</span>';
             companyHtml += '</div>';
             companyHtml += '<div style="background: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">';

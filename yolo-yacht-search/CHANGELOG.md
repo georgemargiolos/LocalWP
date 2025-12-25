@@ -1,5 +1,16 @@
 # Changelog
 
+## [85.9] - 2025-12-25
+
+### Added
+- **Company Names in Backoffice Sync Dashboard** - Company Breakdown now shows company names
+  - Added company ID to name mapping (YOLO Charters, Albatros Yachting, Kiriacoulis, etc.)
+  - Format: `✅ YOLO Charters (#7850) 5/5`
+  - Applied to both Yacht Sync and Price Sync dashboards
+  - Unknown company IDs fallback to `Company {id}` format
+
+---
+
 ## [85.8] - 2025-12-25
 
 ### Changed
