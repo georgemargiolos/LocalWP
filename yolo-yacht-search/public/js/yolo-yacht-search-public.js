@@ -493,6 +493,89 @@
     }
     
     /**
+     * Get airport distance HTML (v81.18)
+     */
+    function getAirportDistanceHtml(homeBase) {
+        if (!homeBase) return '';
+        
+        const baseLower = homeBase.toLowerCase().trim();
+        
+        // Airport mapping: 'search_term' => ['airport_name', 'code', 'distance_km']
+        const airportMap = {
+            // PREVEZA / LEFKADA AREA (PVK - Aktion Airport)
+            'preveza marina': ['Aktion Airport', 'PVK', 5],
+            'preveza main port': ['Aktion Airport', 'PVK', 7],
+            'cleopatra marina': ['Aktion Airport', 'PVK', 6],
+            'd-marin marina lefkas': ['Aktion Airport', 'PVK', 25],
+            'd-marin lefkas': ['Aktion Airport', 'PVK', 25],
+            'port of lefkas': ['Aktion Airport', 'PVK', 25],
+            'lefkada': ['Aktion Airport', 'PVK', 25],
+            'nydri marina': ['Aktion Airport', 'PVK', 40],
+            'nydri port': ['Aktion Airport', 'PVK', 40],
+            'nydri': ['Aktion Airport', 'PVK', 40],
+            'vliho': ['Aktion Airport', 'PVK', 38],
+            'vasiliki': ['Aktion Airport', 'PVK', 55],
+            'sivota': ['Aktion Airport', 'PVK', 35],
+            'nikiana': ['Aktion Airport', 'PVK', 32],
+            'lygia': ['Aktion Airport', 'PVK', 28],
+            'ligia': ['Aktion Airport', 'PVK', 28],
+            'marina paleros': ['Aktion Airport', 'PVK', 45],
+            'palairos': ['Aktion Airport', 'PVK', 45],
+            'vounaki': ['Aktion Airport', 'PVK', 45],
+            'vonitsa': ['Aktion Airport', 'PVK', 15],
+            'astakos': ['Aktion Airport', 'PVK', 60],
+            'plataria': ['Aktion Airport', 'PVK', 50],
+            'mitikas': ['Aktion Airport', 'PVK', 55],
+            'mytikas': ['Aktion Airport', 'PVK', 55],
+            'perigiali': ['Aktion Airport', 'PVK', 25],
+            // CORFU AREA (CFU - Corfu Airport)
+            'd-marin marina gouvia': ['Corfu Airport', 'CFU', 8],
+            'd-marin gouvia': ['Corfu Airport', 'CFU', 8],
+            'gouvia': ['Corfu Airport', 'CFU', 8],
+            'corfu harbor': ['Corfu Airport', 'CFU', 3],
+            'corfu': ['Corfu Airport', 'CFU', 3],
+            'mandraki': ['Corfu Airport', 'CFU', 4],
+            'benitses': ['Corfu Airport', 'CFU', 12],
+            'palaiokastritsas': ['Corfu Airport', 'CFU', 25],
+            'alipa': ['Corfu Airport', 'CFU', 25],
+            // PAXOS
+            'paxos': ['Corfu Airport', 'CFU', 50],
+            'gaios': ['Corfu Airport', 'CFU', 50],
+            // KEFALONIA AREA (EFL - Kefalonia Airport)
+            'argostoli': ['Kefalonia Airport', 'EFL', 10],
+            'fiskardo': ['Kefalonia Airport', 'EFL', 50],
+            'sami': ['Kefalonia Airport', 'EFL', 25],
+            'agia effimia': ['Kefalonia Airport', 'EFL', 35],
+            'agia pelagia': ['Kefalonia Airport', 'EFL', 20],
+            'lixouri': ['Kefalonia Airport', 'EFL', 15],
+            'poros': ['Kefalonia Airport', 'EFL', 30],
+            // ITHACA
+            'ithaca': ['Kefalonia Airport', 'EFL', 40],
+            'vathy': ['Kefalonia Airport', 'EFL', 40],
+            // ZAKYNTHOS AREA (ZTH - Zakynthos Airport)
+            'zakynthos': ['Zakynthos Airport', 'ZTH', 5],
+            'zante': ['Zakynthos Airport', 'ZTH', 5],
+            'agios sostis': ['Zakynthos Airport', 'ZTH', 8]
+        };
+        
+        // Try exact match first
+        if (airportMap[baseLower]) {
+            const [name, code, km] = airportMap[baseLower];
+            return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code}</span>`;
+        }
+        
+        // Try partial match
+        for (const [searchTerm, airportInfo] of Object.entries(airportMap)) {
+            if (baseLower.includes(searchTerm)) {
+                const [name, code, km] = airportInfo;
+                return `<span class="yolo-ys-airport-distance">· ✈️ ${km}km from ${code}</span>`;
+            }
+        }
+        
+        return '';
+    }
+    
+    /**
      * Show error message
      */
     function showError(message) {
@@ -507,7 +590,7 @@
     }
     
     /**
-     * Render boat card
+     * Render boat card (v81.18: Added airport distance)
      */
     function renderBoatCard(boat, isYolo) {
         const yoloClass = isYolo ? 'yolo-yacht' : '';
@@ -536,6 +619,9 @@
             yachtName = nameParts[0];
             yachtModel = nameParts.slice(1).join(' ');
         }
+        
+        // Get airport info (v81.18)
+        const airportHtml = getAirportDistanceHtml(boat.startBase);
         
         // Helper function to format price with European locale
         const formatPrice = (price) => {
@@ -598,6 +684,7 @@
                     <div class="yolo-ys-yacht-location">
                         <span class="yolo-ys-location-icon">📍</span>
                         <span class="yolo-ys-location-text">${boat.startBase || 'Location not specified'}</span>
+                        ${airportHtml}
                     </div>
                     <div class="yolo-ys-yacht-header">
                         <h3 class="yolo-ys-yacht-name">${yachtName}</h3>

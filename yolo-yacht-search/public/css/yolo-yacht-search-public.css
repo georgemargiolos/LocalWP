@@ -455,3 +455,28 @@
         flex: 1 1 100%;
     }
 }
+
+
+/* ========================================
+   v81.18: Airport Distance Display
+   ======================================== */
+
+.yolo-ys-airport-distance {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-left: 4px;
+    white-space: nowrap;
+}
+
+/* Responsive: Stack airport info on smaller screens */
+@media (max-width: 576px) {
+    .yolo-ys-yacht-location {
+        flex-wrap: wrap;
+    }
+    
+    .yolo-ys-airport-distance {
+        display: block;
+        margin-left: 0;
+        margin-top: 2px;
+    }
+}
