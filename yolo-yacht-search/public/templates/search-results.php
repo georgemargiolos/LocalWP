@@ -272,7 +272,7 @@ if (!defined('ABSPATH')) {
         <!-- Load More Button -->
         <div class="yolo-ys-load-more" id="yolo-ys-load-more" style="display: none;">
             <button type="button" id="load-more-btn" class="btn-load-more">
-                <span id="load-more-text"><?php _e('Load More', 'yolo-yacht-search'); ?></span>
+                <span id="load-more-text"><?php _e('Load more yachts', 'yolo-yacht-search'); ?></span>
                 <span id="load-more-remaining"></span>
             </button>
         </div>
