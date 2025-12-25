@@ -581,8 +581,12 @@ jQuery(document).ready(function($) {
             order: JSON.stringify(order),
             nonce: nonce
         }, function(response) {
-            alert('Order saved!');
-        }, 500);
+            if (response.success) {
+                alert('Order saved!');
+            } else {
+                alert('Error saving order: ' + (response.data || 'Unknown error'));
+            }
+        });
     });
     
     // Copy synced description (will be implemented in Phase 3)
