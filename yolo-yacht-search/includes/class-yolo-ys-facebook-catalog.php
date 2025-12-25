@@ -13,23 +13,30 @@ if (!defined('ABSPATH')) {
 class YOLO_YS_Facebook_Catalog {
     
     /**
-     * Partner company IDs (loaded from settings)
-     * v86.2 FIX: Was hardcoded, now reads from options
+     * All company IDs for catalog (YOLO + Partners)
+     * v86.4: Now includes YOLO company alongside partners
      */
-    private $partner_company_ids;
+    private $catalog_company_ids;
     
     /**
-     * Constructor - load partner companies from settings
-     * v86.2 FIX
+     * Constructor - load YOLO + partner companies from settings
+     * v86.4: Combined YOLO and partners for unified catalog
      */
     public function __construct() {
-        $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
-        $this->partner_company_ids = array_filter(array_map('intval', array_map('trim', explode(',', $friend_companies))));
+        // Get YOLO company ID
+        $yolo_company = intval(get_option('yolo_ys_my_company_id', 7850));
         
-        // Fallback if empty
-        if (empty($this->partner_company_ids)) {
-            $this->partner_company_ids = array(4366, 3604, 6711);
+        // Get partner company IDs
+        $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
+        $partners = array_filter(array_map('intval', array_map('trim', explode(',', $friend_companies))));
+        
+        // Fallback for partners if empty
+        if (empty($partners)) {
+            $partners = array(4366, 3604, 6711);
         }
+        
+        // Combine: YOLO + Partners for catalog
+        $this->catalog_company_ids = array_unique(array_merge(array($yolo_company), $partners));
     }
     
     /**
@@ -146,12 +153,18 @@ class YOLO_YS_Facebook_Catalog {
     public function update_partner_starting_prices() {
         global $wpdb;
         
+        // v86.4: Early return if no companies configured
+        if (empty($this->catalog_company_ids)) {
+            error_log('YOLO Facebook Catalog: No companies configured for price update');
+            return 0;
+        }
+        
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        // Get all partner yachts with their minimum prices from offers
-        $partner_placeholders = implode(',', array_fill(0, count($this->partner_company_ids), '%d'));
+        // Get all catalog yachts (YOLO + Partners) with their minimum prices from offers
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -165,7 +178,7 @@ class YOLO_YS_Facebook_Catalog {
             AND p.date_from >= %s
             GROUP BY y.id, y.model",
             array_merge(
-                $this->partner_company_ids,
+                $this->catalog_company_ids,
                 array(date('Y-m-d'))
             )
         );
@@ -230,11 +243,16 @@ class YOLO_YS_Facebook_Catalog {
     public function get_partner_boats() {
         global $wpdb;
         
+        // v86.4: Early return if no companies configured
+        if (empty($this->catalog_company_ids)) {
+            return array();
+        }
+        
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         $images_table = $wpdb->prefix . 'yolo_yacht_images';
         
-        $partner_placeholders = implode(',', array_fill(0, count($this->partner_company_ids), '%d'));
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -255,7 +273,7 @@ class YOLO_YS_Facebook_Catalog {
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0
             ORDER BY y.model ASC",
-            $this->partner_company_ids
+            $this->catalog_company_ids
         );
         
         return $wpdb->get_results($sql);
@@ -448,14 +466,14 @@ class YOLO_YS_Facebook_Catalog {
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        $partner_placeholders = implode(',', array_fill(0, count($this->partner_company_ids), '%d'));
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
         
         // Total partner boats
         $total = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$yachts_table} 
             WHERE company_id IN ({$partner_placeholders})
             AND (status = 'active' OR status IS NULL)",
-            $this->partner_company_ids
+            $this->catalog_company_ids
         ));
         
         // Partner boats with prices
@@ -465,7 +483,7 @@ class YOLO_YS_Facebook_Catalog {
             WHERE y.company_id IN ({$partner_placeholders})
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0",
-            $this->partner_company_ids
+            $this->catalog_company_ids
         ));
         
         $last_update = get_option('yolo_ys_last_fb_catalog_update', 'Never');

@@ -496,10 +496,34 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                 <div class="map-container">
                     <?php 
                     $maps_key = get_option('yolo_ys_google_maps_api_key', '');
+                    
+                    // v86.4: Get marina coordinates for reliable map centering
+                    $marina_coords = null;
+                    if (function_exists('yolo_ys_get_marina_coordinates')) {
+                        $marina_coords = yolo_ys_get_marina_coordinates($yacht->home_base);
+                    }
+                    
                     if (!empty($maps_key)): 
+                        // Use coordinates if available, otherwise fall back to text search
+                        if ($marina_coords && isset($marina_coords['lat']) && isset($marina_coords['lng'])):
+                            // Direct coordinate embed - always works
+                            $map_url = sprintf(
+                                'https://www.google.com/maps/embed/v1/view?key=%s&center=%s,%s&zoom=14&maptype=roadmap',
+                                esc_attr($maps_key),
+                                $marina_coords['lat'],
+                                $marina_coords['lng']
+                            );
+                        else:
+                            // Fallback to text search (may not work for unknown marinas)
+                            $map_url = sprintf(
+                                'https://www.google.com/maps/embed/v1/place?key=%s&q=%s&zoom=12',
+                                esc_attr($maps_key),
+                                urlencode($yacht->home_base . ', Ionian Islands, Greece')
+                            );
+                        endif;
                     ?>
                     <iframe 
-                        src="https://www.google.com/maps/embed/v1/place?key=<?php echo esc_attr($maps_key); ?>&q=<?php echo urlencode($yacht->home_base . ', Greece'); ?>&zoom=12"
+                        src="<?php echo esc_url($map_url); ?>"
                         allowfullscreen="" 
                         loading="lazy" 
                         referrerpolicy="no-referrer-when-downgrade">
