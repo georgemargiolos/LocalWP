@@ -13,9 +13,24 @@ if (!defined('ABSPATH')) {
 class YOLO_YS_Facebook_Catalog {
     
     /**
-     * Partner company IDs (excludes YOLO 7850)
+     * Partner company IDs (loaded from settings)
+     * v86.2 FIX: Was hardcoded, now reads from options
      */
-    private $partner_company_ids = array(4366, 3604, 6711);
+    private $partner_company_ids;
+    
+    /**
+     * Constructor - load partner companies from settings
+     * v86.2 FIX
+     */
+    public function __construct() {
+        $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
+        $this->partner_company_ids = array_filter(array_map('intval', array_map('trim', explode(',', $friend_companies))));
+        
+        // Fallback if empty
+        if (empty($this->partner_company_ids)) {
+            $this->partner_company_ids = array(4366, 3604, 6711);
+        }
+    }
     
     /**
      * Brand mapping for models that don't include brand prefix
@@ -90,7 +105,10 @@ class YOLO_YS_Facebook_Catalog {
         // e.g., "Bavaria C42" -> "Bavaria"
         if (preg_match('/^([A-Za-z\-]+)\s/', $model, $matches)) {
             $potential_brand = trim($matches[1]);
-            // Check if it's a known brand
+            // v86.2 FIX: Check if it's a known brand (either as key or value)
+            if (array_key_exists($potential_brand, $this->brand_mapping)) {
+                return $this->brand_mapping[$potential_brand];
+            }
             if (in_array($potential_brand, $this->brand_mapping)) {
                 return $potential_brand;
             }
@@ -327,8 +345,12 @@ class YOLO_YS_Facebook_Catalog {
             // Price
             $price = number_format($boat->starting_from_price, 2, '.', '') . ' EUR';
             
-            // Link
-            $link = $yacht_base_url . $boat->slug . '/';
+            // Link - v86.2 FIX: Add fallback for empty slugs
+            if (!empty($boat->slug)) {
+                $link = $yacht_base_url . $boat->slug . '/';
+            } else {
+                $link = home_url('/yacht-details/?yacht_id=' . $boat->yacht_id);
+            }
             
             // Brand
             $brand = $this->extract_brand_from_model($boat->model);
@@ -345,7 +367,7 @@ class YOLO_YS_Facebook_Catalog {
             
             // Build CSV row
             $row = array(
-                $this->csv_escape($boat->yacht_id),
+                $this->csv_escape($boat->yacht_id, true),  // v86.2: Force quote large numbers
                 $this->csv_escape($boat->model),
                 $this->csv_escape($description),
                 $this->csv_escape($price),
@@ -370,19 +392,22 @@ class YOLO_YS_Facebook_Catalog {
     
     /**
      * Escape value for CSV
+     * v86.2 FIX: Added force_quote parameter for large numbers
      * 
      * @param string $value The value to escape
+     * @param bool $force_quote Force quoting (for large numbers that Excel might misinterpret)
      * @return string Escaped value
      */
-    private function csv_escape($value) {
+    private function csv_escape($value, $force_quote = false) {
         if ($value === null || $value === '') {
             return '""';
         }
         
+        $value = (string) $value;
         $value = str_replace('"', '""', $value);
         
-        // Wrap in quotes if contains comma, quote, or newline
-        if (strpos($value, ',') !== false || strpos($value, '"') !== false || strpos($value, "\n") !== false) {
+        // v86.2 FIX: Always quote if forced (for long numbers like yacht IDs)
+        if ($force_quote || strpos($value, ',') !== false || strpos($value, '"') !== false || strpos($value, "\n") !== false) {
             return '"' . $value . '"';
         }
         
