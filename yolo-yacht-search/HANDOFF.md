@@ -1,54 +1,32 @@
 # Handoff Document - YOLO Yacht Search & Booking Plugin
 
-**Date:** December 24, 2025  
-**Version:** v80.5 (Latest Stable Version)  
-**Task Goal:** Scalability improvements and yacht deactivation system for handling 15+ companies.
+**Date:** December 25, 2025  
+**Version:** v85.0 (Latest Stable Version)  
+**Task Goal:** Critical search filter fix and UX improvement for location/airport display.
 
 ---
 
-## 🔴 Summary of Work Completed (v80.5)
+## 🔴 Summary of Work Completed (v85.0)
 
-### 1. Yacht Deactivation System (Soft Delete) - IMPLEMENTED
-- **Problem:** When a company removes a yacht from their fleet, it stayed in the database forever
-- **Solution:** Mark yachts as inactive instead of deleting them
+### 1. CRITICAL: Partner Boats Greek Ionian Filter - IMPLEMENTED
+- **Problem:** Boats from non-Ionian areas (e.g., Nikiti/Halkidiki) were appearing in search results even after company was removed from settings
+- **Root Cause:** Greek Ionian filter was ONLY applied during sync. Once boats were in database, search showed ALL "active" boats with NO Greek Ionian filter
+- **Solution:** Added `home_base_id IN (GREEK_IONIAN_BASE_IDS)` filter to all search queries
 - **Implementation:**
-  - Added `status` column (`active`/`inactive`) to yachts table
-  - Added `deactivated_at` timestamp column
-  - Yachts not in API response are marked inactive
-  - Yachts automatically reactivate if they return to API
-  - All data (images, equipment, history) is preserved
-  - Inactive yachts hidden from search and "Our Yachts" pages
+  - Added filter to `yolo_ys_ajax_search_yachts()` - original search function
+  - Added filter to `yolo_ys_ajax_search_yachts_filtered()` - partner query
+  - Added filter to count query for accurate pagination
 - **Status:** **COMPLETE**
 
-### 2. Batch Pause for Scalability - IMPLEMENTED
-- **Problem:** With 15+ companies, sync could hit rate limits or timeout
-- **Solution:** Process companies in batches of 5 with 2-minute pause between batches
+### 2. Location & Airport Display in One Line - IMPLEMENTED
+- **Problem:** Location and airport info were displayed separately
+- **Solution:** Combined into one line in yacht details header
+- **Format:** `📍 Preveza Main Port · ✈️ 7km from PVK - Aktion Airport`
 - **Implementation:**
-  - Yacht Sync: Process 5 companies → pause 2 min → repeat
-  - Offers Sync: Process 5 companies → pause 2 min → repeat
-  - Execution time limit increased to 30 minutes
+  - Modified `yacht-details-v3.php` header section
+  - Uses existing `yolo_ys_get_nearest_airport()` helper function
+  - Same row, same fonts for cleaner presentation
 - **Status:** **COMPLETE**
-
-### 3. Search Filter for Active Yachts - IMPLEMENTED
-- **Problem:** Inactive yachts could appear in search results
-- **Solution:** All queries now filter by `status = 'active'`
-- **Implementation:**
-  - Search results query: Added `AND (y.status = 'active' OR y.status IS NULL)`
-  - `get_all_yachts()`: Added optional `$include_inactive` parameter
-- **Status:** **COMPLETE**
-
----
-
-## Previous Session Summary (v80.3-80.4)
-
-### v80.4: Performance & Consistency Fixes
-- **Bug #6:** Cast company IDs to integers in search
-- **Bug #4:** Batch inserts for 10-100x faster sync
-
-### v80.3: CRITICAL: Per-Company Delete Fix
-- Fixed data loss bug where YOLO boats lost prices when partner syncs succeeded but YOLO sync failed
-- Auto-sync now uses dropdown year instead of current+next year
-- Added error logging for offer storage
 
 ---
 
@@ -56,99 +34,81 @@
 
 | File | Change Summary |
 | :--- | :--- |
-| `yolo-yacht-search.php` | Version bump to 80.5 |
-| `CHANGELOG.md` | Updated with v80.5 entry |
-| `README.md` | Updated with latest version and v80.5 summary |
-| `includes/class-yolo-ys-database.php` | Added status columns to schema, activate/deactivate methods, status filter in get_all_yachts() |
-| `includes/class-yolo-ys-activator.php` | Added migration for status and deactivated_at columns |
-| `includes/class-yolo-ys-sync.php` | Added batch pause (5 companies, 2 min), yacht activation/deactivation logic |
-| `public/class-yolo-ys-public-search.php` | Added status filter to search query |
-
----
-
-## Database Changes
-
-New columns added to `wp_yolo_yachts` table:
-```sql
-status VARCHAR(20) DEFAULT 'active'
-deactivated_at DATETIME DEFAULT NULL
-```
-
-Migration runs automatically on plugin update.
+| `yolo-yacht-search.php` | Version bump to 85.0 |
+| `CHANGELOG.md` | Updated with v85.0 entry |
+| `README.md` | Updated with latest version and v85.0 summary |
+| `public/class-yolo-ys-public-search.php` | Added Greek Ionian filter to 3 locations |
+| `public/templates/yacht-details-v3.php` | Combined location and airport display in header |
 
 ---
 
 ## Technical Implementation Details
 
-### Yacht Deactivation Flow
+### Greek Ionian Filter in Search Queries
+
+**Change 1: Original Search Function (line ~160)**
 ```php
-// After syncing each company's yachts:
-$api_yacht_ids = []; // Collect IDs from API response
-
-foreach ($yachts as $yacht) {
-    $this->db->store_yacht($yacht, $company_id);
-    $api_yacht_ids[] = $yacht['id'];
-}
-
-// Activate yachts that ARE in API response
-$this->db->activate_yachts($api_yacht_ids);
-
-// Deactivate yachts from this company that are NOT in API response
-$this->db->deactivate_missing_yachts($company_id, $api_yacht_ids);
-```
-
-### Batch Pause Flow
-```php
-$batch_size = 5;
-$batch_pause_seconds = 120; // 2 minutes
-$company_count = 0;
-
-foreach ($all_companies as $company_id) {
-    $company_count++;
-    
-    // ... sync company ...
-    
-    // Pause every 5 companies
-    if ($company_count % $batch_size === 0 && $company_count < $total_companies) {
-        sleep($batch_pause_seconds);
+// v85.0: Only include partner boats from Greek Ionian bases
+if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+    $home_base_id = null;
+    if (!empty($row->raw_data)) {
+        $raw_data = json_decode($row->raw_data, true);
+        $home_base_id = isset($raw_data['homeBaseId']) ? $raw_data['homeBaseId'] : null;
+    }
+    if ($home_base_id && in_array($home_base_id, YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+        $friend_boats[] = $boat;
     }
 }
 ```
 
----
-
-## Server Cron Setup (Recommended)
-
-WordPress pseudo-cron only runs when someone visits the site. For reliable auto-sync, set up a server cron:
-
-**Step 1: Add to wp-config.php:**
+**Change 2: Partner Query (line ~412)**
 ```php
-define('DISABLE_WP_CRON', true);
+// v85.0: Filter partner boats to Greek Ionian bases ONLY
+if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+    $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
+    $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%s'));
+    $partner_sql .= " AND y.home_base_id IN ($ionian_placeholders)";
+    foreach ($ionian_base_ids as $base_id) {
+        $partner_params[] = $base_id;
+    }
+}
 ```
 
-**Step 2: Add to server crontab:**
-```bash
-*/15 * * * * wget -q -O /dev/null "https://yolo-charters.com/wp-cron.php?doing_wp_cron" >/dev/null 2>&1
+**Change 3: Count Query (line ~509)**
+```php
+// v85.0: Greek Ionian filter for count query
+if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+    $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
+    $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%s'));
+    $count_sql .= " AND y.home_base_id IN ($ionian_placeholders)";
+    foreach ($ionian_base_ids as $base_id) {
+        $count_params[] = $base_id;
+    }
+}
+```
+
+### Location & Airport Display
+
+**yacht-details-v3.php (line ~229)**
+```php
+<span class="location" onclick="document.querySelector('.yacht-map-section h3')?.scrollIntoView({behavior: 'smooth'});">
+    📍 <?php echo esc_html($yacht->home_base); ?><?php 
+    // v85.0: Show airport info in same line
+    $airport_info = yolo_ys_get_nearest_airport($yacht->home_base);
+    if ($airport_info): 
+    ?> · ✈️ <?php echo esc_html($airport_info[2]); ?>km from <?php echo esc_html($airport_info[1]); ?> - <?php echo esc_html($airport_info[0]); ?><?php endif; ?>
+</span>
 ```
 
 ---
 
 ## Testing Checklist
 
-- [ ] Update plugin to v80.5
-- [ ] Verify database migration ran (check for `status` column in `wp_yolo_yachts`)
-- [ ] Run Yacht Sync and check logs for batch pause messages
-- [ ] Verify inactive yachts don't appear in search results
-- [ ] Verify inactive yachts don't appear on "Our Yachts" page
-- [ ] Test with 15+ companies to verify batch pause works
-
----
-
-## Next Steps
-
-1. **Test yacht deactivation** with real API data
-2. **Monitor batch pause timing** with 15+ companies
-3. **Consider admin UI** to view/manage inactive yachts
+- [ ] Update plugin to v85.0
+- [ ] Search for yachts and verify non-Ionian boats don't appear
+- [ ] Check yacht details page - location and airport should be in one line
+- [ ] Verify format: `📍 [Base Name] · ✈️ [X]km from [CODE] - [Airport Name]`
+- [ ] Test with different bases (Preveza, Lefkada, Corfu, etc.)
 
 ---
 
@@ -157,7 +117,6 @@ define('DISABLE_WP_CRON', true);
 | Resource | Link | Notes |
 | :--- | :--- | :--- |
 | **GitHub Repository** | [https://github.com/georgemargiolos/LocalWP](https://github.com/georgemargiolos/LocalWP) | All code is pushed here. |
-| **Latest Plugin ZIP** | `/home/ubuntu/LocalWP/yolo-yacht-search-v80.5.zip` | Use this file to update the plugin on your WordPress site. |
-| **Latest Changelog** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/CHANGELOG.md) | For a detailed history of changes. |
-| **Latest README** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/README.md) | For an overview of the latest features. |
-| **Handoff File** | [https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md](https://github.com/georgemargiolos/LocalWP/blob/main/yolo-yacht-search/HANDOFF.md) | This document. |
+| **Latest Changelog** | [CHANGELOG.md](CHANGELOG.md) | For a detailed history of changes. |
+| **Latest README** | [README.md](README.md) | For an overview of the latest features. |
+| **Handoff File** | [HANDOFF.md](HANDOFF.md) | This document. |

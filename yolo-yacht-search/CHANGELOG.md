@@ -1,5 +1,28 @@
 # Changelog
 
+## [85.0] - 2025-12-25
+
+### Fixed
+- **CRITICAL: Partner Boats from Removed Companies Appearing in Search** - Boats from non-Ionian areas (e.g., Nikiti/Halkidiki) were appearing in search results
+  - **Root Cause:** Greek Ionian filter was only applied during sync, not during search queries
+  - **Solution:** Added `home_base_id IN (GREEK_IONIAN_BASE_IDS)` filter to all search queries
+  - Partner boats now filtered by `home_base_id` against 41 verified Greek Ionian base IDs
+  - Filter applied to: original search function, filtered search query, and count query
+  - Only boats from Lefkada, Corfu, Kefalonia, Zakynthos, Ithaca, Preveza, Paxos will appear
+
+### Changed
+- **Location & Airport Display in One Line** - Yacht details header now shows location and airport info together
+  - Format: `📍 Preveza Main Port · ✈️ 7km from PVK - Aktion Airport`
+  - Same row, same fonts for cleaner presentation
+  - Uses existing `yolo_ys_get_nearest_airport()` helper function
+
+### Files Modified
+- `public/class-yolo-ys-public-search.php` - Added Greek Ionian filter to 3 locations
+- `public/templates/yacht-details-v3.php` - Combined location and airport display
+- `yolo-yacht-search.php` - Version bump to 85.0
+
+---
+
 ## [80.7] - 2025-12-24
 
 ### Fixed
