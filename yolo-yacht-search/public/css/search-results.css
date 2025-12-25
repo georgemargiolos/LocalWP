@@ -664,6 +664,6 @@ main .yolo-ys-search-results,
 
 /* v85.6: Search form background styling */
 div#yolo-ys-results-search-form {
-    background-color: #f8fafc;
-    padding: 30px;
+    background-color: #f8fafc !important;
+    padding: 30px !important;
 }
