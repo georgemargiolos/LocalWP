@@ -66,6 +66,13 @@ main .yolo-ys-search-results,
     box-sizing: border-box;
 }
 
+/* v85.3: Add row gap for proper card spacing */
+.yolo-ys-search-results .row,
+#yolo-ys-featured-boats,
+#yolo-ys-partner-boats {
+    row-gap: 24px !important;
+}
+
 .yolo-ys-no-results {
     text-align: center;
     padding: 60px 20px;

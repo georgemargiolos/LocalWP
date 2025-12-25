@@ -160,7 +160,10 @@ function yolo_ys_ajax_search_yachts() {
         if ($row->company_id == $my_company_id) {
             $yolo_boats[] = $boat;
         } else {
-            $friend_boats[] = $boat;
+            // v85.3: Only include boats from friend companies, not all non-YOLO boats
+            if (in_array((int)$row->company_id, $friend_ids)) {
+                $friend_boats[] = $boat;
+            }
         }
     }
     
@@ -225,8 +228,10 @@ function yolo_ys_ajax_search_yachts_filtered() {
         return;
     }
     
-    // Get company IDs
+    // Get company IDs - v85.3: Get friend companies for proper filtering
     $my_company_id = (int) get_option('yolo_ys_my_company_id', '7850');
+    $friend_companies = get_option('yolo_ys_friend_companies', '4366,3604,6711');
+    $friend_ids = array_filter(array_map('intval', array_map('trim', explode(',', $friend_companies))));
     
     // Extract dates
     $search_date_from = substr($date_from, 0, 10);
@@ -292,7 +297,12 @@ function yolo_ys_ajax_search_yachts_filtered() {
     
     // ========================================
     // QUERY 2: Partner Yachts - With filters
+    // v85.3: Filter by friend_companies list, not just "not my company"
     // ========================================
+    
+    // Build friend company placeholders
+    $friend_placeholders = !empty($friend_ids) ? implode(',', array_fill(0, count($friend_ids), '%d')) : '0';
+    
     $partner_sql = "SELECT DISTINCT 
                 y.id as yacht_id,
                 y.name as yacht,
@@ -318,10 +328,13 @@ function yolo_ys_ajax_search_yachts_filtered() {
             INNER JOIN {$prices_table} p ON y.id = p.yacht_id
             WHERE p.date_from >= %s 
             AND p.date_from <= %s
-            AND y.company_id != %d
+            AND y.company_id IN ($friend_placeholders)
             AND (y.status = 'active' OR y.status IS NULL)";
     
-    $partner_params = array($search_date_from, $search_date_to, $my_company_id);
+    $partner_params = array($search_date_from, $search_date_to);
+    foreach ($friend_ids as $fid) {
+        $partner_params[] = $fid;
+    }
     
     // Filter by boat type if specified
     if (!empty($kind)) {
@@ -426,14 +439,18 @@ function yolo_ys_ajax_search_yachts_filtered() {
     $count_sql = preg_replace('/SELECT DISTINCT.*?FROM/s', 'SELECT COUNT(DISTINCT y.id) as total FROM', $partner_sql);
     
     // Simpler approach: wrap the query
+    // v85.3: Use friend_companies list for count query too
     $count_sql = "SELECT COUNT(*) FROM (SELECT DISTINCT y.id FROM {$yachts_table} y
             INNER JOIN {$prices_table} p ON y.id = p.yacht_id
             WHERE p.date_from >= %s 
             AND p.date_from <= %s
-            AND y.company_id != %d
+            AND y.company_id IN ($friend_placeholders)
             AND (y.status = 'active' OR y.status IS NULL)";
     
-    $count_params = array($search_date_from, $search_date_to, $my_company_id);
+    $count_params = array($search_date_from, $search_date_to);
+    foreach ($friend_ids as $fid) {
+        $count_params[] = $fid;
+    }
     
     if (!empty($kind)) {
         $count_sql .= " AND y.type = %s";

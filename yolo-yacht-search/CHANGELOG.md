@@ -1,5 +1,27 @@
 # Changelog
 
+## [85.3] - 2025-12-25
+
+### CRITICAL FIX - Nikiti Boats Appearing in Search
+- **Root Cause:** Partner query used `company_id != my_company` which showed ALL non-YOLO boats
+- **Solution:** Changed to `company_id IN (friend_companies)` - only shows boats from configured friend companies
+- Boats from removed companies (like Nikiti) no longer appear in search results
+
+### Changes Applied
+1. Added `friend_ids` array from `yolo_ys_friend_companies` setting
+2. Partner query: `AND y.company_id IN ($friend_placeholders)` instead of `!= %d`
+3. Count query: Same filter for accurate pagination
+4. Basic search: `in_array($row->company_id, $friend_ids)` check before adding to friend_boats
+
+### Key Difference
+| Before | After |
+|--------|-------|
+| `company_id != 7850` | `company_id IN (4366, 3604, 6711)` |
+| Shows ALL non-YOLO boats | Shows ONLY friend company boats |
+| Nikiti boats shown | Nikiti boats hidden |
+
+---
+
 ## [85.2] - 2025-12-25
 
 ### Fixed
