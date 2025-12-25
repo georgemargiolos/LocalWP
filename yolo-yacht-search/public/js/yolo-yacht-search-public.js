@@ -634,14 +634,9 @@
         // Format specs
         const lengthFt = boat.length ? Math.round(boat.length * 3.28084) : 0;
         
-        // Split yacht name into name and model
+        // Use separate name and model fields from API (v87.3 fix)
         let yachtName = boat.yacht || 'Unknown';
-        let yachtModel = '';
-        const nameParts = yachtName.split(' ');
-        if (nameParts.length > 1) {
-            yachtName = nameParts[0];
-            yachtModel = nameParts.slice(1).join(' ');
-        }
+        let yachtModel = boat.model || '';
         
         // Get airport info (v81.18)
         const airportHtml = getAirportDistanceHtml(boat.startBase);

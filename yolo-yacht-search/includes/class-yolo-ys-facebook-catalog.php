@@ -255,13 +255,14 @@ class YOLO_YS_Facebook_Catalog {
         // CAST y.id AS CHAR to ensure yacht_id is string for image lookup
         $sql = "SELECT 
                 CAST(y.id AS CHAR) as yacht_id,
+                y.name,
                 y.model,
                 y.slug,
                 y.description,
                 y.cabins,
                 y.berths,
                 y.home_base,
-                y.build_year,
+                y.year_of_build,
                 y.company_id,
                 COALESCE(c.starting_from_price, 0) as starting_from_price,
                 COALESCE(c.custom_description, '') as custom_description
@@ -393,12 +394,15 @@ class YOLO_YS_Facebook_Catalog {
             $custom_label_1 = !empty($boat->cabins) ? $boat->cabins : '';
             $custom_label_2 = !empty($boat->berths) ? $boat->berths : '';
             $custom_label_3 = !empty($boat->home_base) ? $boat->home_base : '';
-            $custom_label_4 = !empty($boat->build_year) ? $boat->build_year : '';
+            $custom_label_4 = !empty($boat->year_of_build) ? $boat->year_of_build : '';
+            
+            // Build title: Name + Model (v87.3 fix)
+            $title = trim($boat->name) . ' - ' . trim($boat->model);
             
             // Build CSV row
             $row = array(
                 $this->csv_escape($boat->yacht_id, true),  // v86.2: Force quote large numbers
-                $this->csv_escape($boat->model),
+                $this->csv_escape($title),
                 $this->csv_escape($description),
                 $this->csv_escape($price),
                 $this->csv_escape($link),

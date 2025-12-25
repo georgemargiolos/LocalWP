@@ -360,7 +360,8 @@ class YOLO_YS_Public {
         foreach ($results as $row) {
             $boat = array(
                 'yacht_id' => $row->yacht_id,
-                'yacht' => $row->yacht . ' ' . $row->model,
+                'yacht' => $row->yacht,
+                'model' => $row->model,
                 'product' => $row->product,
                 'startBase' => $row->startBase,
                 'price' => number_format($row->price, 0, '.', '.'),

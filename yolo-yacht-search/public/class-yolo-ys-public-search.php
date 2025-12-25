@@ -138,7 +138,8 @@ function yolo_ys_ajax_search_yachts() {
         
         $boat = array(
             'yacht_id' => $row->yacht_id,
-            'yacht' => $row->yacht . ' ' . $row->model,
+            'yacht' => $row->yacht,
+            'model' => $row->model,
             'product' => $row->product,
             'startBase' => $row->startBase,
             'price' => (float)$row->price,
@@ -636,7 +637,8 @@ function yolo_ys_format_boat_result($row, $details_page_url) {
     
     return array(
         'yacht_id' => $row->yacht_id,
-        'yacht' => $row->yacht . ' ' . $row->model,
+        'yacht' => $row->yacht,
+        'model' => $row->model,
         'product' => $row->product,
         'startBase' => $row->startBase,
         'price' => (float)$row->price,
