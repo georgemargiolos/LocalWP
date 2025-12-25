@@ -365,10 +365,37 @@ function yolo_ys_ajax_search_yachts_filtered() {
         $partner_params[] = $price_max;
     }
     
-    // Filter by location (using text matching - v81.20)
+    // Filter by location (v81.25: Map location names to marina search patterns)
     if (!empty($location)) {
-        $partner_sql .= " AND y.home_base LIKE %s";
-        $partner_params[] = '%' . $wpdb->esc_like($location) . '%';
+        // Map location filter values to marina name patterns
+        $location_patterns = array(
+            'Lefkada' => array('Lefkas', 'Lefkada', 'Nydri', 'Vliho', 'Vasiliki', 'Nikiana', 'Lygia', 'Ligia'),
+            'Corfu' => array('Corfu', 'Gouvia', 'Kerkyra'),
+            'Kefalonia' => array('Kefalonia', 'Argostoli', 'Fiskardo', 'Sami', 'Agia Effimia'),
+            'Zakynthos' => array('Zakynthos', 'Zante'),
+            'Ithaca' => array('Ithaca', 'Ithaki', 'Vathy'),
+            'Preveza' => array('Preveza', 'Cleopatra'),
+            'Syvota' => array('Syvota', 'Sivota'),
+            'Vonitsa' => array('Vonitsa'),
+            'Palairos' => array('Palairos', 'Paleros', 'Vounaki'),
+            'Plataria' => array('Plataria'),
+            'Astakos' => array('Astakos'),
+            'Paxos' => array('Paxos', 'Gaios'),
+        );
+        
+        if (isset($location_patterns[$location])) {
+            $patterns = $location_patterns[$location];
+            $like_conditions = array();
+            foreach ($patterns as $pattern) {
+                $like_conditions[] = "y.home_base LIKE %s";
+                $partner_params[] = '%' . $wpdb->esc_like($pattern) . '%';
+            }
+            $partner_sql .= " AND (" . implode(' OR ', $like_conditions) . ")";
+        } else {
+            // Fallback: direct match
+            $partner_sql .= " AND y.home_base LIKE %s";
+            $partner_params[] = '%' . $wpdb->esc_like($location) . '%';
+        }
     }
     
     // Filter by equipment (yacht must have ALL selected equipment)
@@ -429,10 +456,35 @@ function yolo_ys_ajax_search_yachts_filtered() {
         $count_sql .= " AND p.price <= %f";
         $count_params[] = $price_max;
     }
-    // Location filter for count (text matching - v81.20)
+    // Location filter for count (v81.25: Same mapping as main query)
     if (!empty($location)) {
-        $count_sql .= " AND y.home_base LIKE %s";
-        $count_params[] = '%' . $wpdb->esc_like($location) . '%';
+        $location_patterns = array(
+            'Lefkada' => array('Lefkas', 'Lefkada', 'Nydri', 'Vliho', 'Vasiliki', 'Nikiana', 'Lygia', 'Ligia'),
+            'Corfu' => array('Corfu', 'Gouvia', 'Kerkyra'),
+            'Kefalonia' => array('Kefalonia', 'Argostoli', 'Fiskardo', 'Sami', 'Agia Effimia'),
+            'Zakynthos' => array('Zakynthos', 'Zante'),
+            'Ithaca' => array('Ithaca', 'Ithaki', 'Vathy'),
+            'Preveza' => array('Preveza', 'Cleopatra'),
+            'Syvota' => array('Syvota', 'Sivota'),
+            'Vonitsa' => array('Vonitsa'),
+            'Palairos' => array('Palairos', 'Paleros', 'Vounaki'),
+            'Plataria' => array('Plataria'),
+            'Astakos' => array('Astakos'),
+            'Paxos' => array('Paxos', 'Gaios'),
+        );
+        
+        if (isset($location_patterns[$location])) {
+            $patterns = $location_patterns[$location];
+            $like_conditions = array();
+            foreach ($patterns as $pattern) {
+                $like_conditions[] = "y.home_base LIKE %s";
+                $count_params[] = '%' . $wpdb->esc_like($pattern) . '%';
+            }
+            $count_sql .= " AND (" . implode(' OR ', $like_conditions) . ")";
+        } else {
+            $count_sql .= " AND y.home_base LIKE %s";
+            $count_params[] = '%' . $wpdb->esc_like($location) . '%';
+        }
     }
     if (!empty($equipment) && is_array($equipment)) {
         foreach ($equipment as $equip_id) {
