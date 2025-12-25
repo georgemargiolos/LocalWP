@@ -1212,27 +1212,36 @@ class YOLO_YS_Admin {
         }
         
         $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
-        $order = isset($_POST['order']) ? $_POST['order'] : array();
+        $order_json = isset($_POST['order']) ? wp_unslash($_POST['order']) : '';
         
-        if (empty($yacht_id) || empty($order)) {
+        if (empty($yacht_id) || empty($order_json)) {
             wp_send_json_error('Invalid parameters');
         }
         
-        // Sanitize order array
-        $order = array_map('intval', $order);
+        // v87.5: Parse JSON order data - JS sends [{id: X, sort_order: Y}, ...]
+        $order = json_decode($order_json, true);
+        
+        if (!is_array($order)) {
+            wp_send_json_error('Invalid order format');
+        }
         
         global $wpdb;
         $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
         
         // Update sort order for each media item
-        foreach ($order as $sort_order => $media_id) {
-            $wpdb->update(
-                $custom_media_table,
-                array('sort_order' => $sort_order),
-                array('id' => $media_id, 'yacht_id' => $yacht_id),
-                array('%d'),
-                array('%d', '%s')
-            );
+        foreach ($order as $item) {
+            $media_id = isset($item['id']) ? intval($item['id']) : 0;
+            $sort_order = isset($item['sort_order']) ? intval($item['sort_order']) : 0;
+            
+            if ($media_id > 0) {
+                $wpdb->update(
+                    $custom_media_table,
+                    array('sort_order' => $sort_order),
+                    array('id' => $media_id, 'yacht_id' => $yacht_id),
+                    array('%d'),
+                    array('%d', '%s')
+                );
+            }
         }
         
         wp_send_json_success('Order saved');
