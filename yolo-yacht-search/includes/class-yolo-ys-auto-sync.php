@@ -100,16 +100,21 @@ class YOLO_YS_Auto_Sync {
             }
             
             $sync = new YOLO_YS_Progressive_Sync();
-            $state = get_option('yolo_ys_yacht_sync_state', array());
+            
+            // v85.4 FIX: Use get_state() method instead of wrong option name
+            $state = $sync->get_state();
+            if (!$state) {
+                $state = array();
+            }
             $phase = isset($state['phase']) ? $state['phase'] : 1;
             
             if ($phase === 1) {
                 // Phase 1: Sync yacht data (no images)
                 $result = $sync->sync_next_yacht();
                 
-                if ($result['phase_changed'] && $result['phase'] === 2) {
+                if (isset($result['phase_changed']) && $result['phase'] === 2) {
                     // Phase 1 complete, move to Phase 2
-                    error_log('[YOLO Auto-Sync v81.1] Phase 1 complete - Starting image downloads');
+                    error_log('[YOLO Auto-Sync v85.4] Phase 1 complete - Starting image downloads');
                     wp_schedule_single_event(time() + 1, self::PROGRESSIVE_YACHT_HOOK);
                 } elseif (!$result['done']) {
                     // More yachts to sync - schedule next step
@@ -117,7 +122,7 @@ class YOLO_YS_Auto_Sync {
                     
                     // Log progress every 10 yachts
                     if (isset($result['synced']) && $result['synced'] % 10 === 0) {
-                        error_log('[YOLO Auto-Sync v81.1] Phase 1 progress: ' . $result['synced'] . '/' . $result['total'] . ' yacht data synced');
+                        error_log('[YOLO Auto-Sync v85.4] Phase 1 progress: ' . $result['synced'] . '/' . $result['total'] . ' yacht data synced');
                     }
                 }
             } else {
@@ -125,30 +130,21 @@ class YOLO_YS_Auto_Sync {
                 $result = $sync->sync_next_image_batch();
                 
                 if (!$result['done']) {
-                    // More images to download - schedule next step (slightly longer delay for images)
+                    // More images to download
                     wp_schedule_single_event(time() + 2, self::PROGRESSIVE_YACHT_HOOK);
                     
-                    // Log progress every 10 yachts
                     if (isset($result['synced']) && $result['synced'] % 10 === 0) {
-                        error_log('[YOLO Auto-Sync v81.1] Phase 2 progress: ' . $result['synced'] . '/' . $result['total'] . ' yacht images downloaded');
+                        error_log('[YOLO Auto-Sync v85.4] Phase 2 progress: ' . $result['synced'] . '/' . $result['total'] . ' yacht images downloaded');
                     }
                 } else {
                     // Sync complete
-                    error_log('[YOLO Auto-Sync v81.1] Yacht sync COMPLETE: ' . $result['synced'] . ' yachts in ' . $result['duration']);
+                    error_log('[YOLO Auto-Sync v85.4] Yacht sync COMPLETE: ' . $result['synced'] . ' yachts in ' . $result['duration']);
                     update_option('yolo_ys_last_sync', current_time('mysql'));
                     update_option('yolo_ys_last_yacht_sync_status', 'success');
-                    
-                    // Log stats
-                    if (isset($result['stats'])) {
-                        error_log('[YOLO Auto-Sync v81.1] Stats - Images: ' . $result['stats']['images'] . 
-                                  ', Extras: ' . $result['stats']['extras'] . 
-                                  ', Equipment: ' . $result['stats']['equipment']);
-                    }
                 }
             }
         } catch (Exception $e) {
-            error_log('[YOLO Auto-Sync v81.1] Yacht sync step failed: ' . $e->getMessage());
-            // Don't stop - try to continue with next yacht
+            error_log('[YOLO Auto-Sync v85.4] Yacht sync step failed: ' . $e->getMessage());
             wp_schedule_single_event(time() + 5, self::PROGRESSIVE_YACHT_HOOK);
         }
     }

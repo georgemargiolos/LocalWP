@@ -1,5 +1,15 @@
 # Changelog
 
+## [85.4] - 2025-12-25
+
+### Fixed
+- **CRITICAL: Auto-Sync Phase Detection Broken** - Auto-sync was reading state from wrong option
+  - **Bug:** `progressive_yacht_step()` read from `yolo_ys_yacht_sync_state` (wrong)
+  - **Fix:** Changed to use `$sync->get_state()` which reads from `yolo_ys_progressive_sync_state` (correct)
+  - Auto-sync now correctly detects which phase it's in (Phase 1: data, Phase 2: images)
+
+---
+
 ## [85.3] - 2025-12-25
 
 ### CRITICAL FIX - Nikiti Boats Appearing in Search
