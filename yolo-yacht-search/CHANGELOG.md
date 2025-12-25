@@ -1,5 +1,14 @@
 # Changelog
 
+## [86.0] - 2025-12-25
+
+### Fixed
+- **Yacht Customization Partner Companies** - Fixed company dropdown not showing partner companies
+  - Bug: Was reading from wrong option `yolo_ys_friend_company_ids` instead of `yolo_ys_friend_companies`
+  - Now shows YOLO Charters + all configured friend companies (Albatros, Kiriacoulis, Seafarer, etc.)
+
+---
+
 ## [85.9] - 2025-12-25
 
 ### Added

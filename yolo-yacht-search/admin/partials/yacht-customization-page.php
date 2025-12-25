@@ -26,7 +26,7 @@ $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
 $yolo_company_id = get_option('yolo_ys_my_company_id', 7850);
 
 // Get friend company IDs
-$friend_ids_raw = get_option('yolo_ys_friend_company_ids', '');
+$friend_ids_raw = get_option('yolo_ys_friend_companies', '4366,3604,6711');
 $friend_company_ids = array_filter(array_map('trim', explode(',', $friend_ids_raw)));
 
 // Build company list with names
