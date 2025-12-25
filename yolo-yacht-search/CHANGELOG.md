@@ -1,5 +1,15 @@
 # Changelog
 
+## [85.5] - 2025-12-25
+
+### Fixed
+- **Search Results Card Spacing** - Cards were too close together on search results page
+  - **Root Cause:** Missing Bootstrap `g-4` gutter class on row containers
+  - **Fix:** Added `g-4` class to `#yolo-ys-featured-boats` and `#yolo-ys-partner-boats` containers
+  - Now matches the spacing on the Our Yachts page
+
+---
+
 ## [85.4] - 2025-12-25
 
 ### Fixed

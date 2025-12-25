@@ -254,7 +254,7 @@ if (!defined('ABSPATH')) {
         <!-- Featured Yachts Section (YOLO boats) -->
         <div class="yolo-ys-featured-section" id="yolo-ys-featured-section" style="display: none;">
             <h2 class="section-title"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <?php _e('Featured Yachts', 'yolo-yacht-search'); ?></h2>
-            <div class="row" id="yolo-ys-featured-boats">
+            <div class="row g-4" id="yolo-ys-featured-boats">
                 <!-- Featured boats loaded via JS -->
             </div>
         </div>
@@ -265,7 +265,7 @@ if (!defined('ABSPATH')) {
         </div>
         
         <!-- Partner Boats Grid -->
-        <div class="row" id="yolo-ys-partner-boats">
+        <div class="row g-4" id="yolo-ys-partner-boats">
             <!-- Partner boats loaded via JS -->
         </div>
         

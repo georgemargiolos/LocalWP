@@ -66,12 +66,7 @@ main .yolo-ys-search-results,
     box-sizing: border-box;
 }
 
-/* v85.3: Add proper card spacing - target Bootstrap columns */
-#yolo-ys-featured-boats > div,
-#yolo-ys-partner-boats > div,
-.yolo-ys-search-results .row > [class*="col-"] {
-    margin-bottom: 30px !important;
-}
+/* v85.5: Card spacing handled by Bootstrap g-4 gutter class on row containers */
 
 .yolo-ys-no-results {
     text-align: center;
