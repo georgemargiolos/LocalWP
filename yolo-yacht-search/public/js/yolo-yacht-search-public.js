@@ -453,14 +453,16 @@
             });
         }
         
-        // Update results count
+        // Update results count (v81.23: Include featured boats in count)
         const resultsCount = $('#yolo-ys-results-count');
         const countText = $('#results-count-text');
+        const featuredCount = (data.featured_boats && data.featured_boats.length) ? data.featured_boats.length : 0;
+        const totalYachts = featuredCount + (data.total_count || 0);
         
-        if (data.total_count > 0) {
-            countText.text(`Found ${data.total_count} yacht(s)`);
+        if (totalYachts > 0) {
+            countText.text(`Found ${totalYachts} yacht(s)`);
             resultsCount.show();
-        } else if (isNewSearch && (!data.featured_boats || data.featured_boats.length === 0)) {
+        } else if (isNewSearch) {
             // No results at all
             partnerContainer.html(`
                 <div class="col-12">
