@@ -3,7 +3,7 @@
  * Plugin Name: YOLO Yacht Search & Booking
  * Plugin URI: https://github.com/georgemargiolos/LocalWP
  * Description: Yacht search plugin with Booking Manager API integration for YOLO Charters. Features search widget and results blocks with company prioritization.
- * Version: 81.18
+ * Version: 81.19
  * Author: George Margiolos
  * Author URI: https://github.com/georgemargiolos
  * License: GPL v2 or later
@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '81.18');
+define('YOLO_YS_VERSION', '81.19');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -336,10 +336,31 @@ add_action('plugins_loaded', function() {
         }
     }
     
+    // v81.19: Add home_base_id column to yachts table
+    if (version_compare($installed_version, '81.19', '<')) {
+        global $wpdb;
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Check if home_base_id column exists
+        $column_exists = $wpdb->get_results(
+            "SHOW COLUMNS FROM {$yachts_table} LIKE 'home_base_id'"
+        );
+        
+        if (empty($column_exists)) {
+            // Add home_base_id column
+            $wpdb->query(
+                "ALTER TABLE {$yachts_table} 
+                 ADD COLUMN home_base_id bigint(20) DEFAULT NULL 
+                 AFTER home_base"
+            );
+            error_log('YOLO YS v81.19: Added home_base_id column to yachts table');
+        }
+    }
+    
     // Update version to current
-    if (version_compare($installed_version, '75.11', '<')) {
-        update_option('yolo_ys_db_version', '75.11');
-        error_log('YOLO YS: Database migrated to v75.11');
+    if (version_compare($installed_version, '81.19', '<')) {
+        update_option('yolo_ys_db_version', '81.19');
+        error_log('YOLO YS: Database migrated to v81.19');
     }
 }, 5);
 
