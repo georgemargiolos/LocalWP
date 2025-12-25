@@ -36,7 +36,8 @@ class YOLO_YS_Facebook_Catalog {
         }
         
         // Combine: YOLO + Partners for catalog
-        $this->catalog_company_ids = array_unique(array_merge(array($yolo_company), $partners));
+        // v86.5 FIX: Keep as strings to match database column type
+        $this->catalog_company_ids = array_unique(array_merge(array(strval($yolo_company)), array_map('strval', $partners)));
     }
     
     /**
@@ -164,7 +165,8 @@ class YOLO_YS_Facebook_Catalog {
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
         // Get all catalog yachts (YOLO + Partners) with their minimum prices from offers
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.5 FIX: Use %s for string company_ids
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -177,7 +179,7 @@ class YOLO_YS_Facebook_Catalog {
             AND (y.status = 'active' OR y.status IS NULL)
             AND p.date_from >= %s
             GROUP BY y.id, y.model",
-            array_merge(
+            ...array_merge(
                 $this->catalog_company_ids,
                 array(date('Y-m-d'))
             )
@@ -252,7 +254,8 @@ class YOLO_YS_Facebook_Catalog {
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         $images_table = $wpdb->prefix . 'yolo_yacht_images';
         
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.5 FIX: Use %s for string company_ids
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
         
         $sql = $wpdb->prepare(
             "SELECT 
@@ -273,7 +276,7 @@ class YOLO_YS_Facebook_Catalog {
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0
             ORDER BY y.model ASC",
-            $this->catalog_company_ids
+            ...$this->catalog_company_ids
         );
         
         return $wpdb->get_results($sql);
@@ -466,24 +469,25 @@ class YOLO_YS_Facebook_Catalog {
         $yachts_table = $wpdb->prefix . 'yolo_yachts';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%d'));
+        // v86.5 FIX: Use %s for string company_ids
+        $partner_placeholders = implode(',', array_fill(0, count($this->catalog_company_ids), '%s'));
         
-        // Total partner boats
+        // Total catalog boats (YOLO + Partners)
         $total = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$yachts_table} 
             WHERE company_id IN ({$partner_placeholders})
             AND (status = 'active' OR status IS NULL)",
-            $this->catalog_company_ids
+            ...$this->catalog_company_ids
         ));
         
-        // Partner boats with prices
+        // Catalog boats with prices
         $with_prices = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$yachts_table} y
             LEFT JOIN {$custom_table} c ON y.id = c.yacht_id
             WHERE y.company_id IN ({$partner_placeholders})
             AND (y.status = 'active' OR y.status IS NULL)
             AND COALESCE(c.starting_from_price, 0) > 0",
-            $this->catalog_company_ids
+            ...$this->catalog_company_ids
         ));
         
         $last_update = get_option('yolo_ys_last_fb_catalog_update', 'Never');
