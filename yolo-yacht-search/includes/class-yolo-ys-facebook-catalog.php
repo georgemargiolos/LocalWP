@@ -36,12 +36,7 @@ class YOLO_YS_Facebook_Catalog {
         }
         
         // Combine: YOLO + Partners for catalog
-        // v86.6: Use integers - MySQL handles bigint comparison correctly
         $this->catalog_company_ids = array_unique(array_merge(array($yolo_company), $partners));
-        
-        // v86.11: Debug logging
-        error_log('YOLO FB Catalog __construct: YOLO=' . $yolo_company . ', Partners=' . implode(',', $partners));
-        error_log('YOLO FB Catalog __construct: catalog_company_ids=' . implode(',', $this->catalog_company_ids));
     }
     
     /**
@@ -168,10 +163,11 @@ class YOLO_YS_Facebook_Catalog {
         $prices_table = $wpdb->prefix . 'yolo_yacht_prices';
         $custom_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
         
-        // v86.9: Build company IDs directly into query (simpler, more reliable)
+        // v87.0: Build company IDs directly into query
         $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
-        $today = date('Y-m-d');
         
+        // v87.0 FIX: Remove date filter - use minimum price from ANY offer (past or future)
+        // The "starting from" price is an indicative price, valid regardless of specific dates
         $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
@@ -180,8 +176,9 @@ class YOLO_YS_Facebook_Catalog {
             INNER JOIN {$prices_table} p ON CAST(y.id AS CHAR) = p.yacht_id
             WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
-            AND p.date_from >= '{$today}'
-            GROUP BY y.id, y.model";
+            AND p.price > 0
+            GROUP BY y.id, y.model
+            HAVING MIN(p.price) > 0";
         
         $results = $wpdb->get_results($sql);
         
@@ -254,7 +251,7 @@ class YOLO_YS_Facebook_Catalog {
         // v86.9: Build company IDs directly into query (simpler, more reliable)
         $company_ids_escaped = implode(',', array_map('intval', $this->catalog_company_ids));
         
-        // v86.11: Use CAST for consistency with update_partner_starting_prices
+        // v87.0: Use INNER JOIN since we only want boats WITH prices
         $sql = "SELECT 
                 y.id as yacht_id,
                 y.model,
@@ -265,41 +262,16 @@ class YOLO_YS_Facebook_Catalog {
                 y.home_base,
                 y.build_year,
                 y.company_id,
-                COALESCE(c.starting_from_price, 0) as starting_from_price,
+                c.starting_from_price,
                 COALESCE(c.custom_description, '') as custom_description
             FROM {$yachts_table} y
-            LEFT JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
+            INNER JOIN {$custom_table} c ON CAST(y.id AS CHAR) = c.yacht_id
             WHERE y.company_id IN ({$company_ids_escaped})
             AND (y.status = 'active' OR y.status IS NULL)
-            AND COALESCE(c.starting_from_price, 0) > 0
+            AND c.starting_from_price > 0
             ORDER BY y.model ASC";
         
-        // v86.11: Log the SQL before executing
-        error_log('YOLO FB Catalog get_partner_boats SQL: ' . $sql);
-        
-        $results = $wpdb->get_results($sql);
-        
-        // v86.11: Log any MySQL errors
-        if ($wpdb->last_error) {
-            error_log('YOLO FB Catalog MySQL Error: ' . $wpdb->last_error);
-        }
-        
-        // Debug logging
-        if (empty($results)) {
-            error_log('YOLO FB Catalog get_partner_boats: Empty results. Company IDs: ' . $company_ids_escaped);
-            
-            // Check if there are ANY boats for these companies
-            $total_check = $wpdb->get_var("SELECT COUNT(*) FROM {$yachts_table} WHERE company_id IN ({$company_ids_escaped})");
-            error_log('YOLO FB Catalog: Total boats for companies: ' . $total_check);
-            
-            // Check if there are boats with prices
-            $price_check = $wpdb->get_var("SELECT COUNT(*) FROM {$custom_table} WHERE starting_from_price > 0");
-            error_log('YOLO FB Catalog: Total rows with prices in custom_settings: ' . $price_check);
-        } else {
-            error_log('YOLO FB Catalog get_partner_boats: Found ' . count($results) . ' boats');
-        }
-        
-        return $results;
+        return $wpdb->get_results($sql);
     }
     
     /**
