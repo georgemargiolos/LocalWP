@@ -565,23 +565,46 @@
 
 
 /* ========================================
-   v85.3: Airport Distance Display - Same styling as location
+   v85.5: Airport Distance Display - Inline with location
    ======================================== */
 
 .yolo-ys-airport-distance {
     font-size: 14px;
     color: #6b7280;
-    white-space: nowrap;
+    display: inline;
 }
 
-/* Responsive: Stack airport info on smaller screens */
-@media (max-width: 576px) {
+/* v85.5: Ensure all location elements flow inline */
+.yolo-ys-yacht-location {
+    display: block;
+    line-height: 1.5;
+}
+
+.yolo-ys-yacht-location .yolo-ys-location-icon,
+.yolo-ys-yacht-location .yolo-ys-location-text,
+.yolo-ys-yacht-location .yolo-ys-airport-distance {
+    display: inline;
+}
+
+/* Mobile: Responsive text sizing */
+@media (max-width: 768px) {
     .yolo-ys-yacht-location {
-        flex-wrap: wrap;
+        font-size: 13px !important;
+        line-height: 1.6;
     }
     
     .yolo-ys-airport-distance {
-        display: block;
-        margin-top: 2px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yolo-ys-yacht-location {
+        font-size: 12px !important;
+        line-height: 1.7;
+    }
+    
+    .yolo-ys-airport-distance {
+        font-size: 12px;
     }
 }
