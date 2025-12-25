@@ -422,13 +422,12 @@ function yolo_ys_ajax_search_yachts_filtered() {
         }
     }
     
-    // v85.1: Filter partner boats to Greek Ionian bases ONLY
-    // Fixed: Use %d for bigint values, and allow NULL home_base_id (not yet synced)
+    // v85.3: Filter partner boats to Greek Ionian bases ONLY
+    // REMOVED NULL fallback - was allowing Nikiti boats through!
     if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
         $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
-        // Use %d for bigint columns, allow NULL until all yachts re-synced
-        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
-        $partner_sql .= " AND (y.home_base_id IN ($ionian_placeholders) OR y.home_base_id IS NULL)";
+        $ionian_placeholders_base = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
+        $partner_sql .= " AND y.home_base_id IN ($ionian_placeholders_base)";
         foreach ($ionian_base_ids as $base_id) {
             $partner_params[] = (int)$base_id;
         }
@@ -524,11 +523,11 @@ function yolo_ys_ajax_search_yachts_filtered() {
             }
         }
     }
-    // v85.1: Greek Ionian filter for count query (fixed: %d for bigint, allow NULL)
+    // v85.3: Greek Ionian filter for count query - REMOVED NULL fallback
     if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
         $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
-        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
-        $count_sql .= " AND (y.home_base_id IN ($ionian_placeholders) OR y.home_base_id IS NULL)";
+        $ionian_placeholders_count = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
+        $count_sql .= " AND y.home_base_id IN ($ionian_placeholders_count)";
         foreach ($ionian_base_ids as $base_id) {
             $count_params[] = (int)$base_id;
         }

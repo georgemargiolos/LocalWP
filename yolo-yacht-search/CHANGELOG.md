@@ -3,8 +3,11 @@
 ## [85.3] - 2025-12-25
 
 ### CRITICAL FIX - Nikiti Boats Appearing in Search
-- **Root Cause:** Partner query used `company_id != my_company` which showed ALL non-YOLO boats
-- **Solution:** Changed to `company_id IN (friend_companies)` - only shows boats from configured friend companies
+- **Root Cause 1:** Partner query used `company_id != my_company` which showed ALL non-YOLO boats
+- **Root Cause 2:** Greek Ionian filter had `OR home_base_id IS NULL` which allowed Nikiti boats through
+- **Solution:** 
+  - Changed to `company_id IN (friend_companies)` - only shows boats from configured friend companies
+  - Removed NULL fallback from Greek Ionian filter
 - Boats from removed companies (like Nikiti) no longer appear in search results
 
 ### Changes Applied
@@ -12,6 +15,10 @@
 2. Partner query: `AND y.company_id IN ($friend_placeholders)` instead of `!= %d`
 3. Count query: Same filter for accurate pagination
 4. Basic search: `in_array($row->company_id, $friend_ids)` check before adding to friend_boats
+5. **REMOVED** `OR y.home_base_id IS NULL` from Greek Ionian filter (was allowing Nikiti through)
+
+### IMPORTANT: Run Yacht Sync
+After deploying, run a **full yacht sync** to ensure all partner boats have their `home_base_id` populated.
 
 ### Key Difference
 | Before | After |

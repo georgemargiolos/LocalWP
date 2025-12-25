@@ -66,11 +66,11 @@ main .yolo-ys-search-results,
     box-sizing: border-box;
 }
 
-/* v85.3: Add row gap for proper card spacing */
-.yolo-ys-search-results .row,
-#yolo-ys-featured-boats,
-#yolo-ys-partner-boats {
-    row-gap: 24px !important;
+/* v85.3: Add proper card spacing - target Bootstrap columns */
+#yolo-ys-featured-boats > div,
+#yolo-ys-partner-boats > div,
+.yolo-ys-search-results .row > [class*="col-"] {
+    margin-bottom: 30px !important;
 }
 
 .yolo-ys-no-results {
