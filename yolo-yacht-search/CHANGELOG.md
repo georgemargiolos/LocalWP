@@ -1,5 +1,27 @@
 # Changelog
 
+## [85.2] - 2025-12-25
+
+### Fixed
+- **CRITICAL: Nikiti Boats Showing in Search** - Non-Ionian boats from removed companies appearing
+  - **Root Cause:** v85.1 removed the Greek Ionian filter entirely, allowing all boats in DB
+  - **Solution:** Re-added Greek Ionian filter with proper fixes from Cursor:
+    - Use `%d` instead of `%s` for bigint `home_base_id` column
+    - Added `OR y.home_base_id IS NULL` to allow boats not yet re-synced
+  - Filter now correctly excludes Nikiti/Halkidiki boats while allowing Greek Ionian boats
+
+### UI Improvements
+- **Featured Yachts section** - Now displays 5 stars instead of 1 star
+- **Card spacing** - Added 24px margin-bottom to yacht cards for proper row spacing
+- **Filter order** - Yacht Location filter moved to first position in advanced filters
+
+### Technical Details
+- Partner query: `AND (y.home_base_id IN (%d,...) OR y.home_base_id IS NULL)`
+- Count query: Same filter applied for accurate pagination
+- After full yacht sync, all boats will have `home_base_id` populated
+
+---
+
 ## [85.1] - 2025-12-25
 
 ### Fixed

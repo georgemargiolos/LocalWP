@@ -409,6 +409,18 @@ function yolo_ys_ajax_search_yachts_filtered() {
         }
     }
     
+    // v85.1: Filter partner boats to Greek Ionian bases ONLY
+    // Fixed: Use %d for bigint values, and allow NULL home_base_id (not yet synced)
+    if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+        $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
+        // Use %d for bigint columns, allow NULL until all yachts re-synced
+        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
+        $partner_sql .= " AND (y.home_base_id IN ($ionian_placeholders) OR y.home_base_id IS NULL)";
+        foreach ($ionian_base_ids as $base_id) {
+            $partner_params[] = (int)$base_id;
+        }
+    }
+    
     // Get total count before pagination
     $count_sql = str_replace("SELECT DISTINCT", "SELECT COUNT(DISTINCT y.id) as total FROM (SELECT DISTINCT", $partner_sql);
     $count_sql = preg_replace('/SELECT DISTINCT.*?FROM/s', 'SELECT COUNT(DISTINCT y.id) as total FROM', $partner_sql);
@@ -493,6 +505,15 @@ function yolo_ys_ajax_search_yachts_filtered() {
                 $count_sql .= " AND EXISTS (SELECT 1 FROM {$equipment_table} e WHERE e.yacht_id = y.id AND e.equipment_id = %d)";
                 $count_params[] = $equip_id;
             }
+        }
+    }
+    // v85.1: Greek Ionian filter for count query (fixed: %d for bigint, allow NULL)
+    if (defined('YOLO_YS_GREEK_IONIAN_BASE_IDS') && !empty(YOLO_YS_GREEK_IONIAN_BASE_IDS)) {
+        $ionian_base_ids = YOLO_YS_GREEK_IONIAN_BASE_IDS;
+        $ionian_placeholders = implode(',', array_fill(0, count($ionian_base_ids), '%d'));
+        $count_sql .= " AND (y.home_base_id IN ($ionian_placeholders) OR y.home_base_id IS NULL)";
+        foreach ($ionian_base_ids as $base_id) {
+            $count_params[] = (int)$base_id;
         }
     }
     $count_sql .= ") as counted";

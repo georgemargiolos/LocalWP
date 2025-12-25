@@ -61,6 +61,26 @@ if (!defined('ABSPATH')) {
         <!-- Filters Content (collapsed on mobile) -->
         <div class="filters-content" id="filters-content">
             <div class="filters-row">
+                <!-- Location Filter (First) -->
+                <div class="filter-group">
+                    <label for="filter-location"><?php _e('Yacht Location', 'yolo-yacht-search'); ?></label>
+                    <select id="filter-location" class="yolo-filter">
+                        <option value=""><?php _e('Any Location', 'yolo-yacht-search'); ?></option>
+                        <option value="Lefkada">Lefkada</option>
+                        <option value="Corfu">Corfu</option>
+                        <option value="Kefalonia">Kefalonia</option>
+                        <option value="Zakynthos">Zakynthos</option>
+                        <option value="Ithaca">Ithaca</option>
+                        <option value="Preveza">Preveza</option>
+                        <option value="Syvota">Syvota</option>
+                        <option value="Vonitsa">Vonitsa</option>
+                        <option value="Palairos">Palairos</option>
+                        <option value="Plataria">Plataria</option>
+                        <option value="Astakos">Astakos</option>
+                        <option value="Paxos">Paxos</option>
+                    </select>
+                </div>
+                
                 <!-- Cabins Filter -->
                 <div class="filter-group">
                     <label for="filter-cabins"><?php _e('Cabins', 'yolo-yacht-search'); ?></label>
@@ -163,26 +183,6 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
                 
-                <!-- Location Filter -->
-                <div class="filter-group">
-                    <label for="filter-location"><?php _e('Yacht Location', 'yolo-yacht-search'); ?></label>
-                    <select id="filter-location" class="yolo-filter">
-                        <option value=""><?php _e('Any Location', 'yolo-yacht-search'); ?></option>
-                        <option value="Lefkada">Lefkada</option>
-                        <option value="Corfu">Corfu</option>
-                        <option value="Kefalonia">Kefalonia</option>
-                        <option value="Zakynthos">Zakynthos</option>
-                        <option value="Ithaca">Ithaca</option>
-                        <option value="Preveza">Preveza</option>
-                        <option value="Syvota">Syvota</option>
-                        <option value="Vonitsa">Vonitsa</option>
-                        <option value="Palairos">Palairos</option>
-                        <option value="Plataria">Plataria</option>
-                        <option value="Astakos">Astakos</option>
-                        <option value="Paxos">Paxos</option>
-                    </select>
-                </div>
-                
                 <!-- Equipment Filter (Multi-select) -->
                 <div class="filter-group filter-equipment">
                     <label for="filter-equipment"><?php _e('Equipment', 'yolo-yacht-search'); ?></label>
@@ -253,7 +253,7 @@ if (!defined('ABSPATH')) {
         
         <!-- Featured Yachts Section (YOLO boats) -->
         <div class="yolo-ys-featured-section" id="yolo-ys-featured-section" style="display: none;">
-            <h2 class="section-title"><i class="fa-solid fa-star"></i> <?php _e('Featured Yachts', 'yolo-yacht-search'); ?></h2>
+            <h2 class="section-title"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <?php _e('Featured Yachts', 'yolo-yacht-search'); ?></h2>
             <div class="row" id="yolo-ys-featured-boats">
                 <!-- Featured boats loaded via JS -->
             </div>

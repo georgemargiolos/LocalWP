@@ -178,6 +178,7 @@ article .yolo-ys-search-results {
     min-width: 0 !important;
     max-width: none !important;
     box-sizing: border-box !important;
+    margin-bottom: 24px !important;
 }
 
 .yolo-ys-yacht-card:hover {
