@@ -308,17 +308,36 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtersRow = document.querySelector('.filters-row');
         if (!filtersRow) return;
         
-        // Get all filter groups
+        // Get all filter groups and add data-filter attributes for CSS targeting
         const locationGroup = document.getElementById('filter-location').closest('.filter-group');
+        locationGroup.setAttribute('data-filter', 'location');
+        
         const cabinsGroup = document.getElementById('filter-cabins').closest('.filter-group');
+        cabinsGroup.setAttribute('data-filter', 'cabins');
+        
         const lengthMinGroup = document.getElementById('filter-length-min').closest('.filter-group');
+        lengthMinGroup.setAttribute('data-filter', 'length-min');
+        
         const lengthMaxGroup = document.getElementById('filter-length-max').closest('.filter-group');
+        lengthMaxGroup.setAttribute('data-filter', 'length-max');
+        
         const yearMinGroup = document.getElementById('filter-year-min').closest('.filter-group');
+        yearMinGroup.setAttribute('data-filter', 'year-min');
+        
         const yearMaxGroup = document.getElementById('filter-year-max').closest('.filter-group');
+        yearMaxGroup.setAttribute('data-filter', 'year-max');
+        
         const priceMinGroup = document.getElementById('filter-price-min').closest('.filter-group');
+        priceMinGroup.setAttribute('data-filter', 'price-min');
+        
         const priceMaxGroup = document.getElementById('filter-price-max').closest('.filter-group');
+        priceMaxGroup.setAttribute('data-filter', 'price-max');
+        
         const equipmentGroup = document.getElementById('equipment-dropdown-toggle').closest('.filter-group');
+        equipmentGroup.setAttribute('data-filter', 'equipment');
+        
         const sortByGroup = document.getElementById('filter-sort').closest('.filter-group');
+        sortByGroup.setAttribute('data-filter', 'sort');
         const applyBtn = document.getElementById('apply-filters');
         const clearBtn = document.getElementById('clear-filters');
         
@@ -342,6 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create dates group for row 1
         const datesGroup = document.createElement('div');
         datesGroup.className = 'filter-group';
+        datesGroup.setAttribute('data-filter', 'dates');
         datesGroup.innerHTML = '<label>Choose Dates</label>';
         datesInput.className = 'yolo-filter';
         datesGroup.appendChild(datesInput);
@@ -349,6 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create boat type group for row 1
         const boatTypeGroup = document.createElement('div');
         boatTypeGroup.className = 'filter-group';
+        boatTypeGroup.setAttribute('data-filter', 'boat-type');
         boatTypeGroup.innerHTML = '<label>Boat Type</label>';
         boatTypeSelect.className = 'yolo-filter';
         boatTypeGroup.appendChild(boatTypeSelect);

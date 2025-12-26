@@ -766,39 +766,70 @@ main .yolo-ys-search-results,
     display: none !important;
 }
 
-/* Filter rows layout */
+/* Filters container - full width */
+.filters-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+}
+
+/* Filter rows layout - DESKTOP */
 #filter-row-1,
 #filter-row-2 {
-    display: flex;
-    gap: 10px;
-    width: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    width: 100% !important;
+    justify-content: space-between !important;
 }
 
 #filter-row-1 {
-    margin-bottom: 15px;
+    margin-bottom: 15px !important;
 }
 
 #filter-row-2 {
-    align-items: flex-end;
+    align-items: flex-end !important;
 }
 
-/* All filter groups same width */
+/* Single filter groups - equal flex */
 #filter-row-1 .filter-group,
 #filter-row-2 .filter-group {
-    flex: 1;
-    min-width: 120px;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+}
+
+/* Min/Max pairs - each takes half the width of a single filter */
+#filter-row-1 .filter-group[data-filter="year-min"],
+#filter-row-1 .filter-group[data-filter="year-max"],
+#filter-row-2 .filter-group[data-filter="length-min"],
+#filter-row-2 .filter-group[data-filter="length-max"],
+#filter-row-2 .filter-group[data-filter="price-min"],
+#filter-row-2 .filter-group[data-filter="price-max"] {
+    flex: 0.5 1 0 !important;
+}
+
+/* Buttons wrapper - same width as a single filter */
+.filter-buttons-wrapper {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    gap: 5px !important;
+    min-width: 0 !important;
 }
 
 /* Filter labels - centered above boxes */
 #filter-row-1 .filter-group label,
 #filter-row-2 .filter-group label {
-    display: block;
-    text-align: center;
-    margin-bottom: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #374151;
+    display: block !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    color: #374151 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 /* All filter inputs - same height, vertically centered text */
@@ -811,48 +842,134 @@ main .yolo-ys-search-results,
     width: 100% !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 0 12px !important;
-    font-size: 14px !important;
+    padding: 0 8px !important;
+    font-size: 13px !important;
     display: flex !important;
     align-items: center !important;
     text-align: center !important;
     text-align-last: center !important;
     background: white !important;
+    box-sizing: border-box !important;
 }
 
-/* Buttons wrapper */
-.filter-buttons-wrapper {
-    display: flex !important;
-    gap: 5px !important;
-}
-
-/* Apply Filters button - blue, half width */
+/* Apply Filters button - blue */
 .filter-buttons-wrapper #apply-filters {
+    flex: 1 !important;
     height: 45px !important;
-    min-width: 80px !important;
     background: rgb(37, 99, 235) !important;
     color: white !important;
     border: none !important;
     border-radius: 8px !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    white-space: nowrap !important;
 }
 
-/* Clear All button - half width */
+/* Clear All button */
 .filter-buttons-wrapper #clear-filters {
+    flex: 1 !important;
     height: 45px !important;
-    min-width: 80px !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: white !important;
+    white-space: nowrap !important;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE - Filters
+   ============================================ */
+@media (max-width: 1200px) {
+    /* Wrap filters on medium screens */
+    #filter-row-1,
+    #filter-row-2 {
+        flex-wrap: wrap !important;
+    }
+    
+    #filter-row-1 .filter-group,
+    #filter-row-2 .filter-group {
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 140px !important;
+    }
+    
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"],
+    #filter-row-2 .filter-group[data-filter="length-min"],
+    #filter-row-2 .filter-group[data-filter="length-max"],
+    #filter-row-2 .filter-group[data-filter="price-min"],
+    #filter-row-2 .filter-group[data-filter="price-max"] {
+        flex: 1 1 calc(12.5% - 10px) !important;
+        min-width: 70px !important;
+    }
+    
+    .filter-buttons-wrapper {
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 140px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Stack filters on mobile */
+    #filter-row-1,
+    #filter-row-2 {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+    
+    #filter-row-1 .filter-group,
+    #filter-row-2 .filter-group {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+    
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"],
+    #filter-row-2 .filter-group[data-filter="length-min"],
+    #filter-row-2 .filter-group[data-filter="length-max"],
+    #filter-row-2 .filter-group[data-filter="price-min"],
+    #filter-row-2 .filter-group[data-filter="price-max"] {
+        flex: 1 1 calc(50% - 5px) !important;
+        width: calc(50% - 5px) !important;
+        min-width: calc(50% - 5px) !important;
+    }
+    
+    /* Group Min/Max pairs on mobile */
+    #filter-row-1,
+    #filter-row-2 {
+        flex-wrap: wrap !important;
+    }
+    
+    .filter-buttons-wrapper {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+    
+    .filter-buttons-wrapper #apply-filters,
+    .filter-buttons-wrapper #clear-filters {
+        flex: 1 !important;
+        max-width: 50% !important;
+    }
+    
+    /* 5px edge padding on mobile */
+    .entry-content.has-global-padding {
+        margin-left: -27px !important;
+        margin-right: -42px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    .filters-row {
+        padding: 0 5px !important;
+    }
 }
