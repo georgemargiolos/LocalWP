@@ -477,11 +477,18 @@ class YOLO_YS_Database {
                     }
                     
                     // Store local URL in database
+                    // v90.9: Use API's primary flag instead of index (API knows which image is primary)
+                    $is_primary = (!empty($image['primary']) && $image['primary']) ? 1 : 0;
+                    // Fallback: If API doesn't provide primary flag, use first image as primary
+                    if (!isset($image['primary']) && $index === 0) {
+                        $is_primary = 1;
+                    }
+                    
                     $wpdb->insert($this->table_images, array(
                         'yacht_id' => $yacht_id,
                         'image_url' => $local_url,
                         'thumbnail_url' => $thumbnail_local_url,
-                        'is_primary' => ($index === 0) ? 1 : 0,
+                        'is_primary' => $is_primary,
                         'sort_order' => $index
                     ));
                     
@@ -1155,11 +1162,18 @@ class YOLO_YS_Database {
         }
         
         // Store in database
+        // v90.9: Use API's primary flag instead of index (API knows which image is primary)
+        $is_primary = (!empty($image['primary']) && $image['primary']) ? 1 : 0;
+        // Fallback: If API doesn't provide primary flag, use first image as primary
+        if (!isset($image['primary']) && $index === 0) {
+            $is_primary = 1;
+        }
+        
         $wpdb->insert($this->table_images, array(
             'yacht_id' => $yacht_id,
             'image_url' => $local_url,
             'thumbnail_url' => $thumbnail_local_url,
-            'is_primary' => ($index === 0) ? 1 : 0,
+            'is_primary' => $is_primary,
             'sort_order' => $index
         ));
         
