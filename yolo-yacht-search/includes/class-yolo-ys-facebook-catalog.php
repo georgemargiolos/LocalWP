@@ -405,10 +405,14 @@ class YOLO_YS_Facebook_Catalog {
             // v87.4: Product type for Facebook (hierarchical category)
             $product_type = 'Vehicles & Parts > Vehicles > Watercraft > ' . $boat_type . 's';
             
-            // v87.4: Google Product Category for boats
-            // 3564 = Vehicles & Parts > Vehicles > Watercraft > Sailboats
-            // 3563 = Vehicles & Parts > Vehicles > Watercraft > Motor Boats (using for catamarans)
-            $google_category = ($boat_type === 'Catamaran') ? '3563' : '3564';
+            // v89.9.3: Google Product Category for boats (using full path for Facebook compatibility)
+            // Facebook/Meta Commerce Manager requires full category path, not just numeric ID
+            // Catamarans use Motor Boats category, Sailboats use Sailboats category
+            if ($boat_type === 'Catamaran') {
+                $google_category = 'Vehicles & Parts > Vehicles > Watercraft > Motor Boats';
+            } else {
+                $google_category = 'Vehicles & Parts > Vehicles > Watercraft > Sailboats';
+            }
             
             // Custom labels with meaningful data
             $custom_label_0 = $boat_type; // Sailboat/Catamaran

@@ -224,7 +224,7 @@ if (!defined('ABSPATH')) {
                 <div class="filter-group">
                     <label for="filter-sort"><i class="fas fa-sort"></i> <?php _e('Sort By', 'yolo-yacht-search'); ?></label>
                     <select id="filter-sort" class="yolo-filter">
-                        <option value="price_asc"><?php _e('Price: Low to High', 'yolo-yacht-search'); ?></option>
+                        <option value="price_asc" selected><?php _e('Price: Low to High', 'yolo-yacht-search'); ?></option>
                         <option value="price_desc"><?php _e('Price: High to Low', 'yolo-yacht-search'); ?></option>
                         <option value="year_desc"><?php _e('Year: Newest First', 'yolo-yacht-search'); ?></option>
                         <option value="length_desc"><?php _e('Length: Longest First', 'yolo-yacht-search'); ?></option>
@@ -535,18 +535,32 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         // Custom template function for Select2
+        // v89.9.3: Enhanced with fallback logic for empty text cases
         function formatOption(option, selectId) {
-            if (!option.id && option.text) {
+            // v89.9.3: Handle empty text cases with multiple fallbacks
+            var optionText = option.text || '';
+            if (!optionText && option.element) {
+                optionText = $(option.element).text() || '';
+            }
+            if (!optionText && option.id) {
+                // Fallback: try to get text from the original option element
+                var $originalOption = $('#' + selectId + ' option[value="' + option.id + '"]');
+                if ($originalOption.length) {
+                    optionText = $originalOption.text() || '';
+                }
+            }
+            
+            if (!option.id && optionText) {
                 var icons = iconMaps[selectId] || {};
                 var iconClass = icons[''] || 'fa-circle';
-                return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center; color: #6b7280;"></i>' + option.text + '</span>');
+                return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center; color: #6b7280;"></i>' + optionText + '</span>');
             }
             if (!option.id) {
-                return option.text;
+                return optionText || '&nbsp;';
             }
             var icons = iconMaps[selectId] || {};
             var iconClass = icons[option.id] || icons[''] || 'fa-circle';
-            return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center;"></i>' + option.text + '</span>');
+            return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center;"></i>' + optionText + '</span>');
         }
         
         // Initialize Select2 on main filter dropdowns
@@ -555,7 +569,17 @@ document.addEventListener('DOMContentLoaded', function() {
         selectIds.forEach(function(selectId) {
             var $select = $('#' + selectId);
             if ($select.length && !$select.data('select2')) {
-                $select.select2({
+                // v89.9.3: Ensure sort dropdown has a default value before Select2 init
+                if (selectId === 'filter-sort') {
+                    var currentVal = $select.val();
+                    if (!currentVal || currentVal === '') {
+                        $select.val('price_asc');
+                        // Update the selected attribute on the option element
+                        $select.find('option[value="price_asc"]').prop('selected', true);
+                    }
+                }
+                
+                var select2Options = {
                     minimumResultsForSearch: Infinity,
                     dropdownAutoWidth: false,
                     width: '100%',
@@ -567,7 +591,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     templateSelection: function(option) {
                         return formatOption(option, selectId);
                     }
-                });
+                };
+                
+                $select.select2(select2Options);
+                
+                // v89.9.3: Force update Select2 display after init to ensure text is shown
+                if (selectId === 'filter-sort') {
+                    $select.trigger('change.select2');
+                }
             }
         });
         

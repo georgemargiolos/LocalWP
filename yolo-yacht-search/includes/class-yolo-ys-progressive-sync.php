@@ -125,6 +125,11 @@ class YOLO_YS_Progressive_Sync {
         // Get YOLO's company ID - their boats are NOT filtered
         $my_company_id = (int) get_option('yolo_ys_my_company_id', 7850);
         
+        // v89.9.3: Log the actual setting values being used for debugging
+        $friend_companies_setting = get_option('yolo_ys_friend_companies', '4366,3604,6711');
+        error_log("YOLO Progressive Sync v89.9.3: Friend companies setting from database: '{$friend_companies_setting}'");
+        error_log("YOLO Progressive Sync v89.9.3: Companies to process: " . implode(', ', $companies));
+        
         // v81.13: Get HARDCODED Greek Ionian base IDs for client-side filtering
         // Uses constant YOLO_YS_GREEK_IONIAN_BASE_IDS (41 verified bases)
         // FAIL-SAFE: If constant not defined, skip friend companies entirely
@@ -162,7 +167,14 @@ class YOLO_YS_Progressive_Sync {
                         });
                         $yachts = array_values($yachts); // Re-index array
                         
-                        error_log("YOLO Progressive Sync: Company {$company_id} filtered from {$original_count} to " . count($yachts) . " Greek Ionian yachts");
+                        $filtered_count = count($yachts);
+                        error_log("YOLO Progressive Sync: Company {$company_id} filtered from {$original_count} to {$filtered_count} Greek Ionian yachts");
+                        
+                        // v89.9.3: Explicitly skip friend companies with 0 Ionian yachts
+                        if ($filtered_count === 0) {
+                            error_log("YOLO Progressive Sync: SKIPPING company {$company_id} - has 0 yachts in Greek Ionian Sea after filtering");
+                            continue; // Skip this company entirely
+                        }
                     }
                     
                     if (!empty($yachts)) {
