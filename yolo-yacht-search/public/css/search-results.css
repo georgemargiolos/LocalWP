@@ -798,254 +798,120 @@ main .yolo-ys-search-results,
     display: none !important;
 }
 
-/* Filters container - full width */
-.filters-row {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 15px !important;
-    box-sizing: border-box !important;
+/* ========================================
+   v90.8: Bootstrap Grid Filter Layout
+   ======================================== */
+
+/* Filter group styling */
+.filter-group {
+    margin-bottom: 0;
 }
 
-/* Filter rows layout - DESKTOP */
-#filter-row-1,
-#filter-row-2 {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 10px !important;
-    width: 100% !important;
-    justify-content: space-between !important;
+.filter-group label {
+    display: block;
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-#filter-row-1 {
-    margin-bottom: 15px !important;
+.filter-group label i {
+    margin-right: 4px;
 }
 
-#filter-row-2 {
-    align-items: flex-end !important;
+/* Form controls */
+.filter-group .form-select,
+.filter-group select,
+.filter-group input {
+    height: 42px;
+    font-size: 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    text-align: center;
+    text-align-last: center;
 }
 
-/* Single filter groups - equal flex */
-#filter-row-1 .filter-group,
-#filter-row-2 .filter-group {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
+/* Range inputs */
+.filter-range .range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-/* Min/Max pairs - each takes half the width of a single filter */
-#filter-row-1 .filter-group[data-filter="year-min"],
-#filter-row-1 .filter-group[data-filter="year-max"],
-#filter-row-2 .filter-group[data-filter="length-min"],
-#filter-row-2 .filter-group[data-filter="length-max"],
-#filter-row-2 .filter-group[data-filter="price-min"],
-#filter-row-2 .filter-group[data-filter="price-max"] {
-    flex: 0.5 1 0 !important;
+.filter-range .range-inputs select {
+    flex: 1;
+    min-width: 0;
+    padding: 0 4px;
 }
 
-/* Buttons wrapper - same width as a single filter */
-.filter-buttons-wrapper {
-    flex: 1 1 0 !important;
-    display: flex !important;
-    gap: 5px !important;
-    min-width: 0 !important;
+.filter-range .range-separator {
+    color: #9ca3af;
+    font-weight: 500;
+    flex-shrink: 0;
 }
 
-/* Filter labels - centered above boxes */
-#filter-row-1 .filter-group label,
-#filter-row-2 .filter-group label {
-    display: block !important;
-    text-align: center !important;
-    margin-bottom: 8px !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    color: #374151 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+/* Equipment dropdown toggle */
+.equipment-dropdown-toggle.form-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    cursor: pointer;
+    text-align: left;
+    text-align-last: left;
 }
 
-/* All filter inputs - same height, vertically centered text */
-#filter-row-1 select,
-#filter-row-1 input,
-#filter-row-2 select,
-#filter-row-2 input,
-#filter-row-2 button#equipment-dropdown-toggle {
-    height: 45px !important;
-    width: 100% !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 0 8px !important;
-    font-size: 13px !important;
-    display: flex !important;
-    align-items: center !important;
-    text-align: center !important;
-    text-align-last: center !important;
-    background: white !important;
-    box-sizing: border-box !important;
+.equipment-dropdown-toggle.form-select i {
+    font-size: 10px;
+    color: #6b7280;
 }
 
-/* Apply Filters button - blue */
-.filter-buttons-wrapper #apply-filters {
-    flex: 1 !important;
-    height: 45px !important;
-    background: rgb(37, 99, 235) !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    white-space: nowrap !important;
+/* Filter action buttons */
+.filter-actions {
+    padding-top: 22px;
 }
 
-/* Clear All button */
-.filter-buttons-wrapper #clear-filters {
-    flex: 1 !important;
-    height: 45px !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: white !important;
-    white-space: nowrap !important;
+.filter-actions .btn {
+    height: 42px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-actions .btn-primary {
+    background: rgb(37, 99, 235);
+    border-color: rgb(37, 99, 235);
+}
+
+.filter-actions .btn-primary:hover {
+    background: rgb(29, 78, 216);
+    border-color: rgb(29, 78, 216);
 }
 
 /* ============================================
-   MOBILE RESPONSIVE - Filters
-   v90.3: Improved responsive breakpoints for all viewport sizes
+   v90.8: Bootstrap Grid Responsive Overrides
    ============================================ */
 
-/* Large tablets and small desktops (900px - 1200px) */
-@media (max-width: 1200px) {
-    /* Wrap filters on medium screens */
-    #filter-row-1,
-    #filter-row-2 {
-        flex-wrap: wrap !important;
-        gap: 10px !important;
-    }
-    
-    /* Row 1: Location, Dates, Boat Type take more space, Cabins and Year Built wrap */
-    #filter-row-1 .filter-group {
-        flex: 1 1 calc(33.33% - 10px) !important;
-        min-width: 150px !important;
-    }
-    
-    /* Year Built range inputs - smaller */
-    #filter-row-1 .filter-group[data-filter="year-min"],
-    #filter-row-1 .filter-group[data-filter="year-max"] {
-        flex: 0 1 80px !important;
-        min-width: 70px !important;
-    }
-    
-    /* Row 2: All items wrap nicely */
-    #filter-row-2 .filter-group {
-        flex: 1 1 calc(25% - 10px) !important;
-        min-width: 120px !important;
-    }
-    
-    /* Length and Price range inputs - smaller */
-    #filter-row-2 .filter-group[data-filter="length-min"],
-    #filter-row-2 .filter-group[data-filter="length-max"],
-    #filter-row-2 .filter-group[data-filter="price-min"],
-    #filter-row-2 .filter-group[data-filter="price-max"] {
-        flex: 0 1 80px !important;
-        min-width: 70px !important;
-    }
-    
-    .filter-buttons-wrapper {
-        flex: 1 1 auto !important;
-        min-width: 200px !important;
-    }
-}
-
-/* Tablets (769px - 900px) - Two column layout */
-@media (max-width: 900px) and (min-width: 769px) {
-    #yolo-ys-advanced-filters {
-        padding: 15px !important;
-    }
-    
-    #filter-row-1,
-    #filter-row-2 {
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        gap: 12px !important;
-    }
-    
-    /* Row 1: 2 items per row */
-    #filter-row-1 .filter-group {
-        flex: 1 1 calc(50% - 10px) !important;
-        min-width: calc(50% - 10px) !important;
-        max-width: calc(50% - 6px) !important;
-    }
-    
-    /* Year Built label spans full width, inputs side by side */
-    #filter-row-1 .filter-group[data-filter="year-min"],
-    #filter-row-1 .filter-group[data-filter="year-max"] {
-        flex: 1 1 calc(25% - 10px) !important;
-        min-width: 80px !important;
-        max-width: none !important;
-    }
-    
-    /* Row 2: 2 items per row */
-    #filter-row-2 .filter-group {
-        flex: 1 1 calc(50% - 10px) !important;
-        min-width: calc(50% - 10px) !important;
-        max-width: calc(50% - 6px) !important;
-    }
-    
-    /* Length and Price range inputs */
-    #filter-row-2 .filter-group[data-filter="length-min"],
-    #filter-row-2 .filter-group[data-filter="length-max"],
-    #filter-row-2 .filter-group[data-filter="price-min"],
-    #filter-row-2 .filter-group[data-filter="price-max"] {
-        flex: 1 1 calc(25% - 10px) !important;
-        min-width: 70px !important;
-        max-width: none !important;
-    }
-    
-    /* Buttons take full width */
-    .filter-buttons-wrapper {
-        flex: 1 1 100% !important;
-        min-width: 100% !important;
-        justify-content: center !important;
-        margin-top: 5px !important;
-    }
-    
-    .filter-buttons-wrapper .btn-apply-filters,
-    .filter-buttons-wrapper .btn-clear-filters {
-        flex: 1 !important;
-        max-width: 200px !important;
-    }
-}
-
-/* MOBILE FILTER FIXES - v90.2 */
-/* v90.2: Filters at TOP, becomes FIXED when scrolling past original position */
+/* Mobile: Sticky filters at top */
 @media (max-width: 768px) {
     /* FILTERS - Default state (in normal flow) */
     .yolo-ys-advanced-filters,
     #yolo-ys-advanced-filters {
         position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
         z-index: 9999 !important;
         background: white !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
         padding: 12px 10px !important;
-        max-height: none !important;
-        overflow-y: visible !important;
         border-radius: 0 !important;
         border-bottom: 1px solid #e5e7eb !important;
-        margin: 0 -20px !important;
-        width: calc(100% + 40px) !important;
+        margin: 0 -15px !important;
+        width: calc(100% + 30px) !important;
         transition: box-shadow 0.2s ease !important;
     }
     
@@ -1059,135 +925,39 @@ main .yolo-ys-search-results,
         width: 100% !important;
         margin: 0 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-        border-bottom: 2px solid #e5e7eb !important;
     }
     
-    /* Placeholder to prevent content jump when filters become fixed */
-    .yolo-ys-filters-placeholder {
-        display: none;
-    }
-    
+    /* Placeholder to prevent content jump */
     .yolo-ys-filters-placeholder.active {
         display: block !important;
     }
     
-    /* When filters content is expanded, allow scrolling */
-    .yolo-ys-advanced-filters.filters-expanded,
-    #yolo-ys-advanced-filters.filters-expanded {
+    /* When filters expanded, allow scrolling */
+    .yolo-ys-advanced-filters.filters-expanded {
         max-height: 80vh !important;
         overflow-y: auto !important;
     }
     
-    /* Remove bottom padding since filters are now at top */
-    .yolo-ys-search-results {
-        padding-bottom: 40px !important;
+    /* Filter actions on mobile */
+    .filter-actions {
+        padding-top: 10px !important;
+        justify-content: center !important;
     }
     
-    /* Stack filters on mobile */
-    #filter-row-1,
-    #filter-row-2 {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        gap: 10px !important;
-        width: 100% !important;
-    }
-    
-    /* Each filter takes full width on mobile (1 per row) for better readability */
-    #filter-row-1 .filter-group,
-    #filter-row-2 .filter-group {
-        flex: 1 1 100% !important;
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
-        margin-bottom: 10px !important;
-    }
-    
-    /* v89.9.2: Min/Max pairs now full width - removed 48% rule */
-    
-    /* Buttons wrapper - full width */
-    .filter-buttons-wrapper {
-        display: flex !important;
-        flex: 1 1 100% !important;
-        width: 100% !important;
-        gap: 10px !important;
-        justify-content: space-between !important;
-        margin-top: 10px !important;
-    }
-    
-    .filter-buttons-wrapper #apply-filters,
-    .filter-buttons-wrapper #clear-filters {
+    .filter-actions .btn {
         flex: 1 !important;
-        max-width: 48% !important;
-        height: 50px !important;
-        font-size: 15px !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Larger labels on mobile for readability */
-    #filter-row-1 .filter-group label,
-    #filter-row-2 .filter-group label {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        margin-bottom: 6px !important;
-        display: block !important;
-        text-transform: uppercase !important;
-        color: #1f2937 !important;
-    }
-    
-    /* Ensure icons in labels are visible */
-    #filter-row-1 .filter-group label i,
-    #filter-row-2 .filter-group label i {
-        margin-right: 6px !important;
-        font-size: 12px !important;
-    }
-    
-    /* Larger inputs on mobile for touch */
-    #filter-row-1 select,
-    #filter-row-1 input,
-    #filter-row-2 select,
-    #filter-row-2 input,
-    #filter-row-2 button#equipment-dropdown-toggle {
-        height: 44px !important;
-        font-size: 14px !important;
-        padding: 0 12px !important;
-        width: 100% !important;
-        border-radius: 8px !important;
-    }
-    
-    /* Select2 mobile fixes */
-    .select2-container {
-        width: 100% !important;
-    }
-    
-    .select2-container--default .select2-selection--single {
-        height: 44px !important;
-        border-radius: 8px !important;
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 44px !important;
-        padding-left: 12px !important;
+        height: 46px !important;
         font-size: 14px !important;
     }
     
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 42px !important;
+    /* Larger inputs on mobile */
+    .filter-group .form-select,
+    .filter-group select {
+        height: 46px !important;
+        font-size: 14px !important;
     }
     
-    /* 5px edge padding on mobile */
-    .entry-content.has-global-padding {
-        margin-left: -27px !important;
-        margin-right: -42px !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-    
-    .filters-row {
-        padding: 0 !important;
-    }
-    
-    /* Featured badge mobile positioning - v90.6 */
+    /* Featured badge mobile */
     .yolo-ys-featured-badge {
         padding: 6px 10px !important;
         top: 8px !important;
@@ -1211,10 +981,6 @@ main .yolo-ys-search-results,
     .yolo-ys-equipment-item {
         font-size: 9px !important;
         padding: 2px 5px !important;
-    }
-    
-    .yolo-ys-equipment-item i {
-        font-size: 10px !important;
     }
 }
 

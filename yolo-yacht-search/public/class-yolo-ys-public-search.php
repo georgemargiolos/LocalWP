@@ -598,11 +598,33 @@ function yolo_ys_ajax_search_yachts_filtered() {
 /**
  * Helper function to format boat result
  * v90.7: Added equipment IDs for yacht cards
+ * v90.8: Added custom media support for search results
  */
 function yolo_ys_format_boat_result($row, $details_page_url) {
     global $wpdb;
     
     $primary_image = $row->image_url;
+    
+    // v90.8: Check if yacht uses custom media
+    $custom_settings_table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+    $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+    
+    $use_custom_media = $wpdb->get_var($wpdb->prepare(
+        "SELECT use_custom_media FROM {$custom_settings_table} WHERE yacht_id = %s",
+        $row->yacht_id
+    ));
+    
+    if ($use_custom_media) {
+        // Get first custom image
+        $custom_image = $wpdb->get_var($wpdb->prepare(
+            "SELECT media_url FROM {$custom_media_table} WHERE yacht_id = %s AND media_type = 'image' ORDER BY sort_order ASC LIMIT 1",
+            $row->yacht_id
+        ));
+        
+        if (!empty($custom_image)) {
+            $primary_image = $custom_image;
+        }
+    }
     
     // Fallback: Extract from raw_data if no image in database
     if (empty($primary_image) && !empty($row->raw_data)) {
