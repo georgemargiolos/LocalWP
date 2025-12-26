@@ -667,3 +667,48 @@ div#yolo-ys-results-search-form {
     background: #f8fafc !important;
     padding: 30px !important;
 }
+
+
+/* v87.8: Mobile card width - Match Our Fleet page styling */
+@media (max-width: 768px) {
+    /* Reduce container padding on tablet */
+    .yolo-ys-search-results {
+        padding: 20px 10px !important;
+    }
+    
+    /* Reduce Bootstrap row gutters */
+    .yolo-ys-search-results .row.g-4 {
+        --bs-gutter-x: 16px !important;
+        margin-left: -8px !important;
+        margin-right: -8px !important;
+    }
+    
+    .yolo-ys-search-results .row.g-4 > [class*="col-"] {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Near edge-to-edge cards on small phones */
+    .yolo-ys-search-results {
+        padding: 15px 8px !important;
+    }
+    
+    /* Minimal gutters for wider cards */
+    .yolo-ys-search-results .row.g-4 {
+        --bs-gutter-x: 12px !important;
+        margin-left: -6px !important;
+        margin-right: -6px !important;
+    }
+    
+    .yolo-ys-search-results .row.g-4 > [class*="col-"] {
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+    
+    /* Full-width card appearance */
+    .yolo-ys-search-results .yolo-ys-yacht-card {
+        border-radius: 8px !important;
+    }
+}
