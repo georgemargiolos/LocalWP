@@ -470,10 +470,10 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<!-- v88.7: Select2 initialization with FontAwesome icons -->
+<!-- v88.8: Select2 initialization with FontAwesome icons (fixed dropdown closing) -->
 <script>
 jQuery(document).ready(function($) {
-    // Wait for filter reorganization to complete
+    // Wait for filter reorganization to complete fully
     setTimeout(function() {
         
         // Icon mappings for different filter types
@@ -496,7 +496,7 @@ jQuery(document).ready(function($) {
             'yolo-ys-results-boat-type': {
                 '': 'fa-ship',
                 'Sailing yacht': 'fa-sailboat',
-                'Catamaran': 'fa-dharmachakra'
+                'Catamaran': 'fa-ferry'
             },
             'filter-cabins': {
                 '': 'fa-bed',
@@ -517,6 +517,12 @@ jQuery(document).ready(function($) {
         
         // Custom template function for Select2
         function formatOption(option, selectId) {
+            if (!option.id && option.text) {
+                // Placeholder option
+                var icons = iconMaps[selectId] || {};
+                var iconClass = icons[''] || 'fa-circle';
+                return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center; color: #6b7280;"></i>' + option.text + '</span>');
+            }
             if (!option.id) {
                 return option.text;
             }
@@ -528,16 +534,23 @@ jQuery(document).ready(function($) {
             return $option;
         }
         
-        // Initialize Select2 on filter dropdowns
+        // Initialize Select2 on filter dropdowns with proper settings
         var selectIds = ['filter-location', 'yolo-ys-results-boat-type', 'filter-cabins', 'filter-sort'];
         
         selectIds.forEach(function(selectId) {
             var $select = $('#' + selectId);
             if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
+                // Destroy any existing Select2 instance first
+                if ($select.data('select2')) {
+                    $select.select2('destroy');
+                }
+                
                 $select.select2({
-                    minimumResultsForSearch: Infinity, // Disable search box
+                    minimumResultsForSearch: Infinity,
                     dropdownAutoWidth: false,
                     width: '100%',
+                    dropdownParent: $('body'), // Attach to body to prevent CSS overflow issues
+                    closeOnSelect: true,
                     templateResult: function(option) {
                         return formatOption(option, selectId);
                     },
@@ -545,22 +558,32 @@ jQuery(document).ready(function($) {
                         return formatOption(option, selectId);
                     }
                 });
-            }
-        });
-        
-        // Also initialize length and year range selects (simpler, no icons)
-        var rangeSelects = ['filter-length-min', 'filter-length-max', 'filter-year-min', 'filter-year-max', 'filter-price-min', 'filter-price-max'];
-        rangeSelects.forEach(function(selectId) {
-            var $select = $('#' + selectId);
-            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
-                $select.select2({
-                    minimumResultsForSearch: Infinity,
-                    dropdownAutoWidth: false,
-                    width: '100%'
+                
+                // Prevent event propagation issues
+                $select.on('select2:open', function(e) {
+                    e.stopPropagation();
                 });
             }
         });
         
-    }, 600); // Wait for filter reorganization
+        // Also initialize length, year, and price range selects (simpler, no icons)
+        var rangeSelects = ['filter-length-min', 'filter-length-max', 'filter-year-min', 'filter-year-max', 'filter-price-min', 'filter-price-max'];
+        rangeSelects.forEach(function(selectId) {
+            var $select = $('#' + selectId);
+            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
+                if ($select.data('select2')) {
+                    $select.select2('destroy');
+                }
+                
+                $select.select2({
+                    minimumResultsForSearch: Infinity,
+                    dropdownAutoWidth: false,
+                    width: '100%',
+                    dropdownParent: $('body')
+                });
+            }
+        });
+        
+    }, 800); // Increased timeout for DOM stability
 });
 </script>
