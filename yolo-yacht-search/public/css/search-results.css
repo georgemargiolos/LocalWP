@@ -917,28 +917,39 @@ main .yolo-ys-search-results,
     }
 }
 
-/* MOBILE FILTER FIXES - v89.5 */
+/* MOBILE FILTER FIXES - v90.0 */
+/* v90.0: Filters now at TOP of page, sticky when scrolling */
 @media (max-width: 768px) {
-    /* STICKY FILTERS AT BOTTOM ON MOBILE */
+    /* FILTERS AT TOP ON MOBILE - Initially in normal flow, becomes sticky on scroll */
     .yolo-ys-advanced-filters,
     #yolo-ys-advanced-filters {
-        position: fixed !important;
-        bottom: 0 !important;
+        position: sticky !important;
+        top: 0 !important;
         left: 0 !important;
         right: 0 !important;
+        bottom: auto !important;
         z-index: 9999 !important;
         background: white !important;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
-        padding: 15px 10px !important;
-        max-height: 70vh !important;
-        overflow-y: auto !important;
-        border-top-left-radius: 20px !important;
-        border-top-right-radius: 20px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        padding: 12px 10px !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        border-radius: 0 !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        margin: 0 -20px !important;
+        width: calc(100% + 40px) !important;
     }
     
-    /* Add padding to body to prevent content being hidden behind sticky filters */
+    /* When filters content is expanded, allow scrolling */
+    .yolo-ys-advanced-filters.filters-expanded,
+    #yolo-ys-advanced-filters.filters-expanded {
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Remove bottom padding since filters are now at top */
     .yolo-ys-search-results {
-        padding-bottom: 200px !important;
+        padding-bottom: 40px !important;
     }
     
     /* Stack filters on mobile */
@@ -1395,14 +1406,14 @@ label.equipment-checkbox:hover {
         overflow-x: hidden !important;
     }
     
-    /* Filter container - fixed at bottom, proper width */
+    /* Filter container - v90.0: sticky at top, proper width */
     .yolo-ys-advanced-filters,
     #yolo-ys-advanced-filters {
-        width: 100% !important;
+        width: calc(100% + 20px) !important;
         max-width: 100vw !important;
-        left: 0 !important;
-        right: 0 !important;
-        padding: 15px !important;
+        margin-left: -10px !important;
+        margin-right: -10px !important;
+        padding: 12px 10px !important;
         box-sizing: border-box !important;
         overflow-x: hidden !important;
     }
@@ -1575,9 +1586,12 @@ label.equipment-checkbox:hover {
         padding: 8px !important;
     }
     
+    /* v90.0: Adjust filter margins for smaller screens */
     .yolo-ys-advanced-filters,
     #yolo-ys-advanced-filters {
-        padding: 12px !important;
+        padding: 10px 8px !important;
+        margin: 0 -8px !important;
+        width: calc(100% + 16px) !important;
     }
     
     .filter-group select,

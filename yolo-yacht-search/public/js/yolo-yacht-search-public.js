@@ -154,12 +154,17 @@
             updateEquipmentText();
         });
         
-        // Mobile filters toggle (v81.20)
+        // Mobile filters toggle (v90.0: Updated for top-positioned filters)
         $('#filters-mobile-toggle').on('click', function() {
             const content = $('#filters-content');
             const toggle = $(this);
+            const filtersContainer = $('#yolo-ys-advanced-filters');
+            
             content.toggleClass('expanded');
             toggle.toggleClass('active');
+            
+            // v90.0: Add class to parent container for proper max-height handling
+            filtersContainer.toggleClass('filters-expanded');
         });
         
         // Apply Filters button

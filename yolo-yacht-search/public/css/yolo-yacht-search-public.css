@@ -361,20 +361,33 @@
     transform: rotate(180deg);
 }
 
-/* Mobile: Filters collapsed by default */
+/* Mobile: Filters collapsed by default - v90.0: Top-positioned sticky filters */
 @media (max-width: 768px) {
     .yolo-ys-advanced-filters {
-        padding: 15px;
+        padding: 12px 15px;
     }
     
+    /* v90.0: Improved toggle button styling for top position */
     .yolo-ys-advanced-filters .filters-mobile-toggle {
         display: flex;
         margin-bottom: 0;
+        padding: 12px 16px;
+        font-size: 14px;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .yolo-ys-advanced-filters .filters-mobile-toggle.active {
+        background: #ffffff;
+        border-color: #1e3a8a;
     }
     
     .yolo-ys-advanced-filters .filters-content {
         display: none;
-        margin-top: 15px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
     }
     
     .yolo-ys-advanced-filters .filters-content.expanded {
