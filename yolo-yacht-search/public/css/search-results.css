@@ -1378,7 +1378,7 @@ label.equipment-checkbox:hover {
 
 
 /*
- * v89.10 MOBILE FILTER FIX - COMPREHENSIVE
+ * v89.9.1 MOBILE FILTER FIX - COMPREHENSIVE
  * 
  * FIXES: Horizontal scroll, truncated text, narrow inputs
  * ============================================================
@@ -1506,6 +1506,24 @@ label.equipment-checkbox:hover {
         height: 48px !important;
         display: flex !important;
         align-items: center !important;
+    }
+    
+    /* Bigger and better aligned dropdown arrows */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+        width: 30px !important;
+        right: 5px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-width: 8px 6px 0 6px !important;
+        border-color: #374151 transparent transparent transparent !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        position: static !important;
     }
     
     .select2-container--default .select2-selection--single .select2-selection__rendered {
