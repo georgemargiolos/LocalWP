@@ -177,6 +177,36 @@
         font-size: 18px !important;
     }
     
+    /* -----------------------------------------
+       SEARCH RESULTS PAGE - Match Our Fleet styling
+       v87.9 Fix: Cards were narrower than Our Fleet
+       ----------------------------------------- */
+    .yolo-ys-search-results {
+        padding: 0 !important;
+    }
+    
+    .yolo-ys-search-results .container-fluid {
+        padding: 0 12px !important;
+    }
+    
+    /* Keep search form with some padding */
+    .yolo-ys-search-results #yolo-ys-results-search-form {
+        margin-left: 12px !important;
+        margin-right: 12px !important;
+    }
+    
+    /* Keep filters with padding */
+    .yolo-ys-search-results .yolo-ys-filters-toggle-container {
+        margin-left: 12px !important;
+        margin-right: 12px !important;
+    }
+    
+    /* Section headers need padding */
+    .yolo-ys-search-results .yolo-ys-section-header {
+        margin-left: 12px !important;
+        margin-right: 12px !important;
+    }
+    
     /* Remove gap from Bootstrap row on mobile - use margin on columns instead */
     .yolo-ys-search-results .row {
         --bs-gutter-x: 0;

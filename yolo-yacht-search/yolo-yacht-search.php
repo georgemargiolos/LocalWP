@@ -20,7 +20,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('YOLO_YS_VERSION', '87.8');
+define('YOLO_YS_VERSION', '87.9');
 
 // Plugin directory path
 define('YOLO_YS_PLUGIN_DIR', plugin_dir_path(__FILE__));
