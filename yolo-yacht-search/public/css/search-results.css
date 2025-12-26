@@ -1375,3 +1375,130 @@ label.equipment-checkbox:hover {
 .yolo-ys-yacht-image {
     position: relative !important;
 }
+
+
+/*
+ * v89.9 MOBILE PADDING FIX
+ * 
+ * PROBLEM: Filters are right on the edge of mobile screen - no horizontal padding
+ * ============================================================
+ */
+
+@media (max-width: 768px) {
+    /* FIX: Ensure search results container has proper padding */
+    .yolo-ys-search-results {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+    
+    .yolo-ys-search-results .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* FIX: Add proper horizontal padding to filter container */
+    .yolo-ys-advanced-filters,
+    #yolo-ys-advanced-filters {
+        padding: 20px 16px !important; /* Increased from 15px 10px */
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    /* FIX: Add padding to filters content wrapper */
+    .filters-content,
+    #filters-content {
+        padding: 0 !important; /* Remove any conflicting padding */
+        margin: 0 !important;
+    }
+    
+    /* FIX: Add margin to filter rows for spacing */
+    .filters-row,
+    #filter-row-1,
+    #filter-row-2 {
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 16px !important; /* Increased gap between filter groups */
+    }
+    
+    /* FIX: Add padding to each filter group */
+    .filter-group {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    /* FIX: Ensure filter inputs have proper spacing */
+    .filter-group select,
+    .filter-group .select2-container,
+    .filter-group input,
+    .yolo-filter {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* FIX: Range inputs container */
+    .filter-range .range-inputs {
+        gap: 8px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* FIX: Equipment dropdown - full width with proper spacing */
+    .filter-equipment,
+    .equipment-dropdown {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    #equipment-dropdown-toggle,
+    .equipment-dropdown-toggle {
+        width: 100% !important;
+    }
+    
+    /* FIX: Filter actions buttons - full width with spacing */
+    .filter-actions,
+    .filter-buttons-wrapper {
+        margin-top: 20px !important;
+        padding-top: 15px !important;
+        gap: 12px !important;
+    }
+    
+    .filter-actions button,
+    .btn-apply-filters,
+    .btn-clear-filters {
+        width: 100% !important;
+    }
+    
+    /* FIX: Mobile toggle button padding */
+    .filters-mobile-toggle,
+    #filters-mobile-toggle {
+        padding: 14px 16px !important;
+        margin-bottom: 15px !important;
+    }
+}
+
+/* Extra small phones - even more padding */
+@media (max-width: 480px) {
+    .yolo-ys-advanced-filters,
+    #yolo-ys-advanced-filters {
+        padding: 18px 12px !important; /* Slightly less on very small screens but still adequate */
+    }
+    
+    .filters-row,
+    #filter-row-1,
+    #filter-row-2 {
+        gap: 14px !important;
+    }
+    
+    .filter-group label {
+        font-size: 11px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .filter-group select,
+    .filter-group .select2-container,
+    .filter-group input {
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+    }
+}
