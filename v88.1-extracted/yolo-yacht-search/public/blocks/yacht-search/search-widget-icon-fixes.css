@@ -1,0 +1,151 @@
+/* ============================================
+   YOLO Search Widget - Icon & Alignment Fixes
+   ============================================
+   
+   These styles are already applied to:
+   yolo-yacht-search/public/blocks/yacht-search/style.css
+   
+   Key Features:
+   - Dropdown arrow icon on Boat Type select
+   - Calendar icon on Date picker
+   - Button properly aligned with input fields
+   ============================================ */
+
+
+/* ========================================
+   Select Wrapper with Dropdown Arrow Icon
+   ======================================== */
+.yolo-ys-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.yolo-ys-form-field select {
+    width: 100%;
+    padding: 12px 40px 12px 15px; /* Extra right padding for icon */
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    transition: border-color 0.3s;
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+}
+
+.yolo-ys-select-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 12px;
+    pointer-events: none; /* Click passes through to select */
+    transition: transform 0.2s ease;
+}
+
+/* Highlight icon on focus */
+.yolo-ys-select-wrapper select:focus + .yolo-ys-select-icon {
+    color: #1e3a8a;
+}
+
+
+/* ========================================
+   Input Wrapper with Calendar Icon
+   ======================================== */
+.yolo-ys-input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.yolo-ys-form-field input {
+    width: 100%;
+    padding: 12px 15px 12px 42px; /* Extra left padding for icon */
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.yolo-ys-input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 16px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Highlight icon on focus */
+.yolo-ys-input-wrapper input:focus + .yolo-ys-input-icon,
+.yolo-ys-input-wrapper:focus-within .yolo-ys-input-icon {
+    color: #1e3a8a;
+}
+
+
+/* ========================================
+   Search Button - Proper Alignment
+   ======================================== */
+.yolo-ys-form-field.yolo-ys-field-button {
+    flex: 0 0 auto;
+    justify-content: flex-end;
+}
+
+.yolo-ys-search-button {
+    background: #dc2626;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    height: 46px; /* Match input height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yolo-ys-search-button:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3);
+}
+
+
+/* ========================================
+   HTML Structure Required
+   ======================================== */
+/*
+<div class="yolo-ys-form-field yolo-ys-field-select">
+    <label>Boat Type</label>
+    <div class="yolo-ys-select-wrapper">
+        <select>...</select>
+        <i class="fa-solid fa-chevron-down yolo-ys-select-icon"></i>
+    </div>
+</div>
+
+<div class="yolo-ys-form-field yolo-ys-field-date">
+    <label>Dates</label>
+    <div class="yolo-ys-input-wrapper">
+        <i class="fa-regular fa-calendar yolo-ys-input-icon"></i>
+        <input type="text" />
+    </div>
+</div>
+
+<div class="yolo-ys-form-field yolo-ys-field-button">
+    <button class="yolo-ys-search-button">SEARCH</button>
+</div>
+*/
+

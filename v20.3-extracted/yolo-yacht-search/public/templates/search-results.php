@@ -11,6 +11,9 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="yolo-ys-search-results">
+    <!-- Page Title -->
+    <h1 class="search-results-title" style="font-size: 1.75rem; font-weight: 700; color: rgb(37, 99, 235); text-align: center; margin: 0 0 0.75rem 0; padding: 0; letter-spacing: -0.5px; display: block;"><?php _e('Search Results', 'yolo-yacht-search'); ?></h1>
+    
     <div class="container-fluid">
     
     <!-- Search Form at Top of Results -->

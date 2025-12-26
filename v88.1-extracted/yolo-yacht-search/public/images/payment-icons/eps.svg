@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32" width="50" height="32">
+  <rect width="50" height="32" rx="4" fill="#fff" stroke="#e6e6e6"/>
+  <rect x="5" y="8" width="40" height="16" rx="2" fill="#9E1C72"/>
+  <text x="25" y="20" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">eps</text>
+</svg>

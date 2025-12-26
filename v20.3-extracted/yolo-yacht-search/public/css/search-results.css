@@ -497,6 +497,30 @@ main .yolo-ys-search-results,
 
 /* Mobile responsiveness for yacht cards */
 @media (max-width: 768px) {
+    /* Remove top padding/margin causing white space on mobile */
+    body .yolo-ys-search-results,
+    #content .yolo-ys-search-results,
+    .entry-content .yolo-ys-search-results,
+    main .yolo-ys-search-results,
+    .site-content .yolo-ys-search-results,
+    .yolo-ys-search-results {
+        padding-top: 0 !important;
+    }
+    
+    /* Remove WordPress theme top padding/margin */
+    .wp-block-group.has-global-padding {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    /* Fix left/right padding for exactly 5px edges */
+    .entry-content.has-global-padding {
+        margin-left: -27px !important;
+        margin-right: -42px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
     .yolo-ys-yacht-image {
         height: 200px;
     }

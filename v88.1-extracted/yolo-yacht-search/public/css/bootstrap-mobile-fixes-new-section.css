@@ -1,0 +1,70 @@
+    /* -----------------------------------------
+       SEARCH RESULTS PAGE - Match Our Fleet styling
+       v88.1 Fix: High specificity selectors to override theme
+       ----------------------------------------- */
+    body .yolo-ys-search-results,
+    #content .yolo-ys-search-results,
+    .entry-content .yolo-ys-search-results,
+    main .yolo-ys-search-results,
+    .site-content .yolo-ys-search-results {
+        padding: 0 !important;
+    }
+    
+    body .yolo-ys-search-results .container-fluid,
+    #content .yolo-ys-search-results .container-fluid,
+    .entry-content .yolo-ys-search-results .container-fluid,
+    main .yolo-ys-search-results .container-fluid,
+    .site-content .yolo-ys-search-results .container-fluid {
+        padding: 0 !important;
+    }
+    
+    /* Keep search form with some padding */
+    body .yolo-ys-search-results #yolo-ys-results-search-form,
+    #content .yolo-ys-search-results #yolo-ys-results-search-form,
+    .entry-content .yolo-ys-search-results #yolo-ys-results-search-form,
+    main .yolo-ys-search-results #yolo-ys-results-search-form,
+    .site-content .yolo-ys-search-results #yolo-ys-results-search-form {
+        margin: 0 10px 15px 10px !important;
+    }
+    
+    /* Keep filters with padding */
+    body .yolo-ys-search-results .yolo-ys-filters-toggle-container,
+    #content .yolo-ys-search-results .yolo-ys-filters-toggle-container,
+    .entry-content .yolo-ys-search-results .yolo-ys-filters-toggle-container,
+    main .yolo-ys-search-results .yolo-ys-filters-toggle-container,
+    .site-content .yolo-ys-search-results .yolo-ys-filters-toggle-container {
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+    }
+    
+    /* Section headers need padding */
+    body .yolo-ys-search-results .yolo-ys-section-header,
+    #content .yolo-ys-search-results .yolo-ys-section-header,
+    .entry-content .yolo-ys-search-results .yolo-ys-section-header,
+    main .yolo-ys-search-results .yolo-ys-section-header,
+    .site-content .yolo-ys-search-results .yolo-ys-section-header {
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+    }
+    
+    /* Yacht grid rows - match Our Fleet */
+    body .yolo-ys-search-results .yolo-ys-yacht-grid.row,
+    #content .yolo-ys-search-results .yolo-ys-yacht-grid.row,
+    .entry-content .yolo-ys-search-results .yolo-ys-yacht-grid.row,
+    main .yolo-ys-search-results .yolo-ys-yacht-grid.row,
+    .site-content .yolo-ys-search-results .yolo-ys-yacht-grid.row {
+        --bs-gutter-x: 0;
+        margin-left: -5px !important;
+        margin-right: -5px !important;
+    }
+    
+    body .yolo-ys-search-results .yolo-ys-yacht-grid.row > [class*="col-"],
+    #content .yolo-ys-search-results .yolo-ys-yacht-grid.row > [class*="col-"],
+    .entry-content .yolo-ys-search-results .yolo-ys-yacht-grid.row > [class*="col-"],
+    main .yolo-ys-search-results .yolo-ys-yacht-grid.row > [class*="col-"],
+    .site-content .yolo-ys-search-results .yolo-ys-yacht-grid.row > [class*="col-"] {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        margin-bottom: 10px !important;
+    }
+    

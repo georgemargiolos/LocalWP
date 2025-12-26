@@ -1,0 +1,618 @@
+/* YOLO Yacht Search - Public Styles */
+/* v30.0 - Removed aggressive font wildcards that broke layouts */
+/* Fonts are inherited from WordPress theme automatically */
+/* v41.28 - Removed duplicate .yolo-ys-search-widget styles (already in yacht-search/style.css) */
+
+/* Import block styles */
+@import url('../blocks/yacht-search/style.css');
+@import url('../blocks/yacht-results/style.css');
+
+/* Additional custom styles can be added here */
+
+/* Override Litepicker colors to match theme */
+.litepicker .container__months .month-item-header .button-previous-month,
+.litepicker .container__months .month-item-header .button-next-month {
+    color: #1e3a8a;
+}
+
+.litepicker .container__days .day-item.is-today {
+    color: #dc2626;
+}
+
+.litepicker .container__days .day-item.is-in-range {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.litepicker .container__days .day-item.is-start-date,
+.litepicker .container__days .day-item.is-end-date {
+    background-color: #1e3a8a;
+    color: white;
+}
+
+.litepicker .container__days .day-item:hover {
+    background-color: #f3f4f6;
+    color: #1e3a8a;
+}
+
+/* Smooth transitions */
+.yolo-ys-yacht-card,
+.yolo-ys-search-button,
+.yolo-ys-view-button {
+    transition: all 0.3s ease;
+}
+
+/* Accessibility improvements */
+.yolo-ys-search-button:focus,
+.yolo-ys-view-button:focus,
+.yolo-ys-form-field select:focus,
+.yolo-ys-form-field input:focus {
+    outline: 2px solid #1e3a8a;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .yolo-ys-search-widget {
+        display: none;
+    }
+    
+    .yolo-ys-yacht-card {
+        page-break-inside: avoid;
+    }
+}
+
+/* NOTE: .yolo-ys-search-widget styles are defined in:
+   ../blocks/yacht-search/style.css (imported above)
+   
+   To change the search widget background, edit:
+   public/blocks/yacht-search/style.css lines 3-12
+*/
+
+
+/* v81.1: Load More Button Styles */
+.yolo-ys-load-more-container {
+    text-align: center;
+    margin: 30px 0 40px 0;
+    padding: 20px;
+}
+
+.yolo-ys-load-more-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.yolo-ys-load-more-btn:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+
+.yolo-ys-load-more-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(30, 58, 138, 0.3);
+}
+
+/* Partner fleet Load More button - slightly different color */
+#friend-load-more-container .yolo-ys-load-more-btn {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    box-shadow: 0 4px 15px rgba(55, 65, 81, 0.3);
+}
+
+#friend-load-more-container .yolo-ys-load-more-btn:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    box-shadow: 0 6px 20px rgba(55, 65, 81, 0.4);
+}
+
+
+/* ========================================
+   v81.17: Advanced Filters Section
+   ======================================== */
+
+.yolo-ys-advanced-filters {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin: 20px 0 30px 0;
+}
+
+.yolo-ys-advanced-filters .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.yolo-ys-advanced-filters .filter-group {
+    flex: 1;
+    min-width: 140px;
+    max-width: 180px;
+}
+
+.yolo-ys-advanced-filters .filter-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.yolo-ys-advanced-filters .filter-group select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+.yolo-ys-advanced-filters .filter-group select:hover {
+    border-color: #94a3b8;
+}
+
+.yolo-ys-advanced-filters .filter-group select:focus {
+    outline: none;
+    border-color: #1e3a8a;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+/* Equipment Multi-select Dropdown */
+.yolo-ys-advanced-filters .filter-equipment {
+    position: relative;
+    min-width: 180px;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown {
+    position: relative;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown-toggle {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown-toggle:hover {
+    border-color: #94a3b8;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown-toggle i {
+    font-size: 10px;
+    color: #64748b;
+    transition: transform 0.2s ease;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    margin-top: 4px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.yolo-ys-advanced-filters .equipment-dropdown-menu.show {
+    display: block;
+}
+
+.yolo-ys-advanced-filters .equipment-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+    color: #334155;
+}
+
+.yolo-ys-advanced-filters .equipment-checkbox:hover {
+    background-color: #f1f5f9;
+}
+
+.yolo-ys-advanced-filters .equipment-checkbox input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Filter Actions */
+.yolo-ys-advanced-filters .filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.yolo-ys-advanced-filters .btn-apply-filters {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yolo-ys-advanced-filters .btn-apply-filters:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.yolo-ys-advanced-filters .btn-clear-filters {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yolo-ys-advanced-filters .btn-clear-filters:hover {
+    color: #334155;
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+/* ========================================
+   v81.20: Range Filter Inputs
+   ======================================== */
+
+.yolo-ys-advanced-filters .filter-range {
+    min-width: 180px;
+    max-width: 220px;
+}
+
+.yolo-ys-advanced-filters .range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yolo-ys-advanced-filters .range-inputs select {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 8px;
+    padding-right: 28px;
+    font-size: 13px;
+}
+
+.yolo-ys-advanced-filters .range-separator {
+    color: #94a3b8;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   v81.20: Mobile Filters Toggle
+   ======================================== */
+
+.yolo-ys-advanced-filters .filters-mobile-toggle {
+    display: none;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a8a;
+    background: #ffffff;
+    border: 1px solid #1e3a8a;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle:hover {
+    background: #f8fafc;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle .toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.yolo-ys-advanced-filters .filters-mobile-toggle.active .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Mobile: Filters collapsed by default */
+@media (max-width: 768px) {
+    .yolo-ys-advanced-filters {
+        padding: 15px;
+    }
+    
+    .yolo-ys-advanced-filters .filters-mobile-toggle {
+        display: flex;
+        margin-bottom: 0;
+    }
+    
+    .yolo-ys-advanced-filters .filters-content {
+        display: none;
+        margin-top: 15px;
+    }
+    
+    .yolo-ys-advanced-filters .filters-content.expanded {
+        display: block;
+    }
+    
+    .yolo-ys-advanced-filters .filters-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yolo-ys-advanced-filters .filter-group {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .yolo-ys-advanced-filters .filter-range {
+        max-width: 100%;
+    }
+    
+    .yolo-ys-advanced-filters .filter-actions {
+        flex-direction: column;
+    }
+    
+    .yolo-ys-advanced-filters .btn-apply-filters,
+    .yolo-ys-advanced-filters .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   v81.17: Featured Yachts Section
+   ======================================== */
+
+.yolo-ys-featured-section {
+    margin-bottom: 40px;
+}
+
+.yolo-ys-featured-section .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.yolo-ys-featured-section .section-title i {
+    color: #f59e0b;
+}
+
+/* ========================================
+   v81.17: Results Count
+   ======================================== */
+
+.yolo-ys-results-count {
+    margin: 20px 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.yolo-ys-results-count #results-count-text {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ========================================
+   v81.17: Load More Button (Updated)
+   ======================================== */
+
+.yolo-ys-load-more {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.yolo-ys-load-more .btn-load-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.yolo-ys-load-more .btn-load-more:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+
+.yolo-ys-load-more .btn-load-more:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.yolo-ys-load-more .btn-load-more #load-more-remaining {
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* ========================================
+   v81.17: Loading Spinner
+   ======================================== */
+
+.yolo-ys-loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.yolo-ys-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #1e3a8a;
+    border-radius: 50%;
+    animation: yolo-spin 0.8s linear infinite;
+    margin: 0 auto 15px auto;
+}
+
+@keyframes yolo-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.yolo-ys-loading p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ========================================
+   v81.17: Responsive Filters
+   ======================================== */
+
+@media (max-width: 992px) {
+    .yolo-ys-advanced-filters .filter-group {
+        min-width: 120px;
+        max-width: none;
+        flex: 1 1 calc(33.333% - 10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .yolo-ys-advanced-filters {
+        padding: 15px;
+    }
+    
+    .yolo-ys-advanced-filters .filters-row {
+        gap: 12px;
+    }
+    
+    .yolo-ys-advanced-filters .filter-group {
+        flex: 1 1 calc(50% - 6px);
+        min-width: 0;
+    }
+    
+    .yolo-ys-advanced-filters .filter-actions {
+        flex-direction: column;
+    }
+    
+    .yolo-ys-advanced-filters .btn-apply-filters,
+    .yolo-ys-advanced-filters .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .yolo-ys-advanced-filters .filter-group {
+        flex: 1 1 100%;
+    }
+}
+
+
+/* ========================================
+   v85.5: Airport Distance Display - Inline with location
+   ======================================== */
+
+.yolo-ys-airport-distance {
+    font-size: 14px;
+    color: #6b7280;
+    display: inline;
+}
+
+/* v85.5: Ensure all location elements flow inline */
+.yolo-ys-yacht-location {
+    display: block;
+    line-height: 1.5;
+}
+
+.yolo-ys-yacht-location .yolo-ys-location-icon,
+.yolo-ys-yacht-location .yolo-ys-location-text,
+.yolo-ys-yacht-location .yolo-ys-airport-distance {
+    display: inline;
+}
+
+/* Mobile: Responsive text sizing */
+@media (max-width: 768px) {
+    .yolo-ys-yacht-location {
+        font-size: 13px !important;
+        line-height: 1.6;
+    }
+    
+    .yolo-ys-airport-distance {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yolo-ys-yacht-location {
+        font-size: 12px !important;
+        line-height: 1.7;
+    }
+    
+    .yolo-ys-airport-distance {
+        font-size: 12px;
+    }
+}
+
+
+/* v85.8: Pipe separator between location and airport */
+.yolo-ys-location-separator {
+    color: #9ca3af;
+    padding: 0 4px;
+    display: inline;
+}
