@@ -438,6 +438,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.yoloUpdateSearchParams(fp.selectedDates[0], fp.selectedDates[1]);
             }
         }, true); // Use capture to run before other handlers
+        
+        // v89.0: Signal that reorganization is complete for Select2 initialization
+        window.yoloFiltersReorganized = true;
+        console.log('YOLO: Filter reorganization complete');
     }
 });
 </script>
@@ -470,12 +474,27 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<!-- v88.8: Select2 initialization with FontAwesome icons (fixed dropdown closing) -->
+<!-- v89.0: Select2 initialization - FIXED timing issue -->
 <script>
-jQuery(document).ready(function($) {
-    // Wait for filter reorganization to complete fully
-    setTimeout(function() {
+(function($) {
+    // Flag to track when reorganization is complete
+    window.yoloFiltersReorganized = window.yoloFiltersReorganized || false;
+    
+    // Wait for both reorganization AND DOM to be ready
+    function initSelect2WhenReady() {
+        // Check if reorganization is complete
+        if (!window.yoloFiltersReorganized) {
+            setTimeout(initSelect2WhenReady, 100);
+            return;
+        }
         
+        // Additional delay for DOM stability after reorganization
+        setTimeout(function() {
+            initializeSelect2Dropdowns();
+        }, 200);
+    }
+    
+    function initializeSelect2Dropdowns() {
         // Icon mappings for different filter types
         var iconMaps = {
             'filter-location': {
@@ -518,7 +537,6 @@ jQuery(document).ready(function($) {
         // Custom template function for Select2
         function formatOption(option, selectId) {
             if (!option.id && option.text) {
-                // Placeholder option
                 var icons = iconMaps[selectId] || {};
                 var iconClass = icons[''] || 'fa-circle';
                 return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center; color: #6b7280;"></i>' + option.text + '</span>');
@@ -528,28 +546,20 @@ jQuery(document).ready(function($) {
             }
             var icons = iconMaps[selectId] || {};
             var iconClass = icons[option.id] || icons[''] || 'fa-circle';
-            var $option = $(
-                '<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center;"></i>' + option.text + '</span>'
-            );
-            return $option;
+            return $('<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center;"></i>' + option.text + '</span>');
         }
         
-        // Initialize Select2 on filter dropdowns with proper settings
+        // Initialize Select2 on main filter dropdowns
         var selectIds = ['filter-location', 'yolo-ys-results-boat-type', 'filter-cabins', 'filter-sort'];
         
         selectIds.forEach(function(selectId) {
             var $select = $('#' + selectId);
-            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
-                // Destroy any existing Select2 instance first
-                if ($select.data('select2')) {
-                    $select.select2('destroy');
-                }
-                
+            if ($select.length && !$select.data('select2')) {
                 $select.select2({
                     minimumResultsForSearch: Infinity,
                     dropdownAutoWidth: false,
                     width: '100%',
-                    dropdownParent: $('body'), // Attach to body to prevent CSS overflow issues
+                    dropdownParent: $select.closest('.filter-group'),  // Attach to parent, not body
                     closeOnSelect: true,
                     templateResult: function(option) {
                         return formatOption(option, selectId);
@@ -558,32 +568,30 @@ jQuery(document).ready(function($) {
                         return formatOption(option, selectId);
                     }
                 });
-                
-                // Prevent event propagation issues
-                $select.on('select2:open', function(e) {
-                    e.stopPropagation();
-                });
             }
         });
         
-        // Also initialize length, year, and price range selects (simpler, no icons)
+        // Initialize range selects (simpler, no icons)
         var rangeSelects = ['filter-length-min', 'filter-length-max', 'filter-year-min', 'filter-year-max', 'filter-price-min', 'filter-price-max'];
         rangeSelects.forEach(function(selectId) {
             var $select = $('#' + selectId);
-            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
-                if ($select.data('select2')) {
-                    $select.select2('destroy');
-                }
-                
+            if ($select.length && !$select.data('select2')) {
                 $select.select2({
                     minimumResultsForSearch: Infinity,
                     dropdownAutoWidth: false,
                     width: '100%',
-                    dropdownParent: $('body')
+                    dropdownParent: $select.closest('.filter-group')  // Attach to parent, not body
                 });
             }
         });
         
-    }, 800); // Increased timeout for DOM stability
-});
+        console.log('YOLO: Select2 dropdowns initialized');
+    }
+    
+    // Start checking when jQuery is ready
+    $(document).ready(function() {
+        initSelect2WhenReady();
+    });
+    
+})(jQuery);
 </script>
