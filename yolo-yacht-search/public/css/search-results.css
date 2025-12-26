@@ -1102,93 +1102,102 @@ main .yolo-ys-search-results,
 }
 
 /* Equipment checkbox styling - restore proper checkboxes */
-/* Override Bootstrap 5 form-check styles */
-.equipment-dropdown-menu .equipment-checkbox,
-#equipment-dropdown-menu .equipment-checkbox,
+/* Equipment checkbox styling - custom modern checkboxes */
 .equipment-checkbox {
     display: flex !important;
     align-items: center !important;
-    padding: 10px 12px !important;
+    padding: 10px 14px !important;
     cursor: pointer !important;
-    transition: background-color 0.15s ease !important;
-    gap: 10px !important;
-    margin-bottom: 0 !important;
+    transition: background-color 0.2s ease !important;
+    border-radius: 6px !important;
+    margin: 2px 0 !important;
 }
 
-.equipment-dropdown-menu .equipment-checkbox:hover,
-#equipment-dropdown-menu .equipment-checkbox:hover,
 .equipment-checkbox:hover {
-    background-color: #f3f4f6 !important;
+    background-color: #f1f5f9 !important;
 }
 
-/* Custom checkbox design - full control over styling */
-.equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
-#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
 .equipment-checkbox input[type="checkbox"] {
-    position: relative !important;
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 18px !important;
-    min-height: 18px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    cursor: pointer !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
+    /* Hide default checkbox */
     appearance: none !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    border: 2px solid #9ca3af !important;
+    -webkit-appearance: none !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    margin-right: 12px !important;
+    cursor: pointer !important;
+    border: 2px solid #cbd5e1 !important;
     border-radius: 4px !important;
-    background-color: #fff !important;
-    flex-shrink: 0 !important;
-    transition: all 0.15s ease !important;
+    background: #fff !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
 }
 
-/* Checkbox hover state */
 .equipment-checkbox input[type="checkbox"]:hover {
     border-color: #3b82f6 !important;
 }
 
-/* Checkbox checked state */
 .equipment-checkbox input[type="checkbox"]:checked {
-    background-color: #3b82f6 !important;
+    background: #3b82f6 !important;
     border-color: #3b82f6 !important;
 }
 
-/* Checkmark using ::after pseudo-element */
-.equipment-checkbox input[type="checkbox"]::after {
+.equipment-checkbox input[type="checkbox"]:checked::after {
     content: '' !important;
-    display: block !important;
     position: absolute !important;
-    top: 1px !important;
-    left: 5px !important;
+    left: 6px !important;
+    top: 2px !important;
     width: 5px !important;
     height: 10px !important;
     border: solid white !important;
     border-width: 0 2px 2px 0 !important;
     transform: rotate(45deg) !important;
-    opacity: 0 !important;
-    transition: opacity 0.15s ease !important;
 }
 
-/* Show checkmark when checked */
-.equipment-checkbox input[type="checkbox"]:checked::after {
-    opacity: 1 !important;
-}
-
-.equipment-dropdown-menu .equipment-checkbox i,
-#equipment-dropdown-menu .equipment-checkbox i,
 .equipment-checkbox i {
-    width: 18px !important;
+    width: 22px !important;
     text-align: center !important;
-    color: #6b7280 !important;
+    color: #3b82f6 !important;
+    margin-right: 10px !important;
     font-size: 14px !important;
-    flex-shrink: 0 !important;
 }
 
-.equipment-checkbox input[type="checkbox"]:checked + i {
-    color: rgb(37, 99, 235) !important;
+.equipment-checkbox:hover i {
+    color: #1d4ed8 !important;
+}
+
+/* Equipment dropdown menu styling */
+#equipment-dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+    z-index: 9999 !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    padding: 6px 0 !important;
+}
+
+#equipment-dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#equipment-dropdown-menu::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+#equipment-dropdown-menu::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+#equipment-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 /* Mobile responsive Select2 */
