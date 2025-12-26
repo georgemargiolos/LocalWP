@@ -917,20 +917,20 @@ main .yolo-ys-search-results,
     }
 }
 
-/* MOBILE FILTER FIXES - v90.0 */
-/* v90.0: Filters now at TOP of page, sticky when scrolling */
+/* MOBILE FILTER FIXES - v90.2 */
+/* v90.2: Filters at TOP, becomes FIXED when scrolling past original position */
 @media (max-width: 768px) {
-    /* FILTERS AT TOP ON MOBILE - Initially in normal flow, becomes sticky on scroll */
+    /* FILTERS - Default state (in normal flow) */
     .yolo-ys-advanced-filters,
     #yolo-ys-advanced-filters {
-        position: sticky !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
         bottom: auto !important;
         z-index: 9999 !important;
         background: white !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
         padding: 12px 10px !important;
         max-height: none !important;
         overflow-y: visible !important;
@@ -938,6 +938,29 @@ main .yolo-ys-search-results,
         border-bottom: 1px solid #e5e7eb !important;
         margin: 0 -20px !important;
         width: calc(100% + 40px) !important;
+        transition: box-shadow 0.2s ease !important;
+    }
+    
+    /* FILTERS - Fixed state (when scrolled past) */
+    .yolo-ys-advanced-filters.is-sticky,
+    #yolo-ys-advanced-filters.is-sticky {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        border-bottom: 2px solid #e5e7eb !important;
+    }
+    
+    /* Placeholder to prevent content jump when filters become fixed */
+    .yolo-ys-filters-placeholder {
+        display: none;
+    }
+    
+    .yolo-ys-filters-placeholder.active {
+        display: block !important;
     }
     
     /* When filters content is expanded, allow scrolling */

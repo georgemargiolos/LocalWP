@@ -167,6 +167,9 @@
             filtersContainer.toggleClass('filters-expanded');
         });
         
+        // v90.2: Sticky filters on scroll (mobile only)
+        initStickyFilters();
+        
         // Apply Filters button
         $('#apply-filters').on('click', function() {
             currentPage = 1;
@@ -780,6 +783,79 @@
                 </div>
             </div>
         `;
+    }
+    
+    /**
+     * v90.2: Initialize sticky filters on scroll (mobile only)
+     * Makes the filters bar stick to the top when scrolling past its original position
+     */
+    function initStickyFilters() {
+        // Only run on mobile
+        if (window.innerWidth > 768) return;
+        
+        const filtersContainer = document.getElementById('yolo-ys-advanced-filters');
+        if (!filtersContainer) return;
+        
+        // Create placeholder element to prevent content jump
+        let placeholder = document.querySelector('.yolo-ys-filters-placeholder');
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.className = 'yolo-ys-filters-placeholder';
+            filtersContainer.parentNode.insertBefore(placeholder, filtersContainer.nextSibling);
+        }
+        
+        let filtersTop = null;
+        let filtersHeight = null;
+        let isSticky = false;
+        
+        // Calculate initial position after filters are visible
+        function updateFilterPosition() {
+            if (!filtersContainer.classList.contains('is-sticky')) {
+                filtersTop = filtersContainer.getBoundingClientRect().top + window.pageYOffset;
+                filtersHeight = filtersContainer.offsetHeight;
+            }
+        }
+        
+        // Initial calculation with delay to ensure filters are visible
+        setTimeout(updateFilterPosition, 500);
+        
+        // Recalculate on resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                // Remove sticky on desktop
+                filtersContainer.classList.remove('is-sticky');
+                placeholder.classList.remove('active');
+                isSticky = false;
+            } else {
+                updateFilterPosition();
+            }
+        });
+        
+        // Scroll handler
+        window.addEventListener('scroll', function() {
+            if (window.innerWidth > 768) return;
+            if (filtersTop === null) {
+                updateFilterPosition();
+                return;
+            }
+            
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop >= filtersTop && !isSticky) {
+                // Make sticky
+                filtersContainer.classList.add('is-sticky');
+                placeholder.style.height = filtersHeight + 'px';
+                placeholder.classList.add('active');
+                isSticky = true;
+            } else if (scrollTop < filtersTop && isSticky) {
+                // Remove sticky
+                filtersContainer.classList.remove('is-sticky');
+                placeholder.classList.remove('active');
+                isSticky = false;
+            }
+        }, { passive: true });
+        
+        console.log('YOLO: Sticky filters initialized for mobile');
     }
     
 })(jQuery);
