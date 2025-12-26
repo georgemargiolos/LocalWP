@@ -64,9 +64,9 @@ if (!defined('ABSPATH')) {
         <!-- Filters Content (collapsed on mobile) -->
         <div class="filters-content" id="filters-content">
             <!-- Bootstrap Grid for Filters -->
-            <div class="row g-3 mb-3">
+            <div class="row g-2 mb-2">
                 <!-- Location Filter -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="col-6 col-md-4 col-lg-3 col-xl">
                     <div class="filter-group">
                         <label for="filter-location"><i class="fas fa-map-marker-alt"></i> <?php _e('Location', 'yolo-yacht-search'); ?></label>
                         <select id="filter-location" class="yolo-filter form-select">
@@ -88,7 +88,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Cabins Filter -->
-                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-1">
+                <div class="col-6 col-md-4 col-lg-2 col-xl">
                     <div class="filter-group">
                         <label for="filter-cabins"><i class="fas fa-bed"></i> <?php _e('Cabins', 'yolo-yacht-search'); ?></label>
                         <select id="filter-cabins" class="yolo-filter form-select">
@@ -103,7 +103,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Length Range Filter -->
-                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                <div class="col-6 col-md-4 col-lg-3 col-xl">
                     <div class="filter-group filter-range">
                         <label><i class="fas fa-ruler-horizontal"></i> <?php _e('Length', 'yolo-yacht-search'); ?></label>
                         <div class="range-inputs d-flex align-items-center gap-1">
@@ -137,7 +137,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Year Range Filter -->
-                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                <div class="col-6 col-md-4 col-lg-3 col-xl">
                     <div class="filter-group filter-range">
                         <label><i class="fas fa-calendar"></i> <?php _e('Year', 'yolo-yacht-search'); ?></label>
                         <div class="range-inputs d-flex align-items-center gap-1">
@@ -167,7 +167,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Price Range Filter -->
-                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="col-6 col-md-4 col-lg-3 col-xl">
                     <div class="filter-group filter-range">
                         <label><i class="fas fa-euro-sign"></i> <?php _e('Price/Week', 'yolo-yacht-search'); ?></label>
                         <div class="range-inputs d-flex align-items-center gap-1">
@@ -198,7 +198,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Equipment Filter (Multi-select) -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                <div class="col-6 col-md-4 col-lg-3 col-xl">
                     <div class="filter-group filter-equipment">
                         <label for="filter-equipment"><i class="fas fa-cog"></i> <?php _e('Equipment', 'yolo-yacht-search'); ?></label>
                         <div class="equipment-dropdown">
@@ -273,7 +273,7 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Sort By -->
-                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-1">
+                <div class="col-6 col-md-4 col-lg-2 col-xl">
                     <div class="filter-group">
                         <label for="filter-sort"><i class="fas fa-sort"></i> <?php _e('Sort', 'yolo-yacht-search'); ?></label>
                         <select id="filter-sort" class="yolo-filter form-select">
@@ -287,8 +287,8 @@ if (!defined('ABSPATH')) {
                 </div>
                 
                 <!-- Filter Actions -->
-                <div class="col-12 col-sm-12 col-md-12 col-lg-auto">
-                    <div class="filter-actions d-flex gap-2 align-items-end h-100">
+                <div class="col-12 col-md-4 col-lg-auto">
+                    <div class="filter-actions d-flex gap-2 align-items-end h-100 pt-2 pt-lg-0">
                         <button type="button" id="apply-filters" class="btn btn-primary">
                             <i class="fa-solid fa-search"></i> <?php _e('Apply', 'yolo-yacht-search'); ?>
                         </button>

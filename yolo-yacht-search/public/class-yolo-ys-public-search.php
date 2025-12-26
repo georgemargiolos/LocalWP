@@ -11,7 +11,12 @@ if (!defined('ABSPATH')) {
  * AJAX handler for yacht search - Query from DATABASE first
  */
 function yolo_ys_ajax_search_yachts() {
-    // Note: Search widget doesn't require nonce (public search functionality)
+    // v90.9: Add nonce verification for security
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_ys_nonce')) {
+        wp_send_json_error(array('message' => 'Security check failed'));
+        return;
+    }
+    
     global $wpdb;
     
     // Validate required POST parameters
@@ -194,6 +199,12 @@ add_action('wp_ajax_nopriv_yolo_ys_search_yachts', 'yolo_ys_ajax_search_yachts')
  * - Featured Yachts (YOLO) shown separately without filters
  */
 function yolo_ys_ajax_search_yachts_filtered() {
+    // v90.9: Add nonce verification for security
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'yolo_ys_nonce')) {
+        wp_send_json_error(array('message' => 'Security check failed'));
+        return;
+    }
+    
     global $wpdb;
     
     // Get search parameters
