@@ -919,7 +919,8 @@ main .yolo-ys-search-results,
 
 @media (max-width: 768px) {
     /* STICKY FILTERS AT BOTTOM ON MOBILE */
-    .yolo-ys-filters-container {
+    .yolo-ys-advanced-filters,
+    #yolo-ys-advanced-filters {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;

@@ -66,7 +66,7 @@ if (!defined('ABSPATH')) {
             <div class="filters-row">
                 <!-- Location Filter (First) -->
                 <div class="filter-group">
-                    <label for="filter-location"><?php _e('Yacht Location', 'yolo-yacht-search'); ?></label>
+                    <label for="filter-location"><i class="fas fa-map-marker-alt"></i> <?php _e('Yacht Location', 'yolo-yacht-search'); ?></label>
                     <select id="filter-location" class="yolo-filter">
                         <option value=""><?php _e('Any Location', 'yolo-yacht-search'); ?></option>
                         <option value="Lefkada">Lefkada</option>
@@ -86,7 +86,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Cabins Filter -->
                 <div class="filter-group">
-                    <label for="filter-cabins"><?php _e('Cabins', 'yolo-yacht-search'); ?></label>
+                    <label for="filter-cabins"><i class="fas fa-bed"></i> <?php _e('Cabins', 'yolo-yacht-search'); ?></label>
                     <select id="filter-cabins" class="yolo-filter">
                         <option value=""><?php _e('Any', 'yolo-yacht-search'); ?></option>
                         <option value="2">2+</option>
@@ -99,7 +99,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Length Range Filter -->
                 <div class="filter-group filter-range">
-                    <label><?php _e('Length (m)', 'yolo-yacht-search'); ?></label>
+                    <label><i class="fas fa-ruler-horizontal"></i> <?php _e('Length (m)', 'yolo-yacht-search'); ?></label>
                     <div class="range-inputs">
                         <select id="filter-length-min" class="yolo-filter range-min">
                             <option value=""><?php _e('Min', 'yolo-yacht-search'); ?></option>
@@ -131,7 +131,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Year Range Filter -->
                 <div class="filter-group filter-range">
-                    <label><?php _e('Year Built', 'yolo-yacht-search'); ?></label>
+                    <label><i class="fas fa-calendar"></i> <?php _e('Year Built', 'yolo-yacht-search'); ?></label>
                     <div class="range-inputs">
                         <select id="filter-year-min" class="yolo-filter range-min">
                             <option value=""><?php _e('Min', 'yolo-yacht-search'); ?></option>
@@ -159,7 +159,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Price Range Filter -->
                 <div class="filter-group filter-range">
-                    <label><?php _e('Price (€/week)', 'yolo-yacht-search'); ?></label>
+                    <label><i class="fas fa-euro-sign"></i> <?php _e('Price (€/week)', 'yolo-yacht-search'); ?></label>
                     <div class="range-inputs">
                         <select id="filter-price-min" class="yolo-filter range-min">
                             <option value=""><?php _e('Min', 'yolo-yacht-search'); ?></option>
@@ -188,7 +188,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Equipment Filter (Multi-select) -->
                 <div class="filter-group filter-equipment">
-                    <label for="filter-equipment"><?php _e('Equipment', 'yolo-yacht-search'); ?></label>
+                    <label for="filter-equipment"><i class="fas fa-cog"></i> <?php _e('Equipment', 'yolo-yacht-search'); ?></label>
                     <div class="equipment-dropdown">
                         <button type="button" class="equipment-dropdown-toggle" id="equipment-dropdown-toggle">
                             <span id="equipment-selected-text"><?php _e('Select Equipment', 'yolo-yacht-search'); ?></span>
@@ -222,7 +222,7 @@ if (!defined('ABSPATH')) {
                 
                 <!-- Sort By -->
                 <div class="filter-group">
-                    <label for="filter-sort"><?php _e('Sort By', 'yolo-yacht-search'); ?></label>
+                    <label for="filter-sort"><i class="fas fa-sort"></i> <?php _e('Sort By', 'yolo-yacht-search'); ?></label>
                     <select id="filter-sort" class="yolo-filter">
                         <option value="price_asc"><?php _e('Price: Low to High', 'yolo-yacht-search'); ?></option>
                         <option value="price_desc"><?php _e('Price: High to Low', 'yolo-yacht-search'); ?></option>
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const datesGroup = document.createElement('div');
         datesGroup.className = 'filter-group';
         datesGroup.setAttribute('data-filter', 'dates');
-        datesGroup.innerHTML = '<label>Choose Dates</label>';
+        datesGroup.innerHTML = '<label><i class="fas fa-calendar-alt"></i> Choose Dates</label>';
         datesInput.className = 'yolo-filter';
         datesGroup.appendChild(datesInput);
         
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const boatTypeGroup = document.createElement('div');
         boatTypeGroup.className = 'filter-group';
         boatTypeGroup.setAttribute('data-filter', 'boat-type');
-        boatTypeGroup.innerHTML = '<label>Boat Type</label>';
+        boatTypeGroup.innerHTML = '<label><i class="fas fa-ship"></i> Boat Type</label>';
         boatTypeSelect.className = 'yolo-filter';
         boatTypeGroup.appendChild(boatTypeSelect);
         
