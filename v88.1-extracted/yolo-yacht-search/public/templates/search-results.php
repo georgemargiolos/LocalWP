@@ -386,9 +386,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 mode: 'range',
                 dateFormat: 'd.m.Y',
                 minDate: 'today',
-                locale: { firstDayOfWeek: 1 }
+                locale: { firstDayOfWeek: 1 },
+                onChange: function(selectedDates, dateStr, instance) {
+                    // v88.3: Update currentSearchParams when dates change
+                    if (selectedDates.length === 2 && typeof window.yoloUpdateSearchParams === 'function') {
+                        window.yoloUpdateSearchParams(selectedDates[0], selectedDates[1]);
+                    }
+                }
             });
         }
+        
+        // v88.3: Hook boat type change to update currentSearchParams
+        boatTypeSelect.addEventListener('change', function() {
+            if (typeof window.yoloUpdateBoatType === 'function') {
+                window.yoloUpdateBoatType(this.value);
+            }
+        });
+        
+        // v88.3: Override Apply Filters to include boat type and dates
+        const origApplyClick = applyBtn.onclick;
+        applyBtn.addEventListener('click', function(e) {
+            // Update currentSearchParams with current boat type value
+            if (typeof window.yoloUpdateBoatType === 'function') {
+                window.yoloUpdateBoatType(boatTypeSelect.value);
+            }
+            
+            // Update dates if flatpickr has selected dates
+            const fp = datesInput._flatpickr;
+            if (fp && fp.selectedDates.length === 2 && typeof window.yoloUpdateSearchParams === 'function') {
+                window.yoloUpdateSearchParams(fp.selectedDates[0], fp.selectedDates[1]);
+            }
+        }, true); // Use capture to run before other handlers
     }
 });
+</script>
+
+<!-- v88.3: Helper functions to update search params from reorganized filters -->
+<script>
+(function() {
+    // Format date for API (YYYY-MM-DDTHH:mm:ss)
+    function formatDateForAPI(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return year + '-' + month + '-' + day + 'T00:00:00';
+    }
+    
+    // Expose function to update dates in currentSearchParams
+    window.yoloUpdateSearchParams = function(startDate, endDate) {
+        if (typeof currentSearchParams !== 'undefined') {
+            currentSearchParams.dateFrom = formatDateForAPI(startDate);
+            currentSearchParams.dateTo = formatDateForAPI(endDate);
+        }
+    };
+    
+    // Expose function to update boat type in currentSearchParams
+    window.yoloUpdateBoatType = function(boatType) {
+        if (typeof currentSearchParams !== 'undefined') {
+            currentSearchParams.kind = boatType || '';
+        }
+    };
+})();
 </script>
