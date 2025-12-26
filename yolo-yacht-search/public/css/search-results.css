@@ -1458,30 +1458,29 @@ label.equipment-checkbox:hover {
         width: 100% !important;
     }
     
-    /* Range inputs container - horizontal layout */
+    /* Range inputs container - VERTICAL layout on mobile for full width */
     .filter-range .range-inputs,
     .range-inputs {
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
         gap: 8px !important;
         width: 100% !important;
     }
     
-    /* Range select inputs - equal width, show full text */
+    /* Range select inputs - full width on mobile */
     .filter-range .range-inputs select,
     .filter-range .range-inputs .select2-container,
     .range-inputs select,
     .range-inputs .select2-container {
-        flex: 1 !important;
-        min-width: 0 !important;
-        width: auto !important;
+        flex: none !important;
+        min-width: 100% !important;
+        width: 100% !important;
     }
     
-    /* Range separator */
+    /* Hide range separator on mobile */
     .range-separator {
-        flex-shrink: 0 !important;
-        padding: 0 4px !important;
+        display: none !important;
     }
     
     /* All selects and inputs - full width, proper height */
