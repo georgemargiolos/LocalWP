@@ -1016,3 +1016,120 @@ main .yolo-ys-search-results,
         padding: 0 !important;
     }
 }
+
+
+/* ============================================
+   v88.7: Select2 Custom Styling for Filters
+   ============================================ */
+
+/* Select2 container */
+.select2-container--default .select2-selection--single {
+    height: 45px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 43px !important;
+    padding-left: 12px !important;
+    padding-right: 30px !important;
+    color: #374151 !important;
+    font-size: 13px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 43px !important;
+    right: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #6b7280 transparent transparent transparent !important;
+}
+
+/* Dropdown styling */
+.select2-container--default .select2-results__option {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #f1f5f9 !important;
+    color: #1f2937 !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: rgb(37, 99, 235) !important;
+    color: #fff !important;
+}
+
+.select2-dropdown {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 4px !important;
+}
+
+/* Icon styling inside Select2 */
+.select2-results__option i,
+.select2-selection__rendered i {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.select2-results__option[aria-selected=true] i {
+    color: #fff !important;
+}
+
+/* Focus state */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: rgb(37, 99, 235) !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Range inputs - smaller width for Select2 */
+.filter-range .select2-container {
+    min-width: 80px !important;
+}
+
+/* Fix label icon spacing */
+.filter-group label i,
+.yolo-ys-form-field label i {
+    margin-right: 6px !important;
+}
+
+/* Equipment checkbox styling - restore proper checkboxes */
+.equipment-checkbox {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+}
+
+.equipment-checkbox input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 10px !important;
+    cursor: pointer !important;
+    accent-color: rgb(37, 99, 235) !important;
+}
+
+/* Mobile responsive Select2 */
+@media (max-width: 768px) {
+    .select2-container--default .select2-selection--single {
+        height: 42px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 40px !important;
+        font-size: 12px !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
+}

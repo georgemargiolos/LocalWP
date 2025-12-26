@@ -470,250 +470,97 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<!-- v88.6: Custom dropdowns with FontAwesome icons -->
-<style>
-/* Custom Select Dropdown with Icons */
-.yolo-custom-select {
-    position: relative;
-    width: 100%;
-}
-
-.yolo-custom-select .select-selected {
-    height: 45px;
-    width: 100%;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    padding: 0 35px 0 12px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    background: white;
-    cursor: pointer;
-    box-sizing: border-box;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.yolo-custom-select .select-selected::after {
-    content: '\f078';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 10px;
-    color: #6b7280;
-    transition: transform 0.2s;
-}
-
-.yolo-custom-select.open .select-selected::after {
-    transform: translateY(-50%) rotate(180deg);
-}
-
-.yolo-custom-select .select-items {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    margin-top: 4px;
-    max-height: 250px;
-    overflow-y: auto;
-    z-index: 9999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: none;
-}
-
-.yolo-custom-select.open .select-items {
-    display: block;
-}
-
-.yolo-custom-select .select-item {
-    padding: 10px 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    transition: background 0.15s;
-}
-
-.yolo-custom-select .select-item:hover {
-    background: #f1f5f9;
-}
-
-.yolo-custom-select .select-item.selected {
-    background: rgb(37, 99, 235);
-    color: white;
-}
-
-.yolo-custom-select .select-item i {
-    width: 18px;
-    text-align: center;
-    font-size: 14px;
-}
-
-/* Equipment checkbox icons */
-.equipment-checkbox {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-}
-
-.equipment-checkbox i {
-    width: 18px;
-    text-align: center;
-    color: #6b7280;
-}
-</style>
-
+<!-- v88.7: Select2 initialization with FontAwesome icons -->
 <script>
-// v88.6: Convert select elements to custom dropdowns with icons
-document.addEventListener('DOMContentLoaded', function() {
+jQuery(document).ready(function($) {
+    // Wait for filter reorganization to complete
     setTimeout(function() {
+        
         // Icon mappings for different filter types
-        const iconMaps = {
+        var iconMaps = {
             'filter-location': {
-                '': '📍',
-                'Lefkada': '🏝️',
-                'Corfu': '🏝️',
-                'Kefalonia': '🏝️',
-                'Zakynthos': '🏝️',
-                'Ithaca': '🏝️',
-                'Preveza': '⚓',
-                'Syvota': '🏝️',
-                'Vonitsa': '⚓',
-                'Palairos': '⚓',
-                'Plataria': '⚓',
-                'Astakos': '⚓',
-                'Paxos': '🏝️'
+                '': 'fa-map-marker-alt',
+                'Lefkada': 'fa-umbrella-beach',
+                'Corfu': 'fa-umbrella-beach',
+                'Kefalonia': 'fa-umbrella-beach',
+                'Zakynthos': 'fa-umbrella-beach',
+                'Ithaca': 'fa-umbrella-beach',
+                'Preveza': 'fa-anchor',
+                'Syvota': 'fa-umbrella-beach',
+                'Vonitsa': 'fa-anchor',
+                'Palairos': 'fa-anchor',
+                'Plataria': 'fa-anchor',
+                'Astakos': 'fa-anchor',
+                'Paxos': 'fa-umbrella-beach'
             },
             'yolo-ys-results-boat-type': {
-                '': '<i class="fas fa-ship"></i>',
-                'Sailing yacht': '<i class="fas fa-sailboat"></i>',
-                'Catamaran': '<i class="fas fa-dharmachakra"></i>'
+                '': 'fa-ship',
+                'Sailing yacht': 'fa-sailboat',
+                'Catamaran': 'fa-dharmachakra'
             },
             'filter-cabins': {
-                '': '<i class="fas fa-bed"></i>',
-                '2': '<i class="fas fa-bed"></i>',
-                '3': '<i class="fas fa-bed"></i>',
-                '4': '<i class="fas fa-bed"></i>',
-                '5': '<i class="fas fa-bed"></i>',
-                '6': '<i class="fas fa-bed"></i>'
+                '': 'fa-bed',
+                '2': 'fa-bed',
+                '3': 'fa-bed',
+                '4': 'fa-bed',
+                '5': 'fa-bed',
+                '6': 'fa-bed'
             },
             'filter-sort': {
-                'price_asc': '<i class="fas fa-arrow-up-short-wide"></i>',
-                'price_desc': '<i class="fas fa-arrow-down-wide-short"></i>',
-                'year_desc': '<i class="fas fa-calendar-check"></i>',
-                'length_desc': '<i class="fas fa-ruler"></i>',
-                'cabins_desc': '<i class="fas fa-bed"></i>'
+                'price_asc': 'fa-arrow-up-1-9',
+                'price_desc': 'fa-arrow-down-9-1',
+                'year_desc': 'fa-calendar-check',
+                'length_desc': 'fa-ruler',
+                'cabins_desc': 'fa-bed'
             }
         };
         
-        // Convert a select to custom dropdown
-        function convertToCustomSelect(selectId) {
-            const select = document.getElementById(selectId);
-            if (!select || select.dataset.customized) return;
-            
-            select.dataset.customized = 'true';
-            const icons = iconMaps[selectId] || {};
-            
-            // Create wrapper
-            const wrapper = document.createElement('div');
-            wrapper.className = 'yolo-custom-select';
-            
-            // Create selected display
-            const selected = document.createElement('div');
-            selected.className = 'select-selected';
-            
-            // Create items container
-            const items = document.createElement('div');
-            items.className = 'select-items';
-            
-            // Populate options
-            Array.from(select.options).forEach((opt, idx) => {
-                const item = document.createElement('div');
-                item.className = 'select-item' + (opt.selected ? ' selected' : '');
-                item.dataset.value = opt.value;
-                
-                const icon = icons[opt.value] || '';
-                item.innerHTML = icon + ' <span>' + opt.text + '</span>';
-                
-                if (opt.selected) {
-                    selected.innerHTML = icon + ' <span>' + opt.text + '</span>';
-                }
-                
-                item.addEventListener('click', function() {
-                    select.value = this.dataset.value;
-                    selected.innerHTML = this.innerHTML;
-                    
-                    // Update selected class
-                    items.querySelectorAll('.select-item').forEach(i => i.classList.remove('selected'));
-                    this.classList.add('selected');
-                    
-                    // Close dropdown
-                    wrapper.classList.remove('open');
-                    
-                    // Trigger change event
-                    select.dispatchEvent(new Event('change', { bubbles: true }));
-                });
-                
-                items.appendChild(item);
-            });
-            
-            // Toggle dropdown
-            selected.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // Close other dropdowns
-                document.querySelectorAll('.yolo-custom-select.open').forEach(s => {
-                    if (s !== wrapper) s.classList.remove('open');
-                });
-                wrapper.classList.toggle('open');
-            });
-            
-            // Close on outside click
-            document.addEventListener('click', function() {
-                wrapper.classList.remove('open');
-            });
-            
-            wrapper.appendChild(selected);
-            wrapper.appendChild(items);
-            
-            // Hide original select and insert custom
-            select.style.display = 'none';
-            select.parentNode.insertBefore(wrapper, select);
+        // Custom template function for Select2
+        function formatOption(option, selectId) {
+            if (!option.id) {
+                return option.text;
+            }
+            var icons = iconMaps[selectId] || {};
+            var iconClass = icons[option.id] || icons[''] || 'fa-circle';
+            var $option = $(
+                '<span><i class="fas ' + iconClass + '" style="margin-right: 8px; width: 16px; text-align: center;"></i>' + option.text + '</span>'
+            );
+            return $option;
         }
         
-        // Convert key selects
-        convertToCustomSelect('filter-location');
-        convertToCustomSelect('yolo-ys-results-boat-type');
-        convertToCustomSelect('filter-cabins');
-        convertToCustomSelect('filter-sort');
+        // Initialize Select2 on filter dropdowns
+        var selectIds = ['filter-location', 'yolo-ys-results-boat-type', 'filter-cabins', 'filter-sort'];
         
-        // Add icons to equipment checkboxes
-        const equipmentIcons = {
-            '46': 'fa-solar-panel',
-            '7': 'fa-umbrella-beach',
-            '1': 'fa-bolt',
-            '2': 'fa-snowflake',
-            '3': 'fa-arrows-left-right',
-            '4': 'fa-gear',
-            '5': 'fa-droplet'
-        };
-        
-        document.querySelectorAll('.equipment-checkbox input[type="checkbox"]').forEach(cb => {
-            const iconClass = equipmentIcons[cb.value];
-            if (iconClass && !cb.parentNode.querySelector('i')) {
-                const icon = document.createElement('i');
-                icon.className = 'fas ' + iconClass;
-                cb.parentNode.insertBefore(icon, cb.nextSibling);
+        selectIds.forEach(function(selectId) {
+            var $select = $('#' + selectId);
+            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
+                $select.select2({
+                    minimumResultsForSearch: Infinity, // Disable search box
+                    dropdownAutoWidth: false,
+                    width: '100%',
+                    templateResult: function(option) {
+                        return formatOption(option, selectId);
+                    },
+                    templateSelection: function(option) {
+                        return formatOption(option, selectId);
+                    }
+                });
             }
         });
         
-    }, 500); // Wait for filter reorganization
+        // Also initialize length and year range selects (simpler, no icons)
+        var rangeSelects = ['filter-length-min', 'filter-length-max', 'filter-year-min', 'filter-year-max', 'filter-price-min', 'filter-price-max'];
+        rangeSelects.forEach(function(selectId) {
+            var $select = $('#' + selectId);
+            if ($select.length && !$select.hasClass('select2-hidden-accessible')) {
+                $select.select2({
+                    minimumResultsForSearch: Infinity,
+                    dropdownAutoWidth: false,
+                    width: '100%'
+                });
+            }
+        });
+        
+    }, 600); // Wait for filter reorganization
 });
 </script>

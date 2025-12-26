@@ -95,10 +95,18 @@ class YOLO_YS_Public {
         if (is_a($post, 'WP_Post')) {
             // Search results page CSS
             if (has_shortcode($post->post_content, 'yolo_search_results')) {
+                // Select2 CSS for enhanced dropdowns with icons
+                wp_enqueue_style(
+                    'select2',
+                    YOLO_YS_PLUGIN_URL . 'vendor/select2/select2.min.css',
+                    array(),
+                    '4.1.0'
+                );
+                
                 wp_enqueue_style(
                     'yolo-ys-search-results',
                     YOLO_YS_PLUGIN_URL . 'public/css/search-results.css',
-                    array('yolo-ys-bootstrap-mobile'),  // Load AFTER bootstrap-mobile-fixes to ensure max-width:none !important wins
+                    array('yolo-ys-bootstrap-mobile', 'select2'),  // Load AFTER bootstrap-mobile-fixes and select2
                     $this->version
                 );
                 
@@ -257,6 +265,18 @@ class YOLO_YS_Public {
             '1.12.0',
             true
         );
+        
+        // Select2 JS for enhanced dropdowns with icons (search results page)
+        global $post;
+        if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'yolo_search_results')) {
+            wp_enqueue_script(
+                'select2',
+                YOLO_YS_PLUGIN_URL . 'vendor/select2/select2.min.js',
+                array('jquery'),
+                '4.1.0',
+                true
+            );
+        }
         
         // Plugin public JS
         wp_enqueue_script(
