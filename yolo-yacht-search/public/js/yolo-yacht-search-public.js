@@ -654,6 +654,10 @@
             : '<div class="yolo-ys-yacht-placeholder">⛵</div>';
         
         // YOLO logo for YOLO yachts
+        const featuredBadgeHtml = isYolo 
+            ? '<div class="yolo-ys-featured-badge"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> Featured Yacht</div>' 
+            : '';
+        
         const yoloLogoHtml = isYolo 
             ? '<img src="https://yolo-charters.com/wp-content/uploads/2025/11/logo-for-YOLO-charters.png" alt="YOLO Charters" class="yolo-ys-yacht-logo">' 
             : '';
@@ -727,6 +731,7 @@
                 <div class="yolo-ys-yacht-image">
                     ${imageHtml}
                     ${yoloLogoHtml}
+                    ${featuredBadgeHtml}
                 </div>
                 <div class="yolo-ys-yacht-content">
                     <div class="yolo-ys-yacht-location">

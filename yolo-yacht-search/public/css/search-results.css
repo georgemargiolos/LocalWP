@@ -1121,7 +1121,7 @@ main .yolo-ys-search-results,
     background-color: #f3f4f6 !important;
 }
 
-/* Force native checkbox appearance - override Bootstrap */
+/* Custom checkbox design - full control over styling */
 .equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
 #equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
 .equipment-checkbox input[type="checkbox"] {
@@ -1133,23 +1133,48 @@ main .yolo-ys-search-results,
     margin: 0 !important;
     padding: 0 !important;
     cursor: pointer !important;
-    accent-color: rgb(37, 99, 235) !important;
-    -webkit-appearance: checkbox !important;
-    -moz-appearance: checkbox !important;
-    appearance: checkbox !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    border: 1px solid #9ca3af !important;
-    border-radius: 3px !important;
+    border: 2px solid #9ca3af !important;
+    border-radius: 4px !important;
     background-color: #fff !important;
     flex-shrink: 0 !important;
+    transition: all 0.15s ease !important;
 }
 
-/* Hide any pseudo-elements Bootstrap might add */
-.equipment-checkbox input[type="checkbox"]::before,
+/* Checkbox hover state */
+.equipment-checkbox input[type="checkbox"]:hover {
+    border-color: #3b82f6 !important;
+}
+
+/* Checkbox checked state */
+.equipment-checkbox input[type="checkbox"]:checked {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Checkmark using ::after pseudo-element */
 .equipment-checkbox input[type="checkbox"]::after {
-    display: none !important;
-    content: none !important;
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    top: 1px !important;
+    left: 5px !important;
+    width: 5px !important;
+    height: 10px !important;
+    border: solid white !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
+    opacity: 0 !important;
+    transition: opacity 0.15s ease !important;
+}
+
+/* Show checkmark when checked */
+.equipment-checkbox input[type="checkbox"]:checked::after {
+    opacity: 1 !important;
 }
 
 .equipment-dropdown-menu .equipment-checkbox i,
@@ -1194,4 +1219,36 @@ main .yolo-ys-search-results,
 /* Select2 pointer cursor */
 .select2-container .select2-selection {
     cursor: pointer !important;
+}
+
+
+/* Featured Yacht Badge - positioned in top-right of yacht card image */
+.yolo-ys-featured-badge {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    max-width: 200px !important;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: white !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.yolo-ys-featured-badge i {
+    font-size: 10px !important;
+    color: white !important;
+}
+
+/* Ensure yacht image container is positioned relatively for badge positioning */
+.yolo-ys-yacht-image {
+    position: relative !important;
 }

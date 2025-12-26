@@ -202,19 +202,19 @@ if (!defined('ABSPATH')) {
                                 <input type="checkbox" name="equipment[]" value="7"> <i class="fas fa-umbrella-beach"></i> <?php _e('Bimini', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="1"> <i class="fas fa-bolt"></i> <?php _e('Generator', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="12"> <i class="fas fa-bolt"></i> <?php _e('Generator', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="2"> <i class="fas fa-snowflake"></i> <?php _e('Air Conditioning', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="29"> <i class="fas fa-snowflake"></i> <?php _e('Air Conditioning', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="3"> <i class="fas fa-arrows-left-right"></i> <?php _e('Bow Thruster', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="9"> <i class="fas fa-arrows-left-right"></i> <?php _e('Bow Thruster', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="4"> <i class="fas fa-gear"></i> <?php _e('Electric Winch', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="6"> <i class="fas fa-gear"></i> <?php _e('Electric Winch', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="5"> <i class="fas fa-droplet"></i> <?php _e('Watermaker', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="44"> <i class="fas fa-droplet"></i> <?php _e('Watermaker', 'yolo-yacht-search'); ?>
                             </label>
                         </div>
                     </div>
@@ -256,7 +256,7 @@ if (!defined('ABSPATH')) {
         
         <!-- Featured Yachts Section (YOLO boats) -->
         <div class="yolo-ys-featured-section" id="yolo-ys-featured-section" style="display: none;">
-            <h2 class="section-title"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <?php _e('Featured Yachts', 'yolo-yacht-search'); ?></h2>
+            <!-- Featured Yachts heading removed - badge now inside yacht cards -->
             <div class="row g-4" id="yolo-ys-featured-boats">
                 <!-- Featured boats loaded via JS -->
             </div>
