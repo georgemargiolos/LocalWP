@@ -961,18 +961,7 @@ main .yolo-ys-search-results,
         margin-bottom: 10px !important;
     }
     
-    /* Min/Max pairs - each takes 48% (so pair = ~100% with gap) */
-    #filter-row-1 .filter-group[data-filter="year-min"],
-    #filter-row-1 .filter-group[data-filter="year-max"],
-    #filter-row-2 .filter-group[data-filter="length-min"],
-    #filter-row-2 .filter-group[data-filter="length-max"],
-    #filter-row-2 .filter-group[data-filter="price-min"],
-    #filter-row-2 .filter-group[data-filter="price-max"] {
-        flex: 1 1 calc(48% - 5px) !important;
-        width: calc(48% - 5px) !important;
-        min-width: calc(48% - 5px) !important;
-        max-width: calc(48% - 5px) !important;
-    }
+    /* v89.9.2: Min/Max pairs now full width - removed 48% rule */
     
     /* Buttons wrapper - full width */
     .filter-buttons-wrapper {
