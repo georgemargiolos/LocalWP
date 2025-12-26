@@ -918,47 +918,89 @@ main .yolo-ys-search-results,
 }
 
 @media (max-width: 768px) {
+    /* STICKY FILTERS AT BOTTOM ON MOBILE */
+    .yolo-ys-filters-container {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: white !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+        padding: 15px 10px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        border-top-left-radius: 20px !important;
+        border-top-right-radius: 20px !important;
+    }
+    
+    /* Add padding to body to prevent content being hidden behind sticky filters */
+    .yolo-ys-search-results {
+        padding-bottom: 200px !important;
+    }
+    
     /* Stack filters on mobile */
     #filter-row-1,
     #filter-row-2 {
-        flex-direction: column !important;
-        gap: 15px !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
     }
     
+    /* Each filter takes 50% width on mobile (2 per row) */
     #filter-row-1 .filter-group,
     #filter-row-2 .filter-group {
-        flex: 1 1 100% !important;
-        width: 100% !important;
-        min-width: 100% !important;
+        flex: 1 1 calc(50% - 5px) !important;
+        width: calc(50% - 5px) !important;
+        min-width: calc(50% - 5px) !important;
+        max-width: calc(50% - 5px) !important;
     }
     
+    /* Min/Max pairs - each takes 25% (so pair = 50%) */
     #filter-row-1 .filter-group[data-filter="year-min"],
     #filter-row-1 .filter-group[data-filter="year-max"],
     #filter-row-2 .filter-group[data-filter="length-min"],
     #filter-row-2 .filter-group[data-filter="length-max"],
     #filter-row-2 .filter-group[data-filter="price-min"],
     #filter-row-2 .filter-group[data-filter="price-max"] {
-        flex: 1 1 calc(50% - 5px) !important;
-        width: calc(50% - 5px) !important;
-        min-width: calc(50% - 5px) !important;
+        flex: 1 1 calc(25% - 5px) !important;
+        width: calc(25% - 5px) !important;
+        min-width: calc(25% - 5px) !important;
+        max-width: calc(25% - 5px) !important;
     }
     
-    /* Group Min/Max pairs on mobile */
-    #filter-row-1,
-    #filter-row-2 {
-        flex-wrap: wrap !important;
-    }
-    
+    /* Buttons wrapper - full width */
     .filter-buttons-wrapper {
         flex: 1 1 100% !important;
         width: 100% !important;
         justify-content: center !important;
+        margin-top: 10px !important;
     }
     
     .filter-buttons-wrapper #apply-filters,
     .filter-buttons-wrapper #clear-filters {
         flex: 1 !important;
         max-width: 50% !important;
+        height: 50px !important;
+        font-size: 15px !important;
+    }
+    
+    /* Smaller labels on mobile */
+    #filter-row-1 .filter-group label,
+    #filter-row-2 .filter-group label {
+        font-size: 10px !important;
+        margin-bottom: 5px !important;
+    }
+    
+    /* Smaller inputs on mobile */
+    #filter-row-1 select,
+    #filter-row-1 input,
+    #filter-row-2 select,
+    #filter-row-2 input,
+    #filter-row-2 button#equipment-dropdown-toggle {
+        height: 40px !important;
+        font-size: 12px !important;
+        padding: 0 6px !important;
     }
     
     /* 5px edge padding on mobile */
@@ -970,6 +1012,6 @@ main .yolo-ys-search-results,
     }
     
     .filters-row {
-        padding: 0 5px !important;
+        padding: 0 !important;
     }
 }
