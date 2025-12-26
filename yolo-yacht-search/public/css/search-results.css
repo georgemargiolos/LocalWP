@@ -463,36 +463,68 @@ main .yolo-ys-search-results,
     margin: 0;
 }
 
+/* v90.6: Specs grid - single row layout with 4 or 5 columns */
 .yolo-ys-yacht-specs-grid {
-    margin-bottom: 20px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid #e5e7eb !important;
 }
 
-/* Specs row - justified layout with space-between */
-.yolo-ys-specs-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
+/* 5 columns when yacht has refit */
+.yolo-ys-yacht-specs-grid.has-refit {
+    grid-template-columns: repeat(5, 1fr) !important;
 }
 
 .yolo-ys-spec-item {
-    text-align: left;
+    text-align: center !important;
+    padding: 10px 4px !important;
+    border-right: 1px solid #e5e7eb !important;
+}
+
+.yolo-ys-spec-item:last-child {
+    border-right: none !important;
 }
 
 .yolo-ys-spec-value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 4px;
-}
-
-/* Refit year BOLD only */
-.yolo-ys-refit-bold {
-    font-weight: 900;
+    margin-bottom: 2px;
 }
 
 .yolo-ys-spec-label {
-    font-size: 13px;
+    font-size: 10px;
     color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* v90.6: Equipment row styling */
+.yolo-ys-equipment-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 10px 12px !important;
+    background: #fafafa !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.yolo-ys-equipment-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 10px !important;
+    color: #374151 !important;
+    background: #fff !important;
+    padding: 3px 6px !important;
+    border-radius: 4px !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.yolo-ys-equipment-item i {
+    font-size: 11px !important;
 }
 
 /* Red button to match "Our Yachts" design */
@@ -1155,16 +1187,34 @@ main .yolo-ys-search-results,
         padding: 0 !important;
     }
     
-    /* Featured badge mobile positioning */
+    /* Featured badge mobile positioning - v90.6 */
     .yolo-ys-featured-badge {
-        font-size: 9px !important;
-        padding: 4px 8px !important;
+        padding: 6px 10px !important;
         top: 8px !important;
         right: 8px !important;
     }
     
-    .yolo-ys-featured-badge i {
+    .yolo-ys-featured-stars i {
+        font-size: 10px !important;
+    }
+    
+    .yolo-ys-featured-text {
         font-size: 8px !important;
+    }
+    
+    /* Equipment row mobile */
+    .yolo-ys-equipment-row {
+        gap: 4px !important;
+        padding: 8px 10px !important;
+    }
+    
+    .yolo-ys-equipment-item {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+    }
+    
+    .yolo-ys-equipment-item i {
+        font-size: 10px !important;
     }
 }
 
@@ -1444,30 +1494,38 @@ label.equipment-checkbox:hover {
 }
 
 
-/* Featured Yacht Badge - positioned in top-right of yacht card image */
+/* v90.6: Featured Yacht Badge - Redesigned with yellow stars, black text, white background */
 .yolo-ys-featured-badge {
     position: absolute !important;
     top: 10px !important;
     right: 10px !important;
-    max-width: 200px !important;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    color: white !important;
-    padding: 6px 12px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    padding: 8px 12px !important;
     border-radius: 6px !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     z-index: 10 !important;
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 2px !important;
 }
 
-.yolo-ys-featured-badge i {
-    font-size: 10px !important;
-    color: white !important;
+.yolo-ys-featured-stars {
+    display: flex !important;
+    gap: 2px !important;
+}
+
+.yolo-ys-featured-stars i {
+    font-size: 12px !important;
+    color: #f59e0b !important;
+}
+
+.yolo-ys-featured-text {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
 }
 
 /* Ensure yacht image container is positioned relatively for badge positioning */

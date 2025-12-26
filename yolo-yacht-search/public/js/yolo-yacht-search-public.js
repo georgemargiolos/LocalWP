@@ -651,6 +651,67 @@
     }
     
     /**
+     * v90.6: Render equipment row with priority sorting
+     * Shows up to 10 equipment items with icons and text labels
+     * Priority order: Heating, Solar, SUP, Coffee, Autopilot, Electric Toilet, Outboard, then others
+     */
+    function renderEquipmentRow(equipment) {
+        if (!equipment || !Array.isArray(equipment) || equipment.length === 0) {
+            return '';
+        }
+        
+        // Equipment mapping with priority and icons
+        const equipmentConfig = {
+            11: { name: 'Heating', icon: 'fa-duotone fa-fire-flame-curved', color: '#ef4444', priority: 1 },
+            46: { name: 'Solar', icon: 'fa-duotone fa-solar-panel', color: '#84cc16', priority: 2 },
+            23: { name: 'SUP', icon: 'fa-duotone fa-person-swimming', color: '#0891b2', priority: 3 },
+            25: { name: 'Coffee', icon: 'fa-duotone fa-mug-hot', color: '#78350f', priority: 4 },
+            1: { name: 'Autopilot', icon: 'fa-duotone fa-compass', color: '#6366f1', priority: 5 },
+            27: { name: 'Elec. Toilet', icon: 'fa-duotone fa-toilet', color: '#64748b', priority: 6 },
+            18: { name: 'Outboard', icon: 'fa-duotone fa-engine', color: '#71717a', priority: 7 },
+            29: { name: 'A/C', icon: 'fa-duotone fa-snowflake', color: '#3b82f6', priority: 8 },
+            12: { name: 'Generator', icon: 'fa-duotone fa-bolt', color: '#eab308', priority: 9 },
+            7: { name: 'Bimini', icon: 'fa-duotone fa-umbrella-beach', color: '#f59e0b', priority: 10 },
+            9: { name: 'Bow Thruster', icon: 'fa-duotone fa-arrows-left-right', color: '#10b981', priority: 11 },
+            44: { name: 'Watermaker', icon: 'fa-duotone fa-droplet', color: '#0284c7', priority: 12 },
+            21: { name: 'Wi-Fi', icon: 'fa-duotone fa-wifi', color: '#2563eb', priority: 13 },
+            6: { name: 'Elec. Winch', icon: 'fa-duotone fa-gear', color: '#475569', priority: 14 },
+            5: { name: 'Plotter', icon: 'fa-duotone fa-map-location-dot', color: '#8b5cf6', priority: 15 },
+            4: { name: 'Dinghy', icon: 'fa-duotone fa-sailboat', color: '#0ea5e9', priority: 16 },
+            37: { name: 'Fridge', icon: 'fa-duotone fa-refrigerator', color: '#06b6d4', priority: 17 },
+            42: { name: 'TV', icon: 'fa-duotone fa-tv', color: '#334155', priority: 18 },
+            33: { name: 'Inverter', icon: 'fa-duotone fa-plug-circle-bolt', color: '#22c55e', priority: 19 },
+            40: { name: 'Snorkel', icon: 'fa-duotone fa-mask-snorkel', color: '#14b8a6', priority: 20 },
+        };
+        
+        // Map equipment IDs to config and sort by priority
+        const sortedEquipment = equipment
+            .map(id => {
+                const config = equipmentConfig[id];
+                if (config) {
+                    return { id, ...config };
+                }
+                return null;
+            })
+            .filter(item => item !== null)
+            .sort((a, b) => a.priority - b.priority)
+            .slice(0, 10); // Limit to 10 items
+        
+        if (sortedEquipment.length === 0) {
+            return '';
+        }
+        
+        const equipmentHtml = sortedEquipment.map(eq => `
+            <span class="yolo-ys-equipment-item">
+                <i class="${eq.icon}" style="color: ${eq.color};"></i>
+                <span>${eq.name}</span>
+            </span>
+        `).join('');
+        
+        return `<div class="yolo-ys-equipment-row">${equipmentHtml}</div>`;
+    }
+    
+    /**
      * Render boat card (v81.18: Added airport distance)
      */
     function renderBoatCard(boat, isYolo) {
@@ -661,9 +722,14 @@
             ? `<img src="${boat.image_url}" alt="${boat.yacht}" loading="lazy">` 
             : '<div class="yolo-ys-yacht-placeholder">⛵</div>';
         
-        // YOLO logo for YOLO yachts
+        // YOLO logo for YOLO yachts - v90.6: Redesigned featured badge
         const featuredBadgeHtml = isYolo 
-            ? '<div class="yolo-ys-featured-badge"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> Featured Yacht</div>' 
+            ? `<div class="yolo-ys-featured-badge">
+                <div class="yolo-ys-featured-stars">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <div class="yolo-ys-featured-text">FEATURED YACHT</div>
+            </div>` 
             : '';
         
         const yoloLogoHtml = isYolo 
@@ -751,33 +817,30 @@
                         <h3 class="yolo-ys-yacht-name">${yachtName}</h3>
                         ${yachtModel ? `<h4 class="yolo-ys-yacht-model">${yachtModel}</h4>` : ''}
                     </div>
-                    <div class="yolo-ys-yacht-specs-grid">
-                        <div class="yolo-ys-specs-row">
-                            <div class="yolo-ys-spec-item">
-                                <div class="yolo-ys-spec-value">${boat.cabins || 0}</div>
-                                <div class="yolo-ys-spec-label">CABINS</div>
-                            </div>
-                            <div class="yolo-ys-spec-item">
-                                <div class="yolo-ys-spec-value">${boat.wc || 0}</div>
-                                <div class="yolo-ys-spec-label">HEADS</div>
-                            </div>
+                    <div class="yolo-ys-yacht-specs-grid ${boat.refit_year ? 'has-refit' : ''}">
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.cabins || 0}</div>
+                            <div class="yolo-ys-spec-label">CABINS</div>
                         </div>
-                        <div class="yolo-ys-specs-row">
-                            <div class="yolo-ys-spec-item">
-                                <div class="yolo-ys-spec-value">${boat.year_of_build || 'N/A'}</div>
-                                <div class="yolo-ys-spec-label">BUILT YEAR</div>
-                            </div>
-                            ${boat.refit_year ? `
-                            <div class="yolo-ys-spec-item">
-                                <div class="yolo-ys-spec-value yolo-ys-refit-bold">${refitDisplay}</div>
-                                <div class="yolo-ys-spec-label">REFIT</div>
-                            </div>` : ''}
-                            <div class="yolo-ys-spec-item">
-                                <div class="yolo-ys-spec-value">${lengthFt} ft</div>
-                                <div class="yolo-ys-spec-label">LENGTH</div>
-                            </div>
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.wc || 0}</div>
+                            <div class="yolo-ys-spec-label">HEADS</div>
+                        </div>
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.year_of_build || 'N/A'}</div>
+                            <div class="yolo-ys-spec-label">BUILT</div>
+                        </div>
+                        ${boat.refit_year ? `
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${boat.refit_year}</div>
+                            <div class="yolo-ys-spec-label">REFIT</div>
+                        </div>` : ''}
+                        <div class="yolo-ys-spec-item">
+                            <div class="yolo-ys-spec-value">${lengthFt} ft</div>
+                            <div class="yolo-ys-spec-label">LENGTH</div>
                         </div>
                     </div>
+                    ${renderEquipmentRow(boat.equipment || [])}
                     ${priceHtml}
                     <span class="yolo-ys-details-btn">DETAILS</span>
                 </div>
