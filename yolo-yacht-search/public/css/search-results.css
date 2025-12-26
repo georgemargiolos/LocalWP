@@ -1154,67 +1154,128 @@ main .yolo-ys-search-results,
     margin-right: 6px !important;
 }
 
-/* Equipment checkbox styling - restore proper checkboxes */
-/* Equipment checkbox styling - custom modern checkboxes */
-.equipment-checkbox {
+/* ========================================
+   v89.8: Equipment Checkbox Styling - FIXED
+   Using maximum specificity with ID selector
+   to override theme styles that set display:block
+   ======================================== */
+
+/* Label container - use ID selector for maximum specificity */
+#equipment-dropdown-menu label.equipment-checkbox,
+.equipment-dropdown-menu label.equipment-checkbox,
+label.equipment-checkbox {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
+    flex-wrap: nowrap !important;
     padding: 10px 14px !important;
     cursor: pointer !important;
     transition: background-color 0.2s ease !important;
     border-radius: 6px !important;
     margin: 2px 0 !important;
+    background: transparent !important;
+    white-space: nowrap !important;
 }
 
-.equipment-checkbox:hover {
+#equipment-dropdown-menu label.equipment-checkbox:hover,
+.equipment-dropdown-menu label.equipment-checkbox:hover,
+label.equipment-checkbox:hover {
     background-color: #f1f5f9 !important;
 }
 
-.equipment-checkbox input[type="checkbox"] {
-    /* Hide default checkbox */
-    appearance: none !important;
+/* Custom checkbox - maximum specificity */
+#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
+#equipment-dropdown-menu .equipment-checkbox input,
+.equipment-dropdown-menu .equipment-checkbox input[type="checkbox"],
+.equipment-checkbox input[type="checkbox"],
+.equipment-checkbox input {
+    /* Remove default appearance */
     -webkit-appearance: none !important;
-    width: 20px !important;
-    height: 20px !important;
-    min-width: 20px !important;
-    margin-right: 12px !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    /* Fixed sizing */
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+    min-height: 18px !important;
+    max-height: 18px !important;
+    
+    /* Styling */
+    margin: 0 !important;
+    margin-right: 10px !important;
+    padding: 0 !important;
     cursor: pointer !important;
-    border: 2px solid #cbd5e1 !important;
+    border: 2px solid #94a3b8 !important;
     border-radius: 4px !important;
     background: #fff !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.15s ease !important;
     position: relative !important;
+    flex: 0 0 18px !important;
+    flex-shrink: 0 !important;
+    
+    /* Reset any theme styles */
+    box-shadow: none !important;
+    outline: none !important;
 }
 
-.equipment-checkbox input[type="checkbox"]:hover {
+/* Hover state */
+#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"]:hover,
+.equipment-checkbox input[type="checkbox"]:hover,
+.equipment-checkbox input:hover {
     border-color: #3b82f6 !important;
+    background: #f0f9ff !important;
 }
 
-.equipment-checkbox input[type="checkbox"]:checked {
+/* Checked state */
+#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"]:checked,
+.equipment-checkbox input[type="checkbox"]:checked,
+.equipment-checkbox input:checked {
     background: #3b82f6 !important;
     border-color: #3b82f6 !important;
 }
 
-.equipment-checkbox input[type="checkbox"]:checked::after {
+/* Checkmark for checked state */
+#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"]:checked::before,
+.equipment-checkbox input[type="checkbox"]:checked::before,
+.equipment-checkbox input:checked::before {
     content: '' !important;
+    display: block !important;
     position: absolute !important;
-    left: 6px !important;
-    top: 2px !important;
+    left: 4px !important;
+    top: 0px !important;
     width: 5px !important;
-    height: 10px !important;
+    height: 9px !important;
     border: solid white !important;
     border-width: 0 2px 2px 0 !important;
     transform: rotate(45deg) !important;
 }
 
-.equipment-checkbox i {
-    width: 22px !important;
-    text-align: center !important;
-    color: #3b82f6 !important;
-    margin-right: 10px !important;
-    font-size: 14px !important;
+/* Focus state for accessibility */
+#equipment-dropdown-menu .equipment-checkbox input[type="checkbox"]:focus,
+.equipment-checkbox input[type="checkbox"]:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
 }
 
+/* Icon styling */
+#equipment-dropdown-menu .equipment-checkbox i,
+.equipment-dropdown-menu .equipment-checkbox i,
+.equipment-checkbox i {
+    display: inline-flex !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    text-align: center !important;
+    justify-content: center !important;
+    color: #3b82f6 !important;
+    margin-right: 8px !important;
+    font-size: 14px !important;
+    flex: 0 0 20px !important;
+    flex-shrink: 0 !important;
+}
+
+#equipment-dropdown-menu .equipment-checkbox:hover i,
 .equipment-checkbox:hover i {
     color: #1d4ed8 !important;
 }
