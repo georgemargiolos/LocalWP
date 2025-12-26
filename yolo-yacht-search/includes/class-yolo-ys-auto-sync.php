@@ -342,7 +342,7 @@ class YOLO_YS_Auto_Sync {
         
         // Get next scheduled time for response
         $next_run = wp_next_scheduled($hook);
-        $next_run_formatted = $next_run ? date('M d, Y g:i A', $next_run) : 'Not scheduled';
+        $next_run_formatted = $next_run ? wp_date('M d, Y g:i A', $next_run) : 'Not scheduled';
         
         wp_send_json_success(array(
             'message' => 'Auto-sync setting saved',
@@ -359,7 +359,7 @@ class YOLO_YS_Auto_Sync {
         
         $status = array(
             'enabled' => $next_run !== false,
-            'next_run' => $next_run ? date('M d, Y g:i A', $next_run) : null,
+            'next_run' => $next_run ? wp_date('M d, Y g:i A', $next_run) : null,
             'frequency' => get_option('yolo_ys_auto_sync_' . $type . '_frequency', 'disabled'),
             'time' => get_option('yolo_ys_auto_sync_' . $type . '_time', '03:00'),
             'last_sync' => get_option('yolo_ys_last_' . $type . '_sync', null),

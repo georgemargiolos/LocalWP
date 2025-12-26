@@ -181,7 +181,7 @@ $sync_status = $sync->get_sync_status();
                     <?php
                     $next_yacht_sync = wp_next_scheduled('yolo_ys_auto_sync_yachts');
                     if ($next_yacht_sync) {
-                        echo 'Next: ' . date('M d, g:i A', $next_yacht_sync);
+                        echo 'Next: ' . wp_date('M d, g:i A', $next_yacht_sync);
                     }
                     ?>
                 </span>
@@ -328,7 +328,7 @@ $sync_status = $sync->get_sync_status();
                     <?php
                     $next_offers_sync = wp_next_scheduled('yolo_ys_auto_sync_offers');
                     if ($next_offers_sync) {
-                        echo 'Next: ' . date('M d, g:i A', $next_offers_sync);
+                        echo 'Next: ' . wp_date('M d, g:i A', $next_offers_sync);
                     }
                     ?>
                 </span>

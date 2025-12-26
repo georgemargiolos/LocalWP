@@ -1,12 +1,13 @@
 (function($) {
     'use strict';
     
-    // v81.17: Server-side filtering state
-    let currentSearchParams = {
+    // v81.17: Server-side filtering state (v88.5: Exposed globally for filter reorganization)
+    window.currentSearchParams = {
         dateFrom: '',
         dateTo: '',
         kind: ''
     };
+    var currentSearchParams = window.currentSearchParams;
     let currentPage = 1;
     let isLoading = false;
     
@@ -137,8 +138,12 @@
             $('#equipment-dropdown-menu').toggleClass('show');
         });
         
-        // Close equipment dropdown when clicking outside
+        // Close equipment dropdown when clicking outside (exclude Select2 elements)
         $(document).on('click', function(e) {
+            // Don't close if clicking on Select2 elements
+            if ($(e.target).closest('.select2-container, .select2-dropdown, .select2-results, .select2-selection').length) {
+                return;
+            }
             if (!$(e.target).closest('.filter-equipment').length) {
                 $('#equipment-dropdown-menu').removeClass('show');
             }
@@ -370,6 +375,31 @@
         isLoading = true;
         
         const filters = getFilterValues();
+        
+        // v88.4: Read boat type and dates from moved filter elements
+        var boatTypeSelect = document.getElementById('yolo-ys-results-boat-type');
+        var datesInput = document.getElementById('yolo-ys-results-dates');
+        
+        // Update currentSearchParams from filter elements if they exist
+        if (boatTypeSelect) {
+            currentSearchParams.kind = boatTypeSelect.value || '';
+        }
+        
+        // Parse dates from flatpickr input (format: DD.MM.YYYY - DD.MM.YYYY)
+        if (datesInput && datesInput.value) {
+            var dateRange = datesInput.value.split(' - ');
+            if (dateRange.length === 2) {
+                var parseDate = function(dateStr) {
+                    var parts = dateStr.trim().split('.');
+                    if (parts.length === 3) {
+                        return parts[2] + '-' + parts[1] + '-' + parts[0] + 'T00:00:00';
+                    }
+                    return '';
+                };
+                currentSearchParams.dateFrom = parseDate(dateRange[0]);
+                currentSearchParams.dateTo = parseDate(dateRange[1]);
+            }
+        }
         
         // Show loading
         showLoading();

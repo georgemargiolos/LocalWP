@@ -712,3 +712,437 @@ div#yolo-ys-results-search-form {
         border-radius: 8px !important;
     }
 }
+
+
+/* ========================================
+   WHITE SPACE FIXES - v88.2
+   - Remove top white space (ALL SCREEN SIZES)
+   - Fix left/right padding for exactly 5px edges on mobile
+   ======================================== */
+
+/* Remove top padding causing white space - DESKTOP & MOBILE */
+body .yolo-ys-search-results,
+#content .yolo-ys-search-results,
+.entry-content .yolo-ys-search-results,
+main .yolo-ys-search-results,
+.site-content .yolo-ys-search-results,
+.yolo-ys-search-results {
+    padding-top: 0 !important;
+}
+
+/* Remove WordPress theme top padding/margin - DESKTOP & MOBILE */
+.wp-block-group.has-global-padding {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Fix left/right padding for exactly 5px edges - MOBILE ONLY */
+@media (max-width: 768px) {
+    .entry-content.has-global-padding {
+        margin-left: -27px !important;
+        margin-right: -42px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+
+/* ============================================
+   v88.3 - FILTER REORGANIZATION CSS
+   ============================================ */
+
+/* Remove white space at top - ALL SCREEN SIZES */
+.yolo-ys-search-results {
+    padding-top: 0 !important;
+}
+
+.wp-block-group.has-global-padding {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Hide search form - filters now include dates and boat type */
+.yolo-ys-results-search-form {
+    display: none !important;
+}
+
+/* Filters container - full width */
+.filters-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+}
+
+/* Filter rows layout - DESKTOP */
+#filter-row-1,
+#filter-row-2 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+}
+
+#filter-row-1 {
+    margin-bottom: 15px !important;
+}
+
+#filter-row-2 {
+    align-items: flex-end !important;
+}
+
+/* Single filter groups - equal flex */
+#filter-row-1 .filter-group,
+#filter-row-2 .filter-group {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+}
+
+/* Min/Max pairs - each takes half the width of a single filter */
+#filter-row-1 .filter-group[data-filter="year-min"],
+#filter-row-1 .filter-group[data-filter="year-max"],
+#filter-row-2 .filter-group[data-filter="length-min"],
+#filter-row-2 .filter-group[data-filter="length-max"],
+#filter-row-2 .filter-group[data-filter="price-min"],
+#filter-row-2 .filter-group[data-filter="price-max"] {
+    flex: 0.5 1 0 !important;
+}
+
+/* Buttons wrapper - same width as a single filter */
+.filter-buttons-wrapper {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+}
+
+/* Filter labels - centered above boxes */
+#filter-row-1 .filter-group label,
+#filter-row-2 .filter-group label {
+    display: block !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    color: #374151 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* All filter inputs - same height, vertically centered text */
+#filter-row-1 select,
+#filter-row-1 input,
+#filter-row-2 select,
+#filter-row-2 input,
+#filter-row-2 button#equipment-dropdown-toggle {
+    height: 45px !important;
+    width: 100% !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 0 8px !important;
+    font-size: 13px !important;
+    display: flex !important;
+    align-items: center !important;
+    text-align: center !important;
+    text-align-last: center !important;
+    background: white !important;
+    box-sizing: border-box !important;
+}
+
+/* Apply Filters button - blue */
+.filter-buttons-wrapper #apply-filters {
+    flex: 1 !important;
+    height: 45px !important;
+    background: rgb(37, 99, 235) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+}
+
+/* Clear All button */
+.filter-buttons-wrapper #clear-filters {
+    flex: 1 !important;
+    height: 45px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: white !important;
+    white-space: nowrap !important;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE - Filters
+   ============================================ */
+@media (max-width: 1200px) {
+    /* Wrap filters on medium screens */
+    #filter-row-1,
+    #filter-row-2 {
+        flex-wrap: wrap !important;
+    }
+    
+    #filter-row-1 .filter-group,
+    #filter-row-2 .filter-group {
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 140px !important;
+    }
+    
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"],
+    #filter-row-2 .filter-group[data-filter="length-min"],
+    #filter-row-2 .filter-group[data-filter="length-max"],
+    #filter-row-2 .filter-group[data-filter="price-min"],
+    #filter-row-2 .filter-group[data-filter="price-max"] {
+        flex: 1 1 calc(12.5% - 10px) !important;
+        min-width: 70px !important;
+    }
+    
+    .filter-buttons-wrapper {
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 140px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* STICKY FILTERS AT BOTTOM ON MOBILE */
+    .yolo-ys-advanced-filters,
+    #yolo-ys-advanced-filters {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: white !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+        padding: 15px 10px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        border-top-left-radius: 20px !important;
+        border-top-right-radius: 20px !important;
+    }
+    
+    /* Add padding to body to prevent content being hidden behind sticky filters */
+    .yolo-ys-search-results {
+        padding-bottom: 200px !important;
+    }
+    
+    /* Stack filters on mobile */
+    #filter-row-1,
+    #filter-row-2 {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    /* Each filter takes 50% width on mobile (2 per row) */
+    #filter-row-1 .filter-group,
+    #filter-row-2 .filter-group {
+        flex: 1 1 calc(50% - 5px) !important;
+        width: calc(50% - 5px) !important;
+        min-width: calc(50% - 5px) !important;
+        max-width: calc(50% - 5px) !important;
+    }
+    
+    /* Min/Max pairs - each takes 25% (so pair = 50%) */
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"],
+    #filter-row-2 .filter-group[data-filter="length-min"],
+    #filter-row-2 .filter-group[data-filter="length-max"],
+    #filter-row-2 .filter-group[data-filter="price-min"],
+    #filter-row-2 .filter-group[data-filter="price-max"] {
+        flex: 1 1 calc(25% - 5px) !important;
+        width: calc(25% - 5px) !important;
+        min-width: calc(25% - 5px) !important;
+        max-width: calc(25% - 5px) !important;
+    }
+    
+    /* Buttons wrapper - full width */
+    .filter-buttons-wrapper {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        justify-content: center !important;
+        margin-top: 10px !important;
+    }
+    
+    .filter-buttons-wrapper #apply-filters,
+    .filter-buttons-wrapper #clear-filters {
+        flex: 1 !important;
+        max-width: 50% !important;
+        height: 50px !important;
+        font-size: 15px !important;
+    }
+    
+    /* Smaller labels on mobile */
+    #filter-row-1 .filter-group label,
+    #filter-row-2 .filter-group label {
+        font-size: 10px !important;
+        margin-bottom: 5px !important;
+    }
+    
+    /* Smaller inputs on mobile */
+    #filter-row-1 select,
+    #filter-row-1 input,
+    #filter-row-2 select,
+    #filter-row-2 input,
+    #filter-row-2 button#equipment-dropdown-toggle {
+        height: 40px !important;
+        font-size: 12px !important;
+        padding: 0 6px !important;
+    }
+    
+    /* 5px edge padding on mobile */
+    .entry-content.has-global-padding {
+        margin-left: -27px !important;
+        margin-right: -42px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    .filters-row {
+        padding: 0 !important;
+    }
+}
+
+
+/* ============================================
+   v88.7: Select2 Custom Styling for Filters
+   ============================================ */
+
+/* Select2 container */
+.select2-container--default .select2-selection--single {
+    height: 45px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 43px !important;
+    padding-left: 12px !important;
+    padding-right: 30px !important;
+    color: #374151 !important;
+    font-size: 13px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 43px !important;
+    right: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #6b7280 transparent transparent transparent !important;
+}
+
+/* Dropdown styling */
+.select2-container--default .select2-results__option {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #f1f5f9 !important;
+    color: #1f2937 !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: rgb(37, 99, 235) !important;
+    color: #fff !important;
+}
+
+.select2-dropdown {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 4px !important;
+}
+
+/* Icon styling inside Select2 */
+.select2-results__option i,
+.select2-selection__rendered i {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.select2-results__option[aria-selected=true] i {
+    color: #fff !important;
+}
+
+/* Focus state */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: rgb(37, 99, 235) !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Range inputs - smaller width for Select2 */
+.filter-range .select2-container {
+    min-width: 80px !important;
+}
+
+/* Fix label icon spacing */
+.filter-group label i,
+.yolo-ys-form-field label i {
+    margin-right: 6px !important;
+}
+
+/* Equipment checkbox styling - restore proper checkboxes */
+.equipment-checkbox {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    cursor: pointer !important;
+}
+
+.equipment-checkbox input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 10px !important;
+    cursor: pointer !important;
+    accent-color: rgb(37, 99, 235) !important;
+}
+
+/* Mobile responsive Select2 */
+@media (max-width: 768px) {
+    .select2-container--default .select2-selection--single {
+        height: 42px !important;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 40px !important;
+        font-size: 12px !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
+}
+
+
+/* v88.9: Pointer cursor for date picker input */
+#yolo-ys-results-dates,
+.yolo-ys-search-results input[type="text"][placeholder*="date"],
+.flatpickr-input {
+    cursor: pointer !important;
+}
+
+/* Select2 pointer cursor */
+.select2-container .select2-selection {
+    cursor: pointer !important;
+}

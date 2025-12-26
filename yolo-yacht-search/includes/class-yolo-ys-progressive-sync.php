@@ -658,7 +658,7 @@ class YOLO_YS_Progressive_Sync {
      */
     public function init_price_sync($year = null) {
         // v86.6: Race condition protection - check if sync already running
-        $existing_state = get_option(self::PRICE_STATE_OPTION, null);
+        $existing_state = get_option(self::STATE_OPTION, null);  // v88.3 FIX: Was PRICE_STATE_OPTION (undefined constant)
         if ($existing_state && isset($existing_state['status']) && $existing_state['status'] === 'running') {
             return array(
                 'success' => false,
@@ -904,6 +904,7 @@ class YOLO_YS_Progressive_Sync {
             'synced' => $state['synced_yachts'],
             'total' => $state['total_yachts'],
             'duration' => $duration,
+            'year' => isset($state['year']) ? $state['year'] : date('Y') + 1,
             'stats' => $state['stats'],
             'companies' => $state['companies'],
             'errors' => $state['errors']
@@ -927,7 +928,7 @@ class YOLO_YS_Progressive_Sync {
                 wp_schedule_single_event(time() + 2, 'yolo_progressive_sync_yacht');
             }
         } else if ($type === 'prices') {
-            $year = get_option('yolo_ys_sync_year', date('Y') + 1);
+            $year = get_option('yolo_ys_offers_sync_year', date('Y') + 1);
             $result = $this->init_price_sync($year);
             if ($result['success']) {
                 // Schedule first price sync
