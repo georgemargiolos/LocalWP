@@ -1261,19 +1261,22 @@ label.equipment-checkbox:hover {
 
 
 /* v90.6: Featured Yacht Badge - Redesigned with yellow stars, black text, white background */
+/* v90.8: Updated to 60px height with centered content */
 .yolo-ys-featured-badge {
     position: absolute !important;
     top: 10px !important;
     right: 10px !important;
     background: rgba(255, 255, 255, 0.92) !important;
-    padding: 8px 12px !important;
+    height: 60px !important;
+    padding: 0 14px !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     z-index: 10 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 2px !important;
+    justify-content: center !important;
+    gap: 3px !important;
 }
 
 .yolo-ys-featured-stars {
