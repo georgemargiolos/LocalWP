@@ -597,8 +597,11 @@ function yolo_ys_ajax_search_yachts_filtered() {
 
 /**
  * Helper function to format boat result
+ * v90.7: Added equipment IDs for yacht cards
  */
 function yolo_ys_format_boat_result($row, $details_page_url) {
+    global $wpdb;
+    
     $primary_image = $row->image_url;
     
     // Fallback: Extract from raw_data if no image in database
@@ -616,6 +619,13 @@ function yolo_ys_format_boat_result($row, $details_page_url) {
             }
         }
     }
+    
+    // v90.7: Get equipment IDs for this yacht
+    $equipment_table = $wpdb->prefix . 'yolo_yacht_equipment';
+    $equipment_ids = $wpdb->get_col($wpdb->prepare(
+        "SELECT equipment_id FROM {$equipment_table} WHERE yacht_id = %d",
+        $row->yacht_id
+    ));
     
     // Build details URL with search dates
     $search_week_from = date('Y-m-d', strtotime($row->date_from));
@@ -654,7 +664,8 @@ function yolo_ys_format_boat_result($row, $details_page_url) {
         'date_from' => $row->date_from,
         'date_to' => $row->date_to,
         'image_url' => $primary_image,
-        'details_url' => $yacht_url
+        'details_url' => $yacht_url,
+        'equipment' => array_map('intval', $equipment_ids)
     );
 }
 
