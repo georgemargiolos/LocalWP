@@ -1133,3 +1133,16 @@ main .yolo-ys-search-results,
         font-size: 12px !important;
     }
 }
+
+
+/* v88.9: Pointer cursor for date picker input */
+#yolo-ys-results-dates,
+.yolo-ys-search-results input[type="text"][placeholder*="date"],
+.flatpickr-input {
+    cursor: pointer !important;
+}
+
+/* Select2 pointer cursor */
+.select2-container .select2-selection {
+    cursor: pointer !important;
+}

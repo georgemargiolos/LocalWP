@@ -138,8 +138,12 @@
             $('#equipment-dropdown-menu').toggleClass('show');
         });
         
-        // Close equipment dropdown when clicking outside
+        // Close equipment dropdown when clicking outside (exclude Select2 elements)
         $(document).on('click', function(e) {
+            // Don't close if clicking on Select2 elements
+            if ($(e.target).closest('.select2-container, .select2-dropdown, .select2-results, .select2-selection').length) {
+                return;
+            }
             if (!$(e.target).closest('.filter-equipment').length) {
                 $('#equipment-dropdown-menu').removeClass('show');
             }
