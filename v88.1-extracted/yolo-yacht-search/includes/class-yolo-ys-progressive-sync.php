@@ -658,7 +658,7 @@ class YOLO_YS_Progressive_Sync {
      */
     public function init_price_sync($year = null) {
         // v86.6: Race condition protection - check if sync already running
-        $existing_state = get_option(self::PRICE_STATE_OPTION, null);
+        $existing_state = get_option(self::STATE_OPTION, null);  // v88.3 FIX: Was PRICE_STATE_OPTION (undefined constant)
         if ($existing_state && isset($existing_state['status']) && $existing_state['status'] === 'running') {
             return array(
                 'success' => false,
