@@ -887,33 +887,109 @@ main .yolo-ys-search-results,
 
 /* ============================================
    MOBILE RESPONSIVE - Filters
+   v90.3: Improved responsive breakpoints for all viewport sizes
    ============================================ */
+
+/* Large tablets and small desktops (900px - 1200px) */
 @media (max-width: 1200px) {
     /* Wrap filters on medium screens */
     #filter-row-1,
     #filter-row-2 {
         flex-wrap: wrap !important;
+        gap: 10px !important;
     }
     
-    #filter-row-1 .filter-group,
+    /* Row 1: Location, Dates, Boat Type take more space, Cabins and Year Built wrap */
+    #filter-row-1 .filter-group {
+        flex: 1 1 calc(33.33% - 10px) !important;
+        min-width: 150px !important;
+    }
+    
+    /* Year Built range inputs - smaller */
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"] {
+        flex: 0 1 80px !important;
+        min-width: 70px !important;
+    }
+    
+    /* Row 2: All items wrap nicely */
     #filter-row-2 .filter-group {
         flex: 1 1 calc(25% - 10px) !important;
-        min-width: 140px !important;
+        min-width: 120px !important;
     }
     
-    #filter-row-1 .filter-group[data-filter="year-min"],
-    #filter-row-1 .filter-group[data-filter="year-max"],
+    /* Length and Price range inputs - smaller */
     #filter-row-2 .filter-group[data-filter="length-min"],
     #filter-row-2 .filter-group[data-filter="length-max"],
     #filter-row-2 .filter-group[data-filter="price-min"],
     #filter-row-2 .filter-group[data-filter="price-max"] {
-        flex: 1 1 calc(12.5% - 10px) !important;
+        flex: 0 1 80px !important;
         min-width: 70px !important;
     }
     
     .filter-buttons-wrapper {
+        flex: 1 1 auto !important;
+        min-width: 200px !important;
+    }
+}
+
+/* Tablets (769px - 900px) - Two column layout */
+@media (max-width: 900px) and (min-width: 769px) {
+    #yolo-ys-advanced-filters {
+        padding: 15px !important;
+    }
+    
+    #filter-row-1,
+    #filter-row-2 {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+    
+    /* Row 1: 2 items per row */
+    #filter-row-1 .filter-group {
+        flex: 1 1 calc(50% - 10px) !important;
+        min-width: calc(50% - 10px) !important;
+        max-width: calc(50% - 6px) !important;
+    }
+    
+    /* Year Built label spans full width, inputs side by side */
+    #filter-row-1 .filter-group[data-filter="year-min"],
+    #filter-row-1 .filter-group[data-filter="year-max"] {
         flex: 1 1 calc(25% - 10px) !important;
-        min-width: 140px !important;
+        min-width: 80px !important;
+        max-width: none !important;
+    }
+    
+    /* Row 2: 2 items per row */
+    #filter-row-2 .filter-group {
+        flex: 1 1 calc(50% - 10px) !important;
+        min-width: calc(50% - 10px) !important;
+        max-width: calc(50% - 6px) !important;
+    }
+    
+    /* Length and Price range inputs */
+    #filter-row-2 .filter-group[data-filter="length-min"],
+    #filter-row-2 .filter-group[data-filter="length-max"],
+    #filter-row-2 .filter-group[data-filter="price-min"],
+    #filter-row-2 .filter-group[data-filter="price-max"] {
+        flex: 1 1 calc(25% - 10px) !important;
+        min-width: 70px !important;
+        max-width: none !important;
+    }
+    
+    /* Buttons take full width */
+    .filter-buttons-wrapper {
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+        justify-content: center !important;
+        margin-top: 5px !important;
+    }
+    
+    .filter-buttons-wrapper .btn-apply-filters,
+    .filter-buttons-wrapper .btn-clear-filters {
+        flex: 1 !important;
+        max-width: 200px !important;
     }
 }
 
