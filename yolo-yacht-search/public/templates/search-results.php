@@ -208,16 +208,16 @@ if (!defined('ABSPATH')) {
                                 <input type="checkbox" name="equipment[]" value="9"> <i class="fa-duotone fa-arrows-left-right" style="color: #10b981;"></i> <?php _e('Bow Thruster', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="3"> <i class="fa-duotone fa-map-location-dot" style="color: #8b5cf6;"></i> <?php _e('Chart Plotter', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="5"> <i class="fa-duotone fa-map-location-dot" style="color: #8b5cf6;"></i> <?php _e('Chart Plotter', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="50"> <i class="fa-duotone fa-mug-hot" style="color: #78350f;"></i> <?php _e('Coffee Maker', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="25"> <i class="fa-duotone fa-mug-hot" style="color: #78350f;"></i> <?php _e('Coffee Maker', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="8"> <i class="fa-duotone fa-sailboat" style="color: #0ea5e9;"></i> <?php _e('Dinghy', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="4"> <i class="fa-duotone fa-sailboat" style="color: #0ea5e9;"></i> <?php _e('Dinghy', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="47"> <i class="fa-duotone fa-toilet" style="color: #64748b;"></i> <?php _e('Electric Toilet', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="27"> <i class="fa-duotone fa-toilet" style="color: #64748b;"></i> <?php _e('Electric Toilet', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
                                 <input type="checkbox" name="equipment[]" value="6"> <i class="fa-duotone fa-gear" style="color: #475569;"></i> <?php _e('Electric Winch', 'yolo-yacht-search'); ?>
@@ -226,34 +226,34 @@ if (!defined('ABSPATH')) {
                                 <input type="checkbox" name="equipment[]" value="12"> <i class="fa-duotone fa-bolt" style="color: #eab308;"></i> <?php _e('Generator', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="48"> <i class="fa-duotone fa-fire-flame-curved" style="color: #ef4444;"></i> <?php _e('Heating', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="11"> <i class="fa-duotone fa-fire-flame-curved" style="color: #ef4444;"></i> <?php _e('Heating', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="49"> <i class="fa-duotone fa-plug-circle-bolt" style="color: #22c55e;"></i> <?php _e('Inverter', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="33"> <i class="fa-duotone fa-plug-circle-bolt" style="color: #22c55e;"></i> <?php _e('Inverter', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="10"> <i class="fa-duotone fa-engine" style="color: #71717a;"></i> <?php _e('Outboard Engine', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="18"> <i class="fa-duotone fa-engine" style="color: #71717a;"></i> <?php _e('Outboard Engine', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="51"> <i class="fa-duotone fa-refrigerator" style="color: #06b6d4;"></i> <?php _e('Refrigerator', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="37"> <i class="fa-duotone fa-refrigerator" style="color: #06b6d4;"></i> <?php _e('Refrigerator', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="52"> <i class="fa-duotone fa-mask-snorkel" style="color: #14b8a6;"></i> <?php _e('Snorkelling Equipment', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="40"> <i class="fa-duotone fa-mask-snorkel" style="color: #14b8a6;"></i> <?php _e('Snorkelling Equipment', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
                                 <input type="checkbox" name="equipment[]" value="46"> <i class="fa-duotone fa-solar-panel" style="color: #84cc16;"></i> <?php _e('Solar Panels', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="53"> <i class="fa-duotone fa-person-swimming" style="color: #0891b2;"></i> <?php _e('Stand Up Paddle', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="23"> <i class="fa-duotone fa-person-swimming" style="color: #0891b2;"></i> <?php _e('Stand Up Paddle', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="54"> <i class="fa-duotone fa-tv" style="color: #334155;"></i> <?php _e('TV', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="42"> <i class="fa-duotone fa-tv" style="color: #334155;"></i> <?php _e('TV', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
                                 <input type="checkbox" name="equipment[]" value="44"> <i class="fa-duotone fa-droplet" style="color: #0284c7;"></i> <?php _e('Watermaker', 'yolo-yacht-search'); ?>
                             </label>
                             <label class="equipment-checkbox">
-                                <input type="checkbox" name="equipment[]" value="45"> <i class="fa-duotone fa-wifi" style="color: #2563eb;"></i> <?php _e('Wi-Fi', 'yolo-yacht-search'); ?>
+                                <input type="checkbox" name="equipment[]" value="21"> <i class="fa-duotone fa-wifi" style="color: #2563eb;"></i> <?php _e('Wi-Fi', 'yolo-yacht-search'); ?>
                             </label>
                         </div>
                     </div>
