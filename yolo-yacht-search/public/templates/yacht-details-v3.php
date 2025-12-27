@@ -519,9 +519,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     if (!empty($maps_key)): 
                         // Use coordinates if available, otherwise fall back to text search
                         if ($marina_coords && isset($marina_coords['lat']) && isset($marina_coords['lng'])):
-                            // Direct coordinate embed - always works
+                            // v91.24: Use place mode with coordinates to show marker pin
                             $map_url = sprintf(
-                                'https://www.google.com/maps/embed/v1/view?key=%s&center=%s,%s&zoom=14&maptype=roadmap',
+                                'https://www.google.com/maps/embed/v1/place?key=%s&q=%s,%s&zoom=14',
                                 esc_attr($maps_key),
                                 $marina_coords['lat'],
                                 $marina_coords['lng']
