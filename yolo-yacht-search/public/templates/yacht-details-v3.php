@@ -517,9 +517,9 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     }
                     
                     if (!empty($maps_key)): 
-                        // Use coordinates if available, otherwise fall back to text search
+                        // v91.25: Use place mode for known marinas (shows marker), view mode for unknown (no marker but correct area)
                         if ($marina_coords && isset($marina_coords['lat']) && isset($marina_coords['lng'])):
-                            // v91.24: Use place mode with coordinates to show marker pin
+                            // Known marina - use place mode with coordinates to show marker pin
                             $map_url = sprintf(
                                 'https://www.google.com/maps/embed/v1/place?key=%s&q=%s,%s&zoom=14',
                                 esc_attr($maps_key),
@@ -527,11 +527,11 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                                 $marina_coords['lng']
                             );
                         else:
-                            // Fallback to text search (may not work for unknown marinas)
+                            // Unknown marina - use view mode centered on Ionian (no misleading marker)
+                            // Centered on Lefkada area as default Ionian location
                             $map_url = sprintf(
-                                'https://www.google.com/maps/embed/v1/place?key=%s&q=%s&zoom=12',
-                                esc_attr($maps_key),
-                                urlencode($yacht->home_base . ', Ionian Islands, Greece')
+                                'https://www.google.com/maps/embed/v1/view?key=%s&center=38.83,20.71&zoom=10&maptype=roadmap',
+                                esc_attr($maps_key)
                             );
                         endif;
                     ?>
