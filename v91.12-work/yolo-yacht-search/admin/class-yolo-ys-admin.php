@@ -1,0 +1,1506 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * The admin-specific functionality of the plugin
+ */
+class YOLO_YS_Admin {
+    
+    private $plugin_name;
+    private $version;
+    
+    public function __construct($plugin_name, $version) {
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+        
+        // Add AJAX handlers
+        add_action('wp_ajax_yolo_ys_sync_equipment', array($this, 'ajax_sync_equipment'));
+        add_action('wp_ajax_yolo_ys_sync_yachts', array($this, 'ajax_sync_yachts'));
+        add_action('wp_ajax_yolo_ys_sync_prices', array($this, 'ajax_sync_prices'));
+        
+        // Yacht Customization AJAX handlers (v65.14)
+        add_action('wp_ajax_yolo_save_yacht_custom_setting', array($this, 'ajax_save_yacht_custom_setting'));
+        add_action('wp_ajax_yolo_save_yacht_custom_description', array($this, 'ajax_save_yacht_custom_description'));
+        
+        // Yacht Customization Media AJAX handlers (v65.15)
+        add_action('wp_ajax_yolo_copy_synced_images', array($this, 'ajax_copy_synced_images'));
+        add_action('wp_ajax_yolo_add_custom_media', array($this, 'ajax_add_custom_media'));
+        add_action('wp_ajax_yolo_delete_custom_media', array($this, 'ajax_delete_custom_media'));
+        add_action('wp_ajax_yolo_save_media_order', array($this, 'ajax_save_media_order'));
+        
+        // Booking management AJAX handlers (v70.3)
+        add_action('wp_ajax_yolo_delete_booking', array($this, 'ajax_delete_booking'));
+        
+        // v80.3: Save offers year for auto-sync
+        add_action('wp_ajax_yolo_ys_save_offers_year', array($this, 'ajax_save_offers_year'));
+        
+        // v81.4: Look up company names
+        add_action('wp_ajax_yolo_lookup_company_names', array($this, 'ajax_lookup_company_names'));
+        
+        // v86.7: Facebook Catalog manual update
+        add_action('wp_ajax_yolo_ys_update_catalog_prices', array($this, 'ajax_update_catalog_prices'));
+        
+        // v81.0: Progressive sync AJAX handlers
+        add_action('wp_ajax_yolo_progressive_init_yacht_sync', array($this, 'ajax_progressive_init_yacht_sync'));
+        add_action('wp_ajax_yolo_progressive_sync_next_yacht', array($this, 'ajax_progressive_sync_next_yacht'));
+        add_action('wp_ajax_yolo_progressive_sync_next_image_batch', array($this, 'ajax_progressive_sync_next_image_batch')); // v81.1: Phase 2 image sync
+        add_action('wp_ajax_yolo_progressive_init_price_sync', array($this, 'ajax_progressive_init_price_sync'));
+        add_action('wp_ajax_yolo_progressive_sync_next_price', array($this, 'ajax_progressive_sync_next_price'));
+        add_action('wp_ajax_yolo_progressive_cancel_sync', array($this, 'ajax_progressive_cancel_sync'));
+        add_action('wp_ajax_yolo_progressive_get_state', array($this, 'ajax_progressive_get_state'));
+    }
+    
+    /**
+     * Enqueue admin styles
+     */
+    public function enqueue_styles() {
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_style(
+            $this->plugin_name,
+            YOLO_YS_PLUGIN_URL . 'admin/css/yolo-yacht-search-admin.css',
+            array(),
+            $this->version
+        );
+        
+        // Enqueue bookings CSS on bookings page
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-ys-bookings') {
+            wp_enqueue_style(
+                'yolo-ys-admin-bookings',
+                YOLO_YS_PLUGIN_URL . 'admin/css/admin-bookings.css',
+                array(),
+                $this->version
+            );
+        }
+    }
+    
+    /**
+     * Enqueue admin scripts
+     */
+    public function enqueue_scripts() {
+        wp_enqueue_script('wp-color-picker');
+        wp_enqueue_script(
+            $this->plugin_name,
+            YOLO_YS_PLUGIN_URL . 'admin/js/yolo-yacht-search-admin.js',
+            array('jquery', 'wp-color-picker'),
+            $this->version,
+            true
+        );
+        
+        // Localize script for AJAX
+        wp_localize_script($this->plugin_name, 'yoloYsAdmin', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('yolo_ys_admin_nonce')
+        ));
+        
+        // Enqueue jQuery UI Sortable and Media Library for Yacht Customization page (v65.15)
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-yacht-customization') {
+            wp_enqueue_script('jquery-ui-sortable');
+            wp_enqueue_media();
+        }
+        
+        // Enqueue jQuery UI Sortable for Payment Icons page (v75.20)
+        if ($screen && $screen->id === 'yolo-yacht-search_page_yolo-payment-icons') {
+            wp_enqueue_script('jquery-ui-sortable');
+        }
+    }
+    
+    /**
+     * Add plugin admin menu
+     */
+    public function add_plugin_admin_menu() {
+        add_menu_page(
+            __('YOLO Yacht Search', 'yolo-yacht-search'),
+            __('YOLO Yacht Search', 'yolo-yacht-search'),
+            'edit_posts', // Changed from 'manage_options' to allow base managers (who have editor capabilities)
+            'yolo-yacht-search',
+            array($this, 'display_plugin_admin_page'),
+            'dashicons-palmtree',
+            30
+        );
+        
+        // Add Settings submenu (replaces the auto-generated duplicate)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Settings', 'yolo-yacht-search'),
+            __('Settings', 'yolo-yacht-search'),
+            'edit_posts', // Changed to allow base managers
+            'yolo-yacht-search',
+            array($this, 'display_plugin_admin_page')
+        );
+        
+        // Add Bookings submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Bookings', 'yolo-yacht-search'),
+            __('Bookings', 'yolo-yacht-search'),
+            'edit_posts', // Changed to allow base managers
+            'yolo-ys-bookings',
+            array($this, 'display_bookings_page')
+        );
+        
+        // Add Texts submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Texts', 'yolo-yacht-search'),
+            __('Texts', 'yolo-yacht-search'),
+            'edit_posts', // Changed to allow base managers
+            'yolo-yacht-texts',
+            array($this, 'display_texts_page')
+        );
+        
+        // Add Quote Requests submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Quote Requests', 'yolo-yacht-search'),
+            __('Quote Requests', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-quote-requests',
+            array($this, 'display_quote_requests_page')
+        );
+        
+        // Add Contact Messages submenu
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Contact Messages', 'yolo-yacht-search'),
+            __('Contact Messages', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-contact-messages',
+            array($this, 'display_contact_messages_page')
+        );
+        
+        // Add Notification Settings submenu (admin only)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Notification Settings', 'yolo-yacht-search'),
+            __('Notification Settings', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-notification-settings',
+            array($this, 'display_notification_settings_page')
+        );
+        
+        // Add Yacht Customization submenu (v65.14)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Yacht Customization', 'yolo-yacht-search'),
+            __('Yacht Customization', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-yacht-customization',
+            array($this, 'display_yacht_customization_page')
+        );
+        
+        // Add CRM submenu (v71.0)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('CRM', 'yolo-yacht-search'),
+            __('CRM', 'yolo-yacht-search'),
+            'edit_posts', // Allow base managers
+            'yolo-ys-crm',
+            array($this, 'display_crm_page')
+        );
+        
+        // Add Payment Icons submenu (v75.18)
+        add_submenu_page(
+            'yolo-yacht-search',
+            __('Payment Icons', 'yolo-yacht-search'),
+            __('Payment Icons', 'yolo-yacht-search'),
+            'manage_options', // Admin only
+            'yolo-payment-icons',
+            array($this, 'display_payment_icons_page')
+        );
+    }
+    
+    /**
+     * Display admin page
+     */
+    public function display_plugin_admin_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yolo-yacht-search-admin-display.php';
+    }
+    
+    /**
+     * Display bookings page
+     */
+    public function display_bookings_page() {
+        // Load required classes
+        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings.php';
+        require_once YOLO_YS_PLUGIN_DIR . 'admin/class-yolo-ys-admin-bookings-manager.php';
+        
+        // Display bookings list with tabbed view (table + calendar)
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/bookings-list-v2.php';
+    }
+    
+    /**
+     * Display texts customization page
+     */
+    public function display_texts_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/texts-page.php';
+    }
+    
+    /**
+     * Display quote requests page
+     */
+    public function display_quote_requests_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-requests-list.php';
+    }
+    
+    /**
+     * Display contact messages page
+     */
+    public function display_contact_messages_page() {
+        $action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : 'list';
+        
+        if ($action === 'view' && isset($_GET['message_id'])) {
+            include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/contact-message-detail.php';
+        } else {
+            include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/contact-messages-list.php';
+        }
+    }
+    
+    /**
+     * Display notification settings page
+     */
+    public function display_notification_settings_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/quote-notification-settings.php';
+    }
+    
+    /**
+     * Display yacht customization page (v65.14)
+     */
+    public function display_yacht_customization_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/yacht-customization-page.php';
+    }
+    
+    /**
+     * Display CRM page (v71.0)
+     */
+    public function display_crm_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/crm-page.php';
+    }
+    
+    /**
+     * Display Payment Icons page (v75.18)
+     */
+    public function display_payment_icons_page() {
+        include_once YOLO_YS_PLUGIN_DIR . 'admin/partials/payment-icons-page.php';
+    }
+    
+    /**
+     * Register plugin settings
+     */
+    public function register_settings() {
+        // API Settings Section
+        add_settings_section(
+            'yolo_ys_api_settings',
+            __('Booking Manager API Settings', 'yolo-yacht-search'),
+            array($this, 'api_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_api_key');
+        add_settings_field(
+            'yolo_ys_api_key',
+            __('API Key', 'yolo-yacht-search'),
+            array($this, 'api_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_api_settings'
+        );
+        
+        // Company Settings Section
+        add_settings_section(
+            'yolo_ys_company_settings',
+            __('Company Settings', 'yolo-yacht-search'),
+            array($this, 'company_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_my_company_id');
+        add_settings_field(
+            'yolo_ys_my_company_id',
+            __('My Company ID (YOLO)', 'yolo-yacht-search'),
+            array($this, 'my_company_id_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_company_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_friend_companies');
+        add_settings_field(
+            'yolo_ys_friend_companies',
+            __('Friend Companies IDs', 'yolo-yacht-search'),
+            array($this, 'friend_companies_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_company_settings'
+        );
+        
+        // Results Page Setting
+        register_setting('yolo-yacht-search', 'yolo_ys_results_page');
+        add_settings_field(
+            'yolo_ys_results_page',
+            __('Search Results Page', 'yolo-yacht-search'),
+            array($this, 'results_page_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_company_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_yacht_details_page');
+        add_settings_field(
+            'yolo_ys_yacht_details_page',
+            __('Yacht Details Page', 'yolo-yacht-search'),
+            array($this, 'yacht_details_page_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_company_settings'
+        );
+        
+        // General Settings Section
+        add_settings_section(
+            'yolo_ys_general_settings',
+            __('General Settings', 'yolo-yacht-search'),
+            array($this, 'general_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        // REMOVED in v30.0: cache_duration setting was never used
+        // Data freshness now depends on manual sync or auto-sync cron jobs
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_currency');
+        add_settings_field(
+            'yolo_ys_currency',
+            __('Currency', 'yolo-yacht-search'),
+            array($this, 'currency_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_general_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_google_maps_api_key');
+        add_settings_field(
+            'yolo_ys_google_maps_api_key',
+            __('Google Maps API Key', 'yolo-yacht-search'),
+            array($this, 'google_maps_api_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_general_settings'
+        );
+        
+        // Stripe Settings Section
+        add_settings_section(
+            'yolo_ys_stripe_settings',
+            __('Stripe Payment Settings', 'yolo-yacht-search'),
+            array($this, 'stripe_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_publishable_key');
+        add_settings_field(
+            'yolo_ys_stripe_publishable_key',
+            __('Stripe Publishable Key', 'yolo-yacht-search'),
+            array($this, 'stripe_publishable_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_secret_key');
+        add_settings_field(
+            'yolo_ys_stripe_secret_key',
+            __('Stripe Secret Key', 'yolo-yacht-search'),
+            array($this, 'stripe_secret_key_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_stripe_webhook_secret');
+        add_settings_field(
+            'yolo_ys_stripe_webhook_secret',
+            __('Stripe Webhook Secret', 'yolo-yacht-search'),
+            array($this, 'stripe_webhook_secret_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+
+        register_setting('yolo-yacht-search', 'yolo_ys_deposit_percentage');
+        add_settings_field(
+            'yolo_ys_deposit_percentage',
+            __('Deposit Percentage', 'yolo-yacht-search'),
+            array($this, 'deposit_percentage_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_stripe_settings'
+        );
+        
+        // Styling Settings Section
+        add_settings_section(
+            'yolo_ys_styling_settings',
+            __('Styling Settings', 'yolo-yacht-search'),
+            array($this, 'styling_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_load_fontawesome');
+        add_settings_field(
+            'yolo_ys_load_fontawesome',
+            __('Load FontAwesome from CDN', 'yolo-yacht-search'),
+            array($this, 'load_fontawesome_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_styling_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_primary_color', array('sanitize_callback' => 'sanitize_hex_color'));
+        add_settings_field(
+            'yolo_ys_primary_color',
+            __('Primary Color', 'yolo-yacht-search'),
+            array($this, 'primary_color_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_styling_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_button_bg_color', array('sanitize_callback' => 'sanitize_hex_color'));
+        add_settings_field(
+            'yolo_ys_button_bg_color',
+            __('Button Background Color', 'yolo-yacht-search'),
+            array($this, 'button_bg_color_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_styling_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_button_text_color', array('sanitize_callback' => 'sanitize_hex_color'));
+        add_settings_field(
+            'yolo_ys_button_text_color',
+            __('Button Text Color', 'yolo-yacht-search'),
+            array($this, 'button_text_color_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_styling_settings'
+        );
+        
+        // Analytics & SEO Settings Section
+        add_settings_section(
+            'yolo_ys_analytics_settings',
+            __('Analytics & SEO Settings', 'yolo-yacht-search'),
+            array($this, 'analytics_settings_callback'),
+            'yolo-yacht-search'
+        );
+        
+        
+        register_setting('yolo-yacht-search', 'yolo_default_og_image');
+        add_settings_field(
+            'yolo_default_og_image',
+            __('Default Open Graph Image URL', 'yolo-yacht-search'),
+            array($this, 'default_og_image_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_twitter_handle');
+        add_settings_field(
+            'yolo_twitter_handle',
+            __('Twitter Handle', 'yolo-yacht-search'),
+            array($this, 'twitter_handle_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_enable_schema');
+        add_settings_field(
+            'yolo_enable_schema',
+            __('Enable Schema.org Structured Data', 'yolo-yacht-search'),
+            array($this, 'enable_schema_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_enable_debug_mode');
+        add_settings_field(
+            'yolo_enable_debug_mode',
+            __('Enable Analytics Debug Mode', 'yolo-yacht-search'),
+            array($this, 'enable_debug_mode_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        // Facebook Conversions API Settings
+        register_setting('yolo-yacht-search', 'yolo_ys_fb_pixel_id');
+        add_settings_field(
+            'yolo_ys_fb_pixel_id',
+            __('Facebook Pixel ID', 'yolo-yacht-search'),
+            array($this, 'fb_pixel_id_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+        
+        register_setting('yolo-yacht-search', 'yolo_ys_fb_access_token');
+        add_settings_field(
+            'yolo_ys_fb_access_token',
+            __('Facebook Conversions API Access Token', 'yolo-yacht-search'),
+            array($this, 'fb_access_token_callback'),
+            'yolo-yacht-search',
+            'yolo_ys_analytics_settings'
+        );
+    }
+    
+    // Section Callbacks
+    public function api_settings_callback() {
+        echo '<p>' . __('Configure your Booking Manager API credentials.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function company_settings_callback() {
+        echo '<p>' . __('Configure your company ID and friend companies. Your boats (YOLO - 7850) will appear first in search results.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function general_settings_callback() {
+        echo '<p>' . __('General plugin settings.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function styling_settings_callback() {
+        echo '<p>' . __('Customize the appearance of the search forms and results.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    // Field Callbacks
+    public function api_key_callback() {
+        $value = get_option('yolo_ys_api_key', '');
+        echo '<textarea name="yolo_ys_api_key" rows="3" class="large-text code">' . esc_textarea($value) . '</textarea>';
+        echo '<p class="description">' . __('Your Booking Manager API key (prefilled)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function my_company_id_callback() {
+        $value = get_option('yolo_ys_my_company_id', '7850');
+        echo '<input type="text" name="yolo_ys_my_company_id" value="' . esc_attr($value) . '" class="regular-text" />';
+        echo '<p class="description">' . __('Your YOLO company ID (boats will show first in results)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function friend_companies_callback() {
+        $value = get_option('yolo_ys_friend_companies', '');
+        echo '<input type="text" name="yolo_ys_friend_companies" id="yolo_ys_friend_companies" value="' . esc_attr($value) . '" class="large-text" />';
+        echo '<p class="description">' . __('Comma-separated list of friend company IDs', 'yolo-yacht-search') . '</p>';
+        echo '<div id="yolo-friend-companies-names" style="margin-top: 10px;"></div>';
+    }
+    
+    public function results_page_callback() {
+        $value = get_option('yolo_ys_results_page', '');
+        $pages = get_pages();
+        
+        echo '<select name="yolo_ys_results_page" class="regular-text">';
+        echo '<option value="">' . __('Select a page...', 'yolo-yacht-search') . '</option>';
+        foreach ($pages as $page) {
+            $selected = ($value == $page->ID) ? 'selected' : '';
+            echo '<option value="' . esc_attr((string) $page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
+        }
+        echo '</select>';
+        echo '<p class="description">' . __('Select the page where search results will be displayed (must contain [yolo_search_results] shortcode)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function yacht_details_page_callback() {
+        $value = get_option('yolo_ys_yacht_details_page', '');
+        $pages = get_pages();
+        
+        echo '<select name="yolo_ys_yacht_details_page" class="regular-text">';
+        echo '<option value="">' . __('Select a page...', 'yolo-yacht-search') . '</option>';
+        foreach ($pages as $page) {
+            $selected = ($value == $page->ID) ? 'selected' : '';
+            echo '<option value="' . esc_attr((string) $page->ID) . '" ' . $selected . '>' . esc_html($page->post_title) . '</option>';
+        }
+        echo '</select>';
+        echo '<p class="description">' . __('Select the page where yacht details will be displayed (must contain [yolo_yacht_details] shortcode)', 'yolo-yacht-search') . '</p>';
+    }
+    
+    // REMOVED in v30.0: cache_duration_callback() - setting was never used
+    
+    public function currency_callback() {
+        $value = get_option('yolo_ys_currency', 'EUR');
+        $currencies = array('EUR' => 'Euro (€)', 'USD' => 'US Dollar ($)', 'GBP' => 'British Pound (£)');
+        
+        echo '<select name="yolo_ys_currency" class="regular-text">';
+        foreach ($currencies as $code => $name) {
+            $selected = ($value == $code) ? 'selected' : '';
+            echo '<option value="' . esc_attr($code) . '" ' . $selected . '>' . esc_html($name) . '</option>';
+        }
+        echo '</select>';
+    }
+    
+    public function google_maps_api_key_callback() {
+        $value = get_option('yolo_ys_google_maps_api_key', 'AIzaSyB4aSnafHcLVFdMSBnLf_0wRjYHhj7P4L4');
+        echo '<input type="text" name="yolo_ys_google_maps_api_key" value="' . esc_attr($value) . '" class="large-text code" />';
+        echo '<p class="description">' . __('Google Maps API key for displaying yacht locations on maps', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function load_fontawesome_callback() {
+        $value = get_option('yolo_ys_load_fontawesome', '0');
+        echo '<label><input type="checkbox" name="yolo_ys_load_fontawesome" value="1" ' . checked($value, '1', false) . ' /> ' . __('Load FontAwesome 6 from CDN', 'yolo-yacht-search') . '</label>';
+        echo '<p class="description">' . __('Uncheck this if your theme already loads FontAwesome (e.g., FontAwesome 7 Kit). Default: unchecked.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function primary_color_callback() {
+        $value = get_option('yolo_ys_primary_color', '#1e3a8a');
+        echo '<input type="text" name="yolo_ys_primary_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    public function button_bg_color_callback() {
+        $value = get_option('yolo_ys_button_bg_color', '#dc2626');
+        echo '<input type="text" name="yolo_ys_button_bg_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    public function button_text_color_callback() {
+        $value = get_option('yolo_ys_button_text_color', '#ffffff');
+        echo '<input type="text" name="yolo_ys_button_text_color" value="' . esc_attr($value) . '" class="color-picker" />';
+    }
+    
+    // Stripe Settings Callbacks
+    public function stripe_settings_callback() {
+        echo '<p>' . __('Configure Stripe payment gateway for accepting yacht bookings. Get your API keys from <a href="https://dashboard.stripe.com/apikeys" target="_blank">Stripe Dashboard</a>.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_publishable_key_callback() {
+        $value = get_option('yolo_ys_stripe_publishable_key', 'pk_test_51ST5sKEqtLDG25BLYenhP94HzLvKGFhAjOFNTZVZpUZLUNJVUkXoGEYoypHzmqVltBELrX2QpsVhhqzcRgvPyedG00Wpt5SF3d');
+        echo '<input type="text" name="yolo_ys_stripe_publishable_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="pk_test_... or pk_live_..." />';
+        echo '<p class="description">' . __('Your Stripe publishable key. Use pk_test_ for testing or pk_live_ for live payments.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_secret_key_callback() {
+        $value = get_option('yolo_ys_stripe_secret_key', 'sk_test_51ST5sKEqtLDG25BLFqTjNKXepps0axIoIafVyOQ1eVn3lRXoTQ3z0oB4TlqLQ8mhM19F5QBrO5MxCMZ1NN7kmITT00IK1vaUhE');
+        echo '<input type="password" name="yolo_ys_stripe_secret_key" value="' . esc_attr($value) . '" class="large-text code" placeholder="sk_test_... or sk_live_..." />';
+        echo '<p class="description">' . __('Your Stripe secret key. Use sk_test_ for testing or sk_live_ for live payments. Keep this secure!', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function stripe_webhook_secret_callback() {
+        $value = get_option('yolo_ys_stripe_webhook_secret', '');
+        $webhook_url = home_url('/wp-json/yolo-yacht-search/v1/stripe-webhook');
+        echo '<input type="password" name="yolo_ys_stripe_webhook_secret" value="' . esc_attr($value) . '" class="large-text code" placeholder="whsec_... (optional)" />';
+        echo '<p class="description"><strong style="color: #10b981;">✓ Webhooks are OPTIONAL!</strong> Bookings are automatically created when customers return from payment.</p>';
+        echo '<p class="description">' . __('For production reliability, you can optionally setup webhook at: <code>' . esc_html($webhook_url) . '</code>', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description">' . __('Add this URL to your <a href="https://dashboard.stripe.com/webhooks" target="_blank">Stripe Webhooks</a> and listen for <code>checkout.session.completed</code> event.', 'yolo-yacht-search') . '</p>';
+    }
+    
+
+    
+    public function deposit_percentage_callback() {
+        $value = get_option('yolo_ys_deposit_percentage', '50');
+        echo '<input type="number" name="yolo_ys_deposit_percentage" value="' . esc_attr($value) . '" class="small-text" min="1" max="100" step="1" /> %';
+        echo '<p class="description">' . __('Percentage of charter price to charge as deposit (1-100%). Customer pays remaining balance later. Example: 50% means customer pays half now, half later.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    // Analytics & SEO Callbacks
+    public function analytics_settings_callback() {
+        echo '<p>' . __('Configure SEO and tracking settings. This plugin sends custom yacht booking events to both Google Analytics 4 (via GTM) and Facebook Conversions API (server-side).', 'yolo-yacht-search') . '</p>';
+        echo '<p><strong>' . __('Facebook Conversions API:', 'yolo-yacht-search') . '</strong> ' . __('Server-side tracking for better data quality and attribution. Events are sent directly from your WordPress server to Facebook, bypassing browser limitations.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    
+    public function default_og_image_callback() {
+        $value = get_option('yolo_default_og_image', '');
+        echo '<input type="url" name="yolo_default_og_image" value="' . esc_attr($value) . '" class="regular-text" placeholder="https://example.com/image.jpg" />';
+        echo '<p class="description">' . __('Default image URL for social media sharing (Open Graph). Recommended size: 1200x630px.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function twitter_handle_callback() {
+        $value = get_option('yolo_twitter_handle', '');
+        echo '<input type="text" name="yolo_twitter_handle" value="' . esc_attr($value) . '" class="regular-text" placeholder="@YOLOCharters" />';
+        echo '<p class="description">' . __('Your Twitter/X handle (e.g., @YOLOCharters) for Twitter Card attribution.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function enable_schema_callback() {
+        $value = get_option('yolo_enable_schema', '1');
+        echo '<input type="checkbox" name="yolo_enable_schema" value="1" ' . checked('1', $value, false) . ' />';
+        echo '<label>' . __('Enable Schema.org structured data for better SEO and rich Google results', 'yolo-yacht-search') . '</label>';
+    }
+    
+    public function enable_debug_mode_callback() {
+        $value = get_option('yolo_enable_debug_mode', '0');
+        echo '<input type="checkbox" name="yolo_enable_debug_mode" value="1" ' . checked('1', $value, false) . ' />';
+        echo '<label>' . __('Enable debug mode (shows analytics events in browser console and logs server-side events)', 'yolo-yacht-search') . '</label>';
+    }
+    
+    public function fb_pixel_id_callback() {
+        $value = get_option('yolo_ys_fb_pixel_id', '');
+        echo '<input type="text" name="yolo_ys_fb_pixel_id" value="' . esc_attr($value) . '" class="regular-text" placeholder="1896226957957033" />';
+        echo '<p class="description">' . __('Your Facebook Pixel ID (15-16 digits). Find it in Facebook Events Manager.', 'yolo-yacht-search') . '</p>';
+    }
+    
+    public function fb_access_token_callback() {
+        $value = get_option('yolo_ys_fb_access_token', '');
+        echo '<textarea name="yolo_ys_fb_access_token" rows="3" class="large-text code" placeholder="EAAc8FRZAYvDs...">' . esc_textarea($value) . '</textarea>';
+        echo '<p class="description">' . __('Your Facebook Conversions API Access Token. Generate it in Facebook Events Manager > Settings > Conversions API.', 'yolo-yacht-search') . '</p>';
+        echo '<p class="description"><strong>' . __('Events tracked server-side:', 'yolo-yacht-search') . '</strong> ViewContent (yacht view), Lead (quote request), Purchase (booking completed)</p>';
+        echo '<p class="description"><strong>' . __('Events tracked client-side:', 'yolo-yacht-search') . '</strong> Search, AddToCart (week selection), InitiateCheckout (book now), AddPaymentInfo (form submission)</p>';
+    }
+    
+    /**
+     * v86.7: AJAX handler for Facebook Catalog price update
+     */
+    public function ajax_update_catalog_prices() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+        
+        try {
+            $fb_catalog = new YOLO_YS_Facebook_Catalog();
+            $updated = $fb_catalog->update_partner_starting_prices();
+            
+            wp_send_json_success(array(
+                'message' => "Updated prices for {$updated} boats from existing offers.",
+                'updated' => $updated
+            ));
+        } catch (Exception $e) {
+            wp_send_json_error($e->getMessage());
+        }
+    }
+    
+    /**
+     * AJAX handler for equipment catalog sync
+     */
+    public function ajax_sync_equipment() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_equipment_catalog();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX handler for yacht sync
+     */
+    public function ajax_sync_yachts() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_all_yachts();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX handler for offers sync
+     */
+    public function ajax_sync_prices() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        // Get year parameter (default to next year)
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        $sync = new YOLO_YS_Sync();
+        $result = $sync->sync_all_offers($year);
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX: Save offers year for auto-sync
+     * v80.3: Auto-sync now uses the same year as manual sync (from dropdown)
+     */
+    public function ajax_save_offers_year() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        // Validate year is reasonable (current year to +5 years)
+        $current_year = (int) date('Y');
+        if ($year < $current_year || $year > $current_year + 5) {
+            wp_send_json_error(array('message' => 'Invalid year'));
+        }
+        
+        update_option('yolo_ys_offers_sync_year', $year);
+        
+        wp_send_json_success(array('message' => 'Year saved', 'year' => $year));
+    }
+    
+    /**
+     * AJAX: Save yacht custom setting (use_custom_media, use_custom_description, or starting_from_price)
+     * @since 65.14
+     * @updated 75.11 - Added starting_from_price support
+     */
+    public function ajax_save_yacht_custom_setting() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $setting = isset($_POST['setting']) ? sanitize_text_field($_POST['setting']) : '';
+        
+        // v75.11: Support starting_from_price as decimal, others as int
+        $allowed_settings = array('use_custom_media', 'use_custom_description', 'starting_from_price');
+        
+        // v75.12: Better error messages for debugging
+        if (empty($yacht_id)) {
+            wp_send_json_error('Missing yacht_id');
+        }
+        if (!in_array($setting, $allowed_settings)) {
+            wp_send_json_error('Invalid setting: ' . $setting);
+        }
+        
+        // Handle value type based on setting
+        if ($setting === 'starting_from_price') {
+            $value = isset($_POST['value']) ? floatval($_POST['value']) : 0;
+            $format = '%f';
+        } else {
+            $value = isset($_POST['value']) ? intval($_POST['value']) : 0;
+            $format = '%d';
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // v75.12: Auto-migrate starting_from_price column if it doesn't exist
+        if ($setting === 'starting_from_price') {
+            $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'starting_from_price'");
+            if (empty($column_exists)) {
+                $wpdb->query(
+                    "ALTER TABLE {$table} 
+                     ADD COLUMN starting_from_price decimal(10,2) DEFAULT 0 
+                     COMMENT 'Starting from price for Facebook/Google Ads tracking (v75.11)'"
+                );
+                error_log('YOLO YS v75.12: Auto-added starting_from_price column to custom settings table');
+            }
+        }
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $result = $wpdb->update(
+                $table,
+                array($setting => $value),
+                array('yacht_id' => $yacht_id),
+                array($format),
+                array('%s')
+            );
+        } else {
+            $result = $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    $setting => $value
+                ),
+                array('%s', $format)
+            );
+        }
+        
+        // v75.12: Check for database errors
+        if ($result === false) {
+            wp_send_json_error('Database error: ' . $wpdb->last_error);
+        }
+        
+        wp_send_json_success('Setting saved');
+    }
+    
+    /**
+     * AJAX: Save yacht custom description
+     * @since 65.14
+     */
+    public function ajax_save_yacht_custom_description() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $description = isset($_POST['description']) ? wp_kses_post(wp_unslash($_POST['description'])) : '';
+        
+        if (empty($yacht_id)) {
+            wp_send_json_error('Invalid yacht ID');
+        }
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yolo_yacht_custom_settings';
+        
+        // Check if record exists
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT yacht_id FROM {$table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        
+        if ($exists) {
+            $wpdb->update(
+                $table,
+                array('custom_description' => $description),
+                array('yacht_id' => $yacht_id),
+                array('%s'),
+                array('%s')
+            );
+        } else {
+            $wpdb->insert(
+                $table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    'custom_description' => $description
+                ),
+                array('%s', '%s')
+            );
+        }
+        
+        wp_send_json_success('Description saved');
+    }
+    
+    /**
+     * AJAX: Copy synced images to custom media
+     * v86.1: Downloads images locally to WordPress media library instead of copying external URLs
+     * @since 65.15
+     * @updated 86.1
+     */
+    public function ajax_copy_synced_images() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        
+        if (empty($yacht_id)) {
+            wp_send_json_error('Invalid yacht ID');
+        }
+        
+        global $wpdb;
+        $images_table = $wpdb->prefix . 'yolo_yacht_images';
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        $yachts_table = $wpdb->prefix . 'yolo_yachts';
+        
+        // Get yacht name for file naming
+        $yacht = $wpdb->get_row($wpdb->prepare(
+            "SELECT name FROM {$yachts_table} WHERE id = %s",
+            $yacht_id
+        ));
+        $yacht_name = $yacht ? sanitize_title($yacht->name) : 'yacht';
+        
+        // Get synced images
+        $synced_images = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$images_table} WHERE yacht_id = %s ORDER BY sort_order ASC",
+            $yacht_id
+        ));
+        
+        if (empty($synced_images)) {
+            wp_send_json_error('No synced images to copy');
+        }
+        
+        // Clear existing custom media for this yacht
+        $wpdb->delete($custom_media_table, array('yacht_id' => $yacht_id), array('%s'));
+        
+        // Require WordPress media functions
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        
+        // Copy synced images to custom media - download locally
+        $sort_order = 0;
+        $copied_count = 0;
+        $failed_count = 0;
+        
+        foreach ($synced_images as $image) {
+            $image_url = $image->image_url;
+            $local_url = $image_url; // Fallback to original URL if download fails
+            $thumbnail_url = $image->thumbnail_url;
+            
+            // Try to download the image to WordPress media library
+            if (!empty($image_url)) {
+                $tmp_file = download_url($image_url, 30); // 30 second timeout
+                
+                if (!is_wp_error($tmp_file)) {
+                    // Get file extension from URL or default to jpg
+                    $path_info = pathinfo(parse_url($image_url, PHP_URL_PATH));
+                    $extension = isset($path_info['extension']) ? $path_info['extension'] : 'jpg';
+                    // Clean extension (remove query strings)
+                    $extension = preg_replace('/[^a-zA-Z0-9]/', '', $extension);
+                    if (empty($extension) || strlen($extension) > 4) {
+                        $extension = 'jpg';
+                    }
+                    
+                    $file_array = array(
+                        'name' => $yacht_name . '-' . ($sort_order + 1) . '.' . $extension,
+                        'tmp_name' => $tmp_file
+                    );
+                    
+                    // Upload to WordPress media library
+                    $attachment_id = media_handle_sideload($file_array, 0, $yacht_name . ' Image ' . ($sort_order + 1));
+                    
+                    if (!is_wp_error($attachment_id)) {
+                        // Get the local URL
+                        $local_url = wp_get_attachment_url($attachment_id);
+                        // Get thumbnail URL (medium size)
+                        $thumbnail_data = wp_get_attachment_image_src($attachment_id, 'medium');
+                        if ($thumbnail_data) {
+                            $thumbnail_url = $thumbnail_data[0];
+                        }
+                        $copied_count++;
+                    } else {
+                        $failed_count++;
+                        // Clean up temp file on error
+                        @unlink($tmp_file);
+                    }
+                } else {
+                    $failed_count++;
+                }
+            }
+            
+            // Insert into custom media table
+            $wpdb->insert(
+                $custom_media_table,
+                array(
+                    'yacht_id' => $yacht_id,
+                    'media_type' => 'image',
+                    'media_url' => $local_url,
+                    'thumbnail_url' => $thumbnail_url,
+                    'title' => null,
+                    'sort_order' => $sort_order++
+                ),
+                array('%s', '%s', '%s', '%s', '%s', '%d')
+            );
+        }
+        
+        // Get the newly created custom media to return
+        $custom_media = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$custom_media_table} WHERE yacht_id = %s ORDER BY sort_order ASC",
+            $yacht_id
+        ));
+        
+        $message = $copied_count . ' images downloaded locally';
+        if ($failed_count > 0) {
+            $message .= ' (' . $failed_count . ' failed, using original URLs)';
+        }
+        
+        wp_send_json_success(array(
+            'message' => $message,
+            'media' => $custom_media
+        ));
+    }
+    
+    /**
+     * AJAX: Add custom media (image or video)
+     * @since 65.15
+     */
+    public function ajax_add_custom_media() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $media_type = isset($_POST['media_type']) ? sanitize_text_field($_POST['media_type']) : '';
+        $media_url = isset($_POST['media_url']) ? sanitize_text_field($_POST['media_url']) : ''; // v91.10: Use sanitize_text_field to allow YouTube video IDs
+        $thumbnail_url = isset($_POST['thumbnail_url']) ? esc_url_raw($_POST['thumbnail_url']) : '';
+        $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
+        
+        if (empty($yacht_id) || empty($media_type) || empty($media_url)) {
+            wp_send_json_error('Missing required fields');
+        }
+        
+        if (!in_array($media_type, array('image', 'video'))) {
+            wp_send_json_error('Invalid media type');
+        }
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        // Get max sort order for this yacht
+        $max_order = $wpdb->get_var($wpdb->prepare(
+            "SELECT MAX(sort_order) FROM {$custom_media_table} WHERE yacht_id = %s",
+            $yacht_id
+        ));
+        $sort_order = ($max_order !== null) ? $max_order + 1 : 0;
+        
+        // v91.10: For YouTube videos, ALWAYS extract video ID (not just when thumbnail is empty)
+        if ($media_type === 'video') {
+            // Check if it's a YouTube URL and extract the video ID
+            if (preg_match('/(?:(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $media_url, $matches)) {
+                $video_id = $matches[1];
+                // Generate thumbnail if not provided
+                if (empty($thumbnail_url)) {
+                    $thumbnail_url = 'https://img.youtube.com/vi/' . $video_id . '/mqdefault.jpg';
+                }
+                // Store just the video ID for YouTube
+                $media_url = $video_id;
+            }
+            // If it's already just an 11-char video ID, keep it as is
+            elseif (preg_match('/^[a-zA-Z0-9_-]{11}$/', $media_url)) {
+                // Valid YouTube ID, keep as is
+                if (empty($thumbnail_url)) {
+                    $thumbnail_url = 'https://img.youtube.com/vi/' . $media_url . '/mqdefault.jpg';
+                }
+            }
+        }
+        
+        $wpdb->insert(
+            $custom_media_table,
+            array(
+                'yacht_id' => $yacht_id,
+                'media_type' => $media_type,
+                'media_url' => $media_url,
+                'thumbnail_url' => $thumbnail_url,
+                'title' => $title ?: null,
+                'sort_order' => $sort_order
+            ),
+            array('%s', '%s', '%s', '%s', '%s', '%d')
+        );
+        
+        $new_id = $wpdb->insert_id;
+        
+        wp_send_json_success(array(
+            'message' => 'Media added',
+            'id' => $new_id,
+            'media_type' => $media_type,
+            'media_url' => $media_url,
+            'thumbnail_url' => $thumbnail_url,
+            'sort_order' => $sort_order
+        ));
+    }
+    
+    /**
+     * AJAX: Delete custom media
+     * @since 65.15
+     */
+    public function ajax_delete_custom_media() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $media_id = isset($_POST['media_id']) ? intval($_POST['media_id']) : 0;
+        
+        if (empty($media_id)) {
+            wp_send_json_error('Invalid media ID');
+        }
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        $deleted = $wpdb->delete(
+            $custom_media_table,
+            array('id' => $media_id),
+            array('%d')
+        );
+        
+        if ($deleted) {
+            wp_send_json_success('Media deleted');
+        } else {
+            wp_send_json_error('Failed to delete media');
+        }
+    }
+    
+    /**
+     * AJAX: Save media order
+     * @since 65.15
+     */
+    public function ajax_save_media_order() {
+        check_ajax_referer('yolo_yacht_customization_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $yacht_id = isset($_POST['yacht_id']) ? sanitize_text_field($_POST['yacht_id']) : '';
+        $order_json = isset($_POST['order']) ? wp_unslash($_POST['order']) : '';
+        
+        if (empty($yacht_id) || empty($order_json)) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        // v87.5: Parse JSON order data - JS sends [{id: X, sort_order: Y}, ...]
+        $order = json_decode($order_json, true);
+        
+        if (!is_array($order)) {
+            wp_send_json_error('Invalid order format');
+        }
+        
+        global $wpdb;
+        $custom_media_table = $wpdb->prefix . 'yolo_yacht_custom_media';
+        
+        // Update sort order for each media item
+        foreach ($order as $item) {
+            $media_id = isset($item['id']) ? intval($item['id']) : 0;
+            $sort_order = isset($item['sort_order']) ? intval($item['sort_order']) : 0;
+            
+            if ($media_id > 0) {
+                $wpdb->update(
+                    $custom_media_table,
+                    array('sort_order' => $sort_order),
+                    array('id' => $media_id, 'yacht_id' => $yacht_id),
+                    array('%d'),
+                    array('%d', '%s')
+                );
+            }
+        }
+        
+        wp_send_json_success('Order saved');
+    }
+    
+    /**
+     * AJAX: Delete booking
+     * @since 70.3
+     */
+    public function ajax_delete_booking() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $booking_id = isset($_POST['booking_id']) ? intval($_POST['booking_id']) : 0;
+        
+        if (!$booking_id) {
+            wp_send_json_error('Invalid booking ID');
+        }
+        
+        global $wpdb;
+        $table_bookings = $wpdb->prefix . 'yolo_bookings';
+        
+        // Get booking details before deletion for logging
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$table_bookings} WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking) {
+            wp_send_json_error('Booking not found');
+        }
+        
+        // Delete the booking
+        $deleted = $wpdb->delete(
+            $table_bookings,
+            array('id' => $booking_id),
+            array('%d')
+        );
+        
+        if ($deleted) {
+            // Log the deletion
+            error_log('YOLO YS: Booking #' . $booking_id . ' deleted by user ' . get_current_user_id() . ' - Customer: ' . $booking->customer_name);
+            wp_send_json_success('Booking deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete booking');
+        }
+    }
+    
+    // ==========================================
+    // v81.0: PROGRESSIVE SYNC AJAX HANDLERS
+    // ==========================================
+    
+    /**
+     * AJAX: Initialize yacht sync (get yacht list, create queue)
+     */
+    public function ajax_progressive_init_yacht_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->init_yacht_sync();
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX: Sync next yacht in queue
+     */
+    public function ajax_progressive_sync_next_yacht() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->sync_next_yacht();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Sync next image batch (Phase 2 of two-phase sync)
+     * v81.1: Downloads images for one yacht at a time
+     */
+    public function ajax_progressive_sync_next_image_batch() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        try {
+            $sync = new YOLO_YS_Progressive_Sync();
+            $result = $sync->sync_next_image_batch();
+            wp_send_json_success($result);
+        } catch (Exception $e) {
+            error_log('YOLO Image Batch Sync Error: ' . $e->getMessage());
+            wp_send_json_error(array(
+                'message' => 'Error: ' . $e->getMessage(),
+                'retry' => true
+            ));
+        } catch (Error $e) {
+            error_log('YOLO Image Batch Sync Fatal: ' . $e->getMessage());
+            wp_send_json_error(array(
+                'message' => 'Fatal: ' . $e->getMessage(),
+                'retry' => false
+            ));
+        }
+    }
+    
+    /**
+     * AJAX: Initialize price sync
+     */
+    public function ajax_progressive_init_price_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $year = isset($_POST['year']) ? intval($_POST['year']) : (date('Y') + 1);
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->init_price_sync($year);
+        
+        if ($result['success']) {
+            wp_send_json_success($result);
+        } else {
+            wp_send_json_error($result);
+        }
+    }
+    
+    /**
+     * AJAX: Sync next price in queue
+     */
+    public function ajax_progressive_sync_next_price() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->sync_next_price();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Cancel current sync
+     */
+    public function ajax_progressive_cancel_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $result = $sync->cancel_sync();
+        
+        wp_send_json_success($result);
+    }
+    
+    /**
+     * AJAX: Get current sync state
+     */
+    public function ajax_progressive_get_state() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $sync = new YOLO_YS_Progressive_Sync();
+        $state = $sync->get_state();
+        
+        wp_send_json_success(array('state' => $state));
+    }
+    
+    /**
+     * AJAX: Look up company names from IDs
+     * v81.4: Shows company names below the Friend Companies IDs field
+     */
+    public function ajax_lookup_company_names() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        $company_ids = isset($_POST['company_ids']) ? sanitize_text_field($_POST['company_ids']) : '';
+        
+        if (empty($company_ids)) {
+            wp_send_json_success(array('companies' => array()));
+            return;
+        }
+        
+        // Parse comma-separated IDs
+        $ids = array_map('trim', explode(',', $company_ids));
+        $ids = array_filter($ids, function($id) {
+            return is_numeric($id) && $id > 0;
+        });
+        
+        if (empty($ids)) {
+            wp_send_json_success(array('companies' => array()));
+            return;
+        }
+        
+        $api = new YOLO_YS_Booking_Manager_API();
+        $companies = array();
+        
+        foreach ($ids as $company_id) {
+            try {
+                $result = $api->get_company($company_id);
+                if ($result['success'] && isset($result['data'])) {
+                    $data = $result['data'];
+                    $companies[] = array(
+                        'id' => $company_id,
+                        'name' => isset($data['name']) ? $data['name'] : 'Unknown',
+                        'status' => 'found'
+                    );
+                } else {
+                    $companies[] = array(
+                        'id' => $company_id,
+                        'name' => 'Not found',
+                        'status' => 'error'
+                    );
+                }
+            } catch (Exception $e) {
+                $companies[] = array(
+                    'id' => $company_id,
+                    'name' => 'Error: ' . $e->getMessage(),
+                    'status' => 'error'
+                );
+            }
+        }
+        
+        wp_send_json_success(array('companies' => $companies));
+    }
+}

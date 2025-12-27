@@ -1,0 +1,955 @@
+/**
+ * CRM Admin Styles
+ *
+ * @package YOLO_Yacht_Search
+ * @since 71.0
+ */
+
+/* General Layout */
+.yolo-crm-wrap {
+    max-width: 1600px;
+}
+
+.yolo-crm-wrap h1 {
+    display: flex;
+    align-items: center;
+}
+
+/* Filters */
+.crm-filters {
+    background: #fff;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.crm-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.crm-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+    align-items: flex-end;
+}
+
+.crm-filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.crm-filter-item label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #50575e;
+}
+
+.crm-filter-item input[type="text"],
+.crm-filter-item select {
+    min-width: 180px;
+    height: 36px;
+}
+
+.crm-filter-buttons {
+    display: flex;
+    gap: 8px;
+    flex-direction: row;
+}
+
+/* Pipeline Summary */
+.crm-pipeline-summary {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.crm-pipeline-stage {
+    background: #fff;
+    padding: 15px 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    border-top-width: 4px;
+    text-align: center;
+    min-width: 100px;
+    flex: 1;
+}
+
+.crm-pipeline-stage .stage-count {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.crm-pipeline-stage .stage-label {
+    display: block;
+    font-size: 12px;
+    color: #50575e;
+    margin-top: 5px;
+}
+
+/* Customer Table */
+.crm-table-container {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.crm-customers-table {
+    margin: 0;
+    border: none;
+}
+
+.crm-customers-table th {
+    background: #f6f7f7;
+    padding: 12px 15px;
+}
+
+.crm-customers-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+}
+
+.crm-customers-table .column-name {
+    width: 20%;
+}
+
+.crm-customers-table .column-contact {
+    width: 20%;
+}
+
+.crm-customers-table .column-source,
+.crm-customers-table .column-status,
+.crm-customers-table .column-assigned {
+    width: 12%;
+}
+
+.crm-customers-table .column-value {
+    width: 8%;
+    text-align: right;
+}
+
+.crm-customers-table .column-activity {
+    width: 12%;
+}
+
+.crm-customers-table .column-actions {
+    width: 10%;
+}
+
+.crm-customer-name {
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.crm-customer-email {
+    font-size: 12px;
+    color: #50575e;
+}
+
+/* Status Badge */
+.crm-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+/* Source Badge */
+.crm-source-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+/* Pagination */
+.crm-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+}
+
+.crm-pagination-info {
+    color: #50575e;
+}
+
+.crm-pagination-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Detail View Grid */
+.crm-detail-grid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .crm-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards */
+.crm-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.crm-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccd0d4;
+    background: #f6f7f7;
+}
+
+.crm-card-header h2,
+.crm-card-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.crm-card-body {
+    padding: 20px;
+}
+
+/* Customer Info */
+.crm-customer-card .crm-card-header {
+    background: #1e3a8a;
+    color: #fff;
+    border-bottom: none;
+}
+
+.crm-customer-card .crm-card-header h2 {
+    font-size: 18px;
+}
+
+.crm-customer-card .crm-status-badge {
+    font-size: 10px;
+}
+
+.crm-customer-info {
+    margin-bottom: 20px;
+}
+
+.crm-info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.crm-info-row:last-child {
+    border-bottom: none;
+}
+
+.crm-info-row .dashicons {
+    color: #50575e;
+    font-size: 18px;
+}
+
+.crm-info-row a {
+    text-decoration: none;
+}
+
+/* Tags */
+.crm-tags-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.crm-tags-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: #50575e;
+    text-transform: uppercase;
+}
+
+.crm-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.crm-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.crm-tag-remove {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.crm-tag-remove:hover {
+    color: #fff;
+}
+
+.crm-add-tag select {
+    width: 100%;
+}
+
+/* Stats */
+.crm-stats-section {
+    display: flex;
+    gap: 20px;
+}
+
+.crm-stat {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    background: #f6f7f7;
+    border-radius: 4px;
+}
+
+.crm-stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.crm-stat-label {
+    display: block;
+    font-size: 11px;
+    color: #50575e;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+/* Form Groups */
+.crm-form-group {
+    margin-bottom: 15px;
+}
+
+.crm-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.crm-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.crm-form-group input[type="text"],
+.crm-form-group input[type="email"],
+.crm-form-group input[type="number"],
+.crm-form-group input[type="date"],
+.crm-form-group input[type="time"],
+.crm-form-group select,
+.crm-form-group textarea {
+    width: 100%;
+}
+
+.crm-form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.crm-form-row .crm-form-group {
+    flex: 1;
+}
+
+/* Reminders */
+.crm-reminders-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.crm-reminder-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f1;
+    position: relative;
+}
+
+.crm-reminder-item:last-child {
+    border-bottom: none;
+}
+
+.crm-reminder-item.completed {
+    opacity: 0.6;
+}
+
+.crm-reminder-item.completed .crm-reminder-text {
+    text-decoration: line-through;
+}
+
+.crm-reminder-item.overdue {
+    background: #fcf0f1;
+}
+
+.crm-reminder-checkbox {
+    padding-top: 2px;
+}
+
+.crm-reminder-content {
+    flex: 1;
+}
+
+.crm-reminder-text {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.crm-reminder-meta {
+    font-size: 11px;
+    color: #50575e;
+}
+
+.crm-reminder-due {
+    margin-right: 10px;
+}
+
+.crm-reminder-delete {
+    background: none;
+    border: none;
+    color: #a7aaad;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    line-height: 1;
+}
+
+.crm-reminder-delete:hover {
+    color: #dc3232;
+}
+
+/* Bookings List */
+.crm-bookings-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.crm-booking-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.crm-booking-item:last-child {
+    border-bottom: none;
+}
+
+.crm-booking-info {
+    flex: 1;
+}
+
+.crm-booking-info strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.crm-booking-dates,
+.crm-booking-ref {
+    font-size: 12px;
+    color: #50575e;
+}
+
+.crm-booking-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.crm-booking-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* Quick Actions */
+.crm-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.crm-quick-actions .button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Timeline */
+.crm-timeline-card {
+    min-height: 500px;
+}
+
+.crm-timeline {
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.crm-timeline-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.crm-timeline-item:last-child {
+    border-bottom: none;
+}
+
+.crm-timeline-icon {
+    width: 36px;
+    height: 36px;
+    background: #f0f0f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.crm-timeline-icon .dashicons {
+    font-size: 18px;
+    color: #50575e;
+}
+
+.crm-timeline-item[data-type="quote_request"] .crm-timeline-icon {
+    background: #e3f2fd;
+}
+.crm-timeline-item[data-type="quote_request"] .crm-timeline-icon .dashicons {
+    color: #1976d2;
+}
+
+.crm-timeline-item[data-type="contact_message"] .crm-timeline-icon {
+    background: #f3e5f5;
+}
+.crm-timeline-item[data-type="contact_message"] .crm-timeline-icon .dashicons {
+    color: #7b1fa2;
+}
+
+.crm-timeline-item[data-type="booking"] .crm-timeline-icon {
+    background: #e8f5e9;
+}
+.crm-timeline-item[data-type="booking"] .crm-timeline-icon .dashicons {
+    color: #388e3c;
+}
+
+.crm-timeline-item[data-type="phone_call_in"] .crm-timeline-icon,
+.crm-timeline-item[data-type="phone_call_out"] .crm-timeline-icon {
+    background: #fff3e0;
+}
+.crm-timeline-item[data-type="phone_call_in"] .crm-timeline-icon .dashicons,
+.crm-timeline-item[data-type="phone_call_out"] .crm-timeline-icon .dashicons {
+    color: #f57c00;
+}
+
+.crm-timeline-item[data-type="offer_sent"] .crm-timeline-icon {
+    background: #fce4ec;
+}
+.crm-timeline-item[data-type="offer_sent"] .crm-timeline-icon .dashicons {
+    color: #c2185b;
+}
+
+.crm-timeline-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.crm-timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.crm-timeline-type {
+    font-size: 11px;
+    font-weight: 600;
+    color: #50575e;
+    text-transform: uppercase;
+}
+
+.crm-timeline-date {
+    font-size: 11px;
+    color: #a7aaad;
+}
+
+.crm-timeline-subject {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.crm-timeline-body {
+    font-size: 13px;
+    color: #50575e;
+    background: #f6f7f7;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.crm-timeline-meta {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.crm-timeline-meta .crm-meta-item {
+    display: inline-block;
+    margin-right: 15px;
+    color: #50575e;
+}
+
+.crm-timeline-author {
+    font-size: 11px;
+    color: #a7aaad;
+    margin-top: 8px;
+}
+
+/* No Items */
+.crm-no-items {
+    text-align: center;
+    color: #a7aaad;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Modal */
+.crm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.crm-modal-content {
+    background: #fff;
+    border-radius: 4px;
+    width: 500px;
+    max-width: 90%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.crm-modal-large {
+    width: 700px;
+}
+
+.crm-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.crm-modal-header h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.crm-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #50575e;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.crm-modal-close:hover {
+    color: #1d2327;
+}
+
+.crm-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.crm-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid #ccd0d4;
+    background: #f6f7f7;
+}
+
+/* Loading */
+.crm-loading-row td {
+    text-align: center;
+    padding: 40px !important;
+}
+
+/* Row Actions */
+.crm-row-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.crm-row-actions .button {
+    padding: 0 8px;
+    height: 28px;
+    line-height: 26px;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .crm-filter-row {
+        flex-direction: column;
+    }
+    
+    .crm-filter-item {
+        width: 100%;
+    }
+    
+    .crm-filter-item input[type="text"],
+    .crm-filter-item select {
+        width: 100%;
+    }
+    
+    .crm-pipeline-summary {
+        flex-direction: column;
+    }
+    
+    .crm-pipeline-stage {
+        min-width: auto;
+    }
+    
+    .crm-form-row {
+        flex-direction: column;
+    }
+}
+
+/* Reminder snooze dropdown */
+.crm-reminder-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.crm-reminder-snooze {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+    cursor: pointer;
+}
+
+.crm-reminder-snooze:hover {
+    border-color: #2271b1;
+}
+
+/* Quick status dropdown in list */
+.crm-quick-status {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 20px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+}
+
+.crm-quick-status option {
+    background: white;
+    color: #333;
+}
+
+/* Duplicate warning */
+.crm-duplicate-warning {
+    background: #fcf0f1;
+    border: 1px solid #dc3232;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.crm-duplicate-warning-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #dc3232;
+}
+
+.crm-duplicate-warning-header .dashicons {
+    font-size: 20px;
+}
+
+.crm-duplicate-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Merge results */
+.crm-merge-result-item:hover {
+    background: #f0f0f1;
+}
+
+/* Booking Calendar Widget */
+.crm-calendar-widget {
+    background: white;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.crm-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.crm-calendar-header h3 {
+    margin: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.crm-calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.crm-calendar-nav #crm-calendar-month {
+    font-weight: 600;
+    min-width: 120px;
+    text-align: center;
+}
+
+.crm-calendar-body {
+    padding: 15px 20px;
+}
+
+.crm-calendar-bookings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.crm-calendar-booking-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.crm-booking-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.crm-booking-day {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1e3a8a;
+    line-height: 1;
+}
+
+.crm-booking-month {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.crm-booking-info {
+    flex: 1;
+}
+
+.crm-booking-info strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.crm-booking-guest {
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.crm-booking-dates {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.crm-booking-status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.crm-booking-status.confirmed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.crm-booking-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
