@@ -42,6 +42,9 @@ class YOLO_YS_Admin {
         // v91.20: Sync companies from API
         add_action('wp_ajax_yolo_sync_companies', array($this, 'ajax_sync_companies'));
         
+        // v91.21: Force cancel stuck sync
+        add_action('wp_ajax_yolo_force_cancel_sync', array($this, 'ajax_force_cancel_sync'));
+        
         // v86.7: Facebook Catalog manual update
         add_action('wp_ajax_yolo_ys_update_catalog_prices', array($this, 'ajax_update_catalog_prices'));
         
@@ -1320,8 +1323,11 @@ class YOLO_YS_Admin {
             wp_send_json_error(array('message' => 'Unauthorized'));
         }
         
+        // v91.22: Get selected companies from request (manual sync only)
+        $selected_companies = isset($_POST['selected_companies']) ? array_map('sanitize_text_field', $_POST['selected_companies']) : null;
+        
         $sync = new YOLO_YS_Progressive_Sync();
-        $result = $sync->init_yacht_sync();
+        $result = $sync->init_yacht_sync($selected_companies);
         
         if ($result['success']) {
             wp_send_json_success($result);
@@ -1544,5 +1550,28 @@ class YOLO_YS_Admin {
         } catch (Exception $e) {
             wp_send_json_error(array('message' => 'Error: ' . $e->getMessage()));
         }
+    }
+    
+    /**
+     * v91.21: AJAX handler to force cancel a stuck sync
+     * Clears all sync state options to allow a fresh sync
+     */
+    public function ajax_force_cancel_sync() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        // Delete all progressive sync related options
+        delete_option('yolo_ys_progressive_sync_state');
+        delete_option('yolo_ys_sync_in_progress');
+        
+        // Also clear any transients that might be set
+        delete_transient('yolo_ys_sync_lock');
+        
+        wp_send_json_success(array(
+            'message' => 'Sync state cleared successfully. You can now start a new sync.'
+        ));
     }
 }

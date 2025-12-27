@@ -108,7 +108,13 @@ class YOLO_YS_Progressive_Sync {
      * 
      * @return array Initial state with yacht queue
      */
-    public function init_yacht_sync() {
+    /**
+     * Initialize yacht sync
+     * 
+     * @param array|null $selected_companies Optional array of company IDs to sync (null = sync all)
+     * @return array
+     */
+    public function init_yacht_sync($selected_companies = null) {
         // v86.6: Race condition protection - check if sync already running
         $existing_state = get_option(self::STATE_OPTION, null);
         if ($existing_state && isset($existing_state['status']) && $existing_state['status'] === 'running') {
@@ -118,7 +124,14 @@ class YOLO_YS_Progressive_Sync {
             );
         }
         
-        $companies = $this->get_all_company_ids();
+        // v91.22: Use selected companies if provided, otherwise get all
+        if ($selected_companies !== null && is_array($selected_companies) && !empty($selected_companies)) {
+            $companies = $selected_companies;
+            error_log("YOLO Progressive Sync v91.22: Manual sync with " . count($companies) . " selected companies: " . implode(', ', $companies));
+        } else {
+            $companies = $this->get_all_company_ids();
+            error_log("YOLO Progressive Sync v91.22: Auto sync with all " . count($companies) . " companies");
+        }
         $yacht_queue = array();
         $company_stats = array();
         
@@ -639,13 +652,13 @@ class YOLO_YS_Progressive_Sync {
      * Cancel running sync
      */
     public function cancel_sync() {
-        $state = get_option(self::STATE_OPTION, null);
+        // v91.21: Delete the option entirely instead of just updating status
+        // This prevents "sync already in progress" errors after cancellation
+        delete_option(self::STATE_OPTION);
         
-        if ($state) {
-            $state['status'] = 'cancelled';
-            $state['completed_at'] = current_time('mysql');
-            update_option(self::STATE_OPTION, $state, false);
-        }
+        // Also clear any other sync-related options
+        delete_option('yolo_ys_sync_in_progress');
+        delete_transient('yolo_ys_sync_lock');
         
         // Clear scheduled cron events
         wp_clear_scheduled_hook('yolo_progressive_sync_yacht');
@@ -654,7 +667,7 @@ class YOLO_YS_Progressive_Sync {
         
         return array(
             'success' => true,
-            'message' => 'Sync cancelled'
+            'message' => 'Sync cancelled and state cleared'
         );
     }
     

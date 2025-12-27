@@ -2,7 +2,26 @@
 /**
  * Admin Settings Page
  * v81.0 - Progressive sync with live dashboard
+ * v91.21 - Auto-cleanup for stale sync states
  */
+
+// v91.21: Auto-cleanup stale sync states (older than 30 minutes)
+$sync_state = get_option('yolo_ys_progressive_sync_state', array());
+if (!empty($sync_state) && isset($sync_state['status']) && $sync_state['status'] === 'running') {
+    $started_at = isset($sync_state['started_at']) ? strtotime($sync_state['started_at']) : 0;
+    $stale_threshold = 30 * 60; // 30 minutes
+    
+    if ($started_at > 0 && (time() - $started_at) > $stale_threshold) {
+        // Sync is stale, auto-clear it
+        delete_option('yolo_ys_progressive_sync_state');
+        $sync_state = array(); // Clear local variable too
+    }
+}
+
+// Check if there's a stuck sync (for showing Force Cancel button)
+$has_stuck_sync = !empty($sync_state) && isset($sync_state['status']) && $sync_state['status'] === 'running';
+$stuck_sync_type = $has_stuck_sync ? (isset($sync_state['type']) ? $sync_state['type'] : 'unknown') : '';
+$stuck_sync_started = $has_stuck_sync && isset($sync_state['started_at']) ? $sync_state['started_at'] : '';
 
 // Get sync status
 $sync = new YOLO_YS_Sync();
@@ -90,11 +109,56 @@ $sync_status = $sync->get_sync_status();
             </div>
         </div>
         
+        <!-- v91.22: Company Selection for Manual Sync -->
+        <div id="yolo-company-selection" style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e5e7eb;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 style="margin: 0; color: #374151;">Select Companies to Sync</h4>
+                <button type="button" id="yolo-toggle-all-companies" class="button button-secondary" style="font-size: 12px;">
+                    Deselect All
+                </button>
+            </div>
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">Uncheck companies you do not want to sync. Auto-sync always syncs all companies.</div>
+            <div id="yolo-company-checkboxes" style="display: flex; flex-wrap: wrap; gap: 10px; max-height: 200px; overflow-y: auto;">
+                <?php
+                $yolo_company_id = get_option('yolo_ys_my_company_id', '7850');
+                $friend_ids_raw = get_option('yolo_ys_friend_companies', '');
+                $friend_ids = array_filter(array_map('trim', explode(',', $friend_ids_raw)));
+                $all_company_ids = array_merge(array($yolo_company_id), $friend_ids);
+                global $wpdb;
+                $companies_table = $wpdb->prefix . 'yolo_companies';
+                foreach ($all_company_ids as $company_id) {
+                    $company_name = $wpdb->get_var($wpdb->prepare("SELECT name FROM $companies_table WHERE id = %s", $company_id));
+                    if (!$company_name) $company_name = 'Company ' . $company_id;
+                    $is_yolo = ($company_id == $yolo_company_id);
+                    ?>
+                    <label style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: <?php echo $is_yolo ? '#fee2e2' : '#dbeafe'; ?>; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" class="yolo-company-checkbox" value="<?php echo esc_attr($company_id); ?>" checked>
+                        <span><?php echo esc_html($company_name); ?></span>
+                        <span style="color: #9ca3af; font-size: 11px;">(#<?php echo esc_html($company_id); ?>)</span>
+                    </label>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+        
         <!-- Sync Button -->
         <button type="button" id="yolo-progressive-yacht-sync-button" class="button button-primary button-hero" style="background: #dc2626; border-color: #dc2626; text-shadow: none; box-shadow: none;">
             <span class="dashicons dashicons-update" style="margin-top: 8px;"></span>
             Sync Yachts Now
         </button>
+        
+        <?php if ($has_stuck_sync): ?>
+        <!-- v91.21: Force Cancel Button for stuck syncs -->
+        <button type="button" id="yolo-force-cancel-sync-button" class="button button-secondary button-hero" style="margin-left: 10px; background: #f59e0b; border-color: #f59e0b; color: white; text-shadow: none; box-shadow: none;">
+            <span class="dashicons dashicons-dismiss" style="margin-top: 8px;"></span>
+            Force Cancel Stuck Sync
+        </button>
+        <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+            <strong>⚠️ Stuck sync detected:</strong> A <?php echo esc_html($stuck_sync_type); ?> sync started at <?php echo esc_html($stuck_sync_started); ?> appears to be stuck.
+            Click "Force Cancel" to clear it and try again.
+        </div>
+        <?php endif; ?>
         
         <!-- Progressive Sync Dashboard (hidden initially) -->
         <div id="yolo-yacht-sync-dashboard" style="display: none; margin-top: 20px; border: 2px solid #dc2626; border-radius: 12px; overflow: hidden;">
@@ -521,6 +585,54 @@ jQuery(document).ready(function($) {
     });
     
     // ==========================================
+    // v91.22: COMPANY SELECTION TOGGLE
+    // ==========================================
+    var allSelected = true;
+    $('#yolo-toggle-all-companies').on('click', function() {
+        allSelected = !allSelected;
+        $('.yolo-company-checkbox').prop('checked', allSelected);
+        $(this).text(allSelected ? 'Deselect All' : 'Select All');
+    });
+    
+    // ==========================================
+    // v91.21: FORCE CANCEL STUCK SYNC
+    // ==========================================
+    $('#yolo-force-cancel-sync-button').on('click', function() {
+        var $button = $(this);
+        
+        if (!confirm('Are you sure you want to force cancel the stuck sync? This will clear the sync state and allow you to start a new sync.')) {
+            return;
+        }
+        
+        $button.prop('disabled', true);
+        $button.find('.dashicons').addClass('dashicons-update-spin');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_force_cancel_sync',
+                nonce: yoloYsAdmin.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Sync state cleared successfully. The page will now reload.');
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.data.message);
+                    $button.prop('disabled', false);
+                    $button.find('.dashicons').removeClass('dashicons-update-spin');
+                }
+            },
+            error: function() {
+                alert('Failed to clear sync state. Please try again.');
+                $button.prop('disabled', false);
+                $button.find('.dashicons').removeClass('dashicons-update-spin');
+            }
+        });
+    });
+    
+    // ==========================================
     // v91.20: COMPANY SYNC
     // ==========================================
     $('#yolo-sync-companies-button').on('click', function() {
@@ -583,8 +695,19 @@ jQuery(document).ready(function($) {
         var $dashboard = $('#yolo-yacht-sync-dashboard');
         var $message = $('#yolo-ys-sync-message');
         
+        // v91.22: Collect selected company IDs
+        var selectedCompanies = [];
+        $('.yolo-company-checkbox:checked').each(function() {
+            selectedCompanies.push($(this).val());
+        });
+        
+        if (selectedCompanies.length === 0) {
+            alert('Please select at least one company to sync.');
+            return;
+        }
+        
         $button.prop('disabled', true);
-        $message.html('<div class="notice notice-info"><p>⏳ Initializing yacht sync...</p></div>');
+        $message.html('<div class="notice notice-info"><p>⏳ Initializing yacht sync for ' + selectedCompanies.length + ' companies...</p></div>');
         
         // Initialize sync
         $.ajax({
@@ -592,7 +715,8 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_progressive_init_yacht_sync',
-                nonce: yoloYsAdmin.nonce
+                nonce: yoloYsAdmin.nonce,
+                selected_companies: selectedCompanies
             },
             success: function(response) {
                 if (response.success) {
