@@ -3,7 +3,7 @@
 
 # YOLO Yacht Search & Booking Plugin
 
-**Version:** 86.0
+**Version:** 91.26
 **WordPress Version:** 5.8 or higher
 **PHP Version:** 7.4 or higher
 **License:** Proprietary
@@ -14,6 +14,28 @@
 The YOLO Yacht Search & Booking Plugin is a complete system for yacht charter businesses, providing a seamless experience for both customers and administrators. It integrates with the Booking Manager API for real-time yacht availability and pricing, and with Stripe for secure online payments. The plugin is designed to be highly customizable, allowing you to tailor it to your specific needs.
 
 ## 🚀 Latest Updates
+
+### v91.26 - Sync Bases Feature & Map Fix (December 27, 2025)
+
+**New Feature**
+
+1. **Sync Bases Feature for Accurate Map Markers**
+   - New "Sync Bases" button added to the Settings page.
+   - Fetches all 1,500+ marina/base coordinates from the Booking Manager API and stores them in a new database table.
+   - Map display on yacht detail pages now uses these accurate coordinates.
+
+**Critical Fix**
+
+2. **Map Marker Logic Improved**
+   - Corrected the coordinates for "Preveza Main Port" using the accurate API data (no more marker on land).
+   - Implemented smart fallback: Shows marker for known bases, and a general Ionian view **without a misleading marker pin** for unknown bases.
+
+**Files Modified:** 6 files
+**Backward Compatible:** Yes
+**Breaking Changes:** None
+**Production Ready:** ✅
+
+---
 
 ### v85.0 - Search Filter & UX Improvements (December 25, 2025)
 

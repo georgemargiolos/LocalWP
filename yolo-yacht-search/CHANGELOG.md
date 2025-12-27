@@ -1,5 +1,25 @@
 # Changelog
 
+## [91.26] - 2025-12-27
+
+### Added
+- **Sync Bases Feature for Accurate Map Markers**
+  - New "Sync Bases" button added to the Settings page (green, between Companies and Yachts sync).
+  - Fetches all 1,500+ marina/base coordinates from the Booking Manager API.
+  - Stores coordinates (latitude/longitude) in a new `wp_yolo_bases` database table.
+  - Map display on yacht detail pages now uses these accurate coordinates.
+
+### Changed
+- **Map Marker Logic Improved**
+  - Map now prioritizes coordinates from the new `wp_yolo_bases` table (by `home_base_id` then by name).
+  - Fallback logic: If no coordinates are found in the database, it falls back to the hardcoded list, and finally to a general Ionian view **without a misleading marker pin**.
+  - Corrected the coordinates for "Preveza Main Port" using the accurate API data (no more marker on land).
+
+### Removed
+- Removed the old hardcoded `yolo_ys_get_marina_coordinates` function and its data, as it is now superseded by the database sync.
+
+---
+
 ## [86.1] - 2025-12-25
 
 ### Added
