@@ -90,6 +90,7 @@ class YOLO_YS_Booking_Manager_API {
     /**
      * Get all bases from API
      * v81.11: Used to get Greek Ionian base IDs for filtering
+     * v91.26: Also used for syncing base coordinates to database
      * 
      * @return array Array of base objects
      * @throws Exception if API call fails
@@ -107,6 +108,16 @@ class YOLO_YS_Booking_Manager_API {
         }
         
         throw new Exception(isset($result['error']) ? $result['error'] : 'Failed to fetch bases');
+    }
+    
+    /**
+     * v91.26: Alias for get_bases() - used by sync_bases AJAX handler
+     * 
+     * @return array Array of base objects
+     * @throws Exception if API call fails
+     */
+    public function get_all_bases() {
+        return $this->get_bases();
     }
     
     /**

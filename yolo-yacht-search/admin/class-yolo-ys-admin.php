@@ -42,6 +42,9 @@ class YOLO_YS_Admin {
         // v91.20: Sync companies from API
         add_action('wp_ajax_yolo_sync_companies', array($this, 'ajax_sync_companies'));
         
+        // v91.26: Sync bases from API
+        add_action('wp_ajax_yolo_sync_bases', array($this, 'ajax_sync_bases'));
+        
         // v91.21: Force cancel stuck sync
         add_action('wp_ajax_yolo_force_cancel_sync', array($this, 'ajax_force_cancel_sync'));
         
@@ -1540,6 +1543,45 @@ class YOLO_YS_Admin {
                 update_option('yolo_ys_last_company_sync', current_time('mysql'));
                 wp_send_json_success(array(
                     'message' => sprintf('Successfully synced %d companies', $result['synced']),
+                    'synced' => $result['synced'],
+                    'errors' => $result['errors'],
+                    'total' => $result['total']
+                ));
+            } else {
+                wp_send_json_error(array('message' => $result['message']));
+            }
+        } catch (Exception $e) {
+            wp_send_json_error(array('message' => 'Error: ' . $e->getMessage()));
+        }
+    }
+    
+    /**
+     * v91.26: AJAX handler to sync bases (marinas) from API
+     * Fetches all bases from Booking Manager API and stores coordinates in database
+     */
+    public function ajax_sync_bases() {
+        check_ajax_referer('yolo_ys_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+        
+        try {
+            $api = new YOLO_YS_Booking_Manager_API();
+            $bases = $api->get_all_bases();
+            
+            if (empty($bases)) {
+                wp_send_json_error(array('message' => 'No bases returned from API'));
+                return;
+            }
+            
+            $db = new YOLO_YS_Database();
+            $result = $db->sync_bases($bases);
+            
+            if ($result['success']) {
+                update_option('yolo_ys_last_base_sync', current_time('mysql'));
+                wp_send_json_success(array(
+                    'message' => sprintf('Successfully synced %d bases', $result['synced']),
                     'synced' => $result['synced'],
                     'errors' => $result['errors'],
                     'total' => $result['total']

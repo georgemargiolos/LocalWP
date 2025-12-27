@@ -15,8 +15,10 @@ class YOLO_YS_Database {
     private $table_equipment;
     private $table_equipment_catalog;
     private $table_companies;
+    private $table_bases;
     private $equipment_cache = null; // Cache for equipment catalog
     private $companies_cache = null; // v91.20: Cache for company names
+    private $bases_cache = null; // v91.26: Cache for base coordinates
     
     public function __construct() {
         global $wpdb;
@@ -27,6 +29,7 @@ class YOLO_YS_Database {
         $this->table_equipment = $wpdb->prefix . 'yolo_yacht_equipment';
         $this->table_equipment_catalog = $wpdb->prefix . 'yolo_equipment_catalog';
         $this->table_companies = $wpdb->prefix . 'yolo_companies';
+        $this->table_bases = $wpdb->prefix . 'yolo_bases';
     }
     
     /**
@@ -210,6 +213,26 @@ class YOLO_YS_Database {
         dbDelta($sql_equipment);
         dbDelta($sql_equipment_catalog);
         dbDelta($sql_companies);  // v91.20: Companies table
+        
+        // v91.26: Bases table (stores marina/base coordinates from API)
+        $table_bases = $wpdb->prefix . 'yolo_bases';
+        $sql_bases = "CREATE TABLE {$table_bases} (
+            id bigint(20) NOT NULL,
+            name varchar(255) NOT NULL,
+            city varchar(100) DEFAULT NULL,
+            country varchar(100) DEFAULT NULL,
+            address varchar(500) DEFAULT NULL,
+            latitude decimal(10,6) DEFAULT NULL,
+            longitude decimal(10,6) DEFAULT NULL,
+            country_id int(11) DEFAULT NULL,
+            sailing_areas text DEFAULT NULL,
+            last_synced datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY name (name),
+            KEY country (country)
+        ) $charset_collate;";
+        dbDelta($sql_bases);
+        
         dbDelta($sql_bookings);
         dbDelta($sql_license_uploads);
 
@@ -1425,5 +1448,200 @@ class YOLO_YS_Database {
         }
         
         return (int) $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_companies}");
+    }
+    
+    /**
+     * v91.26: Sync all bases from the Booking Manager API
+     * Stores marina/base coordinates for accurate map display
+     * 
+     * @param array $bases Array of base data from API
+     * @return array Result with counts
+     */
+    public function sync_bases($bases) {
+        global $wpdb;
+        
+        if (empty($bases)) {
+            return array('success' => false, 'message' => 'No bases to sync');
+        }
+        
+        $synced = 0;
+        $errors = 0;
+        
+        foreach ($bases as $base) {
+            $id = isset($base['id']) ? $base['id'] : 0;
+            $name = isset($base['name']) ? sanitize_text_field($base['name']) : '';
+            
+            if (empty($id) || empty($name)) {
+                $errors++;
+                continue;
+            }
+            
+            // Convert sailing areas array to JSON
+            $sailing_areas = isset($base['sailingAreas']) ? json_encode($base['sailingAreas']) : null;
+            
+            // Use REPLACE to insert or update
+            $result = $wpdb->replace(
+                $this->table_bases,
+                array(
+                    'id' => $id,
+                    'name' => $name,
+                    'city' => isset($base['city']) ? sanitize_text_field($base['city']) : null,
+                    'country' => isset($base['country']) ? sanitize_text_field($base['country']) : null,
+                    'address' => isset($base['address']) ? sanitize_text_field($base['address']) : null,
+                    'latitude' => isset($base['latitude']) ? floatval($base['latitude']) : null,
+                    'longitude' => isset($base['longitude']) ? floatval($base['longitude']) : null,
+                    'country_id' => isset($base['countryId']) ? intval($base['countryId']) : null,
+                    'sailing_areas' => $sailing_areas,
+                    'last_synced' => current_time('mysql')
+                ),
+                array('%s', '%s', '%s', '%s', '%s', '%f', '%f', '%d', '%s', '%s')
+            );
+            
+            if ($result !== false) {
+                $synced++;
+            } else {
+                $errors++;
+            }
+        }
+        
+        // Clear the cache
+        $this->bases_cache = null;
+        
+        return array(
+            'success' => true,
+            'synced' => $synced,
+            'errors' => $errors,
+            'total' => count($bases)
+        );
+    }
+    
+    /**
+     * v91.26: Get base coordinates by ID
+     * 
+     * @param int|string $base_id Base ID (home_base_id from yacht)
+     * @return array|null Array with lat/lng or null if not found
+     */
+    public function get_base_coordinates_by_id($base_id) {
+        global $wpdb;
+        
+        if (empty($base_id)) {
+            return null;
+        }
+        
+        // Check cache first
+        if ($this->bases_cache === null) {
+            $this->load_bases_cache();
+        }
+        
+        $base_id_str = strval($base_id);
+        if (isset($this->bases_cache[$base_id_str])) {
+            return $this->bases_cache[$base_id_str];
+        }
+        
+        // Fallback: query database directly
+        $base = $wpdb->get_row($wpdb->prepare(
+            "SELECT name, latitude, longitude FROM {$this->table_bases} WHERE id = %s",
+            $base_id
+        ));
+        
+        if ($base && $base->latitude && $base->longitude) {
+            return array(
+                'lat' => floatval($base->latitude),
+                'lng' => floatval($base->longitude),
+                'name' => $base->name
+            );
+        }
+        
+        return null;
+    }
+    
+    /**
+     * v91.26: Get base coordinates by name (fuzzy match)
+     * 
+     * @param string $base_name Base name (home_base from yacht)
+     * @return array|null Array with lat/lng or null if not found
+     */
+    public function get_base_coordinates_by_name($base_name) {
+        global $wpdb;
+        
+        if (empty($base_name)) {
+            return null;
+        }
+        
+        // Try exact match first
+        $base = $wpdb->get_row($wpdb->prepare(
+            "SELECT name, latitude, longitude FROM {$this->table_bases} WHERE name = %s",
+            $base_name
+        ));
+        
+        if ($base && $base->latitude && $base->longitude) {
+            return array(
+                'lat' => floatval($base->latitude),
+                'lng' => floatval($base->longitude),
+                'name' => $base->name
+            );
+        }
+        
+        // Try LIKE match
+        $base = $wpdb->get_row($wpdb->prepare(
+            "SELECT name, latitude, longitude FROM {$this->table_bases} WHERE name LIKE %s LIMIT 1",
+            '%' . $wpdb->esc_like($base_name) . '%'
+        ));
+        
+        if ($base && $base->latitude && $base->longitude) {
+            return array(
+                'lat' => floatval($base->latitude),
+                'lng' => floatval($base->longitude),
+                'name' => $base->name
+            );
+        }
+        
+        return null;
+    }
+    
+    /**
+     * v91.26: Load bases into cache
+     */
+    private function load_bases_cache() {
+        global $wpdb;
+        
+        $this->bases_cache = array();
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->table_bases}'");
+        if (!$table_exists) {
+            return;
+        }
+        
+        $bases = $wpdb->get_results(
+            "SELECT id, name, latitude, longitude FROM {$this->table_bases} WHERE latitude IS NOT NULL AND longitude IS NOT NULL",
+            ARRAY_A
+        );
+        
+        if ($bases) {
+            foreach ($bases as $base) {
+                $this->bases_cache[strval($base['id'])] = array(
+                    'lat' => floatval($base['latitude']),
+                    'lng' => floatval($base['longitude']),
+                    'name' => $base['name']
+                );
+            }
+        }
+    }
+    
+    /**
+     * v91.26: Get base count
+     * 
+     * @return int Number of bases in database
+     */
+    public function get_base_count() {
+        global $wpdb;
+        
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->table_bases}'");
+        if (!$table_exists) {
+            return 0;
+        }
+        
+        return (int) $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_bases}");
     }
 }

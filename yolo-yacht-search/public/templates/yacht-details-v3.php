@@ -510,14 +510,28 @@ $litepicker_url = YOLO_YS_PLUGIN_URL . 'assets/js/litepicker.js';
                     <?php 
                     $maps_key = get_option('yolo_ys_google_maps_api_key', '');
                     
-                    // v86.4: Get marina coordinates for reliable map centering
+                    // v91.26: Get marina coordinates from database (synced from API)
+                    // Priority: 1) home_base_id lookup, 2) home_base name lookup, 3) hardcoded fallback
                     $marina_coords = null;
-                    if (function_exists('yolo_ys_get_marina_coordinates')) {
+                    $db = new YOLO_YS_Database();
+                    
+                    // First try by home_base_id (most accurate)
+                    if (!empty($yacht->home_base_id)) {
+                        $marina_coords = $db->get_base_coordinates_by_id($yacht->home_base_id);
+                    }
+                    
+                    // If not found, try by name
+                    if (!$marina_coords && !empty($yacht->home_base)) {
+                        $marina_coords = $db->get_base_coordinates_by_name($yacht->home_base);
+                    }
+                    
+                    // Fallback to hardcoded function if database has no data
+                    if (!$marina_coords && function_exists('yolo_ys_get_marina_coordinates')) {
                         $marina_coords = yolo_ys_get_marina_coordinates($yacht->home_base);
                     }
                     
                     if (!empty($maps_key)): 
-                        // v91.25: Use place mode for known marinas (shows marker), view mode for unknown (no marker but correct area)
+                        // v91.26: Use place mode for known marinas (shows marker), view mode for unknown (no marker but correct area)
                         if ($marina_coords && isset($marina_coords['lat']) && isset($marina_coords['lng'])):
                             // Known marina - use place mode with coordinates to show marker pin
                             $map_url = sprintf(

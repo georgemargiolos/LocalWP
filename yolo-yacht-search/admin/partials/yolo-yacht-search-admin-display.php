@@ -85,6 +85,33 @@ $sync_status = $sync->get_sync_status();
         </p>
     </div>
     
+    <!-- v91.26: Base/Marina Coordinates Sync Section -->
+    <div class="yolo-ys-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #10b981; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #10b981;">📍 Marina Coordinates Sync</h2>
+        
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 16px; font-weight: 600; color: #374151;">Sync all marina/base coordinates from Booking Manager API</div>
+            <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">Bases in database: <strong id="yolo-base-count"><?php 
+                echo $db->get_base_count();
+            ?></strong> | Last sync: <strong><?php echo get_option('yolo_ys_last_base_sync', 'Never'); ?></strong></div>
+        </div>
+        
+        <button type="button" id="yolo-sync-bases-button" class="button button-primary button-hero" style="background: #10b981; border-color: #10b981; text-shadow: none; box-shadow: none;">
+            <span class="dashicons dashicons-location" style="margin-top: 8px;"></span>
+            Sync Bases
+        </button>
+        
+        <div id="yolo-base-sync-message" style="margin-top: 15px;"></div>
+        
+        <p style="margin-top: 15px; color: #6b7280; font-size: 13px;">
+            <strong>What happens when you sync bases:</strong><br>
+            • Fetches all 1,500+ marinas/bases from Booking Manager API<br>
+            • Stores GPS coordinates (latitude/longitude) for each base<br>
+            • Enables accurate map markers on yacht detail pages<br>
+            • <strong>Note:</strong> Run this once, then periodically to get new marinas
+        </p>
+    </div>
+    
     <!-- Yacht Sync Section - Progressive -->
     <div class="yolo-ys-sync-section" style="background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <h2 style="margin-top: 0; color: #dc2626;">🚤 Yacht Database Sync</h2>
@@ -649,6 +676,52 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: {
                 action: 'yolo_sync_companies',
+                nonce: yoloYsAdmin.nonce
+            },
+            timeout: 120000, // 2 minute timeout for large sync
+            success: function(response) {
+                if (response.success) {
+                    $message.html('<div class="notice notice-success"><p><strong>✅ Success!</strong> ' + response.data.message + '</p></div>');
+                    if (response.data.synced) {
+                        $count.text(response.data.synced);
+                    }
+                } else {
+                    $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> ' + response.data.message + '</p></div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                var errorMsg = 'Failed to sync. ';
+                if (status === 'timeout') {
+                    errorMsg += 'Request timed out. Please try again.';
+                } else {
+                    errorMsg += 'Please try again.';
+                }
+                $message.html('<div class="notice notice-error"><p><strong>❌ Error:</strong> ' + errorMsg + '</p></div>');
+            },
+            complete: function() {
+                $button.prop('disabled', false);
+                $button.find('.dashicons').removeClass('dashicons-update-spin');
+            }
+        });
+    });
+    
+    // ==========================================
+    // v91.26: BASE/MARINA SYNC
+    // ==========================================
+    $('#yolo-sync-bases-button').on('click', function() {
+        var $button = $(this);
+        var $message = $('#yolo-base-sync-message');
+        var $count = $('#yolo-base-count');
+        
+        $button.prop('disabled', true);
+        $button.find('.dashicons').addClass('dashicons-update-spin');
+        $message.html('<div class="notice notice-info"><p>⏳ Syncing marina coordinates from API... This may take a moment.</p></div>');
+        
+        $.ajax({
+            url: yoloYsAdmin.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'yolo_sync_bases',
                 nonce: yoloYsAdmin.nonce
             },
             timeout: 120000, // 2 minute timeout for large sync
